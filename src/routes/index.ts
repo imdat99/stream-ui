@@ -5,15 +5,78 @@ import {
   createWebHistory,
   type RouteRecordRaw,
 } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 type RouteData = RouteRecordRaw & {
-  meta?: ResolvableValue<ReactiveHead>;
+  meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean };
   children?: RouteData[];
 };
 const routes: RouteData[] = [
   {
     path: "/",
-    component: () => import("./home/Home.vue")
+    component: () => import("@/components/RootLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("./home/Home.vue"),
+        beforeEnter: (to, from, next) => {
+          const auth = useAuthStore();
+          if (auth.user) {
+            next({ name: "overview" });
+          } else {
+            next();
+          }
+        },
+      },
+      {
+        path: "",
+        component: () => import("./auth/layout.vue"),
+        children: [
+          {
+            path: "login",
+            name: "login",
+            component: () => import("./auth/login.vue"),
+          },
+          {
+            path: "signup",
+            name: "signup",
+            component: () => import("./auth/signup.vue"),
+          },
+          {
+            path: "forgot",
+            name: "forgot",
+            component: () => import("./auth/forgot.vue"),
+          },
+        ],
+      },
+      {
+        path: "",
+        component: () => import("@/components/DashboardLayout.vue"),
+        meta: { requiresAuth: true },
+        children: [
+          {
+            path: "",
+            name: "overview",
+            component: () => import("./add/Add.vue"),
+          },
+          {
+            path: "video",
+            name: "video",
+            component: () => import("./add/Add.vue"),
+          },
+          {
+            path: "add",
+            name: "add",
+            component: () => import("./add/Add.vue"),
+          },
+          {
+            path: "notification",
+            name: "notification",
+            component: () => import("./add/Add.vue"),
+          },
+        ],
+      }
+    ],
   },
 ];
 const router = createRouter({
@@ -22,4 +85,18 @@ const router = createRouter({
     : createWebHistory(), // client
   routes,
 });
+
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore();
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!auth.user) {
+      next({ name: "login" });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
 export default router;

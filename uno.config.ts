@@ -1,18 +1,12 @@
-// unocss.config.ts
-import {
-  defineConfig,
-  presetWind4,
-  presetIcons,
-  transformerVariantGroup,
-  transformerCompileClass,
-} from "unocss";
+import { defineConfig, presetAttributify, presetTypography, presetWind4, transformerCompileClass, transformerVariantGroup } from 'unocss'
+import { presetBootstrapBtn } from "./bootstrap_btn";
 
 export default defineConfig({
   presets: [
     presetWind4() as any,
-    presetIcons({
-      extraProperties: { display: "block" },
-    }),
+    presetTypography(),
+    presetBootstrapBtn(),
+    presetAttributify(),
   ],
   // By default, `.ts` and `.js` files are NOT extracted.
   // If you want to extract them, use the following configuration.

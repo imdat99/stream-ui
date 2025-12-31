@@ -5,13 +5,42 @@ import { RouterView } from 'vue-router';
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import { vueSWR } from './lib/swr/use-swrv';
 import router from './routes';
-// import { appComponents } from './components'
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
+import { createPinia } from "pinia";
+import { useAuthStore } from './stores/auth';
+
+const pinia = createPinia();
+
 export function createApp() {
+    const app = createSSRApp(withErrorBoundary(RouterView));
+    const head = import.meta.env.SSR ? SSRHead() : CSRHead();
     
-    const app = createSSRApp(withErrorBoundary(RouterView))
-    const head = import.meta.env.SSR ? SSRHead() : CSRHead()
-    app.use(head)
-    app.use(vueSWR({revalidateOnFocus: false}))
-    app.use(router)
-    return { app, router, head }
+    app.use(head);
+    app.use(PrimeVue, {
+        theme: {
+            preset: Aura,
+            options: {
+                darkModeSelector: '.my-app-dark',
+            }
+        }
+    });
+    app.directive('no-hydrate', {
+        created(el) {
+            el.__v_skip = true;
+        }
+    });
+    app.use(vueSWR({revalidateOnFocus: false}));
+    app.use(router);
+    app.use(pinia);
+    
+    // Initialize auth store on client side
+    if (!import.meta.env.SSR) {
+        router.isReady().then(() => {
+            const auth = useAuthStore();
+            auth.init();
+        });
+    }
+    
+    return { app, router, head };
 }
