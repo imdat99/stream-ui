@@ -20,10 +20,15 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Check auth status on init (reads from cookie)
     async function init() {
-        if (initialized.value) return;
+        console.log("Auth store init called");
+        // if (initialized.value) return;
         
         try {
-            const response = await client.checkAuth();
+            const response = await client.checkAuth().then((res) => {
+                
+                console.log("call", res);
+                return res;
+            });
             if (response.authenticated && response.user) {
                 user.value = response.user;
                 // Get CSRF token if authenticated

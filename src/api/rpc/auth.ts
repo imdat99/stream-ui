@@ -164,13 +164,14 @@ const login = async (username: string, password: string) => {
 };
 
 async function checkAuth() {
+    console.log("Check auth called");
     const context = getContext<HonoVarTypes>();
     const token = getCookie(context, 'auth_token');
     
     if (!token) {
         return { authenticated: false, user: null };
     }
-
+    
     try {
         const payload = await verify(token, JWT_SECRET) as any;
         
@@ -178,10 +179,11 @@ async function checkAuth() {
         const userRecord = Array.from(mockUsers.values()).find(
             record => record.user.id === payload.sub
         );
-
+        
         if (!userRecord) {
             return { authenticated: false, user: null };
         }
+        // console.log("Check auth called 2", userRecord);
 
         return {
             authenticated: true,

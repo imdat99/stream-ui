@@ -10,18 +10,21 @@ import Aura from '@primeuix/themes/aura';
 import { createPinia } from "pinia";
 import { useAuthStore } from './stores/auth';
 
-const pinia = createPinia();
 
 export function createApp() {
+    const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));
     const head = import.meta.env.SSR ? SSRHead() : CSRHead();
     
     app.use(head);
     app.use(PrimeVue, {
+        // unstyled: true,
         theme: {
             preset: Aura,
             options: {
                 darkModeSelector: '.my-app-dark',
+                cssLayer: false,
+                prefix: 'pv-',
             }
         }
     });
@@ -42,5 +45,5 @@ export function createApp() {
         });
     }
     
-    return { app, router, head };
+    return { app, router, head, pinia };
 }

@@ -8,11 +8,12 @@ import { contextStorage } from 'hono/context-storage';
 import { cors } from "hono/cors";
 import { jwtRpc, rpcServer } from './api/rpc';
 import isMobile from 'is-mobile';
+import { useAuthStore } from './stores/auth';
 
 const app = new Hono()
 
 // app.use(renderer)
-
+app.use('*', contextStorage());
 app.use(cors(), async (c, next) => {
   c.set("fetch", app.request.bind(app));
   const ua = c.req.header("User-Agent")
@@ -21,15 +22,20 @@ app.use(cors(), async (c, next) => {
   };
   c.set("isMobile", isMobile({ ua }));
   await next();
-}, contextStorage(), rpcServer);
+}, rpcServer);
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });
 app.get("*", async (c) => {
   const url = new URL(c.req.url);
-  const { app, router, head } = createApp();
-  router.push(url.pathname);
-  await router.isReady();
+  const { app, router, head, pinia } = createApp();
+  app.provide("honoContext", c);
+  await router.push(url.pathname);
+  await router.isReady().then(() => {
+    const auth = useAuthStore();
+    auth.initialized = false;
+                auth.init();
+   });
   return streamText(c, async (stream) => {
     c.header("Content-Type", "text/html; charset=utf-8");
     c.header("Content-Encoding", "Identity");
@@ -43,8 +49,8 @@ app.get("*", async (c) => {
     await stream.write(buildBootstrapScript());
     await stream.write("</head><body class='font-sans bg-[#f9fafd] text-gray-800 antialiased flex flex-col min-h-screen'>");
     await stream.pipe(appStream);
-    let json = htmlEscape(JSON.stringify(JSON.stringify(ctx)));
-    await stream.write(`<script>window.__SSR_STATE__ = JSON.parse(${json});</script>`);
+    await stream.write(`<script>window.__SSR_STATE__ = JSON.parse(${htmlEscape(JSON.stringify(JSON.stringify(ctx)))});</script>`);
+    await stream.write(`<script>window.__PINIA_STATE__ = JSON.parse(${htmlEscape(JSON.stringify(JSON.stringify(pinia.state.value)))});</script>`);
     await stream.write("</body></html>");
   });
   // return c.body(renderToWebStream(app, {}));

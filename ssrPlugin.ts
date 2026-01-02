@@ -32,6 +32,7 @@ export function clientFirstBuild(): Plugin {
         // Client build first
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (clientEnvironment) {
+          // console.log("Client First Build Plugin: Building client...", clientEnvironment.resolve);
           await builder.build(clientEnvironment);
         }
 
@@ -106,6 +107,16 @@ export default function ssrPlugin(): Plugin[] {
     name: "ssr-auto-entry",
     config(config) {
       config.define = config.define || {};
+    },
+    resolveId(id, importer, options) {
+      if (!id.startsWith('@httpClientAdapter')) return
+
+      return path.resolve(
+        __dirname,
+        options?.ssr
+          ? "./src/api/httpClientAdapter.server.ts"
+          : "./src/api/httpClientAdapter.client.ts"
+      );
     },
     async configResolved(config) {
       const viteConfig = config as any;

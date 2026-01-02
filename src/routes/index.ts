@@ -75,6 +75,11 @@ const routes: RouteData[] = [
             component: () => import("./add/Add.vue"),
           },
         ],
+      },
+      {
+        path: "/:pathMatch(.*)*",
+        name: "not-found",
+        component: () => import("./NotFound.vue"),
       }
     ],
   },
@@ -88,6 +93,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
+  console.log("Call on server:", Math.random());
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!auth.user) {
       next({ name: "login" });

@@ -10,10 +10,10 @@ export function withErrorBoundary(WrappedComponent: any) {
                         <div class="p-8 space-y-lg max-w-lg w-full">
                             <p>
                                 <b>500.&nbsp;</b>
-                                <ins class="text-gray-500 decoration-none">Đã xảy ra lỗi.</ins>
+                                <ins class="text-gray-500 decoration-none">Something went wrong.</ins>
                             </p>
                             <div class="font-thin">
-                                <p>Máy chủ đang gặp sự cố tạm thời và không thể xử lý yêu cầu của bạn. Vui lòng <a class="underline text-primary" href="/">thử lại</a> sau vài phút.</p>
+                                <p>The server is currently experiencing temporary issues and cannot process your request. Please <a class="underline text-primary" href="/">try again</a> in a few minutes.</p>
                             </div>
                         </div>
                     </div>
