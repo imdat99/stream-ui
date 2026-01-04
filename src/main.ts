@@ -10,7 +10,7 @@ import Aura from '@primeuix/themes/aura';
 import { createPinia } from "pinia";
 import { useAuthStore } from './stores/auth';
 
-
+const bodyClass = ":uno: font-sans bg-[#f9fafd] text-gray-800 antialiased flex flex-col min-h-screen"
 export function createApp() {
     const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));
@@ -23,8 +23,10 @@ export function createApp() {
             preset: Aura,
             options: {
                 darkModeSelector: '.my-app-dark',
-                cssLayer: false,
-                prefix: 'pv-',
+                // cssLayer: {
+                //     name: 'primevue',
+                //     order: 'theme, base, primevue'
+                // }
             }
         }
     });
@@ -45,5 +47,5 @@ export function createApp() {
         });
     }
     
-    return { app, router, head, pinia };
+    return { app, router, head, pinia, bodyClass };
 }

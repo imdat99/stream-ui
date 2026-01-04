@@ -57,6 +57,18 @@ export const getHrefFromManifest = ({
     return href;
   }
 };
+export const loadCssByModules = (m: Array<string>) => {
+  let manifest: Manifest = import.meta.env.PROD
+    ? loadManifest() ?? {} : {};
+  let cssFiles: string[] = [];
+  m.forEach((moduleName) => {
+    const assetInManifest = manifest[moduleName];
+    if (assetInManifest && assetInManifest.css) {
+      cssFiles = cssFiles.concat(assetInManifest.css);
+    }
+  });
+  return cssFiles;
+}
 export function buildBootstrapScript() {
   let script = "";
   let styles = "";

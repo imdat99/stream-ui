@@ -55,6 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
             csrfToken.value = response.csrfToken;
             router.push('/');
         } catch (e: any) {
+            console.log(JSON.parse(e.message))
             error.value = e.message || 'Login failed';
             throw e;
         } finally {
