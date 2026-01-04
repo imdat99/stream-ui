@@ -39,7 +39,7 @@ app.get("*", async (c) => {
   await auth.init();
   await router.push(url.pathname);
   await router.isReady();
-  let usedStyles = new Set(defaultNames);
+  let usedStyles = new Set<String>();
   Base.setLoadedStyleName = async (name: string) => usedStyles.add(name)
   return streamText(c, async (stream) => {
     c.header("Content-Type", "text/html; charset=utf-8");
@@ -53,6 +53,9 @@ app.get("*", async (c) => {
     await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"rel="stylesheet"></link>`);
     await stream.write('<link rel="icon" href="/favicon.ico" />');
     await stream.write(buildBootstrapScript());
+    if (usedStyles.size > 0) {
+      defaultNames.forEach(name => usedStyles.add(name));
+    }
     await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
     await stream.write(`</head><body class='${bodyClass}'>`);
     await stream.pipe(appStream);

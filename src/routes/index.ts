@@ -1,4 +1,5 @@
 import { type ReactiveHead, type ResolvableValue } from "@unhead/vue";
+import { headSymbol } from '@unhead/vue'
 import {
   createMemoryHistory,
   createRouter,
@@ -58,6 +59,13 @@ const routes: RouteData[] = [
             path: "",
             name: "overview",
             component: () => import("./add/Add.vue"),
+            beforeEnter: (to, from, next) => {
+              const head = inject(headSymbol);
+              (head as any).push({
+                title: 'Overview - Holistream',
+              });
+              next();
+            }
           },
           {
             path: "video",
