@@ -121,6 +121,16 @@ export default defineConfig({
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+            .fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
       `;
       },
     },

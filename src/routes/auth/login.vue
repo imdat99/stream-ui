@@ -1,13 +1,8 @@
 <template>
     <div class="w-full">
+        <Toast />
         <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
             class="flex flex-col gap-4 w-full">
-
-            <!-- Global error message -->
-            <Message v-if="auth.error" severity="error" size="small" variant="simple">
-                {{ auth.error }}
-            </Message>
-
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email or Username</label>
                 <InputText name="email" type="text" placeholder="admin or user@example.com" fluid
@@ -58,7 +53,7 @@
 
             <p class="mt-4 text-center text-sm text-gray-600">
                 Don't have an account?
-                <router-link to="/signup" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign up
+                <router-link to="/sign-up" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign up
                     for free</router-link>
             </p>
 
@@ -80,8 +75,16 @@ import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/stores/auth';
-
+import Toast from 'primevue/toast';
+import { useToast } from "primevue/usetoast";
+const t = useToast();
 const auth = useAuthStore();
+// const $form = Form.useFormContext();
+watch(() => auth.error, (newError) => {
+    if (newError) {
+        t.add({ severity: 'error', summary: String(auth.error), detail: newError, life: 5000 });
+    }
+});
 
 const initialValues = reactive({
     email: '',
@@ -97,14 +100,7 @@ const resolver = zodResolver(
 );
 
 const onFormSubmit = async ({ valid, values }: FormSubmitEvent) => {
-    if (valid) {
-        try {
-            await auth.login(values.email, values.password);
-        } catch (error) {
-            // Error is already set in the store
-            console.error('Login failed:', error);
-        }
-    }
+    if (valid) auth.login(values.email, values.password);
 };
 
 const loginWithGoogle = () => {

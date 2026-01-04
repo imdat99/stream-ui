@@ -2,23 +2,16 @@
 	<nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-					<img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)"><img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />
                     <span class="font-bold text-xl tracking-tight text-slate-900">EcoStream</span>
                 </div>
-
-                <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="#features" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Features</a>
-                    <a href="#analytics" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Analytics</a>
                     <a href="#pricing" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Pricing</a>
                 </div>
-
-                <!-- Auth Buttons -->
                 <div class="hidden md:flex items-center gap-4">
                     <RouterLink to="/login" class="text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">Log in</RouterLink>
-                    <RouterLink to="/signup" class="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold cursor-pointer">
+                    <RouterLink to="/sign-up" class="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold cursor-pointer">
                         Start for free
                     </RouterLink>
                 </div>
@@ -26,7 +19,6 @@
         </div>
     </nav>
 	<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <!-- Background Elements -->
         <div class="absolute inset-0 opacity-[0.4] -z-10"></div>
         <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[800px] h-[800px] bg-brand-100/50 rounded-full blur-3xl -z-10 mix-blend-multiply"></div>
         <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-100/50 rounded-full blur-3xl -z-10 mix-blend-multiply"></div>
@@ -62,24 +54,19 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Large Feature -->
                 <div class="md:col-span-2 bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:border-primary/60 transition-all group overflow-hidden relative">
                     <div class="relative z-10">
                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 border border-slate-100">
-                            <!-- <i class="fas fa-globe text-xl"></i> -->
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="532" viewBox="-8 -258 529 532"><path d="M342 32c-2 69-16 129-35 172-10 23-22 40-32 49-10 10-16 11-19 11h-1c-3 0-9-1-19-11-10-9-22-26-32-49-19-43-33-103-35-172h173zm169 0c-9 103-80 188-174 219 30-51 50-129 53-219h121zm-390 0c3 89 23 167 53 218C80 219 11 134 2 32h119zm53-266c-30 51-50 129-53 218H2c9-102 78-186 172-218zm82-14c3 0 9 1 19 11 10 9 22 26 32 50 19 42 33 102 35 171H169c3-69 16-129 35-171 10-24 22-41 32-50s16-11 19-11h1zm81 13c94 31 165 116 174 219H390c-3-90-23-168-53-219z" fill="#059669"/></svg>
 						</div>
                         <h3 class="text-xl font-bold text-slate-900 mb-2">Global Edge Network</h3>
                         <p class="text-slate-500 max-w-md">Content delivered from 200+ PoPs worldwide. Automatic region selection ensures the lowest latency for every viewer.</p>
                     </div>
-                    <!-- Decor -->
                     <div class="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
-                        <!-- <i class="fas fa-globe-americas text-[200px] text-brand-900"></i> -->
 						<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-10 -258 532 532"><path d="M464 8c0-19-3-38-8-56l-27-5c-8-2-15 2-19 9-6 11-19 17-31 13l-14-5c-8-2-17 0-22 5-4 4-4 10 0 14l33 33c5 5 8 12 8 19 0 12-8 23-20 26l-6 1c-3 1-6 5-6 9v12c0 13-4 27-13 38l-25 34c-6 8-16 13-26 13-18 0-32-14-32-32V88c0-9-7-16-16-16h-32c-26 0-48-22-48-48V-4c0-13 6-24 16-32l39-30c6-4 13-6 20-6 3 0 7 1 10 2l32 10c7 3 15 3 22 1l36-9c10-2 17-11 17-22 0-8-5-16-13-20l-29-15c-3-2-8-1-11 2l-4 4c-4 4-11 7-17 7-4 0-8-1-11-3l-15-7c-7-4-15-2-20 4l-13 17c-6 7-16 8-22 1-3-2-5-6-5-10v-41c0-6-1-11-4-16l-10-18C102-154 48-79 48 8c0 115 93 208 208 208S464 123 464 8zM0 8c0-141 115-256 256-256S512-133 512 8 397 264 256 264 0 149 0 8z" fill="#1e3050"/></svg>
 					</div>
                 </div>
 
-                <!-- Tall Feature -->
                 <div class="md:row-span-2 bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden group">
                     <div class="absolute inset-0 bg-gradient-to-b from-slate-800/50 to-transparent"></div>
                     <div class="relative z-10">
@@ -125,60 +112,27 @@
         </div>
     </section>
 	 <!-- Pricing -->
-    <section id="pricing" class="py-24 bg-white border-t border-slate-100">
+    <section id="pricing" class="py-24 border-t border-slate-100 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 mb-4">Simple, transparent pricing</h2>
-                <p class="text-slate-500">No hidden fees. Pay as you grow.</p>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">{{ pricing.title }}</h2>
+                <p class="text-slate-500">{{ pricing.subtitle }}</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                <!-- Hobby -->
-                <div class="p-8 rounded-2xl border border-slate-200 hover:border-slate-300 transition-colors">
-                    <h3 class="font-semibold text-slate-900 mb-2">Hobby</h3>
-                    <div class="flex items-baseline gap-1 mb-6">
-                        <span class="text-4xl font-bold text-slate-900">$0</span>
-                        <span class="text-slate-500">/mo</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+                <div v-for="pack in pricing.packs" :key="pack.name" :class="cn(':uno: p-8 rounded-2xl relative overflow-hidden hover:border-primary transition-colors flex flex-col justify-between', pack.tag == 'POPULAR' ? 'border-primary/80 border-2' : 'border-slate-200 border')" :style="{background: pack.bg}">
+                    <div v-if="pack.tag" class="absolute top-0 right-0 bg-primary/80 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase">{{ pack.tag }}</div>
+                    <div>
+                        <h3 class="font-semibold text-slate-900 text-xl mb-2">{{ pack.name }}</h3>
+                        <div class="flex items-baseline gap-1 mb-6">
+                            <span class="text-4xl font-bold text-slate-900">{{ pack.price }}</span>
+                            <span class="text-slate-500">/mo</span>
+                        </div>
                     </div>
                     <ul class="space-y-3 mb-8 text-sm text-slate-600">
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-brand-500"></i> 100 GB Bandwidth</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-brand-500"></i> 1 Hour of Storage</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-brand-500"></i> Standard Support</li>
+                        <li v-for="value in pack.features" :key="value" class="flex items-center gap-3"><Check-Icon class="fas fa-check text-brand-500"/> {{ value }}</li>
                     </ul>
-                    <button class="w-full py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50 transition-colors">Start Free</button>
-                </div>
-
-                <!-- Pro -->
-                <div class="p-8 rounded-2xl bg-slate-900 text-white shadow-2xl relative overflow-hidden transform">
-                    <div class="absolute top-0 right-0 bg-primary/50 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
-                    <h3 class="font-semibold mb-2 text-brand-400">Pro</h3>
-                    <div class="flex items-baseline gap-1 mb-6">
-						<span class="text-4xl font-bold">$0</span>
-                        <span class="text-lg font-bold line-through">$29</span>
-                        <span class="text-slate-400">/mo</span>
-                    </div>
-                    <ul class="space-y-3 mb-8 text-sm text-slate-300">
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-primary/60"></i> 1 TB Bandwidth</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-primary/60"></i> 100 Hours Storage</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-primary/60"></i> Remove Branding</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-primary/60"></i> 4K Encoding</li>
-                    </ul>
-                    <button class="w-full py-2.5 rounded-lg bg-primary/60 hover:bg-primary/70 font-semibold transition-colors shadow-lg shadow-primary/30">Get Started</button>
-                </div>
-
-                <!-- Scale -->
-                <div class="p-8 rounded-2xl border border-slate-200 hover:border-slate-300 transition-colors">
-                    <h3 class="font-semibold text-slate-900 mb-2">Scale</h3>
-                    <div class="flex items-baseline gap-1 mb-6">
-                        <span class="text-4xl font-bold text-slate-900">$99</span>
-                        <span class="text-slate-500">/mo</span>
-                    </div>
-                    <ul class="space-y-3 mb-8 text-sm text-slate-600">
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-brand-500"></i> 5 TB Bandwidth</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-brand-500"></i> 500 Hours Storage</li>
-                        <li class="flex items-center gap-3"><i class="fas fa-check text-brand-500"></i> Priority Support</li>
-                    </ul>
-                    <button class="w-full py-2.5 rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50 transition-colors">Contact Sales</button>
+                    <router-link to="/sign-up" :class="cn('btn flex justify-center w-full !py-2.5', pack.tag == 'POPULAR' ? 'btn-primary' : 'btn-outline-primary')">{{ pack.buttonText }}</router-link>
                 </div>
             </div>
         </div>
@@ -226,6 +180,55 @@
             </div>
         </div>
     </footer>
+    <Head>
+        <title>EcoStream - Video infrastructure for modern internet</title>
+        <meta name="description" content="Seamlessly host, encode, and stream video with our developer-first API. Optimized for speed, built for scale." />
+    </Head>
 </template>
 <script lang="ts" setup>
+import { Head } from '@unhead/vue/components'
+import { cn } from '@/lib/utils';
+    const pricing = {
+        title: "Simple, transparent pricing",
+        subtitle: "Choose the plan that fits your needs. No hidden fees.",
+        packs: [
+            {
+                name: "Hobby",
+                price: "$0",
+                features: [
+                    "Unlimited upload",
+                    "1 Hour of Storage",
+                    "Standard Support",
+                ],
+                buttonText: "Start Free",
+                tag: "",
+                bg: "#f9fafb",
+            },
+            {
+                name: "Pro",
+                price: "$29",
+                features: [
+                    "Ads free player",
+                    "Support M3U8",
+                    "Unlimited upload",
+                    "Custom ads"
+                ],
+                buttonText: "Get Started",
+                tag: "POPULAR",
+                bg: "#eff6ff",
+            },
+            {
+                name: "Scale",
+                price: "$99",
+                features: [
+                    "5 TB Bandwidth",
+                    "500 Hours Storage",
+                    "Priority Support"
+                ],
+                buttonText: "Contact Sales",
+                tag: "Best Value",
+                bg: "#eef4f7",
+            }
+        ]
+    }
 </script>

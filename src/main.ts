@@ -4,12 +4,13 @@ import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import { vueSWR } from './lib/swr/use-swrv';
-import router from './routes';
+import createAppRouter from './routes';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import { createPinia } from "pinia";
 import { useAuthStore } from './stores/auth';
-
+import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 const bodyClass = ":uno: font-sans bg-[#f9fafd] text-gray-800 antialiased flex flex-col min-h-screen"
 export function createApp() {
     const pinia = createPinia();
@@ -30,22 +31,22 @@ export function createApp() {
             }
         }
     });
+    app.use(ToastService);
     app.directive('no-hydrate', {
         created(el) {
             el.__v_skip = true;
         }
     });
-    app.use(vueSWR({revalidateOnFocus: false}));
-    app.use(router);
-    app.use(pinia);
-    
-    // Initialize auth store on client side
+    app.directive("tooltip", Tooltip)
     if (!import.meta.env.SSR) {
-        router.isReady().then(() => {
-            const auth = useAuthStore();
-            auth.init();
-        });
+        if ((window as any).__PINIA_STATE__ ) {
+            pinia.state.value = (window as any).__PINIA_STATE__;
+        }
     }
+    app.use(pinia);
+    app.use(vueSWR({revalidateOnFocus: false}));
+    const router = createAppRouter();
+    app.use(router);
     
     return { app, router, head, pinia, bodyClass };
 }

@@ -33,12 +33,12 @@ app.get("*", async (c) => {
   const url = new URL(c.req.url);
   const { app, router, head, pinia, bodyClass } = createApp();
   app.provide("honoContext", c);
+  const auth = useAuthStore();
+  auth.$reset();
+  auth.initialized = false;
+  await auth.init();
   await router.push(url.pathname);
-  await router.isReady().then(() => {
-    const auth = useAuthStore();
-    auth.initialized = false;
-                auth.init();
-   });
+  await router.isReady();
   let usedStyles = new Set(defaultNames);
   Base.setLoadedStyleName = async (name: string) => usedStyles.add(name)
   return streamText(c, async (stream) => {

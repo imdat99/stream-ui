@@ -164,7 +164,6 @@ const login = async (username: string, password: string) => {
 };
 
 async function checkAuth() {
-    console.log("Check auth called");
     const context = getContext<HonoVarTypes>();
     const token = getCookie(context, 'auth_token');
     
@@ -183,7 +182,6 @@ async function checkAuth() {
         if (!userRecord) {
             return { authenticated: false, user: null };
         }
-        // console.log("Check auth called 2", userRecord);
 
         return {
             authenticated: true,
