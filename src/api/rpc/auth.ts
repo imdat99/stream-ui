@@ -224,11 +224,11 @@ async function getCSRFToken() {
     const payload = await verify(token, JWT_SECRET) as any;
     const stored = csrfTokens.get(payload.sessionId);
     
-    if (!stored) {
-        throw new Error('CSRF token not found');
-    }
+    // if (!stored) {
+    //     throw new Error('CSRF token not found');
+    // }
 
-    return { csrfToken: stored.token };
+    return { csrfToken: stored?.token || null };
 }
 
 export const authMethods = {

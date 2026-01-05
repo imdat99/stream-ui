@@ -6,7 +6,7 @@ import {
 import { tinyassert } from "@hiogawa/utils";
 import { MiddlewareHandler, type Context, type Next } from "hono";
 import { getContext } from "hono/context-storage";
-import { register } from "module";
+import { csrf } from 'hono/csrf'
 import { z } from "zod";
 import { authMethods } from "./auth";
 import { jwt } from "hono/jwt";
@@ -320,7 +320,9 @@ export const rpcServer = async (c: Context, next: Next) => {
 	if (c.req.path !== endpoint && !c.req.path.startsWith(endpoint + "/")) {
 		return await next();
 	}
-	// c.get("redis").has(`auth_token:${}`)
+  	const cert = c.req.header()
+	console.log("RPC Request Path:", c.req.raw.cf);
+	// if (!cert) return c.text('Forbidden', 403)
 	const handler = exposeTinyRpc({
 		routes,
 		adapter: httpServerAdapter({ endpoint }),

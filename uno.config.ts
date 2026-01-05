@@ -93,7 +93,9 @@ export default defineConfig({
     ],
     ["animate-loadingBar", ["animation", "loadingBar 1.5s linear infinite"]],
   ],
-  transformers: [transformerVariantGroup(), transformerCompileClass()],
+  transformers: [transformerVariantGroup(), transformerCompileClass({
+    classPrefix: "_",
+  })],
   preflights: [
     {
       getCSS: (context) => {

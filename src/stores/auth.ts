@@ -55,47 +55,30 @@ export const useAuthStore = defineStore('auth', () => {
         }).finally(() => {
             loading.value = false;
         });
-        // try {
-        //     const response = await client.login(username, password);
-        //     user.value = response.user;
-        //     csrfToken.value = response.csrfToken;
-        //     router.push('/');
-        // } catch (e: any) {
-        //     // console.log(JSON.parse(e.message))
-        //     // error.value = e.message || 'Login failed';
-        //     error.value = 'Login failed';
-        //     throw e;
-        // } finally {
-        //     loading.value = false;
-        // }
     }
 
     async function register(username: string, email: string, password: string) {
         loading.value = true;
         error.value = null;
-        try {
-            const response = await client.register({ username, email, password });
+        return client.register({ username, email, password }).then((response) => {
             user.value = response.user;
             csrfToken.value = response.csrfToken;
             router.push('/');
-        } catch (e: any) {
+        }).catch((e: any) => {
             // error.value = e.message || 'Registration failed';
             error.value = 'Registration failed';
             throw e;
-        } finally {
+        }).finally(() => {
             loading.value = false;
-        }
+        });
     }
 
     async function logout() {
-        try {
-            await client.logout();
-        } catch (e) {
-            // Ignore errors on logout
-        }
-        user.value = null;
-        csrfToken.value = null;
-        router.push('/');
+        return client.logout().then(() => {
+            user.value = null;
+            csrfToken.value = null;
+            router.push('/');
+        })
     }
 
     return { user, loading, error, csrfToken, initialized, init, login, register, logout, $reset: () => {

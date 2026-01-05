@@ -67,33 +67,57 @@ const routes: RouteData[] = [
             path: "",
             name: "overview",
             component: () => import("./add/Add.vue"),
-            beforeEnter: (to, from, next) => {
-              const head = inject(headSymbol);
-              (head as any).push({
+            meta: {
+              head: {
                 title: 'Overview - Holistream',
-              });
-              next();
+              },
             }
           },
           {
             path: "upload",
             name: "upload",
             component: () => import("./add/Add.vue"),
+            meta: {
+              head: {
+                title: 'Upload - Holistream',
+              },
+            }
           },
           {
             path: "video",
             name: "video",
             component: () => import("./add/Add.vue"),
+            meta: {
+              head: {
+                title: 'Videos - Holistream',
+                meta: [
+                  { name: 'description', content: 'Manage your video content.' },
+                ],
+              },
+            }
           },
           {
-            path: "add",
-            name: "add",
+            path: "plans",
+            name: "plans",
             component: () => import("./add/Add.vue"),
+            meta: {
+              head: {
+                title: 'Plans & Billing',
+                meta: [
+                  { name: 'description', content: 'Manage your plans and billing information.' },
+                ],
+              },
+            }
           },
           {
             path: "notification",
             name: "notification",
             component: () => import("./add/Add.vue"),
+            meta: {
+              head: {
+                title: 'Notification - Holistream',
+              },
+            }
           },
         ],
       },
@@ -115,6 +139,8 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
+  const head = inject(headSymbol);
+  (head as any).push(to.meta.head || {});
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!auth.user) {
       next({ name: "login" });

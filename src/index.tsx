@@ -30,6 +30,7 @@ app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });
 app.get("*", async (c) => {
+  const nonce = crypto.randomUUID();
   const url = new URL(c.req.url);
   const { app, router, head, pinia, bodyClass } = createApp();
   app.provide("honoContext", c);
@@ -59,8 +60,8 @@ app.get("*", async (c) => {
     await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
     await stream.write(`</head><body class='${bodyClass}'>`);
     await stream.pipe(appStream);
-    await stream.write(`<script>window.__SSR_STATE__ = JSON.parse(${htmlEscape(JSON.stringify(JSON.stringify(ctx)))});</script>`);
-    await stream.write(`<script>window.__PINIA_STATE__ = JSON.parse(${htmlEscape(JSON.stringify(JSON.stringify(pinia.state.value)))});</script>`);
+    Object.assign(ctx, { $p: pinia.state.value });
+    await stream.write(`<script type="application/json" data-ssr="true" id="__APP_DATA__" nonce="${nonce}">${htmlEscape((JSON.stringify(ctx)))}</script>`);
     await stream.write("</body></html>");
   });
 })

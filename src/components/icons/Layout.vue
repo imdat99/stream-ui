@@ -1,3 +1,19 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" class="v-mid m-a" height="24" width="24" viewBox="-10 -226 468 468"><path d="M384-184c18 0 32 14 32 32v64H32v-64c0-18 14-32 32-32h320zM32 168V-56h96v256H64c-18 0-32-14-32-32zm128 32V-56h256v224c0 18-14 32-32 32H160zM64-216c-35 0-64 29-64 64v320c0 35 29 64 64 64h320c35 0 64-29 64-64v-320c0-35-29-64-64-64H64z" fill="#1e3050"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" v-if="filled" class="v-mid m-a" height="24" width="24"
+        viewBox="0 0 468 468">
+        <path
+            d="M42 74v64h384V74c0-18-14-32-32-32H74c-18 0-32 14-32 32zm0 96v224c0 18 14 32 32 32h64V170H42zm128 0v256h224c18 0 32-14 32-32V170H170z"
+            fill="#a6acb9" />
+        <path
+            d="M394 42c18 0 32 14 32 32v64H42V74c0-18 14-32 32-32h320zM42 394V170h96v256H74c-18 0-32-14-32-32zm128 32V170h256v224c0 18-14 32-32 32H170zM74 10c-35 0-64 29-64 64v320c0 35 29 64 64 64h320c35 0 64-29 64-64V74c0-35-29-64-64-64H74z"
+            fill="#1e3050" />
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" v-else class="v-mid m-a" height="24" width="24" viewBox="-10 -226 468 468">
+        <path
+            d="M384-184c18 0 32 14 32 32v64H32v-64c0-18 14-32 32-32h320zM32 168V-56h96v256H64c-18 0-32-14-32-32zm128 32V-56h256v224c0 18-14 32-32 32H160zM64-216c-35 0-64 29-64 64v320c0 35 29 64 64 64h320c35 0 64-29 64-64v-320c0-35-29-64-64-64H64z"
+            fill="#1e3050" />
+    </svg>
 </template>
+<script lang="ts" setup>
+defineProps<{ class?: string, filled?: boolean }>();
+</script>

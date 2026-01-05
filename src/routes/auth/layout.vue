@@ -11,7 +11,10 @@
                 {{ content[route.name as keyof typeof content]?.subtitle || '' }}
             </p>
             <vue-head :input="{
-                title: content[route.name as keyof typeof content]?.headTitle || 'Authentication'
+                title: content[route.name as keyof typeof content]?.headTitle || 'Authentication',
+                meta: [
+                    { name: 'description', content: content[route.name as keyof typeof content]?.subtitle || '' }
+                ]
             }" />
         </div>
         <router-view />

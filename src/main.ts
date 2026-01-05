@@ -24,6 +24,7 @@ export function createApp() {
             preset: Aura,
             options: {
                 darkModeSelector: '.my-app-dark',
+                cssLayer: false,
                 // cssLayer: {
                 //     name: 'primevue',
                 //     order: 'theme, base, primevue'
@@ -32,15 +33,18 @@ export function createApp() {
         }
     });
     app.use(ToastService);
-    app.directive('no-hydrate', {
+    app.directive('nh', {
         created(el) {
             el.__v_skip = true;
         }
     });
     app.directive("tooltip", Tooltip)
     if (!import.meta.env.SSR) {
-        if ((window as any).__PINIA_STATE__ ) {
-            pinia.state.value = (window as any).__PINIA_STATE__;
+        Object.entries(JSON.parse(document.getElementById("__APP_DATA__")?.innerText || "{}")).forEach(([key, value]) => {
+            (window as any)[key] = value;
+        });
+        if ((window as any).$p ) {
+            pinia.state.value = (window as any).$p;
         }
     }
     app.use(pinia);
