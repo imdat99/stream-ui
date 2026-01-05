@@ -7,7 +7,9 @@ import unocss from "unocss/vite";
 import Components from "unplugin-vue-components/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { defineConfig } from "vite";
-import ssrPlugin from "./ssrPlugin";
+import ssrPlugin from "./plugins/ssrPlugin";
+import devServer from '@hono/vite-dev-server'
+import { vitePluginSsrMiddleware } from "./plugins/vite-plugin-ssr-middleware";
 export default defineConfig((env) => {
   // console.log("env:", env, import.meta.env);
   return {
@@ -28,8 +30,26 @@ export default defineConfig((env) => {
         resolvers: [PrimeVueResolver()],
       }),
       ssrPlugin(),
-      cloudflare(),
+      vitePluginSsrMiddleware({
+      entry: "src/index.tsx",
+      preview: path.resolve("dist/server/index.js"),
+    })
+      // devServer({
+      //   entry: 'src/index.tsx',
+      // }),
+      // cloudflare(),
     ],
+     environments: {
+    ssr: {
+      build: {
+        outDir: "dist/server",
+        copyPublicDir: false,
+        rollupOptions: {
+          input: { index: "/src/index.tsx" },
+        },
+      },
+    },
+  },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -41,7 +61,8 @@ export default defineConfig((env) => {
     },
 
     ssr: {
-      noExternal: ["vue"],
+      // external: ["vue"]
+      // noExternal: ["vue"],
     },
   };
 });

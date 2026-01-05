@@ -30,6 +30,8 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.17.1",
+    "@hattip/adapter-node": "^0.0.49",
+    "@hono/vite-dev-server": "^0.24.0",
     "@primevue/auto-import-resolver": "^4.5.4",
     "@types/node": "^25.0.3",
     "@vitejs/plugin-vue": "^6.0.3",

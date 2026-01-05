@@ -9,6 +9,7 @@ import { cors } from "hono/cors";
 import { jwtRpc, rpcServer } from './api/rpc';
 import isMobile from 'is-mobile';
 import { useAuthStore } from './stores/auth';
+import { serveStatic } from "hono/bun";
 import { cssContent } from './lib/primeCssContent';
 import { styleTags } from './lib/primePassthrough';
 // @ts-ignore
@@ -26,6 +27,7 @@ app.use(cors(), async (c, next) => {
   c.set("isMobile", isMobile({ ua }));
   await next();
 }, rpcServer);
+app.use(serveStatic({ root: "./public" }))
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });

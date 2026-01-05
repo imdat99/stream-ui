@@ -13,19 +13,15 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Add: typeof import('./src/components/icons/Add.vue')['default']
-    AddFilled: typeof import('./src/components/icons/AddFilled.vue')['default']
     Bell: typeof import('./src/components/icons/Bell.vue')['default']
-    BellFilled: typeof import('./src/components/icons/BellFilled.vue')['default']
     Button: typeof import('primevue/button')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
     CheckIcon: typeof import('./src/components/icons/CheckIcon.vue')['default']
     Credit: typeof import('./src/components/icons/Credit.vue')['default']
     DashboardLayout: typeof import('./src/components/DashboardLayout.vue')['default']
     Home: typeof import('./src/components/icons/Home.vue')['default']
-    HomeFilled: typeof import('./src/components/icons/HomeFilled.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Layout: typeof import('./src/components/icons/Layout.vue')['default']
-    LayoutFilled: typeof import('./src/components/icons/LayoutFilled.vue')['default']
     Message: typeof import('primevue/message')['default']
     Password: typeof import('primevue/password')['default']
     RootLayout: typeof import('./src/components/RootLayout.vue')['default']
@@ -33,9 +29,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     TestIcon: typeof import('./src/components/icons/TestIcon.vue')['default']
     Upload: typeof import('./src/components/icons/Upload.vue')['default']
-    UploadFilled: typeof import('./src/components/icons/UploadFilled.vue')['default']
     Video: typeof import('./src/components/icons/Video.vue')['default']
-    VideoFilled: typeof import('./src/components/icons/VideoFilled.vue')['default']
     VueHead: typeof import('./src/components/VueHead.tsx')['default']
   }
 }
@@ -43,19 +37,15 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const Add: typeof import('./src/components/icons/Add.vue')['default']
-  const AddFilled: typeof import('./src/components/icons/AddFilled.vue')['default']
   const Bell: typeof import('./src/components/icons/Bell.vue')['default']
-  const BellFilled: typeof import('./src/components/icons/BellFilled.vue')['default']
   const Button: typeof import('primevue/button')['default']
   const Checkbox: typeof import('primevue/checkbox')['default']
   const CheckIcon: typeof import('./src/components/icons/CheckIcon.vue')['default']
   const Credit: typeof import('./src/components/icons/Credit.vue')['default']
   const DashboardLayout: typeof import('./src/components/DashboardLayout.vue')['default']
   const Home: typeof import('./src/components/icons/Home.vue')['default']
-  const HomeFilled: typeof import('./src/components/icons/HomeFilled.vue')['default']
   const InputText: typeof import('primevue/inputtext')['default']
   const Layout: typeof import('./src/components/icons/Layout.vue')['default']
-  const LayoutFilled: typeof import('./src/components/icons/LayoutFilled.vue')['default']
   const Message: typeof import('primevue/message')['default']
   const Password: typeof import('primevue/password')['default']
   const RootLayout: typeof import('./src/components/RootLayout.vue')['default']
@@ -63,8 +53,6 @@ declare global {
   const RouterView: typeof import('vue-router')['RouterView']
   const TestIcon: typeof import('./src/components/icons/TestIcon.vue')['default']
   const Upload: typeof import('./src/components/icons/Upload.vue')['default']
-  const UploadFilled: typeof import('./src/components/icons/UploadFilled.vue')['default']
   const Video: typeof import('./src/components/icons/Video.vue')['default']
-  const VideoFilled: typeof import('./src/components/icons/VideoFilled.vue')['default']
   const VueHead: typeof import('./src/components/VueHead.tsx')['default']
 }

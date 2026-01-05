@@ -26,16 +26,17 @@ export function clientFirstBuild(): Plugin {
       config.builder.buildApp = async (builder) => {
         const clientEnvironment = builder.environments.client;
         const workerEnvironments = Object.keys(builder.environments)
-          .filter((name) => name !== "client" && name !== "ssr")
+          .filter((name) => name !== "client")
           .map((name) => builder.environments[name]);
         // console.log('Client First Build Plugin: Starting builds...', workerEnvironments)
         // Client build first
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (clientEnvironment) {
-          // console.log("Client First Build Plugin: Building client...", clientEnvironment.resolve);
+          // clientEnvironment.config.build.outDir = "dist/client";
+          // console.log("Client First Build Plugin: Building client...", Object.keys());
           await builder.build(clientEnvironment);
         }
-
+        // console.log("Client First Build Plugin: Client build complete.", workerEnvironments);
         // Then worker builds
         for (const workerEnv of workerEnvironments) {
           await builder.build(workerEnv);
@@ -110,12 +111,13 @@ export default function ssrPlugin(): Plugin[] {
     },
     resolveId(id, importer, options) {
       if (!id.startsWith('@httpClientAdapter')) return
-
+      const pwd = process.cwd()
+      console.log('Resolving httpClientAdapter in', pwd, 'for', {id, importer, options})
       return path.resolve(
         __dirname,
         options?.ssr
-          ? "./src/api/httpClientAdapter.server.ts"
-          : "./src/api/httpClientAdapter.client.ts"
+          ? pwd+"/src/api/httpClientAdapter.server.ts"
+          : pwd+"/src/api/httpClientAdapter.client.ts"
       );
     },
     async configResolved(config) {
