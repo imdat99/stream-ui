@@ -32,6 +32,14 @@ const routes: RouteData[] = [
       {
         path: "",
         component: () => import("./auth/layout.vue"),
+        beforeEnter: (to, from, next) => {
+          const auth = useAuthStore();
+          if (auth.user) {
+            next({ name: "overview" });
+          } else {
+            next();
+          }
+        },
         children: [
           {
             path: "login",
