@@ -8,7 +8,6 @@ import Components from "unplugin-vue-components/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { defineConfig } from "vite";
 import ssrPlugin from "./plugins/ssrPlugin";
-import devServer from '@hono/vite-dev-server'
 import { vitePluginSsrMiddleware } from "./plugins/vite-plugin-ssr-middleware";
 export default defineConfig((env) => {
   // console.log("env:", env, import.meta.env);
