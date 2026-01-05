@@ -39,8 +39,4 @@ export const BellFilled = createStaticVNode(`<svg aria-hidden="true" aria-label=
             <path
                 d="M20.54 14.24A3.15 3.15 0 0 0 23.66 17H24v2h-8v1h-.02a3.4 3.4 0 0 1-3.38 3h-1.2a3.4 3.4 0 0 1-3.38-3H8v-1H0v-2h.34a3.15 3.15 0 0 0 3.12-2.76l.8-6.41a7.8 7.8 0 0 1 15.48 0zM10 19.6c0 .77.63 1.4 1.4 1.4h1.2c.77 0 1.4-.63 1.4-1.4a.6.6 0 0 0-.6-.6h-2.8a.6.6 0 0 0-.6.6" ></path>
         </svg>`, 1);
-export const Search = createStaticVNode(`<svg aria-hidden="true" aria-label="" class="v-mid m-a" height="24" role="img" viewBox="0 0 24 24" width="24">
-            <path
-                d="M17.33 18.74a10 10 0 1 1 1.41-1.41l4.47 4.47-1.41 1.41zM11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16">
-            </path>
-        </svg>`, 1);
+export const Search = createStaticVNode(`<svg aria-hidden="true" aria-label="" class="v-mid m-a" height="24" role="img" viewBox="0 0 24 24" width="24"><path d="M17.33 18.74a10 10 0 1 1 1.41-1.41l4.47 4.47-1.41 1.41zM11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16"></path></svg>`, 1);

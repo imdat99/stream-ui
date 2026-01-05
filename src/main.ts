@@ -11,7 +11,7 @@ import { createPinia } from "pinia";
 import { useAuthStore } from './stores/auth';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
-const bodyClass = ":uno: font-sans bg-[#f9fafd] text-gray-800 antialiased flex flex-col min-h-screen"
+const bodyClass = ":uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen"
 export function createApp() {
     const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));

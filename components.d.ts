@@ -31,6 +31,10 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TestIcon: typeof import('./src/components/icons/TestIcon.vue')['default']
+    Upload: typeof import('./src/components/icons/Upload.vue')['default']
+    UploadFilled: typeof import('./src/components/icons/UploadFilled.vue')['default']
+    Video: typeof import('./src/components/icons/Video.vue')['default']
+    VideoFilled: typeof import('./src/components/icons/VideoFilled.vue')['default']
     VueHead: typeof import('./src/components/VueHead.tsx')['default']
   }
 }
@@ -56,5 +60,9 @@ declare global {
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
   const TestIcon: typeof import('./src/components/icons/TestIcon.vue')['default']
+  const Upload: typeof import('./src/components/icons/Upload.vue')['default']
+  const UploadFilled: typeof import('./src/components/icons/UploadFilled.vue')['default']
+  const Video: typeof import('./src/components/icons/Video.vue')['default']
+  const VideoFilled: typeof import('./src/components/icons/VideoFilled.vue')['default']
   const VueHead: typeof import('./src/components/VueHead.tsx')['default']
 }

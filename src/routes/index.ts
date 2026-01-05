@@ -68,6 +68,11 @@ const routes: RouteData[] = [
             }
           },
           {
+            path: "upload",
+            name: "upload",
+            component: () => import("./add/Add.vue"),
+          },
+          {
             path: "video",
             name: "video",
             component: () => import("./add/Add.vue"),
