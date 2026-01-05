@@ -40,16 +40,24 @@ export default defineConfig((env) => {
       // cloudflare(),
     ],
      environments: {
-    ssr: {
-      build: {
-        outDir: "dist/server",
-        copyPublicDir: false,
-        rollupOptions: {
-          input: { index: "/src/index.tsx" },
+      client: {
+        build: {
+          outDir: "dist/client",
+          rollupOptions: {
+            input: { index: "/src/client.ts" },
+          },
+        }
+      },
+      server: {
+        build: {
+          outDir: "dist/server",
+          copyPublicDir: false,
+          rollupOptions: {
+            input: { index: "/src/index.tsx" },
+          },
         },
       },
     },
-  },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

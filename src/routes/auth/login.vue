@@ -1,8 +1,8 @@
 <template>
     <div class="w-full">
-        <Toast />
         <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
             class="flex flex-col gap-4 w-full">
+            <Message v-if="auth.error" severity="error">Failed to sign in. Please check your credentials or try again later.</Message>
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email or Username</label>
                 <InputText name="email" type="text" placeholder="admin or user@example.com" fluid
@@ -75,23 +75,18 @@ import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/stores/auth';
-import Toast from 'primevue/toast';
-import { useToast } from "primevue/usetoast";
-const t = useToast();
 const auth = useAuthStore();
 // const $form = Form.useFormContext();
-watch(() => auth.error, (newError) => {
-    if (newError) {
-        t.add({ severity: 'error', summary: String(auth.error), detail: newError, life: 5000 });
-    }
-});
 
 const initialValues = reactive({
     email: '',
     password: '',
     rememberMe: false
 });
-
+watch(() => initialValues, (newValues) => {
+    auth.error = null;
+    // console.log('Form values changed:', newValues);
+});
 const resolver = zodResolver(
     z.object({
         email: z.string().min(1, { message: 'Email or username is required.' }),

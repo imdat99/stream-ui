@@ -26,7 +26,7 @@ export function clientFirstBuild(): Plugin {
       config.builder.buildApp = async (builder) => {
         const clientEnvironment = builder.environments.client;
         const workerEnvironments = Object.keys(builder.environments)
-          .filter((name) => name !== "client")
+          .filter((name) => name !== "client" && name !== "ssr")
           .map((name) => builder.environments[name]);
         // console.log('Client First Build Plugin: Starting builds...', workerEnvironments)
         // Client build first
@@ -112,7 +112,6 @@ export default function ssrPlugin(): Plugin[] {
     resolveId(id, importer, options) {
       if (!id.startsWith('@httpClientAdapter')) return
       const pwd = process.cwd()
-      console.log('Resolving httpClientAdapter in', pwd, 'for', {id, importer, options})
       return path.resolve(
         __dirname,
         options?.ssr
@@ -136,7 +135,8 @@ export default function ssrPlugin(): Plugin[] {
       const clientBuild = viteConfig.environments.client.build;
       clientBuild.manifest = true;
       clientBuild.rollupOptions = clientBuild.rollupOptions || {};
-      clientBuild.rollupOptions.input = "src/client.ts";
+      // clientBuild.rollupOptions.input = "src/client.ts";
+      // clientBuild.outDir = "dist/client";
       if (!viteConfig.environments.ssr) {
           const manifestPath = path.join(clientBuild.outDir as string, '.vite/manifest.json')
           try {
