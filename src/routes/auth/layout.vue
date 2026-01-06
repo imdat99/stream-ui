@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full max-w-md bg-white p-8 rounded-xl border border-primary m-auto overflow-hidden">
+    <div class="w-full max-w-md bg-white p-8 rounded-xl border border-gray-200 m-auto overflow-hidden">
         <div class="text-center mb-8">
             <router-link to="/" class="inline-flex items-center justify-center w-12 h-12 mb-4">
                 <img class="w-12 h-12" src="/apple-touch-icon.png" alt="Logo" />

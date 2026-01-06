@@ -1,56 +1,33 @@
-import { createHead as CSRHead } from "@unhead/vue/client";
-import { createHead as SSRHead } from "@unhead/vue/server";
-import { createSSRApp } from 'vue';
-import { RouterView } from 'vue-router';
-import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
-import { vueSWR } from './lib/swr/use-swrv';
-import createAppRouter from './routes';
-import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
-import { createPinia } from "pinia";
-import { useAuthStore } from './stores/auth';
-import ToastService from 'primevue/toastservice';
-import Tooltip from 'primevue/tooltip';
-const bodyClass = ":uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen"
-export function createApp() {
-    const pinia = createPinia();
-    const app = createSSRApp(withErrorBoundary(RouterView));
-    const head = import.meta.env.SSR ? SSRHead() : CSRHead();
-    
-    app.use(head);
-    app.use(PrimeVue, {
-        // unstyled: true,
-        theme: {
-            preset: Aura,
-            options: {
-                darkModeSelector: '.my-app-dark',
-                cssLayer: false,
-                // cssLayer: {
-                //     name: 'primevue',
-                //     order: 'theme, base, primevue'
-                // }
-            }
-        }
-    });
-    app.use(ToastService);
-    app.directive('nh', {
-        created(el) {
-            el.__v_skip = true;
-        }
-    });
-    app.directive("tooltip", Tooltip)
-    if (!import.meta.env.SSR) {
-        Object.entries(JSON.parse(document.getElementById("__APP_DATA__")?.innerText || "{}")).forEach(([key, value]) => {
-            (window as any)[key] = value;
-        });
-        if ((window as any).$p ) {
-            pinia.state.value = (window as any).$p;
-        }
-    }
-    app.use(pinia);
-    app.use(vueSWR({revalidateOnFocus: false}));
-    const router = createAppRouter();
-    app.use(router);
-    
-    return { app, router, head, pinia, bodyClass };
+import { Hono } from 'hono';
+import { contextStorage } from 'hono/context-storage';
+import { cors } from "hono/cors";
+import isMobile from 'is-mobile';
+import { rpcServer } from './api/rpc';
+import { ssrRender } from './worker/ssrRender';
+// import { serveStatic } from "hono/bun";
+// @ts-ignore
+const app = new Hono()
+const isDev = import.meta.env.DEV;
+console.log("process.versions?.bun:", (process as any).versions?.bun);
+// app.use(renderer)
+app.use('*', contextStorage());
+app.use(cors(), async (c, next) => {
+  c.set("fetch", app.request.bind(app));
+  const ua = c.req.header("User-Agent")
+  if (!ua) {
+    return c.json({ error: "User-Agent header is missing" }, 400);
+  };
+  c.set("isMobile", isMobile({ ua }));
+  await next();
+}, rpcServer);
+if (!isDev) {
+  if ((process as any).versions?.bun) {
+    const { serveStatic } = await import("hono/bun");
+    app.use(serveStatic({ root: "./dist/client" }))
+  }
 }
+app.get("/.well-known/*", (c) => {
+  return c.json({ ok: true });
+});
+app.get("*", ssrRender);
+export default app

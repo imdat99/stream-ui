@@ -19,12 +19,11 @@ const links = [
     { href: "/upload", label: "Upload", icon: Upload, type: "a" },
     { href: "/video", label: "Video", icon: Video, type: "a" },
     { href: "/plans", label: "Plans", icon: Credit, type: "a" },
-    { href: "/notification", label: "Notification", icon: Bell, type: "a" },
+    // { href: "/notification", label: "Notification", icon: Bell, type: "a" },
 ];
 </script>
 <template>
-    <header
-        class=":uno: fixed left-0 w-18 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen border-r border-gray-200 bg-white">
+    <header class=":uno: fixed left-0 w-18 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen border-r border-gray-200 bg-white">
         <component :is="i.type === 'a' ? 'router-link' : 'div'" v-for="i in links" :key="i.label"
             v-bind="i.type === 'a' ? { to: i.href } : {}" v-tooltip="i.label"
             :class="cn(className, $route.path === i.href && 'bg-primary/15')">

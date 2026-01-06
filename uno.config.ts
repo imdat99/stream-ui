@@ -69,6 +69,11 @@ export default defineConfig({
         light: "#e2e6ea",
         dark: "#e2e6ea",
       },
+      foreground: {
+        DEFAULT: "#212529",
+        light: "#495057",
+        dark: "#121212",
+      }
     },
     boxShadow: {
       "primary-box": "2px 2px 10px #aff6b8",
@@ -91,7 +96,13 @@ export default defineConfig({
       "press-animated",
       "transition-all duration-200 ease-[cubic-bezier(.22,1,.36,1)] active:translate-y-0 active:scale-90 active:shadow-md",
     ],
-    ["animate-loadingBar", ["animation", "loadingBar 1.5s linear infinite"]],
+    {
+      "animate-backwards": "animate-fade-in-up delay-200 duration-500",
+      "animate-loading-bar": "relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/50 before:to-transparent before:animate-loadingBar before:content-['']",
+      // "bg-grid-pattern": "bg-[url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\")]",
+    },
+    // ["animate-loadingBar", ["animation", "loadingBar 1.5s linear infinite"]],
+    // ["bg-grid-pattern"]
   ],
   transformers: [transformerVariantGroup(), transformerCompileClass({
     classPrefix: "_",
@@ -101,8 +112,9 @@ export default defineConfig({
       getCSS: (context) => {
         return `
       :root {
-        --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-        --font-serif: 'Playfair Display', serif, 'Times New Roman', Times, serif;
+        --font-sans: Inter var, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+        --font-geist-sans: "Inter", "system-ui", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-geist-mono: "Roboto Mono", "SFMono-Regular", "Menlo", monospace;
       }
       :focus {
         outline-color: ${context.theme.colors?.primary?.active};
@@ -119,7 +131,7 @@ export default defineConfig({
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         .text-gradient {
-            background: linear-gradient(135deg, #064e3b 0%, #10b981 100%);
+            background: linear-gradient(135deg, #064e3b 0%, #2dc76b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -132,7 +144,9 @@ export default defineConfig({
 .fade-leave-to {
   opacity: 0;
 }
-
+.bg-grid-pattern {
+    background-image: url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\");
+}
       `;
       },
     },

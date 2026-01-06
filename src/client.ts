@@ -1,7 +1,7 @@
-import { createApp } from './main';
 import 'uno.css';
+import createVueApp from './shared/createVueApp';
 async function render() {
-    const { app, router } = createApp();
+    const { app, router } = createVueApp();
     router.isReady().then(() => {
         app.mount('body', true)
     })

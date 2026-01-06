@@ -23,9 +23,7 @@ export function renderSSRLayout(c: Context, appStream: ReadableStream) {
         "head",
         null,
         raw('<meta charset="UTF-8"/>'),
-        raw(
-          '<meta name="viewport" content="width=device-width, initial-scale=1.0"/>'
-        ),
+        raw('<meta name="viewport" content="width=device-width, initial-scale=1.0"/>'),
         raw('<link rel="icon" href="/favicon.ico" />'),
         raw(`<base href="${new URL(c.req.url).origin}/"/>`)
       ),
