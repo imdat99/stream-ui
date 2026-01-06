@@ -1,11 +1,11 @@
 <template>
-    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-svh flex">
+    <section class=":m: relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-svh flex">
         <!-- <div class="absolute inset-0 bg-grid-pattern opacity-[0.4] -z-10"></div> -->
         <div
-            class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[800px] h-[800px] bg-primary-light/40 rounded-full blur-3xl -z-10 mix-blend-multiply animate-pulse duration-1000">
+            class=":m: absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[800px] h-[800px] bg-primary-light/40 rounded-full blur-3xl -z-10 mix-blend-multiply animate-pulse duration-1000">
         </div>
         <div
-            class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-100/50 rounded-full blur-3xl -z-10 mix-blend-multiply">
+            class=":m: absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-100/50 rounded-full blur-3xl -z-10 mix-blend-multiply">
         </div>
 
 
@@ -52,7 +52,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div
-                    class="md:col-span-2 bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:border-primary/60 transition-all group overflow-hidden relative">
+                    class=":m: md:col-span-2 bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:border-primary/60 transition-all group overflow-hidden relative">
                     <div class="relative z-10">
                         <div
                             class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-6 border border-slate-100">
@@ -75,11 +75,11 @@
                     </div>
                 </div>
 
-                <div class="md:row-span-2 bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-b from-slate-800/50 to-transparent"></div>
+                <div class=":m: md:row-span-2 bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden group">
+                    <div class=":m: absolute inset-0 bg-gradient-to-b from-slate-800/50 to-transparent"></div>
                     <div class="relative z-10">
                         <div
-                            class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 backdrop-blur-sm border border-white/10">
+                            class=":m: w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6 backdrop-blur-sm border border-white/10">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="-10 -146 468 384">
                                 <path
                                     d="M392-136c-31 0-56 25-56 56v280c0 16 13 28 28 28h28c31 0 56-25 56-56V-80c0-31-25-56-56-56zM168 4c0-31 25-56 56-56h28c16 0 28 13 28 28v224c0 16-12 28-28 28h-56c-15 0-28-12-28-28V4zM0 88c0-31 25-56 56-56h28c16 0 28 13 28 28v140c0 16-12 28-28 28H56c-31 0-56-25-56-56V88z"
@@ -96,7 +96,7 @@
                             <div class="flex justify-between items-center mb-3 border-b border-white/5 pb-2">
                                 <span class="text-slate-500">Live Status</span>
                                 <span
-                                    class="flex items-center gap-1.5 text-red-500 text-[10px] uppercase font-bold tracking-wider animate-pulse"><span
+                                    class=":m: flex items-center gap-1.5 text-red-500 text-[10px] uppercase font-bold tracking-wider animate-pulse"><span
                                         class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> On Air</span>
                             </div>
                             <div class="space-y-1">
@@ -113,9 +113,9 @@
 
                 <!-- Standard Feature -->
                 <div
-                    class="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:border-brand-200 transition-all group hover:shadow-lg hover:shadow-brand-500/5">
+                    class=":m: bg-slate-50 rounded-2xl p-8 border border-slate-100 transition-all group hover:(border-brand-200 shadow-lg shadow-brand-500/5)">
                     <div
-                        class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-purple-600 border border-slate-100">
+                        class=":m: w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-purple-600 border border-slate-100">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 570 570">
                             <path
                                 d="M50 428c-5 5-5 14 0 19s14 5 19 0l237-237c5-5 5-14 0-19s-14-5-19 0L50 428zm16-224c-5 5-5 13 0 19 5 5 14 5 19 0l12-12c5-5 5-14 0-19-6-5-14-5-20 0l-11 12zM174 60c-5 5-5 13 0 19 5 5 14 5 19 0l12-12c5-5 5-14 0-19-6-5-14-5-20 0l-11 12zm215 29c-5 5-5 14 0 19s14 5 19 0l39-39c5-5 5-14 0-19s-14-5-19 0l-39 39zm21 357c-5 5-5 14 0 19s14 5 19 0l18-18c5-5 5-14 0-19s-14-5-19 0l-18 18z"
@@ -132,9 +132,9 @@
 
                 <!-- Standard Feature -->
                 <div
-                    class="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:border-brand-200 transition-all group hover:shadow-lg hover:shadow-brand-500/5">
+                    class=":m: bg-slate-50 rounded-2xl p-8 border border-slate-100 transition-all group hover:(border-brand-200 shadow-lg shadow-brand-500/5)">
                     <div
-                        class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-orange-600 border border-slate-100">
+                        class=":m: w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6 text-orange-600 border border-slate-100">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="-10 -226 532 468">
                             <path
                                 d="M32-216c18 0 32 14 32 32v336c0 9 7 16 16 16h400c18 0 32 14 32 32s-14 32-32 32H80c-44 0-80-36-80-80v-336c0-18 14-32 32-32zM144-24c18 0 32 14 32 32v64c0 18-14 32-32 32s-32-14-32-32V8c0-18 14-32 32-32zm144-64V72c0 18-14 32-32 32s-32-14-32-32V-88c0-18 14-32 32-32s32 14 32 32zm80 32c18 0 32 14 32 32v96c0 18-14 32-32 32s-32-14-32-32v-96c0-18 14-32 32-32zm144-96V72c0 18-14 32-32 32s-32-14-32-32v-224c0-18 14-32 32-32s32 14 32 32z"
@@ -161,7 +161,7 @@
                     :class="cn(':uno: p-8 rounded-2xl relative overflow-hidden hover:border-primary transition-colors flex flex-col justify-between', pack.tag == 'POPULAR' ? 'border-primary/80 border-2' : 'border-slate-200 border')"
                     :style="{ background: pack.bg }">
                     <div v-if="pack.tag"
-                        class="absolute top-0 right-0 bg-primary/80 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase">
+                        class=":m: absolute top-0 right-0 bg-primary/80 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase">
                         {{ pack.tag }}</div>
                     <div>
                         <h3 class="font-semibold text-slate-900 text-xl mb-2">{{ pack.name }}</h3>

@@ -29,15 +29,15 @@ const links = [
             :class="cn(className, $route.path === i.href && 'bg-primary/15')">
             <component :is="i.icon" :filled="$route.path === i.href" />
         </component>
-        <div class="w-12 h-12 rounded-2xl hover:bg-primary/15 flex">
-            <button class="h-[38px] w-[38px] rounded-full m-a ring-2 ring flex press-animated" @click="auth.logout()">
-                <img class="h-8 w-8 rounded-full m-a ring-1 ring-white"
+        <div class=":m: w-12 h-12 rounded-2xl hover:bg-primary/15 flex">
+            <button class=":m: h-[38px] w-[38px] rounded-full m-a ring-2 ring flex press-animated" @click="auth.logout()">
+                <img class=":m: h-8 w-8 rounded-full m-a ring-1 ring-white"
                     src="https://picsum.photos/seed/user123/40/40.jpg" alt="User avatar" />
             </button>
         </div>
     </header>
     <main class="flex flex-1 overflow-hidden md:ps-18">
-        <div class="flex-1 overflow-auto p-4 bg-white rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">
+        <div class=":m: flex-1 overflow-auto p-4 bg-white rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">
             <router-view v-slot="{ Component }">
                 <Transition enter-active-class="transition-all duration-300 ease-in-out"
                     enter-from-class="opacity-0 transform translate-y-4"

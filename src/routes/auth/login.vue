@@ -19,10 +19,10 @@
                     $form.password.error?.message }}</Message>
             </div>
 
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
+            <div class=":m: flex items-center justify-between">
+                <div class=":m: flex items-center gap-2">
                     <Checkbox inputId="remember-me" name="rememberMe" binary :disabled="auth.loading" />
-                    <label for="remember-me" class="text-sm text-gray-900">Remember me</label>
+                    <label for="remember-me" class=":m: text-sm text-gray-900">Remember me</label>
                 </div>
                 <div class="text-sm">
                     <router-link to="/forgot"

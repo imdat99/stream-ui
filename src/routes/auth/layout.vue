@@ -1,7 +1,7 @@
 <template>
-    <div class="w-full max-w-md bg-white p-8 rounded-xl border border-gray-200 m-auto overflow-hidden">
+    <div class=":m: w-full max-w-md bg-white p-8 rounded-xl border border-gray-200 m-auto overflow-hidden">
         <div class="text-center mb-8">
-            <router-link to="/" class="inline-flex items-center justify-center w-12 h-12 mb-4">
+            <router-link to="/" class=":m: inline-flex items-center justify-center w-12 h-12 mb-4">
                 <img class="w-12 h-12" src="/apple-touch-icon.png" alt="Logo" />
             </router-link>
             <h2 class="text-2xl font-bold text-gray-900">

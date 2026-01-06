@@ -1,6 +1,6 @@
 import { defineConfig, presetAttributify, presetTypography, presetWind4, transformerCompileClass, transformerVariantGroup } from 'unocss'
 import { presetBootstrapBtn } from "./bootstrap_btn";
-
+import transformerClassnamesMinifier from './plugins/encodeClassTransformer'
 export default defineConfig({
   presets: [
     presetWind4() as any,
@@ -106,6 +106,8 @@ export default defineConfig({
   ],
   transformers: [transformerVariantGroup(), transformerCompileClass({
     classPrefix: "_",
+  }),transformerClassnamesMinifier({
+    trigger: ':m:',
   })],
   preflights: [
     {
