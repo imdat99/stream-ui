@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>File Tree Visualizer</title>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto; margin: 0; }
+    header { position: sticky; top: 0; background: #111; color: #fff; padding: 12px 14px; display:flex; gap:10px; align-items:center; }
+    header input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid #333; background: #1b1b1b; color:#fff; }
+    header button { padding: 8px 10px; border-radius: 8px; border: 1px solid #333; background: #1b1b1b; color:#fff; cursor:pointer; }
+    main { padding: 10px 14px; }
+    .muted { color: #666; font-size: 12px; }
+    ul { list-style: none; padding-left: 16px; margin: 6px 0; }
+    li { margin: 2px 0; }
+    .row { display:flex; gap:8px; align-items:center; }
+    .twisty { width: 16px; text-align:center; cursor:pointer; user-select:none; }
+    .name { cursor: default; }
+    .file { color: #222; }
+    .dir  { font-weight: 600; }
+    .path { color: #888; font-size: 12px; }
+    .hidden { display:none; }
+    .pill { font-size: 12px; padding: 2px 8px; border: 1px solid #333; border-radius: 999px; background:#1b1b1b; color:#ddd; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="pill">/__hono_di/</span>
+    <input id="q" placeholder="Filter (e.g. src/components or .ts)" />
+    <button id="refresh">Refresh</button>
+  </header>
+  <main>
+    <div class="muted" id="status">Loading…</div>
+    <div id="app"></div>
+  </main>
+
+<script type="module">
+  const app = document.getElementById('app');
+  const statusEl = document.getElementById('status');
+  const qEl = document.getElementById('q');
+  const refreshBtn = document.getElementById('refresh');
+
+  let tree = null;
+  let expanded = new Set([""]); // expand root by default
+
+  function matches(node, q) {
+    if (!q) return true;
+    const hay = (node.path + "/" + node.name).toLowerCase();
+    return hay.includes(q);
+  }
+
+  function renderNode(node, q) {
+    const li = document.createElement('li');
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const twisty = document.createElement('div');
+    twisty.className = 'twisty';
+
+    const name = document.createElement('div');
+    name.className = 'name ' + (node.type === 'dir' ? 'dir' : 'file');
+    name.textContent = node.type === 'dir' ? node.name + '/' : node.name;
+
+    const pathEl = document.createElement('div');
+    pathEl.className = 'path';
+    pathEl.textContent = node.path;
+
+    row.appendChild(twisty);
+    row.appendChild(name);
+    row.appendChild(pathEl);
+    li.appendChild(row);
+
+    if (node.type === 'dir') {
+      const isOpen = expanded.has(node.path);
+      twisty.textContent = isOpen ? '▾' : '▸';
+
+      twisty.onclick = () => {
+        if (expanded.has(node.path)) expanded.delete(node.path);
+        else expanded.add(node.path);
+        draw();
+      };
+
+      // children
+      const ul = document.createElement('ul');
+      ul.className = isOpen ? '' : 'hidden';
+
+      const kids = node.children || [];
+      for (const child of kids) {
+        // prune theo filter: dir được giữ nếu nó hoặc con nó match
+        if (q) {
+          if (child.type === 'file') {
+            if (!matches(child, q)) continue;
+          } else {
+            // dir: giữ nếu match hoặc có con match
+            const hasMatch = matches(child, q) || (child.children || []).some(c => matches(c, q));
+            if (!hasMatch) continue;
+            expanded.add(child.path); // auto expand khi filter
+          }
+        }
+        ul.appendChild(renderNode(child, q));
+      }
+      li.appendChild(ul);
+    } else {
+      twisty.textContent = '·';
+    }
+
+    return li;
+  }
+
+  function draw() {
+    if (!tree) return;
+    const q = (qEl.value || '').trim().toLowerCase();
+    app.innerHTML = '';
+    const ul = document.createElement('ul');
+    ul.appendChild(renderNode(tree, q));
+    app.appendChild(ul);
+    statusEl.textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  }
+
+  async function fetchTree() {
+    statusEl.textContent = 'Fetching…';
+    const res = await fetch('/__hono_di/api/tree');
+    tree = await res.json();
+    draw();
+  }
+
+  refreshBtn.onclick = fetchTree;
+  qEl.oninput = () => draw();
+
+  // Realtime via Vite HMR websocket (custom event)
+  try {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${proto}://${location.host}`, 'vite-hmr');
+    ws.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (msg?.type === 'custom' && msg?.event === 'filetree:update') {
+          tree = msg.data;
+          draw();
+        }
+      } catch {}
+    };
+  } catch {}
+
+  fetchTree();
+</script>
+</body>
+</html>

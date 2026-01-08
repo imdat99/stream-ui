@@ -8,6 +8,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import { defineConfig } from "vite";
 import ssrPlugin from "./plugins/ssrPlugin";
 import { vitePluginSsrMiddleware } from "./plugins/vite-plugin-ssr-middleware";
+import honoDiPlugin from "@hono-di/vite"
 export default defineConfig((env) => {
     // console.log("env:", env, import.meta.env);
     return {
@@ -32,6 +33,7 @@ export default defineConfig((env) => {
                 entry: "src/main.ts",
                 preview: path.resolve("dist/server/index.js"),
             }),
+            honoDiPlugin(),
             // devServer({
             //   entry: 'src/index.tsx',
             // }),

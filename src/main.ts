@@ -8,7 +8,7 @@ import { ssrRender } from './worker/ssrRender';
 // @ts-ignore
 const app = new Hono()
 const isDev = import.meta.env.DEV;
-console.log("process.versions?.bun:", (process as any).versions?.bun);
+
 // app.use(renderer)
 app.use('*', contextStorage());
 app.use(cors(), async (c, next) => {
