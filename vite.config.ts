@@ -67,7 +67,9 @@ export default defineConfig((env) => {
         optimizeDeps: {
             exclude: ["vue"],
         },
-
+        server: {
+            port: 3000,
+        },
         ssr: {
             // external: ["vue"]
             // noExternal: ["vue"],
