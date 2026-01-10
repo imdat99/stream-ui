@@ -1,6 +1,13 @@
+// import { HttpBindings, createAdaptorServer } from '@hono/node-server';
+// import { ServeStaticOptions, serveStatic } from '@hono/node-server/serve-static';
+// import { RESPONSE_ALREADY_SENT } from '@hono/node-server/utils/response';
 import { RequestMethod } from '@nestjs/common';
 import { HttpStatus, Logger } from '@nestjs/common';
-import { ErrorHandler, NestApplicationOptions, RequestHandler } from '@nestjs/common/interfaces';
+import {
+  ErrorHandler,
+  NestApplicationOptions,
+  RequestHandler,
+} from '@nestjs/common/interfaces';
 import { isObject } from '@nestjs/common/utils/shared.utils';
 import { AbstractHttpAdapter } from '@nestjs/core/adapters/http-adapter';
 import { Context, Next, Hono } from 'hono';
@@ -8,6 +15,9 @@ import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
 // import { Data } from 'hono/dist/types/context';
 import { RedirectStatusCode, StatusCode } from 'hono/utils/http-status';
+import http2 from 'http2';
+import { createServer as createServerHTTP, Server } from 'http';
+import { createServer as createServerHTTPS } from 'https';
 
 import { HonoRequest, TypeBodyParser } from './interfaces';
 import { Data } from 'node_modules/hono/dist/types/context';
@@ -16,6 +26,7 @@ import { Data } from 'node_modules/hono/dist/types/context';
 interface HttpBindings {}
 
 type HonoHandler = RequestHandler<HonoRequest, Context>;
+type ServerType = Server | http2.Http2Server | http2.Http2SecureServer;
 type Ctx = Context | (() => Promise<Context>);
 type Method =
   | 'all'
@@ -31,7 +42,7 @@ type Method =
  * Adapter for using Hono with NestJS.
  */
 export class HonoAdapter extends AbstractHttpAdapter<
-  any,
+  ServerType,
   HonoRequest,
   Context
 > {
@@ -232,8 +243,9 @@ export class HonoAdapter extends AbstractHttpAdapter<
   }
 
   public async useStaticAssets(path: string, options: any) {
+    Logger.log("Đã bị comment trong adapter")
     Logger.log('Registering static assets middleware');
-    if ((process as any).versions?.bun && import.meta.env.PROD) {
+    if ((process as any).versions?.bun) {
       const { serveStatic } = await import("hono/bun");
       // app.use(serveStatic({ root: "./dist/client" }))
       // this.instance.use(serveStatic({ root: "./dist/client" }))
@@ -376,10 +388,22 @@ export class HonoAdapter extends AbstractHttpAdapter<
 
       await next();
     });
+    const isHttpsEnabled = options?.httpsOptions;
+    const createServer = isHttpsEnabled
+      ? createServerHTTPS
+      : createServerHTTP;
+    // this.httpServer = createAdaptorServer({
+    //   fetch: this.instance.fetch,
+    //   createServer,
+    //   overrideGlobalObjects: false,
+    // });
+    // this.httpServer = isHttpsEnabled ? 
     return this.httpServer;
   }
 
-  public getType(): string { return 'hono'; }
+  public getType(): string {
+    return 'hono';
+  }
 
   public registerParserMiddleware(_prefix?: string, rawBody?: boolean) {
     if (this._isParserRegistered) {
@@ -421,7 +445,12 @@ export class HonoAdapter extends AbstractHttpAdapter<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public listen(...args: any[]) {}
+  public listen(port: string | number, ...args: any[]): ServerType {
+    return this.httpServer.listen(port, ...args);
+  }
+  public fetch(input: RequestInfo, init?: RequestInit): Response | Promise<Response> {
+    return this.instance.fetch(input as Request, init);
+  }
   public getHonoInstance(): Hono<{ Bindings: HttpBindings }> {
     return this.instance;
   }

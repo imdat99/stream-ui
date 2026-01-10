@@ -33,7 +33,7 @@ import { NestHonoApplication } from './server/HonoAdapter/interfaces';
 // app.get("/.well-known/*", (c) => {
 //   return c.json({ ok: true });
 // });
-const app = await NestFactory.create<NestHonoApplication>(
+const appHonoNest = await NestFactory.create<NestHonoApplication>(
   AppModule,
   new HonoAdapter(),
   {
@@ -51,10 +51,26 @@ const app = await NestFactory.create<NestHonoApplication>(
 //     next();
 //   }
 // });
-const honoInstance = app.getHonoInstance();
-honoInstance.use(contextStorage());
-honoInstance.get("*", ssrRender);
-// app.use('*', contextStorage());
-await app.init();
-const httpAdapter = app.get(HttpAdapterHost);
-export default app
+const app = appHonoNest.getHonoInstance();
+app.use(async (c, next) => {
+  c.set("fetch", app.request.bind(app));
+  const ua = c.req.header("User-Agent")
+  if (!ua) {
+    return c.json({ error: "User-Agent header is missing" }, 400);
+  };
+  c.set("isMobile", isMobile({ ua }));
+  await next();
+}, contextStorage());
+
+appHonoNest.useStaticAssets("/*", { root: "./dist/client" });
+await appHonoNest.init();
+app.get("/.well-known/*", (c) => {
+  return c.json({ ok: true });
+});
+app.use(ssrRender);
+const httpAdapter = appHonoNest.get(HttpAdapterHost);
+// await app.listen(3000)
+// console.log("HTTP Adapter:", app.fetch.toString());
+export default {
+  fetch: app.fetch.bind(app),
+}

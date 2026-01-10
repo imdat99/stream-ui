@@ -73,7 +73,7 @@ export interface NestHonoApplication<
     callback?: (err: Error, address: string) => void,
   ): Promise<TServer>;
   fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
-  getHonoInstance(): Hono<{ Bindings: any }>;
+  getHonoInstance(): Hono;
 }
 export type HonoRequest = Request & {
   headers?: Record<string, string>;

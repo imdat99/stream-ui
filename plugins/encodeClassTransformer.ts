@@ -64,7 +64,6 @@ export default function transformerClassnamesMinifier(options: CompileClassOptio
     enforce: 'pre',
     async transform(s, _id, { uno }) {
       if(s.original.includes('p-button') || s.original.includes('p-component') || s.original.includes('p-button-secondary')) {
-        console.log("transforming:", _id);
       }
       const matches = [...s.original.matchAll(regexp)]
       if (!matches.length)
