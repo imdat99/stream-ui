@@ -6,7 +6,7 @@ import {
     createWebHistory,
     type RouteRecordRaw,
 } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/client/stores/auth";
 
 type RouteData = RouteRecordRaw & {
     meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean };
@@ -15,7 +15,7 @@ type RouteData = RouteRecordRaw & {
 const routes: RouteData[] = [
     {
         path: "/",
-        component: () => import("@/components/RootLayout.vue"),
+        component: () => import("@/client/components/RootLayout.vue"),
         children: [
             {
                 path: "",
@@ -76,7 +76,7 @@ const routes: RouteData[] = [
             },
             {
                 path: "",
-                component: () => import("@/components/DashboardLayout.vue"),
+                component: () => import("@/client/components/DashboardLayout.vue"),
                 meta: { requiresAuth: true },
                 children: [
                     {

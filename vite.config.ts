@@ -21,7 +21,7 @@ export default defineConfig((env) => {
                 dts: true, // Generate TypeScript declaration file
             }),
             Components({
-                dirs: ["src/components"],
+                dirs: ["src/client/components"],
                 extensions: ["vue", "tsx"],
                 dts: true,
                 dtsTsx: true,
@@ -44,7 +44,7 @@ export default defineConfig((env) => {
                 build: {
                     outDir: "dist/client",
                     rollupOptions: {
-                        input: { index: "/src/client.ts" },
+                        input: { index: "/src/client/index.ts" },
                     },
                 },
             },

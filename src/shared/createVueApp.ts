@@ -7,9 +7,9 @@ import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
-import { withErrorBoundary } from '@/lib/hoc/withErrorBoundary';
-import { vueSWR } from '@/lib/swr/use-swrv';
-import createAppRouter from '@/routes';
+import { withErrorBoundary } from '@/client/lib/hoc/withErrorBoundary';
+import { vueSWR } from '@/client/lib/swr/use-swrv';
+import createAppRouter from '@/client/routes';
 const bodyClass = ":uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen bg-gray-50";
 function createApp() {
     const pinia = createPinia();

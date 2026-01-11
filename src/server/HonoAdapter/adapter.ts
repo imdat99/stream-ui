@@ -298,7 +298,7 @@ export class HonoAdapter extends AbstractHttpAdapter<
     bodyLimit?: number,
   ) {
     Logger.log(
-      `Registering body parser middleware for type: ${type} | bodyLimit: ${bodyLimit}`,
+      `Registering body parser middleware for type: ${type} ${bodyLimit ? 'with limit ' + bodyLimit + ' bytes' : ''}`,
     );
     if(bodyLimit !== undefined) {
       this.instance.use(this.bodyLimit(bodyLimit));

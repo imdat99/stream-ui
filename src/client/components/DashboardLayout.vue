@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import Add from "@/components/icons/Add.vue";
-import Bell from "@/components/icons/Bell.vue";
-import Home from "@/components/icons/Home.vue";
-import Video from "@/components/icons/Video.vue";
-import Credit from "@/components/icons/Credit.vue";
+import Home from "@/client/components/icons/Home.vue";
+import Video from "@/client/components/icons/Video.vue";
+import Credit from "@/client/components/icons/Credit.vue";
 import Upload from "./icons/Upload.vue";
-import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/stores/auth";
+import { cn } from "@/client/lib/utils";
+import { useAuthStore } from "@/client/stores/auth";
 import { createStaticVNode } from "vue";
 
 const auth = useAuthStore();

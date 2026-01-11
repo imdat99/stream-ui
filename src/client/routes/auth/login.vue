@@ -74,7 +74,7 @@ import { reactive } from 'vue';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/client/stores/auth';
 const auth = useAuthStore();
 // const $form = Form.useFormContext();
 

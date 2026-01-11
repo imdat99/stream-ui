@@ -13,7 +13,7 @@
     "jsxImportSource": "vue",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
     },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

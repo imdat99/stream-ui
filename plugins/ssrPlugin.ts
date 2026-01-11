@@ -115,8 +115,8 @@ export default function ssrPlugin(): Plugin[] {
       return path.resolve(
         __dirname,
         options?.ssr
-          ? pwd+"/src/api/httpClientAdapter.server.ts"
-          : pwd+"/src/api/httpClientAdapter.client.ts"
+          ? pwd+"/src/client/api/httpClientAdapter.server.ts"
+          : pwd+"/src/client/api/httpClientAdapter.client.ts"
       );
     },
     async configResolved(config) {

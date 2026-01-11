@@ -3,9 +3,9 @@ import { renderSSRHead } from "@unhead/vue/server";
 import { Context } from "hono";
 import { streamText } from "hono/streaming";
 import { renderToWebStream } from "vue/server-renderer";
-import { buildBootstrapScript } from "@/lib/manifest";
-import { styleTags } from "@/lib/primePassthrough";
-import { useAuthStore } from "@/stores/auth";
+import { buildBootstrapScript } from "@/client/lib/manifest";
+import { styleTags } from "@/client/lib/primePassthrough";
+import { useAuthStore } from "@/client/stores/auth";
 // @ts-ignore
 import Base from "@primevue/core/base";
 import { BlankEnv, BlankInput } from "hono/types";

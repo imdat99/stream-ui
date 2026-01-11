@@ -184,7 +184,7 @@
 </template>
 <script lang="ts" setup>
 import { Head } from '@unhead/vue/components'
-import { cn } from '@/lib/utils';
+import { cn } from '@/client/lib/utils';
 const pricing = {
     title: "Simple, transparent pricing",
     subtitle: "Choose the plan that fits your needs. No hidden fees.",

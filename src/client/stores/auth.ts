@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
-import { client } from '@/api/rpcclient';
+import { client } from '@/client/api/rpcclient';
 import { ref } from 'vue';
 
 interface User {

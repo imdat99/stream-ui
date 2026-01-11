@@ -84,7 +84,7 @@ export function buildBootstrapScript() {
           assets: [],
         },
         "1": {
-          file: "src/client.ts",
+          file: "src/client/index.ts",
           isEntry: true,
           css: [],
         },

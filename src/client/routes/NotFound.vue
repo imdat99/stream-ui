@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-import { VueHead } from "@/components/VueHead";
+import { VueHead } from "@/client/components/VueHead";
 </script>
