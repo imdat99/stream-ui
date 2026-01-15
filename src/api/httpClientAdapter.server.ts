@@ -7,6 +7,7 @@ const GET_PAYLOAD_PARAM = "payload";
 export function httpClientAdapter(opts: {
 	url: string;
 	pathsForGET?: string[];
+	headers?: () => Promise<Record<string, string>> | Record<string, string>;
 }): TinyRpcClientAdapter {
 	return {
 		send: async (data) => {
@@ -19,8 +20,8 @@ export function httpClientAdapter(opts: {
 			if (method === "GET") {
 				req = new Request(
 					url +
-						"?" +
-						new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
+					"?" +
+					new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
 				);
 			} else {
 				req = new Request(url, {

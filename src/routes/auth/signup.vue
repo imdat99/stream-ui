@@ -43,6 +43,12 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 
 
+import { useAuthStore } from '@/stores/auth';
+import { useToast } from "primevue/usetoast";
+
+const auth = useAuthStore();
+const toast = useToast();
+
 const initialValues = reactive({
     name: '',
     email: '',
@@ -59,9 +65,9 @@ const resolver = zodResolver(
 
 const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
     if (valid) {
-        console.log('Form submitted:', values);
-        // toast.add({ severity: 'success', summary: 'Success', detail: 'Account created successfully', life: 3000 });
-        // Handle actual signup logic here
+        auth.register(values.name, values.email, values.password).catch(() => {
+             toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
+        });
     }
 };
 </script>

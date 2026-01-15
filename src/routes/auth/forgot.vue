@@ -1,5 +1,6 @@
 <template>
     <div class="w-full">
+        <Toast />
         <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
             class="flex flex-col gap-4 w-full">
             <div class="text-sm text-gray-600 mb-2">
@@ -36,6 +37,13 @@ import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
 
 
+import { useAuthStore } from '@/stores/auth';
+import { useToast } from "primevue/usetoast";
+import { forgotPassword } from '@/lib/firebase';
+
+const auth = useAuthStore();
+const toast = useToast();
+
 const initialValues = reactive({
     email: ''
 });
@@ -48,9 +56,11 @@ const resolver = zodResolver(
 
 const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
     if (valid) {
-        console.log('Form submitted:', values);
-        // toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
-        // Handle actual forgot password logic here
+        forgotPassword(values.email).then(() => {
+             toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
+        }).catch(() => {
+             toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
+        });
     }
 };
 </script>

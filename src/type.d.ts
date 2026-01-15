@@ -6,5 +6,6 @@ declare module "@httpClientAdapter" {
     export function httpClientAdapter(opts: {
         url: string;
         pathsForGET?: string[];
+        headers?: () => Promise<{ Authorization?: undefined; } | { Authorization: string; }>
     }): TinyRpcClientAdapter;
 }

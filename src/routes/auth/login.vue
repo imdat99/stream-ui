@@ -4,8 +4,8 @@
         <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
             class="flex flex-col gap-4 w-full">
             <div class="flex flex-col gap-1">
-                <label for="email" class="text-sm font-medium text-gray-700">Email or Username</label>
-                <InputText name="email" type="text" placeholder="admin or user@example.com" fluid
+                <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+                <InputText name="email" type="text" placeholder="user@example.com" fluid
                     :disabled="auth.loading" />
                 <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
                     $form.email.error?.message }}</Message>
@@ -56,15 +56,6 @@
                 <router-link to="/sign-up" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign up
                     for free</router-link>
             </p>
-
-            <!-- Hint for demo credentials -->
-            <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p class="text-xs text-blue-800 font-medium mb-1">Demo Credentials:</p>
-                <p class="text-xs text-blue-600">Username: <code class="bg-blue-100 px-1 rounded">admin</code> |
-                    Password: <code class="bg-blue-100 px-1 rounded">admin123</code></p>
-                <p class="text-xs text-blue-600">Email: <code class="bg-blue-100 px-1 rounded">user@example.com</code> |
-                    Password: <code class="bg-blue-100 px-1 rounded">password</code></p>
-            </div>
         </Form>
     </div>
 </template>
@@ -104,7 +95,6 @@ const onFormSubmit = async ({ valid, values }: FormSubmitEvent) => {
 };
 
 const loginWithGoogle = () => {
-    console.log('Login with Google');
-    // Handle Google login logic here
+    auth.loginWithGoogle();
 };
 </script>

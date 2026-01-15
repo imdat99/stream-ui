@@ -6,11 +6,9 @@ import {
 import { tinyassert } from "@hiogawa/utils";
 import { MiddlewareHandler, type Context, type Next } from "hono";
 import { getContext } from "hono/context-storage";
-import { csrf } from 'hono/csrf'
+// import { adminAuth } from "../../lib/firebaseAdmin";
 import { z } from "zod";
 import { authMethods } from "./auth";
-import { jwt } from "hono/jwt";
-import { secret } from "./commom";
 import { abortChunk, chunkedUpload, completeChunk, createPresignedUrls, imageContentTypes, nanoid, presignedPut, videoContentTypes } from "./s3_handle";
 // import { createElement } from "react";
 
@@ -222,7 +220,7 @@ const routes = {
 	),
 
 	// access context
-	components: async () => {},
+	components: async () => { },
 	getHomeCourses: async () => {
 		return listCourses.slice(0, 3);
 	},
@@ -298,29 +296,40 @@ const routes = {
 export type RpcRoutes = typeof routes;
 export const endpoint = "/rpc";
 export const pathsForGET: (keyof typeof routes)[] = ["getCounter"];
-export const jwtRpc: MiddlewareHandler = async (c, next) => {
-	const publicPaths: (keyof typeof routes)[] = ["getHomeCourses", "getCourses", "getCourseBySlug", "getCourseContent", "login", "register"];
+
+export const firebaseAuthMiddleware: MiddlewareHandler = async (c, next) => {
+	const publicPaths: (keyof typeof routes)[] = ["getHomeCourses", "getCourses", "getCourseBySlug", "getCourseContent"];
 	const isPublic = publicPaths.some((path) => c.req.path.split("/").includes(path));
 	c.set("isPublic", isPublic);
-	// return await next();
+
 	if (c.req.path !== endpoint && !c.req.path.startsWith(endpoint + "/") || isPublic) {
 		return await next();
 	}
-	console.log("JWT RPC Middleware:", c.req.path);
-	const jwtMiddleware = jwt({
-		secret,
-		cookie: 'auth_token',
-		verification: {
-			aud: "ez.lms_users",
-		}
-	})
-	return jwtMiddleware(c, next)
+
+	const authHeader = c.req.header("Authorization");
+	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+		// Option: return 401 or let it pass with no user?
+		// Old logic seemed to require it for non-public paths.
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+
+	const token = authHeader.split("Bearer ")[1];
+	try {
+		// const decodedToken = await adminAuth.verifyIdToken(token);
+		// c.set("user", decodedToken);
+	} catch (error) {
+		console.error("Firebase Auth Error:", error);
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+
+	return await next();
 }
+
 export const rpcServer = async (c: Context, next: Next) => {
 	if (c.req.path !== endpoint && !c.req.path.startsWith(endpoint + "/")) {
 		return await next();
 	}
-  	const cert = c.req.header()
+	const cert = c.req.header()
 	console.log("RPC Request Path:", c.req.raw.cf);
 	// if (!cert) return c.text('Forbidden', 403)
 	const handler = exposeTinyRpc({

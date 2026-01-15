@@ -6,7 +6,7 @@ import { renderSSRHead } from '@unhead/vue/server';
 import { buildBootstrapScript, getHrefFromManifest, loadCssByModules } from './lib/manifest';
 import { contextStorage } from 'hono/context-storage';
 import { cors } from "hono/cors";
-import { jwtRpc, rpcServer } from './api/rpc';
+import { firebaseAuthMiddleware, rpcServer } from './api/rpc';
 import isMobile from 'is-mobile';
 import { useAuthStore } from './stores/auth';
 import { cssContent } from './lib/primeCssContent';
@@ -25,7 +25,7 @@ app.use(cors(), async (c, next) => {
   };
   c.set("isMobile", isMobile({ ua }));
   await next();
-}, rpcServer);
+}, firebaseAuthMiddleware, rpcServer);
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });
