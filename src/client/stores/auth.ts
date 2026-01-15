@@ -1,14 +1,9 @@
-import { defineStore } from 'pinia';
-import { useRouter } from 'vue-router';
 import { client } from '@/client/api/rpcclient';
+import { User } from 'firebase/auth';
+import { defineStore } from 'pinia';
 import { ref } from 'vue';
-
-interface User {
-    id: string;
-    username: string;
-    email: string;
-    name: string;
-}
+import { useRouter } from 'vue-router';
+import { emailAuth, signUp } from '../lib/firebase';
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null);
@@ -22,31 +17,31 @@ export const useAuthStore = defineStore('auth', () => {
     async function init() {
         if (initialized.value) return;
         
-        try {
-            const response = await client.checkAuth();
-            if (response.authenticated && response.user) {
-                user.value = response.user;
-                // Get CSRF token if authenticated
-                try {
-                    const csrfResponse = await client.getCSRFToken();
-                    csrfToken.value = csrfResponse.csrfToken;
-                } catch (e) {
-                    // CSRF token might not be available yet
-                }
-            }
-        } catch (e) {
-            // Not authenticated, that's fine
-        } finally {
-            initialized.value = true;
-        }
+        // try {
+        //     const response = await client.checkAuth();
+        //     if (response.authenticated && response.user) {
+        //         user.value = response.user;
+        //         // Get CSRF token if authenticated
+        //         try {
+        //             const csrfResponse = await client.getCSRFToken();
+        //             csrfToken.value = csrfResponse.csrfToken;
+        //         } catch (e) {
+        //             // CSRF token might not be available yet
+        //         }
+        //     }
+        // } catch (e) {
+        //     // Not authenticated, that's fine
+        // } finally {
+        //     initialized.value = true;
+        // }
     }
 
     async function login(username: string, password: string) {
         loading.value = true;
         error.value = null;
-        return client.login(username, password).then((response) => {
-            user.value = response.user;
-            csrfToken.value = response.csrfToken;
+        return emailAuth(username, password).then((userCredential) => {
+            user.value = userCredential.user;
+            // csrfToken.value = userCredential.csrfToken;
             router.push('/');
         }).catch((e: any) => {
             // error.value = e.message || 'Login failed';
@@ -60,7 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
     async function register(username: string, email: string, password: string) {
         loading.value = true;
         error.value = null;
-        return client.register({ username, email, password }).then((response) => {
+        return signUp(email, password).then((response) => {
             user.value = response.user;
             csrfToken.value = response.csrfToken;
             router.push('/');

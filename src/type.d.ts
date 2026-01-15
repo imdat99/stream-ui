@@ -8,3 +8,10 @@ declare module "@httpClientAdapter" {
         pathsForGET?: string[];
     }): TinyRpcClientAdapter;
 }
+declare global {
+  var __APP__: {
+    app?: NestHonoApplication;
+    hono?: Hono;
+    server?: Bun.Server;
+  } | undefined;
+}

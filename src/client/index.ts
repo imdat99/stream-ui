@@ -1,5 +1,6 @@
-import 'uno.css';
 import createVueApp from '@/shared/createVueApp';
+import 'uno.css';
+
 async function render() {
     const { app, router } = createVueApp();
     router.isReady().then(() => {
