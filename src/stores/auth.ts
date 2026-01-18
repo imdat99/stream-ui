@@ -1,115 +1,128 @@
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
-// import { client } from '@/api/rpcclient'; // client no longer used for auth actions
-import { ref, onMounted } from 'vue';
-import { emailAuth, signUp, auth, googleAuth } from '@/lib/firebase';
-import { onAuthStateChanged, signOut, User as FirebaseUser } from 'firebase/auth';
-
-interface User {
-    id: string;
-    username: string;
-    email: string;
-    name: string;
-}
+import { ref } from 'vue';
+import { client, ResponseResponse, type ModelUser } from '@/api/client';
 
 export const useAuthStore = defineStore('auth', () => {
-    const user = ref<User | null>(null);
+    const user = ref<ModelUser | null>(null);
     const router = useRouter();
     const loading = ref(false);
     const error = ref<string | null>(null);
     const initialized = ref(false);
 
-    // Check auth status on init using Firebase observer
+    // Initial check for session could go here if there was a /me endpoint or token check
     async function init() {
-        if (initialized.value) return;
-
-        return new Promise<void>((resolve) => {
-            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                if (currentUser) {
-                    user.value = mapFirebaseUser(currentUser);
-                } else {
-                    user.value = null;
-                }
-                initialized.value = true;
-                resolve();
-                // We could unsubscribe here if we only want initial load, 
-                // but keeping it listens for changes (token refresh etc)
-                // However, 'init' usually implies just ONCE waiter.
-                // For reactivity, user.value is updated.
-            });
-            // Note: onAuthStateChanged returns an unsubscribe function.
-            // If we want to keep listening, we shouldn't unsubscribe immediately, 
-            // but for 'await auth.init()' we just want to wait for the first known state.
+        // if (initialized.value) return;
+        const response = await client.request<
+            ResponseResponse & {
+                data?: ModelUser;
+            },
+            ResponseResponse
+        >({
+            path: '/me',
+            method: 'GET'
         });
-    }
-
-    function mapFirebaseUser(fwUser: FirebaseUser): User {
-        return {
-            id: fwUser.uid,
-            username: fwUser.email?.split('@')[0] || 'user', // fallback
-            email: fwUser.email || '',
-            name: fwUser.displayName || fwUser.email?.split('@')[0] || 'User'
-        };
+        if (response.ok) {
+            // user.value = response.data?.data;
+            if (response.data?.data) {
+                user.value = response.data.data;
+            }
+            initialized.value = true;
+        }
     }
 
     async function login(username: string, password: string) {
         loading.value = true;
         error.value = null;
-        // Assuming username is email for Firebase, or we need to look it up?
-        // Firebase works with Email. If input is username, this might fail.
-        // For now assume email.
-        return emailAuth(username, password).then((userCredential) => {
-            user.value = mapFirebaseUser(userCredential.user);
-            router.push('/');
-        }).catch((e: any) => {
+        try {
+            const response = await client.auth.loginCreate({
+                email: username,
+                password: password
+            });
+
+            // Expected response structure: { data: { code: 200, data: User, message: "..." } } based on typical wrapper + schema
+            // BUT client.ts generated code typically returns the body directly in .data property of HttpResponse
+            // And schema says ResponseResponse has 'data': {}
+            // So: response.data (HttpResponse body) -> .data (ResponseResponse payload)
+
+            const body = response.data as any; // Cast to access potential 'data' property if types are loose
+            if (body && body.data) {
+                user.value = body.data;
+                router.push('/');
+            } else {
+                throw new Error('Login failed: No user data received');
+            }
+        } catch (e: any) {
             console.error(e);
             error.value = 'Login failed: ' + (e.message || 'Unknown error');
             throw e;
-        }).finally(() => {
+        } finally {
             loading.value = false;
-        });
+        }
     }
 
     async function loginWithGoogle() {
-        loading.value = true;
-        error.value = null;
-        return googleAuth().then((result) => {
-            user.value = mapFirebaseUser(result.user);
-            router.push('/');
-        }).catch((e: any) => {
-            console.error(e);
-            error.value = 'Google Login failed';
-            throw e;
-        }).finally(() => {
-            loading.value = false;
-        });
+        // usually this initiates a redirect loop. 
+        // Doing it via client.request might follow redirect or return html.
+        // Best to just redirect the window.
+        window.location.href = `${client.baseUrl}/auth/google/login`;
     }
 
     async function register(username: string, email: string, password: string) {
         loading.value = true;
         error.value = null;
-        return signUp(email, password).then((fwUser) => {
-            // update profile with username?
-            // updateProfile(fwUser, { displayName: username });
-            user.value = mapFirebaseUser(fwUser);
-            router.push('/');
-        }).catch((e: any) => {
+        try {
+            const response = await client.auth.registerCreate({
+                username,
+                email,
+                password
+            });
+
+            // Check success
+            const body = response.data as any;
+            if (response.ok) {
+                // Auto login or redirect to login? 
+                // Usually register returns success, user must login.
+                router.push('/login');
+            } else {
+                throw new Error(body.message || 'Registration failed');
+            }
+        } catch (e: any) {
             console.error(e);
             error.value = 'Registration failed: ' + (e.message || 'Unknown error');
             throw e;
-        }).finally(() => {
+        } finally {
             loading.value = false;
-        });
+        }
     }
 
     async function logout() {
-        return signOut(auth).then(() => {
+        loading.value = true;
+        try {
+            await client.auth.logoutCreate();
             user.value = null;
-            router.push('/');
-        })
+            router.push('/login');
+        } catch (e: any) {
+            console.error('Logout error', e);
+            // Force local logout anyway
+            user.value = null;
+            router.push('/login');
+        } finally {
+            loading.value = false;
+        }
     }
+
     return {
-        user, loading, error, initialized, init, login, loginWithGoogle, register, logout, $reset: () => {
+        user,
+        loading,
+        error,
+        initialized,
+        init,
+        login,
+        loginWithGoogle,
+        register,
+        logout,
+        $reset: () => {
             user.value = null;
             loading.value = false;
             error.value = null;

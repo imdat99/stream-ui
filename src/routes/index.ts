@@ -76,7 +76,7 @@ const routes: RouteData[] = [
           {
             path: "upload",
             name: "upload",
-            component: () => import("./add/Add.vue"),
+            component: () => import("./upload/Upload.vue"),
             meta: {
               head: {
                 title: 'Upload - Holistream',
@@ -86,7 +86,7 @@ const routes: RouteData[] = [
           {
             path: "video",
             name: "video",
-            component: () => import("./add/Add.vue"),
+            component: () => import("./video/Videos.vue"),
             meta: {
               head: {
                 title: 'Videos - Holistream',
@@ -99,7 +99,7 @@ const routes: RouteData[] = [
           {
             path: "plans",
             name: "plans",
-            component: () => import("./add/Add.vue"),
+            component: () => import("./plans/Plans.vue"),
             meta: {
               head: {
                 title: 'Plans & Billing',
@@ -130,28 +130,28 @@ const routes: RouteData[] = [
   },
 ];
 const createAppRouter = () => {
-const router = createRouter({
-  history: import.meta.env.SSR
-    ? createMemoryHistory() // server
-    : createWebHistory(), // client
-  routes,
-});
+  const router = createRouter({
+    history: import.meta.env.SSR
+      ? createMemoryHistory() // server
+      : createWebHistory(), // client
+    routes,
+  });
 
-router.beforeEach((to, from, next) => {
-  const auth = useAuthStore();
-  const head = inject(headSymbol);
-  (head as any).push(to.meta.head || {});
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!auth.user) {
-      next({ name: "login" });
+  router.beforeEach((to, from, next) => {
+    const auth = useAuthStore();
+    const head = inject(headSymbol);
+    (head as any).push(to.meta.head || {});
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+      if (!auth.user) {
+        next({ name: "login" });
+      } else {
+        next();
+      }
     } else {
       next();
     }
-  } else {
-    next();
-  }
-});
-return router;
+  });
+  return router;
 }
 
 export default createAppRouter;
