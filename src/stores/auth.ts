@@ -12,23 +12,30 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Initial check for session could go here if there was a /me endpoint or token check
     async function init() {
-        // if (initialized.value) return;
-        const response = await client.request<
-            ResponseResponse & {
-                data?: ModelUser;
-            },
-            ResponseResponse
-        >({
+        if (initialized.value) return;
+        await client.request({
             path: '/me',
-            method: 'GET'
-        });
-        if (response.ok) {
-            // user.value = response.data?.data;
-            if (response.data?.data) {
-                user.value = response.data.data;
+            method: 'GET',
+            format: "json",
+        }).then(r => r.json()).then(r => {
+            if (r.data) {
+                user.value = r.data as ModelUser;
             }
+        }).catch(() => {}).finally(() => {
             initialized.value = true;
-        }
+        });
+        // client.request<
+        //     ResponseResponse & {
+        //         data?: ModelUser;
+        //     },
+        //     ResponseResponse
+        // >({
+        //     path: '/me',
+        //     method: 'GET'
+        // }).then(console.log)
+        // .finally(() => {
+        //     initialized.value = true;
+        // });
     }
 
     async function login(username: string, password: string) {

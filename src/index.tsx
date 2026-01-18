@@ -36,7 +36,7 @@ app.get("*", async (c) => {
   app.provide("honoContext", c);
   const auth = useAuthStore();
   auth.$reset();
-  auth.initialized = false;
+  // auth.initialized = false;
   await auth.init();
   await router.push(url.pathname);
   await router.isReady();

@@ -39,7 +39,7 @@ import { z } from 'zod';
 
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from "primevue/usetoast";
-import { forgotPassword } from '@/lib/firebase';
+import { client } from '@/api/client';
 
 const auth = useAuthStore();
 const toast = useToast();
@@ -56,11 +56,18 @@ const resolver = zodResolver(
 
 const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
     if (valid) {
-        forgotPassword(values.email).then(() => {
-             toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
-        }).catch(() => {
-             toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
-        });
+        client.auth.forgotPasswordCreate({ email: values.email })
+            .then(() => {
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
+            })
+            .catch((error) => {
+                toast.add({ severity: 'error', summary: 'Error', detail: error.message || 'An error occurred', life: 3000 });
+            });
+        // forgotPassword(values.email).then(() => {
+        //      toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
+        // }).catch(() => {
+        //      toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
+        // });
     }
 };
 </script>

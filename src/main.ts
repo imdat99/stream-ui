@@ -16,7 +16,7 @@ export function createApp() {
     const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));
     const head = import.meta.env.SSR ? SSRHead() : CSRHead();
-    
+
     app.use(head);
     app.use(PrimeVue, {
         // unstyled: true,
@@ -43,14 +43,14 @@ export function createApp() {
         Object.entries(JSON.parse(document.getElementById("__APP_DATA__")?.innerText || "{}")).forEach(([key, value]) => {
             (window as any)[key] = value;
         });
-        if ((window as any).$p ) {
+        if ((window as any).$p) {
             pinia.state.value = (window as any).$p;
         }
     }
     app.use(pinia);
-    app.use(vueSWR({revalidateOnFocus: false}));
+    app.use(vueSWR({ revalidateOnFocus: false }));
     const router = createAppRouter();
     app.use(router);
-    
+
     return { app, router, head, pinia, bodyClass };
 }
