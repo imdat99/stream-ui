@@ -10,9 +10,9 @@ export const customFetch = async (url: string, options: RequestInit) => {
 		if (!c) {
 			throw new Error("Hono context not found in SSR");
 		}
-		Object.entries(c.req.header()).forEach(([k, v]) => {
-			Object.assign(options.headers!, { [k]: v });
-		});
+		// Object.entries(c.req.header()).forEach(([k, v]) => {
+		// 	Object.assign(options.headers!, { [k]: v });
+		// });
 		return await c.get("fetch")(url, options);
 	}
 	return fetch(url, options);
