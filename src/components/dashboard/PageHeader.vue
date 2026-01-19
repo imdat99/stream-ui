@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { cn } from '@/lib/utils';
+
 interface Breadcrumb {
   label: string;
   to?: string;
@@ -36,7 +38,7 @@ const getButtonClass = (variant?: string) => {
 </script>
 
 <template>
-  <div class="page-header mb-6">
+  <div :class="cn('page-header mb-6')">
     <!-- Breadcrumb -->
     <nav v-if="breadcrumbs && breadcrumbs.length" class="flex items-center gap-2 text-sm mb-2">
       <template v-for="(crumb, index) in breadcrumbs" :key="index">
@@ -51,8 +53,12 @@ const getButtonClass = (variant?: string) => {
         
         <span 
           v-if="index < breadcrumbs.length - 1"
-          class="i-heroicons-chevron-right w-4 h-4 text-gray-400"
-        />
+          class="w-4 h-4 text-gray-400"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </span>
       </template>
     </nav>
 

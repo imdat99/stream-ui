@@ -673,6 +673,7 @@ export class Api<
 }
 
 export const client = new Api({
-  baseUrl: 'http://localhost:8080',
+  baseUrl: 'r',
+  // baseUrl: 'https://carey-novelty-various-manufacturers.trycloudflare.com',
   customFetch
 });

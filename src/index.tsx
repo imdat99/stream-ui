@@ -6,7 +6,7 @@ import { renderSSRHead } from '@unhead/vue/server';
 import { buildBootstrapScript, getHrefFromManifest, loadCssByModules } from './lib/manifest';
 import { contextStorage } from 'hono/context-storage';
 import { cors } from "hono/cors";
-import { firebaseAuthMiddleware, rpcServer } from './api/rpc';
+import { endpoint, firebaseAuthMiddleware, rpcServer } from './api/rpc';
 import isMobile from 'is-mobile';
 import { useAuthStore } from './stores/auth';
 import { cssContent } from './lib/primeCssContent';
@@ -25,7 +25,20 @@ app.use(cors(), async (c, next) => {
   };
   c.set("isMobile", isMobile({ ua }));
   await next();
-}, firebaseAuthMiddleware, rpcServer);
+}, async (c, next) => {
+ const path = c.req.path
+
+  if (path !== '/r' && !path.startsWith('/r/')) {
+    return next()
+  }
+  const url = new URL(c.req.url)
+  url.host = 'carey-novelty-various-manufacturers.trycloudflare.com'
+  url.protocol = 'https:'
+  url.pathname = path.replace(/^\/r/, '') || '/'
+  url.port = ''
+  const req = new Request(url.toString(), c.req.raw)
+  return fetch(req)
+});
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });
