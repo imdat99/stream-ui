@@ -1,16 +1,14 @@
-import { Hono } from 'hono'
-import { createApp } from './main';
-import { renderToWebStream } from 'vue/server-renderer';
-import { streamText } from 'hono/streaming';
 import { renderSSRHead } from '@unhead/vue/server';
-import { buildBootstrapScript, getHrefFromManifest, loadCssByModules } from './lib/manifest';
+import { Hono } from 'hono';
 import { contextStorage } from 'hono/context-storage';
 import { cors } from "hono/cors";
-import { endpoint, firebaseAuthMiddleware, rpcServer } from './api/rpc';
+import { streamText } from 'hono/streaming';
 import isMobile from 'is-mobile';
-import { useAuthStore } from './stores/auth';
-import { cssContent } from './lib/primeCssContent';
+import { renderToWebStream } from 'vue/server-renderer';
+import { buildBootstrapScript } from './lib/manifest';
 import { styleTags } from './lib/primePassthrough';
+import { createApp } from './main';
+import { useAuthStore } from './stores/auth';
 // @ts-ignore
 import Base from '@primevue/core/base';
 const app = new Hono()
@@ -32,12 +30,15 @@ app.use(cors(), async (c, next) => {
     return next()
   }
   const url = new URL(c.req.url)
-  url.host = 'interesting-atmosphere-encryption-value.trycloudflare.com'
+  url.host = 'cheapest-representations-corporations-related.trycloudflare.com'
   url.protocol = 'https:'
   url.pathname = path.replace(/^\/r/, '') || '/'
   url.port = ''
-  const req = new Request(url.toString(), c.req.raw)
-  return fetch(req)
+  const req = new Request(url.toString(), c.req.raw);
+  const res = await fetch(req).catch(err => console.error('Error during proxy request: ', err.message));
+  // return c.body(res, res.status, res.headers);
+  console.log('Proxy request to: ', url.toString(), ' response: ', res?.status, JSON.stringify(c.req.header(), null, 2));
+  return res
 });
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
