@@ -587,7 +587,14 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<ResponseResponse, ResponseResponse>({
+      this.request<ResponseResponse & {
+        data: {
+          limit: number;
+          page: number;
+          total: number;
+          videos: ModelVideo[];
+        }
+      }, ResponseResponse>({
         path: `/videos`,
         method: "GET",
         query: query,
@@ -674,6 +681,6 @@ export class Api<
 
 export const client = new Api({
   baseUrl: 'r',
-  // baseUrl: 'https://carey-novelty-various-manufacturers.trycloudflare.com',
+  // baseUrl: 'https://interesting-atmosphere-encryption-value.trycloudflare.com',
   customFetch
 });

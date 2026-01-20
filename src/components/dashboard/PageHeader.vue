@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
+import { VNode } from 'vue';
 
 interface Breadcrumb {
   label: string;
@@ -8,7 +9,7 @@ interface Breadcrumb {
 
 interface Action {
   label: string;
-  icon?: string;
+  icon?: string | VNode;
   variant?: 'primary' | 'secondary' | 'danger';
   onClick: () => void;
 }
@@ -76,7 +77,11 @@ const getButtonClass = (variant?: string) => {
           @click="action.onClick"
           :class="getButtonClass(action.variant)"
         >
-          <span v-if="action.icon" :class="[action.icon, 'w-5 h-5']" />
+           <component
+            v-if="action.icon"
+            :is="action.icon"
+            class="w-5 h-5"
+          />
           {{ action.label }}
         </button>
       </div>

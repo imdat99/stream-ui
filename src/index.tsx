@@ -32,7 +32,7 @@ app.use(cors(), async (c, next) => {
     return next()
   }
   const url = new URL(c.req.url)
-  url.host = 'carey-novelty-various-manufacturers.trycloudflare.com'
+  url.host = 'interesting-atmosphere-encryption-value.trycloudflare.com'
   url.protocol = 'https:'
   url.pathname = path.replace(/^\/r/, '') || '/'
   url.port = ''

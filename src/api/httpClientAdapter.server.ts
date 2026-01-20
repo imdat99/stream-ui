@@ -10,7 +10,7 @@ export const customFetch = async (url: string, options: RequestInit) => {
 		Object.assign(options, {
 			headers: c.req.header()
 		});
-		const res = await fetch(["https://carey-novelty-various-manufacturers.trycloudflare.com", url.replace(/r\//, '')].join('/'), options);
+		const res = await fetch(["https://interesting-atmosphere-encryption-value.trycloudflare.com", url.replace(/r\//, '')].join('/'), options);
 		console.log('Fetching URL:', res);
 		res.headers.forEach((value, key) => {
 			c.header(key, value);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, createStaticVNode } from 'vue';
 import { useRouter } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
@@ -12,7 +12,7 @@ const error = ref<string | null>(null);
 const searchQuery = ref('');
 const selectedStatus = ref<string>('all');
 const viewMode = ref<'grid' | 'table'>('table');
-
+const iconHoist = createStaticVNode(`<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1zM16 7l-4-4m0 0L8 7m4-4v12" /></svg>`, 1)
 // Pagination
 const page = ref(1);
 const limit = ref(20);
@@ -31,11 +31,11 @@ const fetchVideos = async () => {
   error.value = null;
   try {
     const response = await client.videos.videosList({ page: page.value, limit: limit.value });
-    const body = response.data as any;
-    
-    if (body.data && Array.isArray(body.data)) {
-      videos.value = body.data;
-      total.value = body.total || body.data.length;
+    const body = response.data.data
+    // console.log('Fetched videos:', body);
+    if (body.videos && Array.isArray(body.videos)) {
+      videos.value = body.videos;
+      total.value = body.total || body.videos.length;
     } else if (Array.isArray(body)) {
       videos.value = body;
       total.value = body.length;
@@ -148,7 +148,8 @@ onMounted(() => {
       :actions="[
         { 
           label: 'Upload Video',
-          icon: 'i-heroicons-cloud-arrow-up',
+          // icon: 'i-heroicons-cloud-arrow-up',
+          icon: iconHoist,
           variant: 'primary',
           onClick: () => router.push('/upload')
         }
@@ -161,28 +162,22 @@ onMounted(() => {
         <!-- Search -->
         <div class="flex-1">
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 i-heroicons-magnifying-glass w-5 h-5 text-gray-400" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="-10 -258 534 534"><path d="M384-40c0-97-79-176-176-176S32-137 32-40s79 176 176 176S384 57 384-40zm-41 158c-36 31-83 50-135 50C93 168 0 75 0-40s93-208 208-208 208 93 208 208c0 52-19 99-50 135l141 142c7 6 7 16 0 22-6 7-16 7-22 0L343 118z" fill="#1e3050"/></svg>
             <input
               v-model="searchQuery"
               @keyup.enter="handleSearch"
               type="text"
               placeholder="Search videos by title or description..."
-              class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
         </div>
 
         <!-- Status Filter -->
-        <select
-          v-model="selectedStatus"
-          @change="handleFilter"
-          class="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-        >
-          <option v-for="option in statusOptions" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-
+        <FloatLabel class="w-full md:w-56" variant="on">
+          <Select v-model="selectedStatus" inputId="on_label" :options="statusOptions" optionLabel="label" optionValue="value" class="w-full" />
+          <label for="on_label">Status</label>
+        </FloatLabel>
         <!-- View Mode Toggle -->
         <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
           <button
@@ -193,7 +188,9 @@ onMounted(() => {
             ]"
             title="Table view"
           >
-            <span class="i-heroicons-list-bullet w-5 h-5" :class="viewMode === 'table' ? 'text-primary' : 'text-gray-600'" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" :class="viewMode === 'table' ? 'text-primary' : 'text-gray-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
           </button>
           <button
             @click="viewMode = 'grid'"
@@ -203,7 +200,9 @@ onMounted(() => {
             ]"
             title="Grid view"
           >
-            <span class="i-heroicons-squares-2x2 w-5 h-5" :class="viewMode === 'grid' ? 'text-primary' : 'text-gray-600'" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" :class="viewMode === 'grid' ? 'text-primary' : 'text-gray-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h6v6H4V4zm0 10h6v6H4v-6zm10-10h6v6h-6V4zm0 10h6v6h-6v-6z" />
+            </svg>
           </button>
         </div>
       </div>
@@ -228,7 +227,7 @@ onMounted(() => {
       v-else-if="videos.length === 0"
       title="No videos found"
       description="You haven't uploaded any videos yet. Start by uploading your first video!"
-      icon="i-heroicons-film"
+      imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png"
       actionLabel="Upload Video"
       :onAction="() => router.push('/upload')"
     />

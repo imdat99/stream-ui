@@ -35,9 +35,11 @@ const props = defineProps<Props>();
     <button
       v-if="actionLabel && onAction"
       @click="onAction"
-      class="px-6 py-3 bg-primary hover:bg-primary-600 text-white rounded-lg font-medium transition-colors press-animated flex items-center gap-2"
+      class="btn btn-outline-primary press-animated flex items-center gap-2"
     >
-      <span class="i-heroicons-plus w-5 h-5" />
+       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg>
       {{ actionLabel }}
     </button>
 
