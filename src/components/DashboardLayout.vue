@@ -19,7 +19,7 @@ const links = [
     { href: "/", label: "Overview", icon: Home, type: "a", className },
     { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
     { href: "/video", label: "Video", icon: Video, type: "a", className },
-    { href: "/plans", label: "Plans", icon: Credit, type: "a", className },
+    { href: "/payments-and-plans", label: "Payments & Plans", icon: Credit, type: "a", className },
     { href: "/notification", label: "Notification", icon: Bell, type: "a", className },
     { href: "/profile", label: "Profile", icon: profileHoist, type: "a", className: 'w-12 h-12 rounded-2xl hover:bg-primary/15 flex' },
 ];

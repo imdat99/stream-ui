@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import { client, type ModelVideo } from '@/api/client';
+import Skeleton from 'primevue/skeleton';
 
 const router = useRouter();
 const loading = ref(true);
@@ -149,8 +150,51 @@ onMounted(() => {
     />
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center py-20">
-      <div class="i-svg-spinners-180-ring-with-bg text-4xl text-primary"></div>
+    <div v-if="loading" class="animate-pulse">
+      <!-- Stats Grid Skeleton -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div v-for="i in 4" :key="i" class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+             <div class="space-y-2">
+                <Skeleton width="5rem" height="1rem" class="mb-2"></Skeleton>
+                <Skeleton width="8rem" height="2rem"></Skeleton>
+             </div>
+             <Skeleton shape="circle" size="3rem"></Skeleton>
+          </div>
+          <Skeleton width="4rem" height="1rem"></Skeleton>
+        </div>
+      </div>
+
+       <!-- Quick Actions Skeleton -->
+       <div class="mb-8">
+         <Skeleton width="10rem" height="1.5rem" class="mb-4"></Skeleton>
+         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+             <div v-for="i in 4" :key="i" class="p-6 rounded-xl border border-gray-200">
+                <Skeleton shape="circle" size="3rem" class="mb-4"></Skeleton>
+                <Skeleton width="8rem" height="1.25rem" class="mb-2"></Skeleton>
+                <Skeleton width="100%" height="1rem"></Skeleton>
+             </div>
+         </div>
+       </div>
+
+       <!-- Recent Videos Skeleton -->
+       <div class="mb-8">
+           <div class="flex items-center justify-between mb-4">
+              <Skeleton width="8rem" height="1.5rem"></Skeleton>
+              <Skeleton width="5rem" height="1rem"></Skeleton>
+           </div>
+           <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+               <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
+                  <div class="flex gap-4">
+                     <Skeleton width="4rem" height="2.5rem" class="rounded"></Skeleton>
+                     <div class="flex-1 space-y-2">
+                        <Skeleton width="30%" height="1rem"></Skeleton>
+                        <Skeleton width="20%" height="0.8rem"></Skeleton>
+                     </div>
+                  </div>
+               </div>
+           </div>
+       </div>
     </div>
 
     <div v-else>

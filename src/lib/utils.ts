@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 export function debounce<Func extends (...args: any[]) => any>(func: Func, wait: number): Func {
   let timeout: ReturnType<typeof setTimeout> | null;
-  return function(this: any, ...args: any[]) {
+  return function (this: any, ...args: any[]) {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => {
       func.apply(this, args);
@@ -48,3 +48,5 @@ export function getImageAspectRatio(url: string): Promise<AspectInfo> {
     img.src = url;
   });
 }
+
+

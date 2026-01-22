@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
 import { VNode } from 'vue';
+import VueHead from '@/components/VueHead';
 
 interface Breadcrumb {
   label: string;
@@ -67,6 +68,7 @@ const getButtonClass = (variant?: string) => {
     <div class="flex items-start justify-between gap-4 flex-wrap">
       <div class="flex-1 min-w-0">
         <h1 class="text-3xl font-bold text-gray-900 mb-1">{{ title }}</h1>
+        <vue-head :input="{ title, meta: [{ name: 'description', content: description || '' }] }" />
         <p v-if="description" class="text-gray-600">{{ description }}</p>
       </div>
 

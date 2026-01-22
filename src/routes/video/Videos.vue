@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, createStaticVNode } from 'vue';
+import { ref, onMounted, createStaticVNode, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import { client, type ModelVideo } from '@/api/client';
+import Skeleton from 'primevue/skeleton';
+
 
 const router = useRouter();
 const videos = ref<ModelVideo[]>([]);
@@ -131,6 +133,8 @@ const deleteVideo = async (videoId?: string) => {
   }
 };
 
+
+
 onMounted(() => {
   fetchVideos();
 });
@@ -157,7 +161,7 @@ onMounted(() => {
     />
 
     <!-- Filters & Search -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white border-b border-gray-200 pb-4 mb-6">
       <div class="flex flex-col md:flex-row gap-4">
         <!-- Search -->
         <div class="flex-1">
@@ -209,8 +213,36 @@ onMounted(() => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center py-20">
-      <div class="i-svg-spinners-180-ring-with-bg text-4xl text-primary"></div>
+    <div v-if="loading" class="animate-pulse">
+        <!-- Grid Skeleton -->
+        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div v-for="i in 8" :key="i" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <Skeleton height="150px" width="100%"></Skeleton>
+                <div class="p-4">
+                    <Skeleton width="80%" height="1.5rem" class="mb-2"></Skeleton>
+                    <Skeleton width="60%" height="1rem" class="mb-4"></Skeleton>
+                    <div class="flex justify-between">
+                        <Skeleton width="3rem" height="1rem"></Skeleton>
+                        <Skeleton width="3rem" height="1rem"></Skeleton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Table Skeleton -->
+        <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
+                <div class="flex gap-4 items-center">
+                    <Skeleton width="5rem" height="3rem" class="rounded"></Skeleton>
+                    <div class="flex-1">
+                        <Skeleton width="40%" height="1.2rem" class="mb-2"></Skeleton>
+                        <Skeleton width="30%" height="1rem"></Skeleton>
+                    </div>
+                    <Skeleton width="10%" height="1rem"></Skeleton>
+                    <Skeleton width="10%" height="1rem"></Skeleton>
+                    <Skeleton width="5rem" height="2rem" borderRadius="16px"></Skeleton>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Error State -->

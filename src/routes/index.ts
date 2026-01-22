@@ -97,12 +97,12 @@ const routes: RouteData[] = [
             }
           },
           {
-            path: "plans",
-            name: "plans",
+            path: "payments-and-plans",
+            name: "payments-and-plans",
             component: () => import("./plans/Plans.vue"),
             meta: {
               head: {
-                title: 'Plans & Billing',
+                title: 'Payments & Plans - Holistream',
                 meta: [
                   { name: 'description', content: 'Manage your plans and billing information.' },
                 ],
@@ -122,7 +122,7 @@ const routes: RouteData[] = [
           {
             path: "profile",
             name: "profile",
-            component: () => import("./add/Add.vue"), // TODO: create profile page
+            component: () => import("./profile/Profile.vue"), // TODO: create profile page
             meta: {
               head: {
                 title: 'Profile - Holistream',

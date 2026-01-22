@@ -27,18 +27,19 @@ app.use(cors(), async (c, next) => {
  const path = c.req.path
 
   if (path !== '/r' && !path.startsWith('/r/')) {
-    return next()
+    return await next()
   }
   const url = new URL(c.req.url)
-  url.host = 'cheapest-representations-corporations-related.trycloudflare.com'
+  url.host = 'api.pipic.fun'
   url.protocol = 'https:'
   url.pathname = path.replace(/^\/r/, '') || '/'
   url.port = ''
   const req = new Request(url.toString(), c.req.raw);
-  const res = await fetch(req).catch(err => console.error('Error during proxy request: ', err.message));
+  return fetch(req);
+  // const res = await fetch(req).catch(err => console.error('Error during proxy request: ', err.message));
   // return c.body(res, res.status, res.headers);
-  console.log('Proxy request to: ', url.toString(), ' response: ', res?.status, JSON.stringify(c.req.header(), null, 2));
-  return res
+  // console.log('Proxy request to: ', url.toString(), ' response: ', res?.status, JSON.stringify(c.req.header(), null, 2));
+  // return res
 });
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });

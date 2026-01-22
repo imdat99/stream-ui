@@ -10,7 +10,7 @@ export const customFetch = async (url: string, options: RequestInit) => {
 		Object.assign(options, {
 			headers: c.req.header()
 		});
-		const res = await fetch(["https://cheapest-representations-corporations-related.trycloudflare.com", url.replace(/r\//, '')].join('/'), options);
+		const res = await fetch(["https://api.pipic.fun", url.replace(/r\//, '')].join('/'), options);
 		res.headers.forEach((value, key) => {
 			c.header(key, value);
 		});
