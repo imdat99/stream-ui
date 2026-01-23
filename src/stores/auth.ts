@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
             format: "json",
         }).then(r => r.json()).then(r => {
             if (r.data) {
-                user.value = r.data as ModelUser;
+                user.value = r.data.user as ModelUser;
             }
         }).catch(() => {}).finally(() => {
             initialized.value = true;

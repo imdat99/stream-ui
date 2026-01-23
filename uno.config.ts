@@ -1,4 +1,4 @@
-import { defineConfig, presetAttributify, presetTypography, presetWind4, transformerCompileClass, transformerVariantGroup } from 'unocss'
+import { defineConfig, presetAttributify, presetTypography, presetWind4, transformerCompileClass, transformerVariantGroup } from 'unocss';
 import { presetBootstrapBtn } from "./bootstrap_btn";
 
 export default defineConfig({
@@ -69,6 +69,16 @@ export default defineConfig({
         light: "#e2e6ea",
         dark: "#e2e6ea",
       },
+      foreground: {
+        DEFAULT: "#111827",
+        light: "#374151",
+        dark: "#000000",
+      },
+      muted: {
+        DEFAULT: "#f3f4f6",
+        light: "#fafafa",
+        dark: "#e5e7eb",
+      }
     },
     boxShadow: {
       "primary-box": "2px 2px 10px #aff6b8",

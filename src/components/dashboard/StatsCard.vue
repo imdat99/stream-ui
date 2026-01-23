@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { VNode } from 'vue';
+
 interface Trend {
   value: number;
   isPositive: boolean;
@@ -7,7 +9,7 @@ interface Trend {
 interface Props {
   title: string;
   value: string | number;
-  icon?: string;
+  icon?: string | VNode;
   trend?: Trend;
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
 }
@@ -34,24 +36,12 @@ const iconColors = {
 </script>
 
 <template>
-  <div 
-    :class="[
-      'stats-card relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br',
-      gradients[color],
-      'border border-white/50 shadow-sm hover:shadow-md transition-all duration-300',
-      'group cursor-pointer'
-    ]"
-  >
-    <!-- Background Icon (decorative) -->
-    <div 
-      v-if="icon"
-      :class="[
-        'absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity',
-        icon,
-        'text-8xl'
-      ]"
-    />
-
+  <div :class="[
+    'stats-card relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br',
+    gradients[color],
+    'border border-white/50 shadow-sm hover:shadow-md transition-all duration-300',
+    'group cursor-pointer'
+  ]">
     <!-- Content -->
     <div class="relative z-10">
       <div class="flex items-start justify-between mb-3">
@@ -59,33 +49,26 @@ const iconColors = {
           <p class="text-sm font-medium text-gray-600 mb-1">{{ title }}</p>
           <p class="text-3xl font-bold text-gray-900">{{ value }}</p>
         </div>
-        
-        <div 
-          v-if="icon"
-          :class="[
-            'w-12 h-12 rounded-xl flex items-center justify-center',
-            'bg-white/80 shadow-sm',
-            iconColors[color]
-          ]"
-        >
-          <span :class="[icon, 'w-6 h-6']" />
+
+        <div v-if="icon" :class="[
+          'w-12 h-12 rounded-xl flex items-center justify-center',
+          'bg-white/80 shadow-sm',
+          iconColors[color]
+        ]">
+          <component :is="icon" class="w-6 h-6" />
         </div>
       </div>
 
       <!-- Trend Indicator -->
       <div v-if="trend" class="flex items-center gap-1 text-sm">
-        <span 
-          :class="[
-            'flex items-center gap-1 font-medium',
-            trend.isPositive ? 'text-success' : 'text-danger'
-          ]"
-        >
-          <span 
-            :class="[
-              'w-4 h-4',
-              trend.isPositive ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'
-            ]"
-          />
+        <span :class="[
+          'flex items-center gap-1 font-medium',
+          trend.isPositive ? 'text-success' : 'text-danger'
+        ]">
+          <span :class="[
+            'w-4 h-4',
+            trend.isPositive ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'
+          ]" />
           {{ Math.abs(trend.value) }}%
         </span>
         <span class="text-gray-500">vs last month</span>

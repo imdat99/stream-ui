@@ -66,7 +66,7 @@ const routes: RouteData[] = [
           {
             path: "",
             name: "overview",
-            component: () => import("./add/Add.vue"),
+            component: () => import("./overview/Overview.vue"),
             meta: {
               head: {
                 title: 'Overview - Holistream',
