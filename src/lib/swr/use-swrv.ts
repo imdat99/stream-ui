@@ -19,26 +19,26 @@
  *               |||    /    //
  *               |||   /
  */
+import { tinyassert } from "@hiogawa/utils";
 import {
-	reactive,
-	watch,
-	ref,
-	toRefs,
+	getCurrentInstance,
+	inject,
+	isReadonly,
+	isRef,
 	// isRef,
 	onMounted,
-	onUnmounted,
-	getCurrentInstance,
-	isReadonly,
 	onServerPrefetch,
-	isRef,
+	onUnmounted,
+	reactive,
+	ref,
+	toRefs,
 	useSSRContext,
-	type FunctionPlugin,
-	inject
-} from 'vue'
-import webPreset from './lib/web-preset'
-import SWRVCache from './cache'
-import type { IConfig, IKey, IResponse, fetcherFn, revalidateOptions } from './types'
-import { tinyassert } from "@hiogawa/utils";
+	watch,
+	type FunctionPlugin
+} from 'vue';
+import SWRVCache from './cache';
+import webPreset from './lib/web-preset';
+import type { IConfig, IKey, IResponse, fetcherFn, revalidateOptions } from './types';
 
 type StateRef<Data, Error> = {
 	data: Data, error: Error, isValidating: boolean, isLoading: boolean, revalidate: Function, key: any
@@ -183,7 +183,7 @@ function useSWRV<Data = any, Error = any>(...args: any[]): IResponse<Data, Error
 	// #region ssr
 	const isSsrHydration = Boolean(
 		!IS_SERVER &&
-		window !== undefined && (window as any).__SSR_STATE__.swrv)
+		window !== undefined && (window as any).window.swrv)
 	// #endregion
 	if (args.length >= 1) {
 		key = args[0]
@@ -211,7 +211,7 @@ function useSWRV<Data = any, Error = any>(...args: any[]): IResponse<Data, Error
 	if (isSsrHydration) {
 		// component was ssrHydrated, so make the ssr reactive as the initial data
 
-		const swrvState = (window as any).__SSR_STATE__.swrv || []
+		const swrvState = (window as any).window.swrv || []
 		const swrvKey = nanoHex(vm.$.type.__name ?? vm.$.type.name)
 		if (swrvKey !== undefined && swrvKey !== null) {
 			const nodeState = swrvState[swrvKey] || []
@@ -466,5 +466,5 @@ export const vueSWR = (swrvConfig: Partial<IConfig> = defaultConfig): FunctionPl
 	// app.provide('swrv', useSWRV)
 	app.provide('swrv-config', swrvConfig)
 }
-export { mutate }
+export { mutate };
 export default useSWRV

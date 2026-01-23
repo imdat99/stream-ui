@@ -1,20 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useAuthStore } from '@/stores/auth';
 import { client, type ModelPlan } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
-import Card from 'primevue/card';
+import useSWRV from '@/lib/swr';
+import { useAuthStore } from '@/stores/auth';
 import Button from 'primevue/button';
-import Skeleton from 'primevue/skeleton';
-import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Tag from 'primevue/tag';
-import ProgressBar from 'primevue/progressbar';
+import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
+import ProgressBar from 'primevue/progressbar';
+import Skeleton from 'primevue/skeleton';
+import Tag from 'primevue/tag';
+import { computed, ref } from 'vue';
 
 const auth = useAuthStore();
 const plans = ref<ModelPlan[]>([]);
-const loading = ref(true);
 const error = ref<string | null>(null);
 const subscribing = ref<string | null>(null);
 const showManageDialog = ref(false);
@@ -48,27 +47,27 @@ const currentPlan = computed(() => {
     if (!Array.isArray(plans.value)) return undefined;
     return plans.value.find(p => p.id === currentPlanId.value);
 });
-
-const fetchPlans = async () => {
-  loading.value = true;
-  error.value = null;
-  try {
-    const response = await client.plans.plansList();
-    if (response.data && Array.isArray(response.data)) {
-        plans.value = response.data;
-    } else if (response.data && Array.isArray((response.data as any).data)) {
-        // Handle paginated or wrapped response
-        plans.value = (response.data as any).data;
-    } else {
-        plans.value = [];
-    }
-  } catch (err: any) {
-    console.error(err);
-    error.value = err.message || 'Failed to load plans';
-  } finally {
-    loading.value = false;
-  }
-};
+const { isLoading } = useSWRV("plans", client.plans.plansList)
+// const fetchPlans = async () => {
+//   loading.value = true;
+//   error.value = null;
+//   try {
+//     const response = await client.plans.plansList();
+//     if (response.data && Array.isArray(response.data)) {
+//         plans.value = response.data;
+//     } else if (response.data && Array.isArray((response.data as any).data)) {
+//         // Handle paginated or wrapped response
+//         plans.value = (response.data as any).data;
+//     } else {
+//         plans.value = [];
+//     }
+//   } catch (err: any) {
+//     console.error(err);
+//     error.value = err.message || 'Failed to load plans';
+//   } finally {
+//     loading.value = false;
+//   }
+// };
 
 const subscribe = async (plan: ModelPlan) => {
   if (!plan.id) return;
@@ -145,10 +144,6 @@ const getStatusSeverity = (status: string) => {
             return 'info';
     }
 };
-
-onMounted(() => {
-  fetchPlans();
-});
 </script>
 
 <template>
@@ -165,7 +160,7 @@ onMounted(() => {
     <div class="content max-w-7xl mx-auto space-y-12 pb-12">
         
         <!-- Hero Section: Current Plan & Usage -->
-        <div v-if="!loading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div v-if="!isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Current Plan Card -->
             <div class="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 shadow-xl">
                  <!-- Background decorations -->
@@ -222,7 +217,7 @@ onMounted(() => {
             </div>
             
              <!-- Loading State -->
-             <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+             <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div v-for="i in 3" :key="i" class="h-full">
                     <Skeleton height="300px" borderRadius="16px"></Skeleton>
                 </div>
