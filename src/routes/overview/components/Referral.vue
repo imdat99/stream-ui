@@ -33,7 +33,10 @@ const auth = useAuthStore()
 const isCopied = ref(false)
 const url = location.origin + '/ref/' + auth.user?.username
 const copyToClipboard = ($event: MouseEvent) => {
-    ($event.target as HTMLInputElement).select()
+    // ($event.target as HTMLInputElement)?.select
+    if ($event.target instanceof HTMLInputElement) {
+        $event.target.select()
+    }
     navigator.clipboard.writeText(url)
     isCopied.value = true
     setTimeout(() => {

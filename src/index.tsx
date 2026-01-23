@@ -24,7 +24,7 @@ app.use(cors(), async (c, next) => {
   c.set("isMobile", isMobile({ ua }));
   await next();
 }, async (c, next) => {
- const path = c.req.path
+  const path = c.req.path
 
   if (path !== '/r' && !path.startsWith('/r/')) {
     return await next()
@@ -34,12 +34,45 @@ app.use(cors(), async (c, next) => {
   url.protocol = 'https:'
   url.pathname = path.replace(/^\/r/, '') || '/'
   url.port = ''
-  const req = new Request(url.toString(), c.req.raw);
-  return fetch(req);
-  // const res = await fetch(req).catch(err => console.error('Error during proxy request: ', err.message));
-  // return c.body(res, res.status, res.headers);
-  // console.log('Proxy request to: ', url.toString(), ' response: ', res?.status, JSON.stringify(c.req.header(), null, 2));
-  // return res
+  // console.log("url", url.toString())
+  // console.log("c.req.raw", c.req.raw)
+  const headers = new Headers(c.req.header());
+  headers.delete("host");
+  headers.delete("connection");
+
+  const response = await fetch(url.toString(), {
+    method: c.req.method,
+    headers: headers,
+    body: c.req.raw.body,
+    // @ts-ignore
+    duplex: 'half',
+    credentials: 'include'
+  });
+
+  const newHeaders = new Headers(response.headers);
+
+  // Rewrite Set-Cookie to remove Domain attribute
+  if (typeof response.headers.getSetCookie === 'function') {
+    newHeaders.delete('set-cookie');
+    const cookies = response.headers.getSetCookie();
+    for (const cookie of cookies) {
+      // Remove Domain=...; or Domain=... ending
+      const newCookie = cookie.replace(/Domain=[^;]+;?/gi, '');
+      newHeaders.append('set-cookie', newCookie);
+    }
+  } else {
+    // Fallback for environments without getSetCookie
+    const cookie = response.headers.get('set-cookie');
+    if (cookie) {
+      newHeaders.set('set-cookie', cookie.replace(/Domain=[^;]+;?/gi, ''));
+    }
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders
+  });
 });
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });

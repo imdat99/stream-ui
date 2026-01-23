@@ -256,7 +256,7 @@ function useSWRV<Data = any, Error = any>(...args: any[]): IResponse<Data, Error
 		const fetcher = data || fn
 		if (
 			!fetcher ||
-			(!(config as any).isDocumentVisible() && !isFirstFetch) ||
+			(!IS_SERVER && !(config as any).isDocumentVisible() && !isFirstFetch) ||
 			(opts?.forceRevalidate !== undefined && !opts?.forceRevalidate)
 		) {
 			stateRef.isValidating = false

@@ -112,7 +112,7 @@ const routes: RouteData[] = [
           {
             path: "notification",
             name: "notification",
-            component: () => import("./add/Add.vue"), // TODO: create notification page
+            component: () => import("./notification/Notification.vue"), // TODO: create notification page
             meta: {
               head: {
                 title: 'Notification - Holistream',

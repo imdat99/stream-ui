@@ -10,7 +10,12 @@ export const customFetch = async (url: string, options: RequestInit) => {
 		Object.assign(options, {
 			headers: c.req.header()
 		});
+		console.log("url", url)
 		const res = await fetch(["https://api.pipic.fun", url.replace(/r\//, '')].join('/'), options);
+		if (url.includes("r/plans")) {
+			console.log("res", await res.json())
+
+		}
 		res.headers.forEach((value, key) => {
 			c.header(key, value);
 		});
