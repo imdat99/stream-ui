@@ -1,5 +1,5 @@
 import { type ReactiveHead, type ResolvableValue } from "@unhead/vue";
-import { headSymbol } from '@unhead/vue'
+import { headSymbol } from "@unhead/vue";
 import {
   createMemoryHistory,
   createRouter,
@@ -19,15 +19,31 @@ const routes: RouteData[] = [
     children: [
       {
         path: "",
-        component: () => import("./home/Home.vue"),
-        beforeEnter: (to, from, next) => {
-          const auth = useAuthStore();
-          if (auth.user) {
-            next({ name: "overview" });
-          } else {
-            next();
-          }
-        },
+        component: () => import("./home/Layout.vue"),
+        children: [
+          {
+            path: "",
+            component: () => import("./home/Home.vue"),
+            beforeEnter: (to, from, next) => {
+              const auth = useAuthStore();
+              if (auth.user) {
+                next({ name: "overview" });
+              } else {
+                next();
+              }
+            },
+          },
+          {
+            path: "/terms",
+            name: "terms",
+            component: () => import("./home/Terms.vue"),
+          },
+          {
+            path: "/privacy",
+            name: "privacy",
+            component: () => import("./home/Privacy.vue"),
+          },
+        ],
       },
       {
         path: "",
@@ -69,9 +85,9 @@ const routes: RouteData[] = [
             component: () => import("./overview/Overview.vue"),
             meta: {
               head: {
-                title: 'Overview - Holistream',
+                title: "Overview - Holistream",
               },
-            }
+            },
           },
           {
             path: "upload",
@@ -79,9 +95,9 @@ const routes: RouteData[] = [
             component: () => import("./upload/Upload.vue"),
             meta: {
               head: {
-                title: 'Upload - Holistream',
+                title: "Upload - Holistream",
               },
-            }
+            },
           },
           {
             path: "video",
@@ -89,12 +105,15 @@ const routes: RouteData[] = [
             component: () => import("./video/Videos.vue"),
             meta: {
               head: {
-                title: 'Videos - Holistream',
+                title: "Videos - Holistream",
                 meta: [
-                  { name: 'description', content: 'Manage your video content.' },
+                  {
+                    name: "description",
+                    content: "Manage your video content.",
+                  },
                 ],
               },
-            }
+            },
           },
           {
             path: "payments-and-plans",
@@ -102,12 +121,15 @@ const routes: RouteData[] = [
             component: () => import("./plans/Plans.vue"),
             meta: {
               head: {
-                title: 'Payments & Plans - Holistream',
+                title: "Payments & Plans - Holistream",
                 meta: [
-                  { name: 'description', content: 'Manage your plans and billing information.' },
+                  {
+                    name: "description",
+                    content: "Manage your plans and billing information.",
+                  },
                 ],
               },
-            }
+            },
           },
           {
             path: "notification",
@@ -115,9 +137,9 @@ const routes: RouteData[] = [
             component: () => import("./notification/Notification.vue"), // TODO: create notification page
             meta: {
               head: {
-                title: 'Notification - Holistream',
+                title: "Notification - Holistream",
               },
-            }
+            },
           },
           {
             path: "profile",
@@ -125,9 +147,9 @@ const routes: RouteData[] = [
             component: () => import("./profile/Profile.vue"), // TODO: create profile page
             meta: {
               head: {
-                title: 'Profile - Holistream',
+                title: "Profile - Holistream",
               },
-            }
+            },
           },
         ],
       },
@@ -135,17 +157,23 @@ const routes: RouteData[] = [
         path: "/:pathMatch(.*)*",
         name: "not-found",
         component: () => import("./NotFound.vue"),
-      }
+      },
     ],
   },
 ];
 const createAppRouter = () => {
   const router = createRouter({
-    history: import.meta.env.SSR
-      ? createMemoryHistory() // server
-      : createWebHistory(), // client
-    routes,
-  });
+        history: import.meta.env.SSR
+            ? createMemoryHistory() // server
+            : createWebHistory(), // client
+        routes,
+        scrollBehavior(to, from, savedPosition) {
+            if (savedPosition) {
+                return savedPosition
+            }
+            return { top: 0 }
+        }
+    });
 
   router.beforeEach((to, from, next) => {
     const auth = useAuthStore();
@@ -162,6 +190,6 @@ const createAppRouter = () => {
     }
   });
   return router;
-}
+};
 
 export default createAppRouter;
