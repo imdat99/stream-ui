@@ -682,12 +682,5 @@ export class Api<
 export const client = new Api({
   baseUrl: 'r',
   // baseUrl: 'https://api.pipic.fun',
-  customFetch: (url, options) => {
-    options.headers = {
-      ...options.headers,
-      "X-Forwarded-For": "[IP_ADDRESS]"
-    }
-    options.credentials = "include"
-    return fetch(url, options)
-  }
+  customFetch
 });
