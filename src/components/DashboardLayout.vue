@@ -5,7 +5,7 @@ import Home from "@/components/icons/Home.vue";
 import Video from "@/components/icons/Video.vue";
 import Credit from "@/components/icons/Credit.vue";
 import Upload from "./icons/Upload.vue";
-import NotificationPopover from "./NotificationPopover.vue";
+import NotificationDrawer from "./NotificationDrawer.vue";
 import { cn } from "@/lib/utils";
 import { createStaticVNode, ref } from "vue";
 
@@ -25,7 +25,8 @@ const links = [
     { href: "/profile", label: "Profile", icon: profileHoist, type: "a", className: 'w-12 h-12 rounded-2xl hover:bg-primary/15 flex' },
 ];
 
-const notificationPopover = ref<InstanceType<typeof NotificationPopover>>();
+const notificationPopover = ref<InstanceType<typeof NotificationDrawer>>();
+const isNotificationOpen = ref(false);
 
 const handleNotificationClick = (event: Event) => {
     notificationPopover.value?.toggle(event);
@@ -37,12 +38,13 @@ const handleNotificationClick = (event: Event) => {
         <template v-for="i in links" :key="i.label">
             <!-- Notification button with popover -->
             <button 
+                name="notification"
                 v-if="i.type === 'notification'"
                 @click="handleNotificationClick"
                 v-tooltip="i.label"
-                :class="cn(i.className, 'relative')"
+                :class="cn(i.className, 'relative', isNotificationOpen && 'bg-primary/15')"
             >
-                <component :is="i.icon" class="w-6 h-6" />
+                <component :is="i.icon" class="w-6 h-6" :filled="isNotificationOpen" />
                 <!-- Unread badge -->
                 <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
@@ -57,9 +59,11 @@ const handleNotificationClick = (event: Event) => {
                 <component :is="i.icon" class="w-6 h-6" :filled="$route.path === i.href" />
             </component>
         </template>
+
+        <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
     </header>
     
-    <NotificationPopover ref="notificationPopover" />
+
     
     <main class="flex flex-1 overflow-hidden md:ps-18">
         <div class="flex-1 overflow-auto p-4 bg-white rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">

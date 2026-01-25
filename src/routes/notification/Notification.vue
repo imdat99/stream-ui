@@ -115,7 +115,7 @@ const handleClearAll = () => {
 </script>
 
 <template>
-    <div class="notification-page">
+    <div>
         <PageHeader 
             title="Notifications" 
             description="Stay updated with your latest activities and alerts."
@@ -124,7 +124,7 @@ const handleClearAll = () => {
                 { label: 'Notifications' }
             ]"
         />
-
+    <div class="w-full max-w-4xl mx-auto mt-6">
         <div class="notification-container bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <NotificationActions
                 :loading="loading"
@@ -148,10 +148,5 @@ const handleClearAll = () => {
             />
         </div>
     </div>
+    </div>
 </template>
-
-<style scoped>
-.notification-page {
-    max-width: 800px;
-}
-</style>
