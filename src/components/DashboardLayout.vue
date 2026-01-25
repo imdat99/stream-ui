@@ -15,52 +15,43 @@ const profileHoist = createStaticVNode(`<div class="h-[38px] w-[38px] rounded-fu
                 <img class="h-8 w-8 rounded-full m-a ring-1 ring-white"
                     src="https://picsum.photos/seed/user123/40/40.jpg" alt="User avatar" />
             </div>`, 1);
-const links = [
-    { href: "/fdsfsd", label: "app", icon: homeHoist, type: "btn", className },
-    { href: "/", label: "Overview", icon: Home, type: "a", className },
-    { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
-    { href: "/video", label: "Video", icon: Video, type: "a", className },
-    { href: "/payments-and-plans", label: "Payments & Plans", icon: Credit, type: "a", className },
-    { href: "#notification", label: "Notification", icon: Bell, type: "notification", className },
-    { href: "/profile", label: "Profile", icon: profileHoist, type: "a", className: 'w-12 h-12 rounded-2xl hover:bg-primary/15 flex' },
-];
-
 const notificationPopover = ref<InstanceType<typeof NotificationDrawer>>();
 const isNotificationOpen = ref(false);
 
 const handleNotificationClick = (event: Event) => {
     notificationPopover.value?.toggle(event);
 };
+const links = [
+    { href: "/#home", label: "app", icon: homeHoist, type: "btn", className },
+    { href: "/", label: "Overview", icon: Home, type: "a", className },
+    { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
+    { href: "/video", label: "Video", icon: Video, type: "a", className },
+    { href: "/payments-and-plans", label: "Payments & Plans", icon: Credit, type: "a", className },
+    { href: "/notification", label: "Notification", icon: Bell, type: "btn", className, action: handleNotificationClick, isActive: isNotificationOpen },
+    { href: "/profile", label: "Profile", icon: profileHoist, type: "a", className: 'w-12 h-12 rounded-2xl hover:bg-primary/15 flex' },
+];
+
+
 </script>
+
 <template>
     <header
         class=":uno: fixed left-0 w-18 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen border-r border-gray-200 bg-white">
         <template v-for="i in links" :key="i.label">
-            <!-- Notification button with popover -->
-            <button 
-                name="notification"
-                v-if="i.type === 'notification'"
-                @click="handleNotificationClick"
-                v-tooltip="i.label"
-                :class="cn(i.className, 'relative', isNotificationOpen && 'bg-primary/15')"
-            >
-                <component :is="i.icon" class="w-6 h-6" :filled="isNotificationOpen" />
-                <!-- Unread badge -->
-                <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <!-- Regular links -->
-            <component 
-                v-else
+            <component
+                :name="i.label"
                 :is="i.type === 'a' ? 'router-link' : 'div'" 
                 v-bind="i.type === 'a' ? { to: i.href } : {}" 
                 v-tooltip="i.label"
-                :class="cn(i.className, $route.path === i.href && 'bg-primary/15')"
+                @click="i.action && i.action($event)"
+                :class="cn(i.className, ($route.path === i.href || i.isActive?.value) && 'bg-primary/15')"
             >
-                <component :is="i.icon" class="w-6 h-6" :filled="$route.path === i.href" />
+                <component :is="i.icon" class="w-6 h-6" :filled="$route.path === i.href || i.isActive?.value" />
             </component>
         </template>
-
-        <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
+        <ClientOnly>
+            <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
+        </ClientOnly>
     </header>
     
 

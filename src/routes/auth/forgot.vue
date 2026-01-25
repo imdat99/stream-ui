@@ -35,7 +35,7 @@ import { reactive } from 'vue';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import { z } from 'zod';
-
+import Toast from 'primevue/toast';
 
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from "primevue/usetoast";

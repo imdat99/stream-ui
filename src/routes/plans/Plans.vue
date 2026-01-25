@@ -12,7 +12,7 @@ import EditPlanDialog from './components/EditPlanDialog.vue';
 import ManageSubscriptionDialog from './components/ManageSubscriptionDialog.vue';
 
 const auth = useAuthStore();
-const plans = ref<ModelPlan[]>([]);
+// const plans = ref<ModelPlan[]>([]);
 const subscribing = ref<string | null>(null);
 const showManageDialog = ref(false);
 const cancelling = ref(false);
@@ -24,6 +24,7 @@ const paymentHistory = ref([
     { id: 'inv_003', date: 'Dec 24, 2025', amount: 19.99, plan: 'Pro Plan', status: 'failed', invoiceId: 'INV-2025-003' },
     { id: 'inv_004', date: 'Jan 24, 2026', amount: 19.99, plan: 'Pro Plan', status: 'pending', invoiceId: 'INV-2026-001' },
 ]);
+const { data, isLoading, mutate: mutatePlans } = useSWRV("r/plans", client.plans.plansList)
 
 // Computed Usage (Mock if not in store)
 const storageUsed = computed(() => auth.user?.storage_used || 0); // bytes
@@ -34,27 +35,26 @@ const uploadsLimit = ref(50);
 
 const currentPlanId = computed(() => {
     if (auth.user?.plan_id) return auth.user.plan_id;
-    if (Array.isArray(plans.value) && plans.value.length > 0) return plans.value[0].id; // Fallback to first plan
+    if (Array.isArray(data?.value?.data?.data.plans) && data?.value?.data?.data.plans.length > 0) return data.value.data.data.plans[0].id; // Fallback to first plan
     return undefined;
 }); 
 
 const currentPlan = computed(() => {
-    if (!Array.isArray(plans.value)) return undefined;
-    return plans.value.find(p => p.id === currentPlanId.value);
+    if (!Array.isArray(data?.value?.data?.data.plans)) return undefined;
+    return data.value.data.data.plans.find(p => p.id === currentPlanId.value);
 });
 
-const { data, isLoading, mutate: mutatePlans } = useSWRV("r/plans", client.plans.plansList)
 
-watch(data, (newValue) => {
-    if (newValue) {
-        // Handle potentially different response structures
-        // Safe access to avoid SSR crash if data is null/undefined
-        const plansList = newValue?.data?.data?.plans;
-        if (Array.isArray(plansList)) {
-             plans.value = plansList;
-        }
-    }
-}, { immediate: true });
+// watch(data, (newValue) => {
+//     if (newValue) {
+//         // Handle potentially different response structures
+//         // Safe access to avoid SSR crash if data is null/undefined
+//         const plansList = newValue?.data?.data?.plans;
+//         if (Array.isArray(plansList)) {
+//              plans.value = plansList;
+//         }
+//     }
+// }, { immediate: true });
 
 const showEditDialog = ref(false);
 const editingPlan = ref<ModelPlan>({});
@@ -85,9 +85,9 @@ const savePlan = async (updatedPlan: ModelPlan) => {
     } catch (e: any) {
         console.error('Failed to update plan', e);
         // Fallback: update local state if API is mocked/missing
-        const idx = plans.value.findIndex(p => p.id === updatedPlan.id);
+        const idx = data.value!.data.data.plans.findIndex(p => p.id === updatedPlan.id);
         if (idx !== -1) {
-            plans.value[idx] = { ...updatedPlan };
+            data.value!.data.data.plans[idx] = { ...updatedPlan };
         }
         showEditDialog.value = false;
         // alert('Note: API update failed, updated locally. ' + e.message);
@@ -168,8 +168,8 @@ const cancelSubscription = async () => {
         </div>
         
         <PlanList 
-            :plans="plans"
-            :is-loading="isLoading"
+            :plans="data?.data?.data.plans || []"
+            :is-loading="!!isLoading"
             :current-plan-id="currentPlanId"
             :subscribing-plan-id="subscribing"
             :is-admin="auth.user?.role === 'admin'"

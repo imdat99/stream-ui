@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
             if (r.data) {
                 user.value = r.data.user as ModelUser;
             }
-        }).catch(() => {}).finally(() => {
+        }).catch(() => { }).finally(() => {
             initialized.value = true;
         });
         // client.request<
@@ -53,8 +53,9 @@ export const useAuthStore = defineStore('auth', () => {
             // So: response.data (HttpResponse body) -> .data (ResponseResponse payload)
 
             const body = response.data as any; // Cast to access potential 'data' property if types are loose
+            console.log("body", body);
             if (body && body.data) {
-                user.value = body.data;
+                user.value = body.data.user;
                 router.push('/');
             } else {
                 throw new Error('Login failed: No user data received');
@@ -103,17 +104,52 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    async function logout() {
+    async function updateProfile(data: { username?: string; email?: string }) {
         loading.value = true;
+        error.value = null;
         try {
-            await client.auth.logoutCreate();
-            user.value = null;
-            router.push('/login');
+            const response = await client.request<
+                ResponseResponse & { data?: ModelUser },
+                ResponseResponse
+            >({
+                path: '/me',
+                method: 'PUT',
+                body: data,
+                format: 'json'
+            });
+
+            const body = response.data as any;
+            if (body && body.data) {
+                user.value = { ...user.value, ...body.data };
+            }
+            return true;
         } catch (e: any) {
-            console.error('Logout error', e);
-            // Force local logout anyway
-            user.value = null;
-            router.push('/login');
+            console.error('Update profile error', e);
+            error.value = 'Failed to update profile: ' + (e.message || 'Unknown error');
+            throw e;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    async function changePassword(currentPassword: string, newPassword: string) {
+        loading.value = true;
+        error.value = null;
+        try {
+            await client.request<ResponseResponse, ResponseResponse>({
+                path: '/auth/change-password',
+                method: 'POST',
+                body: {
+                    current_password: currentPassword,
+                    new_password: newPassword
+                },
+                format: 'json'
+            });
+            return true;
+        } catch (e: any) {
+            console.error('Change password error', e);
+            error.value = 'Failed to change password: ' + (e.message || 'Unknown error');
+            throw e;
         } finally {
             loading.value = false;
         }
@@ -128,7 +164,22 @@ export const useAuthStore = defineStore('auth', () => {
         login,
         loginWithGoogle,
         register,
-        logout,
+        updateProfile,
+        changePassword,
+        logout: async () => {
+            loading.value = true;
+            try {
+                await client.auth.logoutCreate();
+                user.value = null;
+                router.push('/login');
+            } catch (e: any) {
+                console.error('Logout error', e);
+                user.value = null;
+                router.push('/login');
+            } finally {
+                loading.value = false;
+            }
+        },
         $reset: () => {
             user.value = null;
             loading.value = false;

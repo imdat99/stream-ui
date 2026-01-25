@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { reactive } from 'vue';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -44,10 +45,8 @@ import { z } from 'zod';
 
 
 import { useAuthStore } from '@/stores/auth';
-import { useToast } from "primevue/usetoast";
 
 const auth = useAuthStore();
-const toast = useToast();
 
 const initialValues = reactive({
     name: '',
@@ -65,9 +64,7 @@ const resolver = zodResolver(
 
 const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
     if (valid) {
-        auth.register(values.name, values.email, values.password).catch(() => {
-             toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
-        });
+        auth.register(values.name, values.email, values.password);
     }
 };
 </script>

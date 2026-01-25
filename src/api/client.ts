@@ -551,7 +551,9 @@ export class Api<
     plansList: (params: RequestParams = {}) =>
       this.request<
         ResponseResponse & {
-          data?: ModelPlan[];
+          data: {
+            plans: ModelPlan[];
+          } 
         },
         ResponseResponse
       >({

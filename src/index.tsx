@@ -40,38 +40,13 @@ app.use(cors(), async (c, next) => {
   headers.delete("host");
   headers.delete("connection");
 
-  const response = await fetch(url.toString(), {
+  return fetch(url.toString(), {
     method: c.req.method,
     headers: headers,
     body: c.req.raw.body,
     // @ts-ignore
     duplex: 'half',
     credentials: 'include'
-  });
-
-  const newHeaders = new Headers(response.headers);
-
-  // Rewrite Set-Cookie to remove Domain attribute
-  if (typeof response.headers.getSetCookie === 'function') {
-    newHeaders.delete('set-cookie');
-    const cookies = response.headers.getSetCookie();
-    for (const cookie of cookies) {
-      // Remove Domain=...; or Domain=... ending
-      const newCookie = cookie.replace(/Domain=[^;]+;?/gi, '');
-      newHeaders.append('set-cookie', newCookie);
-    }
-  } else {
-    // Fallback for environments without getSetCookie
-    const cookie = response.headers.get('set-cookie');
-    if (cookie) {
-      newHeaders.set('set-cookie', cookie.replace(/Domain=[^;]+;?/gi, ''));
-    }
-  }
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders
   });
 });
 app.get("/.well-known/*", (c) => {

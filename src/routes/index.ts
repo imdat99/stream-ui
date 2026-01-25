@@ -7,6 +7,7 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { inject } from "vue";
 
 type RouteData = RouteRecordRaw & {
   meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean };

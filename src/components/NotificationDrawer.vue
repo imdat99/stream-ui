@@ -97,7 +97,7 @@ onClickOutside(drawerRef, (event) => {
         visible.value = false;
     }
 }, {
-    ignore: ['.press-animated', '[name="notification"]'] // Assuming the trigger button has this class or we can suggest adding a class to the trigger
+    ignore: ['.press-animated', '[name="Notification"]'] // Assuming the trigger button has this class or we can suggest adding a class to the trigger
 });
 
 const handleMarkRead = (id: string) => {
