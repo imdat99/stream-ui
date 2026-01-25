@@ -22,7 +22,7 @@ const handleRemoteUrls = (urls: string[]) => {
 </script>
 
 <template>
-    <div class="flex-1 flex items-stretch">
+    <div class="flex-1 flex items-stretch gap-4">
         <div class="flex-1 overflow-y-auto">
             <PageHeader class="block" title="Upload Videos" description="Choose your preferred method to upload videos."
                 :breadcrumbs="[
