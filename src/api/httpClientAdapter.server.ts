@@ -29,12 +29,6 @@ export const customFetch = (url: string, options: RequestInit) => {
 		// res.headers.forEach((value, key) => {
 		// c.header(key, value);
 		// });
-		return fetch(apiUrl, options).then(res => {
-			// Forward response headers to client (especially Set-Cookie)
-			res.headers.forEach((value, key) => {
-				c.header(key, value);
-			});
-			return res;
-		});
+		return fetch(apiUrl, options)
 	}
 }

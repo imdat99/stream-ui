@@ -43,7 +43,7 @@ const currentPlan = computed(() => {
     return plans.value.find(p => p.id === currentPlanId.value);
 });
 
-const { data, isLoading, mutate: mutatePlans } = useSWRV("r/plans", () => client.plans.plansList())
+const { data, isLoading, mutate: mutatePlans } = useSWRV("r/plans", client.plans.plansList)
 
 watch(data, (newValue) => {
     if (newValue) {

@@ -104,6 +104,6 @@ const bgClass = computed(() => {
 
 <style scoped>
 .notification-item {
-    position: relative;
+    border-radius: 8px;
 }
 </style>
