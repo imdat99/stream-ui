@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { formatBytes } from '@/lib/utils';
 import ProgressBar from 'primevue/progressbar';
 import { computed } from 'vue';
-import { formatBytes } from '@/lib/utils';
 
 const props = defineProps<{
     storageUsed: number;
@@ -15,7 +15,7 @@ const uploadsPercentage = computed(() => Math.min(Math.round((props.uploadsUsed 
 </script>
 
 <template>
-    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm flex flex-col justify-center">
+    <div class="bg-white border border-gray-200 rounded-2xl p-8 flex flex-col justify-center">
         <h3 class="text-lg font-bold text-gray-900 mb-6">Usage Statistics</h3>
         
         <div class="mb-6">

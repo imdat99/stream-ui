@@ -14,6 +14,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Add: typeof import('./src/components/icons/Add.vue')['default']
     AlertTriangleIcon: typeof import('./src/components/icons/AlertTriangleIcon.vue')['default']
+    ArrowDownTray: typeof import('./src/components/icons/ArrowDownTray.vue')['default']
     ArrowRightIcon: typeof import('./src/components/icons/ArrowRightIcon.vue')['default']
     Bell: typeof import('./src/components/icons/Bell.vue')['default']
     Button: typeof import('primevue/button')['default']
@@ -61,6 +62,7 @@ declare module 'vue' {
 declare global {
   const Add: typeof import('./src/components/icons/Add.vue')['default']
   const AlertTriangleIcon: typeof import('./src/components/icons/AlertTriangleIcon.vue')['default']
+  const ArrowDownTray: typeof import('./src/components/icons/ArrowDownTray.vue')['default']
   const ArrowRightIcon: typeof import('./src/components/icons/ArrowRightIcon.vue')['default']
   const Bell: typeof import('./src/components/icons/Bell.vue')['default']
   const Button: typeof import('primevue/button')['default']

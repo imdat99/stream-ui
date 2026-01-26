@@ -21,7 +21,7 @@ const formatBytes = (bytes: number) => {
 </script>
 
 <template>
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
         <h3 class="text-lg font-bold text-gray-900 mb-4">Account Status</h3>
         <div class="space-y-4">
             <div>

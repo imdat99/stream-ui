@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModelUser } from '@/api/client';
-import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
 
 defineProps<{
     user: ModelUser | null;
@@ -14,7 +14,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+    <div class="bg-white border border-gray-200 rounded-2xl p-8">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-xl font-bold text-gray-900">Personal Information</h3>
             <div class="flex gap-2">

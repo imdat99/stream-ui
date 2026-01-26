@@ -3,7 +3,7 @@ import Tag from 'primevue/tag';
 </script>
 
 <template>
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
         <h3 class="text-lg font-bold text-gray-900 mb-4">Linked Accounts</h3>
         <div class="space-y-3">
             <div class="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
