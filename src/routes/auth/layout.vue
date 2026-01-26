@@ -1,5 +1,7 @@
 <template>
-    <div class="w-full max-w-md bg-white p-8 rounded-xl border border-primary m-auto overflow-hidden">
+    <div class=":uno: w-full max-w-md shadow-xl bg-white p-8 rounded-xl m-auto relative before:(content-[''] absolute inset-[-5px] translate-0 z-[-1] opacity-50 rounded-xl bg-[linear-gradient(135deg,var(--glow-stop-1)_0,var(--glow-stop-2)_25%,var(--glow-stop-3)_50%,var(--glow-stop-4)_75%,var(--glow-stop-5)_100%)] animate-[glow-enter-blur_1s_ease_.5s_both]) after:(content-[''] absolute inset-[-1px] translate-0 z-[-1] opacity-50 rounded-xl
+ bg-[linear-gradient(135deg,transparent_0,transparent_34%,transparent_49%,#fff_57%,#fff_64%,var(--glow-stop-1)_66%,var(--glow-stop-2)_75%,var(--glow-stop-3)_83%,var(--glow-stop-4)_92%,var(--glow-stop-5)_100%)] bg-[length:300%_300%] bg-[position:0_0] bg-no-repeat
+ transition-[background-position_.8s_ease] animate-[glow-enter-stroke_.5s_ease_.5s_both])">
         <div class="text-center mb-8">
             <router-link to="/" class="inline-flex items-center justify-center w-12 h-12 mb-4">
                 <img class="w-12 h-12" src="/apple-touch-icon.png" alt="Logo" />

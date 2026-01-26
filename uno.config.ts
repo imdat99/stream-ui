@@ -204,6 +204,11 @@ export default defineConfig({
       :root {
         --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
         --font-serif: 'Playfair Display', serif, 'Times New Roman', Times, serif;
+        --glow-stop-1: #ffc400;
+        --glow-stop-2: #ff9100;
+        --glow-stop-3: #f8682f;
+        --glow-stop-4: #e62c6d;
+        --glow-stop-5: #b25aff;
       }
       :focus {
         outline-color: ${context.theme.colors?.primary?.active};
@@ -233,7 +238,26 @@ export default defineConfig({
 .fade-leave-to {
   opacity: 0;
 }
-
+@keyframes glow-enter-blur {
+    0% {
+      opacity: 0;
+      filter: blur(0);
+      }
+      100% {
+        opacity: 0.5;
+        filter: blur(60px);
+    }
+}
+@keyframes glow-enter-stroke {
+    0% {
+    background-position-x: 0%;
+    background-position-y: 0%;
+    }
+    100% {
+    background-position-x: 100%;
+    background-position-y: 100%;
+      }
+}
       `;
       },
     },
