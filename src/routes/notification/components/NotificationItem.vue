@@ -109,9 +109,8 @@ const bgClass = computed(() => {
         </div>
 
         <!-- Unread indicator -->
-        <div class="absolute left-2 top-1/10 -translate-y-1/2 w-2 h-2 rounded-full bg-primary">
+        <div v-if="!notification.read"
+            class="absolute left-2 top-1/10 -translate-y-1/2 w-2 h-2 rounded-full bg-primary">
         </div>
-        <!-- <div v-if="!notification.read" class="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary">
-        </div> -->
     </div>
 </template>

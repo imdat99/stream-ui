@@ -17,7 +17,7 @@ const handleFileChange = (event: Event) => {
             class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer" @change="handleFileChange">
 
         <div
-            class="bg-gradient-to-tr from-slate-50 to-white rounded-[2rem] p-16 text-center border-2 border-dashed border-slate-200 group-hover:border-success/50 group-hover:shadow-soft transition-all duration-300 relative overflow-hidden">
+            class="bg-gradient-to-tr from-slate-50 to-white rounded-2xl p-16 text-center border-2 border-dashed border-slate-200 group-hover:border-success/50 group-hover:shadow-soft transition-all duration-300 relative overflow-hidden">
 
             <div
                 class="absolute top-0 left-0 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
