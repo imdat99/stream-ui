@@ -1,5 +1,5 @@
 <template>
-    <div class="rounded-xl border border-gray-300 hover:border-primary hover:shadow-lg text-card-foreground">
+    <div class="rounded-xl border border-gray-300 hover:border-primary hover:shadow-lg text-card-foreground bg-white">
         <div class="flex flex-col space-y-1.5 p-6">
             <h3 class="text-2xl font-semibold leading-none tracking-tight">Referral Link</h3>
         </div>

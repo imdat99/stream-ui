@@ -30,7 +30,7 @@ const mode = computed({
 </script>
 
 <template>
-    <div class="inline-flex bg-slate-100 p-1 rounded-2xl relative z-0 w-fit">
+    <div class="inline-flex bg-slate-200 p-1 rounded-2xl relative z-0 w-fit">
         <div
             :class="cn(':uno: absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-all duration-300 ease-out -z-10', mode === 'local' ? 'translate-x-0' : 'translate-x-full')">
         </div>

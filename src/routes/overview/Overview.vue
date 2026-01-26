@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { client, type ModelVideo } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
+import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref } from 'vue';
 import QuickActions from './components/QuickActions.vue';
 import RecentVideos from './components/RecentVideos.vue';
 import StatsOverview from './components/StatsOverview.vue';
-import StorageUsage from './components/StorageUsage.vue';
-import WelcomeBanner from './components/WelcomeBanner.vue';
 
+const auth = useAuthStore()
 const loading = ref(true);
 const recentVideos = ref<ModelVideo[]>([]);
 
@@ -57,12 +57,10 @@ onMounted(() => {
 
 <template>
     <div class="dashboard-overview">
-        <PageHeader title="Dashboard" description="Welcome back! Here's what's happening with your videos."
+        <PageHeader :title="`Welcome back, ${auth.user?.username}! 👋`" description="Here's what's happening with your videos."
             :breadcrumbs="[
                 { label: 'Dashboard' }
             ]" />
-
-        <WelcomeBanner />
 
         <!-- Stats Grid -->
         <StatsOverview :loading="loading" :stats="stats" />

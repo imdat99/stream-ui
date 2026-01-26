@@ -7,17 +7,23 @@ import RemoteUrlForm from './components/RemoteUrlForm.vue';
 import BulkActions from './components/BulkActions.vue';
 import UploadQueue from './components/UploadQueue.vue';
 import { ref } from 'vue';
+import { useUploadQueue } from '@/composables/useUploadQueue';
 
 const mode = ref<'local' | 'remote'>('local');
 
+const { addFiles, addRemoteUrls, items, removeItem, totalSize, completeCount, pendingCount, startQueue } = useUploadQueue();
+
+const handlePublish = () => {
+    console.log('Publishing items...');
+    // TODO: Handle publish action
+};
+
 const handleFilesSelected = (files: FileList) => {
-    console.log('Files selected:', files);
-    // TODO: Handle file upload
+    addFiles(files);
 };
 
 const handleRemoteUrls = (urls: string[]) => {
-    console.log('URLs submitted:', urls);
-    // TODO: Handle remote URL import
+    addRemoteUrls(urls);
 };
 </script>
 
@@ -44,6 +50,8 @@ const handleRemoteUrls = (urls: string[]) => {
                 <BulkActions :visible="false" :pending-count="0" />
             </div>
         </div>
-        <UploadQueue />
+        <UploadQueue :items="items" :total-size="totalSize" :complete-count="completeCount"
+            :pending-count="pendingCount" @remove-item="removeItem" @publish="handlePublish"
+            @start-queue="startQueue" />
     </div>
 </template>

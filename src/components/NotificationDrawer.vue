@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
 import NotificationItem from '@/routes/notification/components/NotificationItem.vue';
 import { onClickOutside } from '@vueuse/core';
+import { computed, ref, watch } from 'vue';
 
 // Emit event when visibility changes
 const emit = defineEmits(['change']);
@@ -97,7 +97,7 @@ onClickOutside(drawerRef, (event) => {
         visible.value = false;
     }
 }, {
-    ignore: ['.press-animated', '[name="Notification"]'] // Assuming the trigger button has this class or we can suggest adding a class to the trigger
+    ignore: ['[name="Notification"]'] // Assuming the trigger button has this class or we can suggest adding a class to the trigger
 });
 
 const handleMarkRead = (id: string) => {
@@ -122,35 +122,23 @@ defineExpose({ toggle });
 
 <template>
     <Teleport to="body">
-        <Transition
-            enter-active-class="transition-all duration-300 ease-out"
-            enter-from-class="opacity-0 -translate-x-4"
-            enter-to-class="opacity-100 translate-x-0"
-            leave-active-class="transition-all duration-200 ease-in"
-            leave-from-class="opacity-100 translate-x-0"
-            leave-to-class="opacity-0 -translate-x-4"
-        >
-            <div 
-                v-if="visible" 
-                ref="drawerRef"
-                class="fixed top-0 left-[80px] bottom-0 w-[380px] bg-white rounded-2xl border border-gray-300 p-3 z-50 flex flex-col shadow-lg my-3"
-            >
+        <Transition enter-active-class="transition-all duration-300 ease-out"
+            enter-from-class="opacity-0 -translate-x-4" enter-to-class="opacity-100 translate-x-0"
+            leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100 translate-x-0"
+            leave-to-class="opacity-0 -translate-x-4">
+            <div v-if="visible" ref="drawerRef"
+                class="fixed top-0 left-[80px] bottom-0 w-[380px] bg-white rounded-2xl border border-gray-300 p-3 z-50 flex flex-col shadow-lg my-3">
                 <!-- Header -->
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center gap-2">
                         <h3 class="font-semibold text-gray-900">Notifications</h3>
-                        <span 
-                            v-if="unreadCount > 0"
-                            class="px-2 py-0.5 text-xs font-medium bg-primary text-white rounded-full"
-                        >
+                        <span v-if="unreadCount > 0"
+                            class="px-2 py-0.5 text-xs font-medium bg-primary text-white rounded-full">
                             {{ unreadCount }}
                         </span>
                     </div>
-                    <button 
-                        v-if="unreadCount > 0"
-                        @click="handleMarkAllRead"
-                        class="text-sm text-primary hover:underline font-medium"
-                    >
+                    <button v-if="unreadCount > 0" @click="handleMarkAllRead"
+                        class="text-sm text-primary hover:underline font-medium">
                         Mark all read
                     </button>
                 </div>
@@ -158,16 +146,10 @@ defineExpose({ toggle });
                 <!-- Notification List -->
                 <div class="flex flex-col flex-1 overflow-y-auto gap-2">
                     <template v-if="notifications.length > 0">
-                        <div 
-                            v-for="notification in notifications" 
-                            :key="notification.id"
-                            class="border-b border-gray-50 last:border-0"
-                        >
-                            <NotificationItem
-                                :notification="notification"
-                                @mark-read="handleMarkRead"
-                                @delete="handleDelete"
-                            />
+                        <div v-for="notification in notifications" :key="notification.id"
+                            class="border-b border-gray-50 last:border-0">
+                            <NotificationItem :notification="notification" @mark-read="handleMarkRead"
+                                @delete="handleDelete" isDrawer />
                         </div>
                     </template>
 
@@ -180,11 +162,9 @@ defineExpose({ toggle });
 
                 <!-- Footer -->
                 <div v-if="notifications.length > 0" class="p-3 border-t border-gray-100 bg-gray-50/50">
-                    <router-link 
-                        to="/notification" 
+                    <router-link to="/notification"
                         class="block w-full text-center text-sm text-primary font-medium hover:underline"
-                        @click="visible = false"
-                    >
+                        @click="visible = false">
                         View all notifications
                     </router-link>
                 </div>

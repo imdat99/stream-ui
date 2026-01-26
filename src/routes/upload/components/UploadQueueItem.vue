@@ -1,31 +1,46 @@
 <script setup lang="ts">
-export interface QueueItem {
-    id: string;
-    name: string;
-    type: 'local' | 'remote';
-    status: 'uploading' | 'processing' | 'fetching' | 'complete' | 'error';
-    progress?: number;
-    uploaded?: string;
-    total?: string;
-    speed?: string;
-    thumbnail?: string;
-}
+import type { QueueItem } from '@/composables/useUploadQueue';
+import { cn } from '@/lib/utils';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     item: QueueItem;
+    minimal?: boolean;
 }>();
 
 const emit = defineEmits<{
     remove: [id: string];
 }>();
+
+const statusLabel = computed(() => {
+    switch (props.item.status) {
+        case 'pending': return 'Pending';
+        case 'uploading': return 'Uploading...';
+        case 'processing': return 'Processing...';
+        case 'complete': return 'Completed';
+        case 'error': return 'Failed';
+        case 'fetching': return 'Fetching...';
+        default: return props.item.status;
+    }
+});
+
+const statusColor = computed(() => {
+    switch (props.item.status) {
+        case 'complete': return 'bg-green-500';
+        case 'error': return 'bg-red-500';
+        case 'pending': return 'bg-slate-400';
+        default: return 'bg-accent';
+    }
+});
 </script>
 
 <template>
     <!-- Local Upload Item -->
     <div v-if="item.type === 'local'"
-        class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100/50 relative group overflow-hidden transition-all hover:shadow-md">
-        <div class="flex gap-4 relative z-10">
-            <div class="w-20 h-16 bg-slate-800 rounded-xl shrink-0 relative overflow-hidden shadow-sm">
+        class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100/50 relative group overflow-hidden transition-all"
+        :class="{ '!p-2 !border-0 !shadow-none !rounded-xl': minimal }">
+        <div :class="cn('flex gap-4 relative z-10', minimal && '!gap-2')">
+            <div v-if="!minimal" class="w-20 h-16 bg-slate-800 rounded-xl shrink-0 relative overflow-hidden shadow-sm">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
                 <img v-if="item.thumbnail" :src="item.thumbnail" class="w-full h-full object-cover opacity-80" alt="">
                 <div class="absolute bottom-1 left-2 z-20">
@@ -54,8 +69,8 @@ const emit = defineEmits<{
                 <div>
                     <div class="flex justify-between text-xs text-slate-500 mb-1.5 font-medium">
                         <span class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
-                            Uploading...
+                            <span class="w-2 h-2 rounded-full animate-pulse" :class="statusColor"></span>
+                            {{ statusLabel }}
                         </span>
                         <span class="text-accent font-bold">{{ item.progress || 0 }}%</span>
                     </div>
@@ -76,12 +91,15 @@ const emit = defineEmits<{
 
     <!-- Remote Fetch Item -->
     <div v-else
-        class="bg-[#F0F3FF] rounded-2xl p-5 shadow-soft border border-indigo-100/50 relative overflow-hidden group transition-all hover:shadow-md">
-        <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#6366F1_1px,transparent_1px)] [background-size:16px_16px]">
+        class="bg-[#F0F3FF] rounded-2xl p-5 shadow-soft border border-indigo-100/50 relative overflow-hidden group transition-all hover:shadow-md"
+        :class="{ '!p-3 !bg-slate-50 !border-0 !shadow-none !rounded-xl': minimal }">
+        <div
+            class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#6366F1_1px,transparent_1px)] [background-size:16px_16px]">
         </div>
 
-        <div class="flex gap-4 relative z-10">
-            <div class="w-20 h-16 bg-indigo-100 rounded-xl shrink-0 flex items-center justify-center text-accent shadow-sm">
+        <div class="flex gap-4 relative z-10" :class="{ '!gap-3': minimal }">
+            <div v-if="!minimal"
+                class="w-20 h-16 bg-indigo-100 rounded-xl shrink-0 flex items-center justify-center text-accent shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-80" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 17H7A5 5 0 0 1 7 7h2" />
@@ -104,13 +122,21 @@ const emit = defineEmits<{
                 </div>
 
                 <div class="flex items-center gap-3 mt-3">
-                    <div class="flex items-center gap-2 text-xs font-bold text-indigo-600 bg-white py-1.5 px-3 rounded-lg shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24"
+                    <div
+                        class="flex items-center gap-2 text-xs font-bold text-indigo-600 bg-white py-1.5 px-3 rounded-lg shadow-sm">
+                        <svg v-if="item.status === 'fetching' || item.status === 'processing'"
+                            xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round">
                             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                         </svg>
-                        Fetching from Google Drive...
+                        <svg v-else-if="item.status === 'complete'" xmlns="http://www.w3.org/2000/svg"
+                            class="w-3.5 h-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        {{ statusLabel }}
                     </div>
                 </div>
             </div>

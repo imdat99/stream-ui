@@ -32,17 +32,17 @@ defineProps<Props>();
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatsCard title="Total Videos" :value="stats.totalVideos" icon="i-heroicons-film" color="primary"
+        <StatsCard title="Total Videos" :value="stats.totalVideos" 
             :trend="{ value: 12, isPositive: true }" />
 
-        <StatsCard title="Total Views" :value="stats.totalViews.toLocaleString()" icon="i-heroicons-eye" color="info"
+        <StatsCard title="Total Views" :value="stats.totalViews.toLocaleString()" 
             :trend="{ value: 8, isPositive: true }" />
 
         <StatsCard title="Storage Used"
-            :value="`${formatBytes(stats.storageUsed)} / ${formatBytes(stats.storageLimit)}`" icon="i-heroicons-server"
+            :value="`${formatBytes(stats.storageUsed)} / ${formatBytes(stats.storageLimit)}`" 
             color="warning" />
 
-        <StatsCard title="Uploads This Month" :value="stats.uploadsThisMonth" icon="i-heroicons-arrow-up-tray"
+        <StatsCard title="Uploads This Month" :value="stats.uploadsThisMonth" 
             color="success" :trend="{ value: 25, isPositive: true }" />
     </div>
 </template>

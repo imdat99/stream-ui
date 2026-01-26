@@ -19,7 +19,7 @@ const handleSubmit = () => {
 </script>
 
 <template>
-    <div class="bg-white rounded-[2rem] shadow-soft p-10 border border-slate-100/50">
+    <div class="bg-gradient-to-tl from-slate-50 to-white rounded-[2rem] shadow-soft p-10 border border-gray-200">
         <label class="block text-lg font-semibold text-slate-900 mb-4">Enter Video URL</label>
 
         <div class="flex gap-4 items-start">

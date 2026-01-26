@@ -60,7 +60,7 @@ const quickActions = [
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <button v-for="action in quickActions" :key="action.title" @click="action.onClick" :class="[
-                    'p-6 rounded-xl text-left transition-all duration-200 flex flex-col',
+                    'p-6 rounded-xl text-left transition-all duration-200 flex flex-col bg-white',
                     'border border-gray-300 hover:border-primary hover:shadow-lg',
                     'group press-animated',
 

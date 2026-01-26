@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import UploadQueueItem, { type QueueItem } from './UploadQueueItem.vue';
+import UploadQueueItem from './UploadQueueItem.vue';
+import type { QueueItem } from '@/composables/useUploadQueue';
 
 defineProps<{
     items?: QueueItem[];
     totalSize?: string;
     completeCount?: number;
+    pendingCount?: number;
 }>();
 
 const emit = defineEmits<{
     removeItem: [id: string];
     publish: [];
+    startQueue: [];
 }>();
 </script>
 
@@ -45,8 +48,7 @@ const emit = defineEmits<{
                 <p class="text-slate-400 font-medium">Empty queue!</p>
             </div>
 
-            <UploadQueueItem v-for="item in items" :key="item.id" :item="item"
-                @remove="emit('removeItem', $event)" />
+            <UploadQueueItem v-for="item in items" :key="item.id" :item="item" @remove="emit('removeItem', $event)" />
         </div>
 
         <div class="p-6 border-t-2 border-white rounded-b-2xl shrink-0">
@@ -54,9 +56,21 @@ const emit = defineEmits<{
                 <span class="text-slate-500">Total size:</span>
                 <span class="text-slate-900">{{ totalSize || '0 MB' }}</span>
             </div>
+
+            <button v-if="pendingCount && pendingCount > 0" @click="emit('startQueue')"
+                class="btn btn-primary w-full flex items-center justify-center gap-2 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                Start Upload ({{ pendingCount }})
+            </button>
+
             <button @click="emit('publish')"
                 class="btn btn-outline-primary w-full flex items-center justify-center gap-2" id="btn-publish"
-                :disabled="!completeCount">
+                :disabled="!completeCount || (pendingCount ? pendingCount > 0 : false)">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10" />

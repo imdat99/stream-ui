@@ -6,6 +6,7 @@ import Video from "@/components/icons/Video.vue";
 import Credit from "@/components/icons/Credit.vue";
 import Upload from "./icons/Upload.vue";
 import NotificationDrawer from "./NotificationDrawer.vue";
+import GlobalUploadIndicator from "./GlobalUploadIndicator.vue";
 import { cn } from "@/lib/utils";
 import { createStaticVNode, ref } from "vue";
 
@@ -38,14 +39,9 @@ const links = [
     <header
         class=":uno: fixed left-0 w-18 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen border-r border-gray-200 bg-white">
         <template v-for="i in links" :key="i.label">
-            <component
-                :name="i.label"
-                :is="i.type === 'a' ? 'router-link' : 'div'" 
-                v-bind="i.type === 'a' ? { to: i.href } : {}" 
-                v-tooltip="i.label"
-                @click="i.action && i.action($event)"
-                :class="cn(i.className, ($route.path === i.href || i.isActive?.value) && 'bg-primary/15')"
-            >
+            <component :name="i.label" :is="i.type === 'a' ? 'router-link' : 'div'"
+                v-bind="i.type === 'a' ? { to: i.href } : {}" v-tooltip="i.label" @click="i.action && i.action($event)"
+                :class="cn(i.className, ($route.path === i.href || i.isActive?.value) && 'bg-primary/15')">
                 <component :is="i.icon" class="w-6 h-6" :filled="$route.path === i.href || i.isActive?.value" />
             </component>
         </template>
@@ -53,11 +49,11 @@ const links = [
             <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
         </ClientOnly>
     </header>
-    
 
-    
+
+
     <main class="flex flex-1 overflow-hidden md:ps-18">
-        <div class="flex-1 overflow-auto p-4 bg-white rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">
+        <div class=":uno: flex-1 overflow-auto p-4 bg-[#FAF8F8] rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">
             <router-view v-slot="{ Component }">
                 <Transition enter-active-class="transition-all duration-300 ease-in-out"
                     enter-from-class="opacity-0 transform translate-y-4"
@@ -69,6 +65,6 @@ const links = [
                 </Transition>
             </router-view>
         </div>
+        <GlobalUploadIndicator />
     </main>
 </template>
-

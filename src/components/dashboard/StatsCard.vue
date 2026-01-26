@@ -14,17 +14,17 @@ interface Props {
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   color: 'primary'
 });
 
-const gradients = {
-  primary: 'from-primary/20 to-primary/5',
-  success: 'from-success/20 to-success/5',
-  warning: 'from-yellow-100 to-yellow-50',
-  danger: 'from-danger/20 to-danger/5',
-  info: 'from-info/20 to-info/5',
-};
+// const gradients = {
+//   primary: 'from-primary/20 to-primary/5',
+//   success: 'from-success/20 to-success/5',
+//   warning: 'from-yellow-100 to-yellow-50',
+//   danger: 'from-danger/20 to-danger/5',
+//   info: 'from-info/20 to-info/5',
+// };
 
 const iconColors = {
   primary: 'text-primary',
@@ -37,10 +37,10 @@ const iconColors = {
 
 <template>
   <div :class="[
-    'stats-card relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br',
-    gradients[color],
-    'border border-white/50 shadow-sm hover:shadow-md transition-all duration-300',
-    'group cursor-pointer'
+    'transform translate-y-0 relative overflow-hidden rounded-2xl p-6 bg-white',
+    // gradients[color],
+    'border border-gray-300 transition-all duration-300',
+    // 'group cursor-pointer'
   ]">
     <!-- Content -->
     <div class="relative z-10">
@@ -65,10 +65,15 @@ const iconColors = {
           'flex items-center gap-1 font-medium',
           trend.isPositive ? 'text-success' : 'text-danger'
         ]">
-          <span :class="[
+          <!-- <span :class="[
             'w-4 h-4',
             trend.isPositive ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'
-          ]" />
+          ]" /> -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path v-if="trend.isPositive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 17l6-6 4 4 8-8" />
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 7l-6 6-4-4-8 8" />
+          </svg>
           {{ Math.abs(trend.value) }}%
         </span>
         <span class="text-gray-500">vs last month</span>
@@ -76,13 +81,3 @@ const iconColors = {
     </div>
   </div>
 </template>
-
-<style scoped>
-.stats-card {
-  transform: translateY(0);
-}
-
-.stats-card:hover {
-  transform: translateY(-2px);
-}
-</style>
