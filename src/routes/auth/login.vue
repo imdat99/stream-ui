@@ -5,7 +5,7 @@
             class="flex flex-col gap-4 w-full">
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email</label>
-                <InputText name="email" type="text" placeholder="user@example.com" fluid
+                <InputText size="small" name="email" type="text" placeholder="Enter your email" fluid
                     :disabled="auth.loading" />
                 <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
                     $form.email.error?.message }}</Message>
@@ -13,27 +13,28 @@
 
             <div class="flex flex-col gap-1">
                 <label for="password" class="text-sm font-medium text-gray-700">Password</label>
-                <Password name="password" placeholder="••••••••" :feedback="false" toggleMask fluid
-                    :inputStyle="{ width: '100%' }" :disabled="auth.loading" />
+                <Password name="password" size="small" placeholder="Enter your password" :feedback="false" toggleMask
+                    fluid :inputStyle="{ width: '100%' }" :disabled="auth.loading" />
                 <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">{{
                     $form.password.error?.message }}</Message>
             </div>
 
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <Checkbox inputId="remember-me" name="rememberMe" binary :disabled="auth.loading" />
+                    <Checkbox inputId="remember-me" size="small" name="rememberMe" binary :disabled="auth.loading" />
                     <label for="remember-me" class="text-sm text-gray-900">Remember me</label>
                 </div>
                 <div class="text-sm">
                     <router-link to="/forgot"
-                        class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Forgot
+                        class="text-blue-600 hover:text-blue-500 hover:underline">Forgot
                         password?</router-link>
                 </div>
             </div>
 
-            <Button type="submit" :label="auth.loading ? 'Signing in...' : 'Sign in'" fluid :loading="auth.loading" />
+            <Button type="submit" size="small" :label="auth.loading ? 'Signing in...' : 'Sign in'" fluid
+                :loading="auth.loading" />
 
-            <div class="relative my-4">
+            <div class="relative">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t border-gray-300"></div>
                 </div>
@@ -42,7 +43,7 @@
                 </div>
             </div>
 
-            <Button type="button" variant="outlined" severity="secondary"
+            <Button size="small" type="button" variant="outlined" severity="secondary"
                 class="w-full flex items-center justify-center gap-2" @click="loginWithGoogle" :disabled="auth.loading">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                     <path
@@ -50,24 +51,25 @@
                 </svg>
                 Google
             </Button>
-
-            <p class="mt-4 text-center text-sm text-gray-600">
-                Don't have an account?
-                <router-link to="/sign-up" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign up
-                    for free</router-link>
-            </p>
+            <div class="mt-2 flex flex-col items-center justify-center gap-1 text-sm text-gray-600">
+                <p class="text-center text-sm text-gray-600">
+                    Don't have an account?
+                    <router-link to="/sign-up" class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign up</router-link>
+                </p>
+                <!-- <router-link to="/forgot" class="text-blue-600 hover:text-blue-500 hover:underline">Forgot password?</router-link> -->
+            </div>
         </Form>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
-import { z } from 'zod';
-import { useAuthStore } from '@/stores/auth';
 import Toast from 'primevue/toast';
 import { useToast } from "primevue/usetoast";
+import { reactive } from 'vue';
+import { z } from 'zod';
 const t = useToast();
 const auth = useAuthStore();
 // const $form = Form.useFormContext();

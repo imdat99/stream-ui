@@ -13,10 +13,10 @@ defineEmits<{
 </script>
 
 <template>
-    <div class="lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 shadow-xl">
+    <div class=":uno: lg:col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8">
         <!-- Background decorations -->
-        <div class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
-        <div class="absolute bottom-0 left-0 -mb-16 -ml-16 w-64 h-64 bg-purple-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        <div class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-500 rounded-full blur-3xl opacity-20"></div>
+        <div class="absolute bottom-0 left-0 -mb-16 -ml-16 w-64 h-64 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
 
         <div class="relative z-10 flex flex-col h-full justify-between">
             <div class="flex justify-between items-start">

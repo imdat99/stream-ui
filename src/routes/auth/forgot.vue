@@ -9,12 +9,12 @@
 
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
-                <InputText name="email" type="email" placeholder="you@example.com" fluid />
+                <InputText size="small" name="email" type="email" placeholder="you@example.com" fluid />
                 <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
                     $form.email.error?.message }}</Message>
             </div>
 
-            <Button type="submit" label="Send Reset Link" fluid />
+            <Button type="submit" size="small" label="Send Reset Link" fluid />
 
             <div class="text-center mt-2">
                 <router-link to="/login" replace
@@ -31,15 +31,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
 import { Form, type FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
-import { z } from 'zod';
 import Toast from 'primevue/toast';
+import { reactive } from 'vue';
+import { z } from 'zod';
 
+import { client } from '@/api/client';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from "primevue/usetoast";
-import { client } from '@/api/client';
 
 const auth = useAuthStore();
 const toast = useToast();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-import { VNode } from 'vue';
+import { type Component, VNode } from 'vue';
 
 interface Breadcrumb {
   label: string;
@@ -15,7 +15,7 @@ interface Action {
 }
 
 interface Props {
-  title: string | VNode;
+  title: string | VNode | Component;
   description?: string;
   breadcrumbs?: Breadcrumb[];
   actions?: Action[];

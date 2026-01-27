@@ -25,7 +25,7 @@ defineProps<Props>();
                     <Skeleton width="5rem" height="1rem" class="mb-2"></Skeleton>
                     <Skeleton width="8rem" height="2rem"></Skeleton>
                 </div>
-                <Skeleton shape="circle" size="3rem"></Skeleton>
+                <!-- <Skeleton shape="circle" size="3rem"></Skeleton> -->
             </div>
             <Skeleton width="4rem" height="1rem"></Skeleton>
         </div>

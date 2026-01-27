@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ModelUser } from '@/api/client';
 import Avatar from 'primevue/avatar';
-import Tag from 'primevue/tag';
 import Button from 'primevue/button';
+import Tag from 'primevue/tag';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -24,10 +24,10 @@ const joinDate = computed(() => {
 </script>
 
 <template>
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white p-8 md:p-10 shadow-xl">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white p-8 md:p-10">
         <!-- Background decorations -->
-        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-primary-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
-        <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-purple-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-primary-500 rounded-full mix-blend-overlay filter blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-purple-500 rounded-full mix-blend-overlay filter blur-3xl"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div class="relative">
@@ -60,7 +60,7 @@ const joinDate = computed(() => {
             </div>
 
             <div class="flex gap-3">
-                <Button label="Logout" severity="secondary" class="border-white/10 text-white hover:bg-white/10 bg-white/5" @click="emit('logout')">
+                <Button label="Logout" severity="danger" class="border-white/10 text-white hover:bg-white/10 bg-white/5" @click="emit('logout')">
                     <template #icon>
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
