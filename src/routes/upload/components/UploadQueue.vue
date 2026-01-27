@@ -17,7 +17,8 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <aside class="w-[420px] bg-gray-100 rounded-xl flex flex-col h-[calc(100svh-64px)] sticky top-16">
+    <aside class=":uno: w-[420px] flex flex-col h-[calc(100svh-64px)] sticky top-16 before:(content-[''] absolute pointer-events-none inset-[-1px] rounded-[calc(var(--radius-2xl)+1px)] bg-[linear-gradient(-45deg,var(--capra-ramp-5)_0,var(--capra-ramp-4)_8%,var(--capra-ramp-3)_17%,var(--capra-ramp-2)_25%,var(--capra-ramp-1)_33%,#292929_34%,#292929_40%,#e1dfdf_45%,#e1dfdf_100%)] bg-[length:400%_200%] bg-[position:0_0] transition-[background-position] duration-[1000ms] ease-in-out delay-[500ms] z-0)" :class="{'before:bg-[position:100%_100%]': pendingCount && pendingCount > 0 }">
+    <div class="bg-slate-50 z-1 relative flex flex-col h-full rounded-2xl overflow-hidden">
         <div class="p-6 border-b border-slate-100/80 flex items-center justify-between shrink-0">
             <div>
                 <h2 class="text-lg font-bold text-slate-900">Upload Queue</h2>
@@ -51,13 +52,13 @@ const emit = defineEmits<{
             <UploadQueueItem v-for="item in items" :key="item.id" :item="item" @remove="emit('removeItem', $event)" />
         </div>
 
-        <div class="p-6 border-t-2 border-white rounded-b-2xl shrink-0">
+        <div class="p-6 border-t-2 border-white shrink-0">
             <div class="flex items-center justify-between text-sm mb-4 font-medium">
                 <span class="text-slate-500">Total size:</span>
                 <span class="text-slate-900">{{ totalSize || '0 MB' }}</span>
             </div>
 
-            <button v-if="pendingCount && pendingCount > 0" @click="emit('startQueue')"
+            <button :disabled="!!(!pendingCount || pendingCount < 1)" @click="emit('startQueue')"
                 class="btn btn-primary w-full flex items-center justify-center gap-2 mb-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -67,17 +68,7 @@ const emit = defineEmits<{
                 </svg>
                 Start Upload ({{ pendingCount }})
             </button>
-
-            <button @click="emit('publish')"
-                class="btn btn-outline-primary w-full flex items-center justify-center gap-2" id="btn-publish"
-                :disabled="!completeCount || (pendingCount ? pendingCount > 0 : false)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="m9 12 2 2 4-4" />
-                </svg>
-                Complete & Publish ({{ completeCount || 0 }})
-            </button>
         </div>
+    </div>
     </aside>
 </template>

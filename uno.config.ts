@@ -152,7 +152,7 @@ export default defineConfig({
         950: "#030712",
       },
       white: {
-        DEFAULT: "#ffffff",
+        DEFAULT: "#faf8f8",
         light: "#f8f9fa",
       },
       light: {
@@ -169,7 +169,7 @@ export default defineConfig({
         DEFAULT: "#f3f4f6",
         light: "#fafafa",
         dark: "#e5e7eb",
-      }
+      },
     },
     boxShadow: {
       "primary-box": "2px 2px 10px #aff6b8",
@@ -209,6 +209,11 @@ export default defineConfig({
         --glow-stop-3: #f8682f;
         --glow-stop-4: #e62c6d;
         --glow-stop-5: #b25aff;
+        --capra-ramp-1: #ffc400;
+        --capra-ramp-2: #ff9100;
+        --capra-ramp-3: #ff530f;
+        --capra-ramp-4: #e62c6d;
+        --capra-ramp-5: #b25aff;
       }
       :focus {
         outline-color: ${context.theme.colors?.primary?.active};
@@ -258,6 +263,37 @@ export default defineConfig({
     background-position-y: 100%;
       }
 }
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 0%;
+  }
+  12.5% {
+    background-position: 75% 25%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  37.5% {
+    background-position: 75% 75%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+  62.5% {
+    background-position: 25% 75%;
+  }
+  75% {
+    background-position: 25% 50%;
+  }
+  87.5% {
+    background-position: 25% 25%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+
       `;
       },
     },

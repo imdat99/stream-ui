@@ -59,14 +59,14 @@ const emit = defineEmits<{
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-6">
-                <div class="flex flex-col gap-2">
+                <!-- <div class="flex flex-col gap-2">
                     <label for="role" class="text-sm font-medium text-gray-700">Role</label>
                     <InputText id="role" :value="user?.role || 'User'" class="w-full capitalize bg-gray-50" readonly />
-                </div>
-                <div class="flex flex-col gap-2">
+                </div> -->
+                <!-- <div class="flex flex-col gap-2">
                     <label for="id" class="text-sm font-medium text-gray-700">User ID</label>
                     <InputText id="id" :value="user?.id || 'N/A'" class="w-full font-mono text-sm bg-gray-50" readonly />
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
