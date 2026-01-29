@@ -25,7 +25,7 @@ const props = defineProps<Props>();
 
 const getButtonClass = (variant?: string) => {
   const baseClass = 'px-4 py-2.5 rounded-lg font-medium transition-all press-animated flex items-center gap-2';
-  
+
   switch (variant) {
     case 'primary':
       return `${baseClass} bg-primary hover:bg-primary-600 text-white shadow-sm`;
@@ -43,20 +43,14 @@ const getButtonClass = (variant?: string) => {
     <!-- Breadcrumb -->
     <nav v-if="breadcrumbs && breadcrumbs.length" class="flex items-center gap-2 text-sm mb-2">
       <template v-for="(crumb, index) in breadcrumbs" :key="index">
-        <router-link
-          v-if="crumb.to"
-          :to="crumb.to"
-          class="text-gray-500 hover:text-primary transition-colors"
-        >
+        <router-link v-if="crumb.to" :to="crumb.to" class="text-gray-500 hover:text-primary transition-colors">
           {{ crumb.label }}
         </router-link>
         <span v-else class="text-gray-700 font-medium">{{ crumb.label }}</span>
-        
-        <span 
-          v-if="index < breadcrumbs.length - 1"
-          class="w-4 h-4 text-gray-400"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+
+        <span v-if="index < breadcrumbs.length - 1" class="w-4 h-4 text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </span>
@@ -72,17 +66,9 @@ const getButtonClass = (variant?: string) => {
       </div>
 
       <div v-if="actions && actions.length" class="flex items-center gap-2 flex-shrink-0">
-        <button
-          v-for="(action, index) in actions"
-          :key="index"
-          @click="action.onClick"
-          :class="getButtonClass(action.variant)"
-        >
-           <component
-            v-if="action.icon"
-            :is="action.icon"
-            class="w-5 h-5"
-          />
+        <button v-for="(action, index) in actions" :key="index" @click="action.onClick"
+          :class="getButtonClass(action.variant)">
+          <component v-if="action.icon" :is="action.icon" class="w-5 h-5" />
           {{ action.label }}
         </button>
       </div>

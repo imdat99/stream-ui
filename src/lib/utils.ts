@@ -81,3 +81,12 @@ export const formatDate = (dateString?: string) => {
         minute: '2-digit'
     });
 };
+
+export const getStatusClass = (status?: string) => {
+    switch (status?.toLowerCase()) {
+        case 'ready': return 'bg-green-100 text-green-700';
+        case 'processing': return 'bg-yellow-100 text-yellow-700';
+        case 'failed': return 'bg-red-100 text-red-700';
+        default: return 'bg-gray-100 text-gray-700';
+    }
+};

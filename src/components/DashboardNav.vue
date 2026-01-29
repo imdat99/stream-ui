@@ -1,0 +1,56 @@
+<script lang="ts" setup>
+import Bell from "@/components/icons/Bell.vue";
+import Home from "@/components/icons/Home.vue";
+import Video from "@/components/icons/Video.vue";
+import Credit from "@/components/icons/Credit.vue";
+import Upload from "@/components/icons/Upload.vue";
+import NotificationDrawer from "./NotificationDrawer.vue";
+import { cn } from "@/lib/utils";
+import { createStaticVNode, ref } from "vue";
+
+const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
+const homeHoist = createStaticVNode(`<img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />`, 1);
+const profileHoist = createStaticVNode(`<div class="h-[38px] w-[38px] rounded-full m-a ring-2 ring flex press-animated">
+                <img class="h-8 w-8 rounded-full m-a ring-1 ring-white"
+                    src="https://picsum.photos/seed/user123/40/40.jpg" alt="User avatar" />
+            </div>`, 1);
+const notificationPopover = ref<InstanceType<typeof NotificationDrawer>>();
+const isNotificationOpen = ref(false);
+
+const handleNotificationClick = (event: Event) => {
+    notificationPopover.value?.toggle(event);
+};
+
+const links = [
+    { href: "/#home", label: "app", icon: homeHoist, type: "btn", className },
+    { href: "/", label: "Overview", icon: Home, type: "a", className },
+    { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
+    { href: "/video", label: "Video", icon: Video, type: "a", className },
+    { href: "/payments-and-plans", label: "Payments & Plans", icon: Credit, type: "a", className },
+    { href: "/notification", label: "Notification", icon: Bell, type: "btn", className, action: handleNotificationClick, isActive: isNotificationOpen },
+    { href: "/profile", label: "Profile", icon: profileHoist, type: "a", className: 'w-12 h-12 rounded-2xl hover:bg-primary/15 flex shrink-0' },
+];
+
+
+</script>
+
+<template>
+    <header
+        class=":uno: fixed left-0 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen bg-muted transition-all duration-300 ease-in-out w-18 items-center">
+
+        <template v-for="i in links" :key="i.label">
+            <component :name="i.label" :is="i.type === 'a' ? 'router-link' : 'div'"
+                v-bind="i.type === 'a' ? { to: i.href } : {}" v-tooltip="i.label" @click="i.action && i.action($event)"
+                :class="cn(
+                    i.className,
+                    ($route.path === i.href || i.isActive?.value) && 'bg-primary/15'
+                )">
+                <component :is="i.icon" class="w-6 h-6 shrink-0"
+                    :filled="$route.path === i.href || i.isActive?.value" />
+            </component>
+        </template>
+    </header>
+    <ClientOnly>
+        <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
+    </ClientOnly>
+</template>

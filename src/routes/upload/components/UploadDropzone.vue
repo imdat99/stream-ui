@@ -17,20 +17,22 @@ const handleFileChange = (event: Event) => {
             class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer" @change="handleFileChange">
 
         <div
-            class="bg-gradient-to-tr from-slate-50 to-white rounded-2xl p-16 text-center border-2 border-dashed border-slate-200 group-hover:border-success/50 group-hover:shadow-soft transition-all duration-300 relative overflow-hidden">
+            class="bg-surface rounded-2xl p-16 text-center border border-dashed border-border group-hover:border-success/50 group-hover:shadow-soft transition-all duration-300 relative overflow-hidden">
 
             <div
-                class="absolute top-0 left-0 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                class="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
             </div>
             <div
-                class="absolute bottom-0 right-0 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                class="absolute bottom-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
             </div>
 
             <div class="relative z-10 flex flex-col items-center">
                 <div
-                    class="w-24 h-24 mb-8 rounded-3xl bg-white shadow-soft flex items-center justify-center text-accent group-hover:scale-110 group-hover:shadow-card-hover transition-all duration-300 ring-4 ring-slate-50 group-hover:ring-indigo-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    class="w-24 h-24 mb-8 rounded-3xl bg-page shadow-soft flex items-center justify-center text-accent transition-all duration-300 ring-4 ring-gray-100 group-hover:(ring-primary/10 scale-110 shadow-md)">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-10 h-10 stroke-primary/60 group-hover:stroke-primary transition-all duration-300"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" x2="12" y1="3" y2="15" />

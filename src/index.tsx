@@ -11,6 +11,7 @@ import { createApp } from './main';
 import { useAuthStore } from './stores/auth';
 // @ts-ignore
 import Base from '@primevue/core/base';
+import { createTextTransformStreamClass } from './lib/replateStreamText';
 const app = new Hono()
 const defaultNames = ['primitive', 'semantic', 'global', 'base', 'ripple-directive']
 // app.use(renderer)
@@ -73,6 +74,7 @@ app.get("*", async (c) => {
     // console.log("ctx: ", );
     await stream.write("<!DOCTYPE html><html lang='en'><head>");
     await stream.write("<base href='" + url.origin + "'/>");
+
     await renderSSRHead(head).then((headString) => stream.write(headString.headTags.replace(/\n/g, "")));
     // await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"rel="stylesheet"></link>`);
     await stream.write(`<link rel="preconnect" href="https://fonts.googleapis.com">`);
@@ -84,7 +86,10 @@ app.get("*", async (c) => {
     }
     await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
     await stream.write(`</head><body class='${bodyClass}'>`);
-    await stream.pipe(appStream);
+    await stream.pipe(createTextTransformStreamClass(appStream, (text) => text.replace('<div id="anchor-header" class="p-4"></div>', `<div id="anchor-header" class="p-4">${ctx.teleports["#anchor-header"] || ""}</div>`).replace('<div id="anchor-top"></div>', `<div id="anchor-top">${ctx.teleports["#anchor-top"] || ""}</div>`)));
+    delete ctx.teleports
+    delete ctx.__teleportBuffers
+    delete ctx.modules;
     Object.assign(ctx, { $p: pinia.state.value });
     await stream.write(`<script type="application/json" data-ssr="true" id="__APP_DATA__" nonce="${nonce}">${htmlEscape((JSON.stringify(ctx)))}</script>`);
     await stream.write("</body></html>");

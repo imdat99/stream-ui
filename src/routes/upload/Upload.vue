@@ -30,11 +30,10 @@ const handleRemoteUrls = (urls: string[]) => {
 <template>
     <div class="flex-1 flex items-stretch gap-4">
         <div class="flex-1 overflow-y-auto">
-            <PageHeader class="block" title="Upload Videos" description="Choose your preferred method to upload videos."
-                :breadcrumbs="[
-                    { label: 'Dashboard', to: '/' },
-                    { label: 'Upload Videos' }
-                ]" />
+            <PageHeader title="Upload Videos" description="Choose your preferred method to upload videos." :breadcrumbs="[
+                { label: 'Dashboard', to: '/' },
+                { label: 'Upload Videos' }
+            ]" />
             <div class="flex flex-col max-w-4xl mx-auto gap-4">
                 <UploadModeToggle v-model="mode" />
                 <InfoTip />

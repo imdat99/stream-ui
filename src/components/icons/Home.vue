@@ -13,5 +13,5 @@
     </svg>
 </template>
 <script lang="ts" setup>
-defineProps<{  filled?: boolean }>();
+defineProps<{ filled?: boolean }>();
 </script>

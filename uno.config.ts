@@ -152,7 +152,7 @@ export default defineConfig({
         950: "#030712",
       },
       white: {
-        DEFAULT: "#faf8f8",
+        DEFAULT: "#ffffff",
         light: "#f8f9fa",
       },
       light: {
@@ -170,6 +170,28 @@ export default defineConfig({
         light: "#fafafa",
         dark: "#e5e7eb",
       },
+      page: {
+        DEFAULT: "#faf8f8",
+        light: "#f8f9fa",
+      },
+      surface: {
+        DEFAULT: "#fafafa",
+        light: "#f8f9fa",
+      },
+      muted: {
+        DEFAULT: "#f5f4f2",
+        light: "#f8f9fa",
+      },
+      border: {
+        DEFAULT: "#e6e7e2",
+        light: "#f8f9fa",
+      },
+      // bg: {
+      //   page:    "#faf8f8", // nền toàn trang
+      //   surface: "#ffffff", // card, modal, table
+      //   muted:   "#f5f4f2", // section phụ
+      //   border:  "#e6e7e2", // viền
+      // }
     },
     boxShadow: {
       "primary-box": "2px 2px 10px #aff6b8",
