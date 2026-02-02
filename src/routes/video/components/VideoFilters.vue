@@ -79,7 +79,7 @@ const emit = defineEmits<{
         }" :rows="limit" :totalRecords="total" :first="(page - 1) * limit" :rowsPerPageOptions="[10, 20, 30]"
             @page="(e) => { emit('update:page', e.page + 1); emit('update:limit', e.rows); }">
             <template #container="{ first, last, page, pageCount, prevPageCallback, nextPageCallback, totalRecords }">
-                <div class="flex items-center gap-2 bg-transparent px-2 justify-between w-full sm:w-auto">
+                <div class="flex items-center gap-2 bg-transparent px-2 justify-between sm:w-auto">
                     <div class="text-sm text-gray-500">
                         <span class="hidden sm:block">{{ first }} - {{ last }} of {{ totalRecords }} results</span>
                         <span class="block sm:hidden">Page {{ page + 1 }} of {{ pageCount }}</span>
