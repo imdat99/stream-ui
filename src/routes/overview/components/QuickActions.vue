@@ -3,7 +3,7 @@ import Chart from '@/components/icons/Chart.vue';
 import Credit from '@/components/icons/Credit.vue';
 import Upload from '@/components/icons/Upload.vue';
 import Video from '@/components/icons/Video.vue';
-import Skeleton from 'primevue/skeleton';
+import Skeleton from '@/components/ui/Skeleton.vue';
 import { useRouter } from 'vue-router';
 import Referral from './Referral.vue';
 
@@ -49,7 +49,7 @@ const quickActions = [
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div v-for="i in 4" :key="i" class="p-6 rounded-xl border border-gray-200">
-                    <Skeleton shape="circle" size="3rem" class="mb-4"></Skeleton>
+                    <Skeleton circle width="3rem" height="3rem" class="mb-4"></Skeleton>
                     <Skeleton width="8rem" height="1.25rem" class="mb-2"></Skeleton>
                     <Skeleton width="100%" height="1rem"></Skeleton>
                 </div>

@@ -1,107 +1,99 @@
 <script setup lang="ts">
-import { type ModelPlan } from '@/api/client';
-import Button from 'primevue/button';
-import Skeleton from 'primevue/skeleton';
-import { formatBytes } from '@/lib/utils'; // Using utils formatBytes
+import type { ModelPlan } from '@/api/client';
+import Button from '@/components/ui/Button.vue';
+import Skeleton from '@/components/ui/Skeleton.vue';
+import { formatBytes } from '@/lib/utils';
 
-defineProps<{
-    plans: ModelPlan[];
-    isLoading: boolean;
-    currentPlanId?: string;
-    subscribingPlanId?: string | null;
-    isAdmin?: boolean;
-}>();
+const props = defineProps<{
+  plans: ModelPlan[]
+  isLoading: boolean
+  currentPlanId?: string
+  subscribingPlanId?: string | null
+  isAdmin?: boolean
+}>()
 
 const emit = defineEmits<{
-    (e: 'subscribe', plan: ModelPlan): void;
-    (e: 'edit', plan: ModelPlan): void;
-}>();
-
-const formatDuration = (seconds?: number) => {
-    if (!seconds) return '0 mins';
-    return `${Math.floor(seconds / 60)} mins`;
-};
-
-const isPopular = (plan: ModelPlan) => {
-    return plan.name?.toLowerCase().includes('pro') || plan.name?.toLowerCase().includes('premium');
-};
-
-const isCurrentComp = (plan: ModelPlan, currentId?: string) => {
-    return plan.id === currentId;
-}
+  (e: 'subscribe', plan: ModelPlan): void
+  (e: 'edit', plan: ModelPlan): void
+}>()
 </script>
 
 <template>
-    <section>
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-bold text-gray-900">Upgrade your workspace</h2>
+  <section>
+    <h2 class="text-2xl font-bold mb-6 text-gray-900">Available Plans</h2>
+    
+    <!-- Loading State -->
+    <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="i in 3" :key="i" class="bg-white border border-gray-200 rounded-xl p-6">
+        <Skeleton height="1.5rem" width="60%" class="mb-4" />
+        <Skeleton height="2rem" width="40%" class="mb-6" />
+        <Skeleton height="1rem" class="mb-2" />
+        <Skeleton height="1rem" class="mb-2" />
+        <Skeleton height="1rem" width="80%" class="mb-6" />
+        <Skeleton height="2.5rem" />
+      </div>
+    </div>
+
+    <!-- Plans Grid -->
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-for="plan in plans"
+        :key="plan.id"
+        class="bg-white border rounded-xl p-6 transition-all hover:shadow-lg"
+        :class="plan.id === currentPlanId ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200'"
+      >
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">{{ plan.name }}</h3>
+            <p class="text-sm text-gray-500">{{ plan.cycle }}</p>
+          </div>
+          <div v-if="plan.id === currentPlanId" class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+            Current
+          </div>
         </div>
-        
-        <!-- Loading State -->
-        <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div v-for="i in 3" :key="i" class="h-full">
-                <Skeleton height="300px" borderRadius="16px"></Skeleton>
-            </div>
+
+        <div class="mb-6">
+          <span class="text-3xl font-bold text-gray-900">${{ plan.price }}</span>
+          <span class="text-gray-500">/{{ plan.cycle }}</span>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-            <div v-for="plan in plans" :key="plan.id" class="relative group h-full">
-                <div v-if="isPopular(plan) && !isCurrentComp(plan, currentPlanId)" class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full z-10 shadow-md uppercase tracking-wide">
-                    Recommended
-                </div>
+        <p class="text-sm text-gray-600 mb-6">{{ plan.description }}</p>
 
-                <!-- Admin Edit Button -->
-                <Button 
-                    v-if="isAdmin"
-                    icon="i-heroicons-pencil-square" 
-                    class="absolute top-2 right-2 z-20 !p-2 !w-8 !h-8" 
-                    severity="secondary" 
-                    text 
-                    rounded
-                    @click.stop="emit('edit', plan)"
-                />
-
-                <div :class="[
-                    'relative bg-white rounded-2xl p-6 h-full border transition-all duration-200 flex flex-col',
-                    isCurrentComp(plan, currentPlanId) ? 'border-primary ring-1 ring-primary/50 bg-primary-50/10' : 'border-gray-200 hover:border-gray-300 hover:shadow-lg',
-                    isPopular(plan) && !isCurrentComp(plan, currentPlanId) ? 'shadow-md border-primary/20' : ''
-                ]">
-                    <div class="mb-4">
-                        <h3 class="text-xl font-bold text-gray-900">{{ plan.name }}</h3>
-                        <p class="text-gray-500 text-sm min-h-[2.5rem] mt-2">{{ plan.description }}</p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold text-gray-900">${{ plan.price }}</span>
-                        <span class="text-gray-500 text-sm">/{{ plan.cycle }}</span>
-                    </div>
-
-                    <ul class="space-y-3 mb-8 flex-grow">
-                        <li class="flex items-center gap-3 text-sm text-gray-700">
-                            <span class="i-heroicons-check-circle text-green-500 text-lg flex-shrink-0"></span>
-                            {{ formatBytes(plan.storage_limit || 0) }} Storage
-                        </li>
-                        <li class="flex items-center gap-3 text-sm text-gray-700">
-                            <span class="i-heroicons-check-circle text-green-500 text-lg flex-shrink-0"></span>
-                            {{ formatDuration(plan.duration_limit) }} Max Duration
-                        </li>
-                        <li class="flex items-center gap-3 text-sm text-gray-700">
-                            <span class="i-heroicons-check-circle text-green-500 text-lg flex-shrink-0"></span>
-                            {{ plan.upload_limit }} Uploads / day
-                        </li>
-                    </ul>
-
-                    <Button 
-                        :label="isCurrentComp(plan, currentPlanId) ? 'Current Plan' : (subscribingPlanId === plan.id ? 'Processing...' : 'Upgrade')" 
-                        :icon="subscribingPlanId === plan.id ? 'i-svg-spinners-180-ring-with-bg' : ''"
-                        class="w-full" 
-                        :severity="isCurrentComp(plan, currentPlanId) ? 'secondary' : 'primary'"
-                        :outlined="isCurrentComp(plan, currentPlanId)"
-                        :disabled="!!subscribingPlanId || isCurrentComp(plan, currentPlanId)"
-                        @click="emit('subscribe', plan)"
-                    />
-                </div>
-            </div>
+        <div class="space-y-2 mb-6 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="i-heroicons-check-circle text-green-500 w-4 h-4" />
+            <span>{{ formatBytes(plan.storage_limit || 0) }} storage</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="i-heroicons-check-circle text-green-500 w-4 h-4" />
+            <span>{{ plan.upload_limit }} uploads/day</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="i-heroicons-check-circle text-green-500 w-4 h-4" />
+            <span>{{ plan.duration_limit }}s video duration</span>
+          </div>
         </div>
-    </section>
+
+        <div class="flex gap-2">
+          <Button
+            v-if="isAdmin"
+            variant="outline"
+            class="flex-1"
+            @click="emit('edit', plan)"
+          >
+            Edit
+          </Button>
+          <Button
+            class="flex-1"
+            :variant="plan.id === currentPlanId ? 'outline' : 'primary'"
+            :loading="subscribingPlanId === plan.id"
+            :disabled="plan.id === currentPlanId"
+            @click="emit('subscribe', plan)"
+          >
+            {{ plan.id === currentPlanId ? 'Current Plan' : 'Subscribe' }}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>

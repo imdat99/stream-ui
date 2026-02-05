@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
-import { formatBytes, formatDate, formatDuration } from '@/lib/utils';
-import Skeleton from 'primevue/skeleton';
+import Skeleton from '@/components/ui/Skeleton.vue';
+import { formatDate, formatDuration } from '@/lib/utils';
 import { useRouter } from 'vue-router';
 
 interface Props {
@@ -34,7 +34,7 @@ const getStatusClass = (status?: string) => {
             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
                     <div class="flex gap-4">
-                        <Skeleton width="4rem" height="2.5rem" class="rounded"></Skeleton>
+                        <Skeleton width="4rem" height="2.5rem" border-radius="0.25rem"></Skeleton>
                         <div class="flex-1 space-y-2">
                             <Skeleton width="30%" height="1rem"></Skeleton>
                             <Skeleton width="20%" height="0.8rem"></Skeleton>

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import Bell from "@/components/icons/Bell.vue";
-import Home from "@/components/icons/Home.vue";
-import Video from "@/components/icons/Video.vue";
 import Credit from "@/components/icons/Credit.vue";
+import Home from "@/components/icons/Home.vue";
 import Upload from "@/components/icons/Upload.vue";
-import NotificationDrawer from "./NotificationDrawer.vue";
+import Video from "@/components/icons/Video.vue";
 import { cn } from "@/lib/utils";
 import { createStaticVNode, ref } from "vue";
+import NotificationDrawer from "./NotificationDrawer.vue";
 
 const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
 const homeHoist = createStaticVNode(`<img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />`, 1);
@@ -40,7 +40,7 @@ const links = [
 
         <template v-for="i in links" :key="i.label">
             <component :name="i.label" :is="i.type === 'a' ? 'router-link' : 'div'"
-                v-bind="i.type === 'a' ? { to: i.href } : {}" v-tooltip="i.label" @click="i.action && i.action($event)"
+                v-bind="i.type === 'a' ? { to: i.href } : {}" :title="i.label" @click="i.action && i.action($event)"
                 :class="cn(
                     i.className,
                     ($route.path === i.href || i.isActive?.value) && 'bg-primary/15'

@@ -7,7 +7,7 @@
             <p class="text-sm text-gray-600 font-medium">Share your referral link and earn commissions from
                 referred users!</p>
             <div class="flex gap-2">
-                <InputText class="w-full" readonly type="text" :value="url" @click="copyToClipboard" />
+                <Input class="w-full" readonly type="text" :value="url" @click="copyToClipboard" />
                 <button class="btn btn-primary" @click="copyToClipboard" :disabled="isCopied">
                     <svg v-if="!isCopied" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -27,6 +27,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import Input from '@/components/ui/Input.vue';
 import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue';
 const auth = useAuthStore()

@@ -1,73 +1,87 @@
 <template>
-    <div class="w-full">
-        <Toast />
-        <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
-            class="flex flex-col gap-4 w-full">
-            <div class="text-sm text-gray-600 mb-2">
-                Enter your email address and we'll send you a link to reset your password.
-            </div>
+  <div class="w-full">
+    <Toast />
+    <Form
+      :initial-values="initialValues"
+      :resolver="forgotSchema"
+      class="flex flex-col gap-4 w-full"
+      @submit="onFormSubmit"
+    >
+      <template #default="{ form }">
+        <div class="text-sm text-gray-600 mb-2">
+          Enter your email address and we'll send you a link to reset your password.
+        </div>
 
-            <div class="flex flex-col gap-1">
-                <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
-                <InputText size="small" name="email" type="email" placeholder="you@example.com" fluid />
-                <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
-                    $form.email.error?.message }}</Message>
-            </div>
+        <div class="flex flex-col gap-1">
+          <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
+          <Input
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            fluid
+          />
+          <Message
+            v-if="form.getFieldMeta('email')?.errorMap?.onChange"
+            severity="error"
+            size="sm"
+          >
+            {{ form.getFieldMeta('email')?.errorMap?.onChange }}
+          </Message>
+        </div>
 
-            <Button type="submit" size="small" label="Send Reset Link" fluid />
+        <Button type="submit" size="sm" fluid>
+          Send Reset Link
+        </Button>
 
-            <div class="text-center mt-2">
-                <router-link to="/login" replace
-                    class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Back to Sign in
-                </router-link>
-            </div>
-        </Form>
-    </div>
+        <div class="text-center mt-2">
+          <router-link
+            to="/login"
+            replace
+            class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              ></path>
+            </svg>
+            Back to Sign in
+          </router-link>
+        </div>
+      </template>
+    </Form>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { Form, type FormSubmitEvent } from '@primevue/forms';
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import Toast from 'primevue/toast';
-import { reactive } from 'vue';
-import { z } from 'zod';
+import { client } from '@/api/client'
+import Form from '@/components/form/Form.vue'
+import Message from '@/components/form/Message.vue'
+import Button from '@/components/ui/Button.vue'
+import Input from '@/components/ui/Input.vue'
+import Toast from '@/components/ui/Toast.vue'
+import { useToast } from '@/composables/useToast'
+import { reactive } from 'vue'
+import { z } from 'zod'
 
-import { client } from '@/api/client';
-import { useAuthStore } from '@/stores/auth';
-import { useToast } from "primevue/usetoast";
+const toast = useToast()
 
-const auth = useAuthStore();
-const toast = useToast();
+const forgotSchema = z.object({
+  email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address.' })
+})
 
 const initialValues = reactive({
-    email: ''
-});
+  email: ''
+})
 
-const resolver = zodResolver(
-    z.object({
-        email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address.' })
-    })
-);
-
-const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
-    if (valid) {
-        client.auth.forgotPasswordCreate({ email: values.email })
-            .then(() => {
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
-            })
-            .catch((error) => {
-                toast.add({ severity: 'error', summary: 'Error', detail: error.message || 'An error occurred', life: 3000 });
-            });
-        // forgotPassword(values.email).then(() => {
-        //      toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
-        // }).catch(() => {
-        //      toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
-        // });
-    }
-};
+const onFormSubmit = async (values: any) => {
+  try {
+    await client.auth.forgotPasswordCreate({ email: values.email })
+    toast.success('Reset link sent', 'Success')
+  } catch (error: any) {
+    toast.error(error.message || 'An error occurred', 'Error')
+  }
+}
 </script>

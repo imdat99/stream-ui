@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import StatsCard from '@/components/dashboard/StatsCard.vue';
+import Skeleton from '@/components/ui/Skeleton.vue';
 import { formatBytes } from '@/lib/utils';
-import Skeleton from 'primevue/skeleton';
 
 interface Props {
     loading: boolean;
@@ -25,7 +25,7 @@ defineProps<Props>();
                     <Skeleton width="5rem" height="1rem" class="mb-2"></Skeleton>
                     <Skeleton width="8rem" height="2rem"></Skeleton>
                 </div>
-                <!-- <Skeleton shape="circle" size="3rem"></Skeleton> -->
+                <!-- <Skeleton circle width="3rem" height="3rem"></Skeleton> -->
             </div>
             <Skeleton width="4rem" height="1rem"></Skeleton>
         </div>

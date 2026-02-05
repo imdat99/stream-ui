@@ -1,93 +1,78 @@
 <script setup lang="ts">
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Tag from 'primevue/tag';
+import { createColumnHelper } from '@/components/table/Column'
+import DataTable from '@/components/table/DataTable.vue'
+import Tag from '@/components/ui/Tag.vue'
+import Toast from '@/components/ui/Toast.vue'
+import { useToast } from '@/composables/useToast'
+import { h } from 'vue'
 
 interface PaymentHistoryItem {
-    id: string;
-    date: string;
-    amount: number;
-    plan: string;
-    status: string;
-    invoiceId: string;
+  id: string
+  date: string
+  amount: number
+  plan: string
+  status: string
+  invoiceId: string
 }
 
-defineProps<{
-    history: PaymentHistoryItem[];
-}>();
+const props = defineProps<{
+  history: PaymentHistoryItem[]
+}>()
+
+const toast = useToast()
 
 const getStatusSeverity = (status: string) => {
-    switch (status) {
-        case 'success':
-            return 'success';
-        case 'failed':
-            return 'danger';
-        case 'pending':
-            return 'warn';
-        default:
-            return 'info';
-    }
-};
-import { useToast } from 'primevue/usetoast';
-import ArrowDownTray from '@/components/icons/ArrowDownTray.vue';
+  switch (status) {
+    case 'success':
+      return 'success' as const
+    case 'failed':
+      return 'danger' as const
+    case 'pending':
+      return 'warning' as const
+    default:
+      return 'info' as const
+  }
+}
 
-const toast = useToast();
+const columnHelper = createColumnHelper<PaymentHistoryItem>()
 
-
+const columns = [
+  columnHelper.accessor('date', {
+    header: 'Date',
+    cell: ({ getValue }) => h('span', { class: 'font-medium' }, getValue()),
+    enableSorting: true
+  }),
+  columnHelper.accessor('amount', {
+    header: 'Amount',
+    cell: ({ getValue }) => h('span', {}, `$${getValue()}`)
+  }),
+  columnHelper.accessor('plan', {
+    header: 'Plan'
+  }),
+  columnHelper.accessor('status', {
+    header: 'Status',
+    cell: ({ getValue }) => h(Tag, {
+      value: getValue(),
+      severity: getStatusSeverity(getValue())
+    })
+  })
+]
 
 const downloadInvoice = (item: PaymentHistoryItem) => {
-    toast.add({
-        severity: 'info',
-        summary: 'Downloading',
-        detail: `Downloading invoice #${item.invoiceId}...`,
-        life: 2000
-    });
+  toast.info(`Downloading invoice #${item.invoiceId}...`, 'Downloading')
 
-    // Simulate download delay
-    setTimeout(() => {
-        toast.add({
-            severity: 'success',
-            summary: 'Downloaded',
-            detail: `Invoice #${item.invoiceId} downloaded successfully`,
-            life: 3000
-        });
-    }, 1500);
-};
+  setTimeout(() => {
+    toast.success(`Invoice #${item.invoiceId} downloaded successfully`, 'Downloaded')
+  }, 1500)
+}
 </script>
 
 <template>
-    <section>
-        <h2 class="text-2xl font-bold mb-6 text-gray-900">Billing History</h2>
-        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <DataTable :value="history" responsiveLayout="scroll" class="w-full">
-                <template #empty>
-                    <div class="text-center py-8 text-gray-500">No payment history found.</div>
-                </template>
-                <Column field="date" header="Date" class="font-medium"></Column>
-                <Column field="amount" header="Amount">
-                    <template #body="slotProps">
-                        ${{ slotProps.data.amount }}
-                    </template>
-                </Column>
-                <Column field="plan" header="Plan"></Column>
-                <Column field="status" header="Status">
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getStatusSeverity(slotProps.data.status)"
-                            class="capitalize px-2 py-0.5 text-xs" :rounded="true" />
-                    </template>
-                </Column>
-                <!-- <Column header="" style="width: 3rem">
-                    <template #body="slotProps">
-                        <Button text rounded severity="secondary" size="small" @click="downloadInvoice(slotProps.data)"
-                            v-tooltip="'Download Invoice'">
-                            <template #icon>
-                                <ArrowDownTray class="w-5 h-5" />
-                            </template>
-                        </Button>
-                    </template>
-                </Column> -->
-            </DataTable>
-        </div>
-    </section>
+  <section>
+    <Toast />
+    <h2 class="text-2xl font-bold mb-6 text-gray-900">Billing History</h2>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <DataTable :data="history" :columns="columns" />
+    </div>
+  </section>
 </template>

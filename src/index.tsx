@@ -6,15 +6,12 @@ import { streamText } from 'hono/streaming';
 import isMobile from 'is-mobile';
 import { renderToWebStream } from 'vue/server-renderer';
 import { buildBootstrapScript } from './lib/manifest';
-import { styleTags } from './lib/primePassthrough';
+import { createTextTransformStreamClass } from './lib/replateStreamText';
 import { createApp } from './main';
 import { useAuthStore } from './stores/auth';
-// @ts-ignore
-import Base from '@primevue/core/base';
-import { createTextTransformStreamClass } from './lib/replateStreamText';
+
 const app = new Hono()
-const defaultNames = ['primitive', 'semantic', 'global', 'base', 'ripple-directive']
-// app.use(renderer)
+
 app.use('*', contextStorage());
 app.use(cors(), async (c, next) => {
   c.set("fetch", app.request.bind(app));
@@ -35,8 +32,7 @@ app.use(cors(), async (c, next) => {
   url.protocol = 'https:'
   url.pathname = path.replace(/^\/r/, '') || '/'
   url.port = ''
-  // console.log("url", url.toString())
-  // console.log("c.req.raw", c.req.raw)
+
   const headers = new Headers(c.req.header());
   headers.delete("host");
   headers.delete("connection");
@@ -50,9 +46,11 @@ app.use(cors(), async (c, next) => {
     credentials: 'include'
   });
 });
+
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });
+
 app.get("*", async (c) => {
   const nonce = crypto.randomUUID();
   const url = new URL(c.req.url);
@@ -60,33 +58,28 @@ app.get("*", async (c) => {
   app.provide("honoContext", c);
   const auth = useAuthStore();
   auth.$reset();
-  // auth.initialized = false;
   await auth.init();
   await router.push(url.pathname);
   await router.isReady();
-  let usedStyles = new Set<String>();
-  Base.setLoadedStyleName = async (name: string) => usedStyles.add(name)
+
   return streamText(c, async (stream) => {
     c.header("Content-Type", "text/html; charset=utf-8");
     c.header("Content-Encoding", "Identity");
     const ctx: Record<string, any> = {};
     const appStream = renderToWebStream(app, ctx);
-    // console.log("ctx: ", );
+
     await stream.write("<!DOCTYPE html><html lang='en'><head>");
     await stream.write("<base href='" + url.origin + "'/>");
 
     await renderSSRHead(head).then((headString) => stream.write(headString.headTags.replace(/\n/g, "")));
-    // await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"rel="stylesheet"></link>`);
     await stream.write(`<link rel="preconnect" href="https://fonts.googleapis.com">`);
     await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">`);
     await stream.write('<link rel="icon" href="/favicon.ico" />');
     await stream.write(buildBootstrapScript());
-    if (usedStyles.size > 0) {
-      defaultNames.forEach(name => usedStyles.add(name));
-    }
-    await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
+
     await stream.write(`</head><body class='${bodyClass}'>`);
     await stream.pipe(createTextTransformStreamClass(appStream, (text) => text.replace('<div id="anchor-header" class="p-4"></div>', `<div id="anchor-header" class="p-4">${ctx.teleports["#anchor-header"] || ""}</div>`).replace('<div id="anchor-top"></div>', `<div id="anchor-top">${ctx.teleports["#anchor-top"] || ""}</div>`)));
+
     delete ctx.teleports
     delete ctx.__teleportBuffers
     delete ctx.modules;
@@ -95,6 +88,7 @@ app.get("*", async (c) => {
     await stream.write("</body></html>");
   });
 })
+
 const ESCAPE_LOOKUP: { [match: string]: string } = {
   "&": "\\u0026",
   ">": "\\u003e",
@@ -108,4 +102,5 @@ const ESCAPE_REGEX = /[&><\u2028\u2029]/g;
 function htmlEscape(str: string): string {
   return str.replace(ESCAPE_REGEX, (match) => ESCAPE_LOOKUP[match]);
 }
+
 export default app
