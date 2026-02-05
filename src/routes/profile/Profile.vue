@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
+import { useAuthStore } from '@/stores/auth';
+import { computed, inject, ref } from 'vue';
+import AccountStatusCard from './components/AccountStatusCard.vue';
+import ChangePasswordDialog from './components/ChangePasswordDialog.vue';
+import LinkedAccountsCard from './components/LinkedAccountsCard.vue';
 import ProfileHero from './components/ProfileHero.vue';
 import ProfileInfoCard from './components/ProfileInfoCard.vue';
-import ChangePasswordDialog from './components/ChangePasswordDialog.vue';
-import AccountStatusCard from './components/AccountStatusCard.vue';
-import LinkedAccountsCard from './components/LinkedAccountsCard.vue';
-import { useToast } from 'primevue/usetoast';
 
 const auth = useAuthStore();
-const toast = useToast();
+const toast = inject<{ add: (t: any) => void }>('toast');
 
 // Dialog visibility
 const showPasswordDialog = ref(false);
 
 // Refs for dialog components
-const passwordDialogRef = ref<InstanceType<typeof ChangePasswordDialog>>();
+const passwordDialogRef = ref<any>();
 
 // Computed storage values
 const storageUsed = computed(() => auth.user?.storage_used || 0);
@@ -26,14 +25,14 @@ const storageLimit = computed(() => 10737418240); // 10GB default
 const handleEditSave = async (data: { username: string; email: string }) => {
     try {
         await auth.updateProfile(data);
-        toast.add({
+        toast?.add({
             severity: 'success',
             summary: 'Profile Updated',
             detail: 'Your profile has been updated successfully.',
             life: 3000
         });
     } catch (e) {
-        toast.add({
+        toast?.add({
             severity: 'error',
             summary: 'Update Failed',
             detail: auth.error || 'Failed to update profile.',
@@ -46,14 +45,16 @@ const handlePasswordSave = async (data: { currentPassword: string; newPassword: 
     try {
         await auth.changePassword(data.currentPassword, data.newPassword);
         showPasswordDialog.value = false;
-        toast.add({
+        toast?.add({
             severity: 'success',
             summary: 'Password Changed',
             detail: 'Your password has been changed successfully.',
             life: 3000
         });
     } catch (e: any) {
-        passwordDialogRef.value?.setError(e.message || 'Failed to change password');
+        if (passwordDialogRef.value?.setError) {
+            passwordDialogRef.value.setError(e.message || 'Failed to change password');
+        }
     }
 };
 </script>

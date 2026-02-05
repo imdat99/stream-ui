@@ -6,14 +6,10 @@ import { streamText } from 'hono/streaming';
 import isMobile from 'is-mobile';
 import { renderToWebStream } from 'vue/server-renderer';
 import { buildBootstrapScript } from './lib/manifest';
-import { styleTags } from './lib/primePassthrough';
+import { createTextTransformStreamClass } from './lib/replateStreamText';
 import { createApp } from './main';
 import { useAuthStore } from './stores/auth';
-// @ts-ignore
-import Base from '@primevue/core/base';
-import { createTextTransformStreamClass } from './lib/replateStreamText';
 const app = new Hono()
-const defaultNames = ['primitive', 'semantic', 'global', 'base', 'ripple-directive']
 // app.use(renderer)
 app.use('*', contextStorage());
 app.use(cors(), async (c, next) => {
@@ -60,12 +56,8 @@ app.get("*", async (c) => {
   app.provide("honoContext", c);
   const auth = useAuthStore();
   auth.$reset();
-  // auth.initialized = false;
-  await auth.init();
   await router.push(url.pathname);
   await router.isReady();
-  let usedStyles = new Set<String>();
-  Base.setLoadedStyleName = async (name: string) => usedStyles.add(name)
   return streamText(c, async (stream) => {
     c.header("Content-Type", "text/html; charset=utf-8");
     c.header("Content-Encoding", "Identity");
@@ -81,10 +73,6 @@ app.get("*", async (c) => {
     await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">`);
     await stream.write('<link rel="icon" href="/favicon.ico" />');
     await stream.write(buildBootstrapScript());
-    if (usedStyles.size > 0) {
-      defaultNames.forEach(name => usedStyles.add(name));
-    }
-    await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
     await stream.write(`</head><body class='${bodyClass}'>`);
     await stream.pipe(createTextTransformStreamClass(appStream, (text) => text.replace('<div id="anchor-header" class="p-4"></div>', `<div id="anchor-header" class="p-4">${ctx.teleports["#anchor-header"] || ""}</div>`).replace('<div id="anchor-top"></div>', `<div id="anchor-top">${ctx.teleports["#anchor-top"] || ""}</div>`)));
     delete ctx.teleports

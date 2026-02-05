@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { ProgressBar } from '@/components/ui/form';
 import { formatBytes } from '@/lib/utils';
-import ProgressBar from 'primevue/progressbar';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -23,7 +23,7 @@ const uploadsPercentage = computed(() => Math.min(Math.round((props.uploadsUsed 
                 <span class="text-gray-600 font-medium">Storage</span>
                 <span class="text-gray-900 font-bold">{{ storagePercentage }}%</span>
             </div>
-            <ProgressBar :value="storagePercentage" :showValue="false" style="height: 8px" :class="storagePercentage > 90 ? 'p-progressbar-danger' : ''"></ProgressBar>
+            <ProgressBar :value="storagePercentage" />
             <p class="text-xs text-gray-500 mt-2">{{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used</p>
         </div>
 
@@ -32,7 +32,7 @@ const uploadsPercentage = computed(() => Math.min(Math.round((props.uploadsUsed 
                 <span class="text-gray-600 font-medium">Monthly Uploads</span>
                 <span class="text-gray-900 font-bold">{{ uploadsPercentage }}%</span>
             </div>
-            <ProgressBar :value="uploadsPercentage" :showValue="false" style="height: 8px"></ProgressBar>
+            <ProgressBar :value="uploadsPercentage" />
             <p class="text-xs text-gray-500 mt-2">{{ uploadsUsed }} of {{ uploadsLimit }} uploads</p>
         </div>
     </div>

@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import Message from 'primevue/message';
-import { ref, computed, watch } from 'vue';
+import { Button, Dialog, Input } from '@/components/ui/form';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     visible: boolean;
@@ -65,36 +62,53 @@ defineExpose({
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="emit('update:visible', $event)" modal header="Change Password" 
-        :style="{ width: '28rem' }" :closable="true" :draggable="false">
+    <Dialog 
+        :visible="visible" 
+        @update:visible="emit('update:visible', $event)" 
+        header="Change Password" 
+        :style="{ width: '28rem' }"
+        :closable="true"
+    >
         <div class="space-y-6 pt-2">
-            <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
+            <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+                {{ error }}
+            </div>
             
             <div class="flex flex-col gap-2">
                 <label for="current-password" class="text-sm font-medium text-gray-700">Current Password</label>
-                <InputText id="current-password" v-model="currentPassword" type="password" class="w-full" 
-                    placeholder="Enter current password" />
+                <Input 
+                    id="current-password" 
+                    v-model="currentPassword" 
+                    type="password" 
+                    placeholder="Enter current password" 
+                />
             </div>
             
             <div class="flex flex-col gap-2">
                 <label for="new-password" class="text-sm font-medium text-gray-700">New Password</label>
-                <InputText id="new-password" v-model="newPassword" type="password" class="w-full" 
+                <Input 
+                    id="new-password" 
+                    v-model="newPassword" 
+                    type="password" 
                     placeholder="Enter new password (min 6 characters)" 
-                    :class="{ 'p-invalid': passwordTooShort }" />
+                />
                 <small v-if="passwordTooShort" class="text-red-500">Password must be at least 6 characters</small>
             </div>
             
             <div class="flex flex-col gap-2">
                 <label for="confirm-password" class="text-sm font-medium text-gray-700">Confirm New Password</label>
-                <InputText id="confirm-password" v-model="confirmPassword" type="password" class="w-full" 
+                <Input 
+                    id="confirm-password" 
+                    v-model="confirmPassword" 
+                    type="password" 
                     placeholder="Confirm new password" 
-                    :class="{ 'p-invalid': passwordMismatch }" />
+                />
                 <small v-if="passwordMismatch" class="text-red-500">Passwords do not match</small>
             </div>
         </div>
         <template #footer>
             <div class="flex justify-end gap-3 pt-4">
-                <Button label="Cancel" severity="secondary" @click="handleClose" :disabled="loading" />
+                <Button variant="secondary" label="Cancel" @click="handleClose" :disabled="loading" />
                 <Button label="Change Password" @click="handleSave" :loading="loading" :disabled="!isValid" />
             </div>
         </template>

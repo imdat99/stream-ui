@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { client, type ModelVideo } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
-import { client, type ModelVideo } from '@/api/client';
-import Skeleton from 'primevue/skeleton';
+import { Skeleton } from '@/components/ui/form';
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const loading = ref(true);
@@ -156,23 +156,23 @@ onMounted(() => {
         <div v-for="i in 4" :key="i" class="bg-white rounded-xl border border-gray-200 p-6">
           <div class="flex items-center justify-between mb-4">
              <div class="space-y-2">
-                <Skeleton width="5rem" height="1rem" class="mb-2"></Skeleton>
-                <Skeleton width="8rem" height="2rem"></Skeleton>
+                <Skeleton width="5rem" height="1rem" class="mb-2 rounded" />
+                <Skeleton width="8rem" height="2rem" class="rounded" />
              </div>
-             <Skeleton shape="circle" size="3rem"></Skeleton>
+             <Skeleton width="3rem" height="3rem" class="rounded-full" />
           </div>
-          <Skeleton width="4rem" height="1rem"></Skeleton>
+          <Skeleton width="4rem" height="1rem" class="rounded" />
         </div>
       </div>
 
        <!-- Quick Actions Skeleton -->
        <div class="mb-8">
-         <Skeleton width="10rem" height="1.5rem" class="mb-4"></Skeleton>
+         <Skeleton width="10rem" height="1.5rem" class="mb-4 rounded" />
          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
              <div v-for="i in 4" :key="i" class="p-6 rounded-xl border border-gray-200">
-                <Skeleton shape="circle" size="3rem" class="mb-4"></Skeleton>
-                <Skeleton width="8rem" height="1.25rem" class="mb-2"></Skeleton>
-                <Skeleton width="100%" height="1rem"></Skeleton>
+                <Skeleton width="3rem" height="3rem" class="mb-4 rounded-full" />
+                <Skeleton width="8rem" height="1.25rem" class="mb-2 rounded" />
+                <Skeleton width="100%" height="1rem" class="rounded" />
              </div>
          </div>
        </div>
@@ -180,16 +180,16 @@ onMounted(() => {
        <!-- Recent Videos Skeleton -->
        <div class="mb-8">
            <div class="flex items-center justify-between mb-4">
-              <Skeleton width="8rem" height="1.5rem"></Skeleton>
-              <Skeleton width="5rem" height="1rem"></Skeleton>
+              <Skeleton width="8rem" height="1.5rem" class="rounded" />
+              <Skeleton width="5rem" height="1rem" class="rounded" />
            </div>
            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
                   <div class="flex gap-4">
-                     <Skeleton width="4rem" height="2.5rem" class="rounded"></Skeleton>
+                     <Skeleton width="4rem" height="2.5rem" class="rounded" />
                      <div class="flex-1 space-y-2">
-                        <Skeleton width="30%" height="1rem"></Skeleton>
-                        <Skeleton width="20%" height="0.8rem"></Skeleton>
+                        <Skeleton width="30%" height="1rem" class="rounded" />
+                        <Skeleton width="20%" height="0.8rem" class="rounded" />
                      </div>
                   </div>
                </div>

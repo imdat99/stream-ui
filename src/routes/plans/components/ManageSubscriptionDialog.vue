@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type ModelPlan } from '@/api/client';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
+import { Button, Dialog } from '@/components/ui/form';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -22,7 +21,7 @@ const visibleModel = computed({
 </script>
 
 <template>
-    <Dialog v-model:visible="visibleModel" modal header="Manage Subscription" :style="{ width: '30rem' }">
+    <Dialog v-model:visible="visibleModel" header="Manage Subscription" :style="{ width: '30rem' }">
         <div class="mb-4">
             <p class="text-gray-600 mb-4">You are currently subscribed to <span class="font-bold text-gray-900">{{ currentPlan?.name }}</span>.</p>
             <div class="bg-gray-50 p-4 rounded-lg space-y-2 border border-gray-200">
@@ -44,11 +43,9 @@ const visibleModel = computed({
             Canceling your subscription will downgrade you to the Free plan at the end of your current billing period.
         </p>
         <div class="flex justify-end gap-2">
-            <Button label="Close" text severity="secondary" @click="visibleModel = false" />
+            <Button variant="secondary" label="Close" @click="visibleModel = false" />
             <Button 
                 label="Cancel Subscription" 
-                severity="danger" 
-                :icon="cancelling ? 'i-svg-spinners-180-ring-with-bg' : 'i-heroicons-x-circle'" 
                 @click="emit('cancel-subscription')" 
                 :disabled="cancelling"
             />

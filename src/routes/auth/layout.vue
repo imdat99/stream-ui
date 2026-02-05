@@ -23,6 +23,7 @@
     </div>
 </template>
 <script setup lang="ts">
+import vueHead from "@/components/VueHead";
 import { useRoute } from 'vue-router';
 
 const route = useRoute();

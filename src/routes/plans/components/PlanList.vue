@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { type ModelPlan } from '@/api/client';
-import Button from 'primevue/button';
-import Skeleton from 'primevue/skeleton';
-import { formatBytes } from '@/lib/utils'; // Using utils formatBytes
+import { Button, Skeleton } from '@/components/ui/form';
+import { formatBytes } from '@/lib/utils';
 
 defineProps<{
     plans: ModelPlan[];
@@ -40,7 +39,7 @@ const isCurrentComp = (plan: ModelPlan, currentId?: string) => {
         <!-- Loading State -->
         <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div v-for="i in 3" :key="i" class="h-full">
-                <Skeleton height="300px" borderRadius="16px"></Skeleton>
+                <Skeleton height="300px" borderRadius="16px" />
             </div>
         </div>
 
@@ -53,11 +52,8 @@ const isCurrentComp = (plan: ModelPlan, currentId?: string) => {
                 <!-- Admin Edit Button -->
                 <Button 
                     v-if="isAdmin"
-                    icon="i-heroicons-pencil-square" 
-                    class="absolute top-2 right-2 z-20 !p-2 !w-8 !h-8" 
-                    severity="secondary" 
-                    text 
-                    rounded
+                    class="absolute top-2 right-2 z-20"
+                    variant="secondary"
                     @click.stop="emit('edit', plan)"
                 />
 
@@ -93,10 +89,8 @@ const isCurrentComp = (plan: ModelPlan, currentId?: string) => {
 
                     <Button 
                         :label="isCurrentComp(plan, currentPlanId) ? 'Current Plan' : (subscribingPlanId === plan.id ? 'Processing...' : 'Upgrade')" 
-                        :icon="subscribingPlanId === plan.id ? 'i-svg-spinners-180-ring-with-bg' : ''"
                         class="w-full" 
-                        :severity="isCurrentComp(plan, currentPlanId) ? 'secondary' : 'primary'"
-                        :outlined="isCurrentComp(plan, currentPlanId)"
+                        :variant="isCurrentComp(plan, currentPlanId) ? 'outlined' : 'primary'"
                         :disabled="!!subscribingPlanId || isCurrentComp(plan, currentPlanId)"
                         @click="emit('subscribe', plan)"
                     />

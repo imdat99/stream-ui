@@ -1,20 +1,24 @@
 <template>
     <div class="w-full">
         <Toast />
-        <Form v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
-            class="flex flex-col gap-4 w-full">
+        <Form
+            :initialValues="initialValues"
+            :validators="validators"
+            @submit="onFormSubmit"
+            class="flex flex-col gap-4 w-full"
+        >
             <div class="text-sm text-gray-600 mb-2">
                 Enter your email address and we'll send you a link to reset your password.
             </div>
 
-            <div class="flex flex-col gap-1">
-                <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
-                <InputText size="small" name="email" type="email" placeholder="you@example.com" fluid />
-                <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
-                    $form.email.error?.message }}</Message>
-            </div>
+            <Field name="email" label="Email address">
+                <template #default="{ value, error, isInvalid }">
+                    <Input name="email" type="email" placeholder="you@example.com" :modelValue="value" />
+                    <div v-if="isInvalid" class="text-xs text-red-600 mt-1">{{ error }}</div>
+                </template>
+            </Field>
 
-            <Button type="submit" size="small" label="Send Reset Link" fluid />
+            <Button type="submit" label="Send Reset Link" />
 
             <div class="text-center mt-2">
                 <router-link to="/login" replace
@@ -31,43 +35,30 @@
 </template>
 
 <script setup lang="ts">
-import { Form, type FormSubmitEvent } from '@primevue/forms';
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import Toast from 'primevue/toast';
-import { reactive } from 'vue';
-import { z } from 'zod';
-
 import { client } from '@/api/client';
-import { useAuthStore } from '@/stores/auth';
-import { useToast } from "primevue/usetoast";
+import { Button, Field, Form, Input, Toast } from '@/components/ui/form';
+import { inject, reactive } from 'vue';
 
-const auth = useAuthStore();
-const toast = useToast();
+const toast = inject<{ add: (t: any) => void }>('toast');
 
 const initialValues = reactive({
     email: ''
 });
 
-const resolver = zodResolver(
-    z.object({
-        email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address.' })
-    })
-);
+const validators = {
+    email: [
+        (value: string) => !value ? 'Email is required.' : undefined,
+        (value: string) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Invalid email address.' : undefined,
+    ],
+};
 
-const onFormSubmit = ({ valid, values }: FormSubmitEvent) => {
-    if (valid) {
-        client.auth.forgotPasswordCreate({ email: values.email })
-            .then(() => {
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
-            })
-            .catch((error) => {
-                toast.add({ severity: 'error', summary: 'Error', detail: error.message || 'An error occurred', life: 3000 });
-            });
-        // forgotPassword(values.email).then(() => {
-        //      toast.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
-        // }).catch(() => {
-        //      toast.add({ severity: 'error', summary: 'Error', detail: auth.error, life: 3000 });
-        // });
-    }
+const onFormSubmit = (values: Record<string, any>) => {
+    client.auth.forgotPasswordCreate({ email: values.email })
+        .then(() => {
+            toast?.add({ severity: 'success', summary: 'Success', detail: 'Reset link sent', life: 3000 });
+        })
+        .catch((error: any) => {
+            toast?.add({ severity: 'error', summary: 'Error', detail: error.message || 'An error occurred', life: 3000 });
+        });
 };
 </script>

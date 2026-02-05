@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import Button from 'primevue/button';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-import Tag from 'primevue/tag';
+import { Tag } from '@/components/ui/form';
+import { inject } from 'vue';
 
 interface PaymentHistoryItem {
     id: string;
@@ -17,36 +15,31 @@ defineProps<{
     history: PaymentHistoryItem[];
 }>();
 
-const getStatusSeverity = (status: string) => {
+const getStatusSeverity = (status: string): 'success' | 'error' | 'warn' | 'info' | 'secondary' => {
     switch (status) {
         case 'success':
             return 'success';
         case 'failed':
-            return 'danger';
+            return 'error';
         case 'pending':
             return 'warn';
         default:
             return 'info';
     }
 };
-import { useToast } from 'primevue/usetoast';
-import ArrowDownTray from '@/components/icons/ArrowDownTray.vue';
 
-const toast = useToast();
-
-
+const toast = inject<{ add: (t: any) => void }>('toast');
 
 const downloadInvoice = (item: PaymentHistoryItem) => {
-    toast.add({
+    toast?.add({
         severity: 'info',
         summary: 'Downloading',
         detail: `Downloading invoice #${item.invoiceId}...`,
         life: 2000
     });
 
-    // Simulate download delay
     setTimeout(() => {
-        toast.add({
+        toast?.add({
             severity: 'success',
             summary: 'Downloaded',
             detail: `Invoice #${item.invoiceId} downloaded successfully`,
@@ -60,34 +53,31 @@ const downloadInvoice = (item: PaymentHistoryItem) => {
     <section>
         <h2 class="text-2xl font-bold mb-6 text-gray-900">Billing History</h2>
         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <DataTable :value="history" responsiveLayout="scroll" class="w-full">
-                <template #empty>
-                    <div class="text-center py-8 text-gray-500">No payment history found.</div>
-                </template>
-                <Column field="date" header="Date" class="font-medium"></Column>
-                <Column field="amount" header="Amount">
-                    <template #body="slotProps">
-                        ${{ slotProps.data.amount }}
-                    </template>
-                </Column>
-                <Column field="plan" header="Plan"></Column>
-                <Column field="status" header="Status">
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.status" :severity="getStatusSeverity(slotProps.data.status)"
-                            class="capitalize px-2 py-0.5 text-xs" :rounded="true" />
-                    </template>
-                </Column>
-                <!-- <Column header="" style="width: 3rem">
-                    <template #body="slotProps">
-                        <Button text rounded severity="secondary" size="small" @click="downloadInvoice(slotProps.data)"
-                            v-tooltip="'Download Invoice'">
-                            <template #icon>
-                                <ArrowDownTray class="w-5 h-5" />
-                            </template>
-                        </Button>
-                    </template>
-                </Column> -->
-            </DataTable>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200 bg-gray-50">
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr v-for="item in history" :key="item.id">
+                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ item.date }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">${{ item.amount }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500">{{ item.plan }}</td>
+                            <td class="px-4 py-3">
+                                <Tag :value="item.status" :severity="getStatusSeverity(item.status)" />
+                            </td>
+                        </tr>
+                        <tr v-if="history.length === 0">
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">No payment history found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 </template>

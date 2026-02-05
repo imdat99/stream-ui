@@ -178,10 +178,6 @@ export default defineConfig({
         DEFAULT: "#fafafa",
         light: "#f8f9fa",
       },
-      muted: {
-        DEFAULT: "#f5f4f2",
-        light: "#f8f9fa",
-      },
       border: {
         DEFAULT: "#e6e7e2",
         light: "#f8f9fa",

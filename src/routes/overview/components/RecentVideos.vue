@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
-import { formatBytes, formatDate, formatDuration } from '@/lib/utils';
-import Skeleton from 'primevue/skeleton';
+import { Skeleton } from '@/components/ui/form';
+import { formatDate, formatDuration } from '@/lib/utils';
 import { useRouter } from 'vue-router';
 
 interface Props {

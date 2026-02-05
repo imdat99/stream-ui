@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProgressBar from 'primevue/progressbar';
+import { ProgressBar } from '@/components/ui/form';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -29,7 +29,7 @@ const formatBytes = (bytes: number) => {
                     <span class="text-gray-600">Storage Used</span>
                     <span class="font-bold text-gray-900">{{ storagePercentage }}%</span>
                 </div>
-                <ProgressBar :value="storagePercentage" :showValue="false" style="height: 6px"></ProgressBar>
+                <ProgressBar :value="storagePercentage" />
                 <p class="text-xs text-gray-500 mt-2">{{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used</p>
             </div>
             <div class="bg-green-50 rounded-lg p-4 border border-green-100 flex items-start gap-3">

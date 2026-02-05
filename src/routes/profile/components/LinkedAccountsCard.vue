@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Tag from 'primevue/tag';
+import { Tag } from '@/components/ui/form';
 </script>
 
 <template>
@@ -18,7 +18,7 @@ import Tag from 'primevue/tag';
                     </div>
                     <span class="font-medium text-gray-700">Google</span>
                 </div>
-                <Tag value="Connected" severity="success" class="text-xs px-2"></Tag>
+                <Tag value="Connected" severity="success" />
             </div>
         </div>
     </div>

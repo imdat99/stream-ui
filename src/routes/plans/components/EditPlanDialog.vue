@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { type ModelPlan } from '@/api/client';
-import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
-import Dialog from 'primevue/dialog';
-import InputNumber from 'primevue/inputnumber';
-import InputText from 'primevue/inputtext';
-import Textarea from 'primevue/textarea';
+import { Button, Dialog } from '@/components/ui/form';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -38,53 +33,100 @@ const visibleModel = computed({
 </script>
 
 <template>
-    <Dialog v-model:visible="visibleModel" modal header="Edit Plan" :style="{ width: '40rem' }">
+    <Dialog v-model:visible="visibleModel" header="Edit Plan" :style="{ width: '40rem' }">
         <div class="space-y-4">
             <div class="flex flex-col gap-2">
                 <label for="plan-name" class="text-sm font-medium text-gray-700">Name</label>
-                <InputText id="plan-name" v-model="localPlan.name" placeholder="Plan Name" />
+                <input 
+                    id="plan-name"
+                    v-model="localPlan.name"
+                    type="text"
+                    placeholder="Plan Name"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-2">
                     <label for="plan-price" class="text-sm font-medium text-gray-700">Price ($)</label>
-                    <InputNumber id="plan-price" v-model="localPlan.price" mode="currency" currency="USD" locale="en-US" :minFractionDigits="2" />
+                    <input 
+                        id="plan-price"
+                        v-model="localPlan.price"
+                        type="number"
+                        placeholder="Price"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
                 </div>
                 <div class="flex flex-col gap-2">
                     <label for="plan-cycle" class="text-sm font-medium text-gray-700">Billing Cycle</label>
-                    <InputText id="plan-cycle" v-model="localPlan.cycle" placeholder="e.g. month, year" />
+                    <input 
+                        id="plan-cycle"
+                        v-model="localPlan.cycle"
+                        type="text"
+                        placeholder="e.g. month, year"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
                 </div>
             </div>
 
-             <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2">
                 <label for="plan-desc" class="text-sm font-medium text-gray-700">Description</label>
-                <Textarea id="plan-desc" v-model="localPlan.description" rows="2" class="w-full" />
+                <textarea 
+                    id="plan-desc"
+                    v-model="localPlan.description"
+                    rows="2"
+                    placeholder="Description"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                />
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-                 <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2">
                     <label for="plan-storage" class="text-sm font-medium text-gray-700">Storage Limit (bytes)</label>
-                    <InputNumber id="plan-storage" v-model="localPlan.storage_limit" />
+                    <input 
+                        id="plan-storage"
+                        v-model="localPlan.storage_limit"
+                        type="number"
+                        placeholder="Storage limit"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
                 </div>
-                 <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2">
                     <label for="plan-uploads" class="text-sm font-medium text-gray-700">Upload Limit (per day)</label>
-                    <InputNumber id="plan-uploads" v-model="localPlan.upload_limit" />
+                    <input 
+                        id="plan-uploads"
+                        v-model="localPlan.upload_limit"
+                        type="number"
+                        placeholder="Upload limit"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
                 </div>
-                 <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2">
                     <label for="plan-duration" class="text-sm font-medium text-gray-700">Duration Limit (sec)</label>
-                    <InputNumber id="plan-duration" v-model="localPlan.duration_limit" />
+                    <input 
+                        id="plan-duration"
+                        v-model="localPlan.duration_limit"
+                        type="number"
+                        placeholder="Duration limit"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
                 </div>
             </div>
 
-             <div class="flex items-center gap-2 pt-2">
-                 <Checkbox v-model="localPlan.is_active" :binary="true" inputId="plan-active" />
-                 <label for="plan-active" class="text-sm font-medium text-gray-700">Active</label>
-             </div>
+            <div class="flex items-center gap-2 pt-2">
+                <input 
+                    type="checkbox" 
+                    id="plan-active" 
+                    v-model="localPlan.is_active"
+                    class="w-4 h-4 rounded border-gray-300"
+                />
+                <label for="plan-active" class="text-sm font-medium text-gray-700">Active</label>
+            </div>
         </div>
 
         <template #footer>
-            <Button label="Cancel" text severity="secondary" @click="visibleModel = false" />
-            <Button label="Save Changes" icon="i-heroicons-check" @click="onSave" :loading="loading" />
+            <Button variant="secondary" label="Cancel" @click="visibleModel = false" />
+            <Button label="Save Changes" @click="onSave" :loading="loading" />
         </template>
     </Dialog>
 </template>
