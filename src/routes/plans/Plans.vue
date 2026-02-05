@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { client, type ModelPlan } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
-import useSWRV from '@/lib/swr';
 import { useAuthStore } from '@/stores/auth';
-import { computed, ref, watch } from 'vue';
+import { useQuery } from '@pinia/colada';
+import { computed, ref } from 'vue';
 import CurrentPlanCard from './components/CurrentPlanCard.vue';
-import UsageStatsCard from './components/UsageStatsCard.vue';
-import PlanList from './components/PlanList.vue';
-import PlanPaymentHistory from './components/PlanPaymentHistory.vue';
 import EditPlanDialog from './components/EditPlanDialog.vue';
 import ManageSubscriptionDialog from './components/ManageSubscriptionDialog.vue';
-
+import PlanList from './components/PlanList.vue';
+import PlanPaymentHistory from './components/PlanPaymentHistory.vue';
+import UsageStatsCard from './components/UsageStatsCard.vue';
+// const ahihi = defineBasicLoader('/payments-and-plans', async to => {
+//   return client.plans.plansList();
+// })
+// const { data, isLoading, reload } = ahihi();
+const { data, isPending, isLoading, refresh } = useQuery({
+  // unique key for the query in the cache
+  key: () => ['payments-and-plans'],
+  query: () => client.plans.plansList(),
+})
 const auth = useAuthStore();
 // const plans = ref<ModelPlan[]>([]);
 const subscribing = ref<string | null>(null);
@@ -24,7 +32,6 @@ const paymentHistory = ref([
     { id: 'inv_003', date: 'Dec 24, 2025', amount: 19.99, plan: 'Pro Plan', status: 'failed', invoiceId: 'INV-2025-003' },
     { id: 'inv_004', date: 'Jan 24, 2026', amount: 19.99, plan: 'Pro Plan', status: 'pending', invoiceId: 'INV-2026-001' },
 ]);
-const { data, isLoading, mutate: mutatePlans } = useSWRV("r/plans", client.plans.plansList)
 
 // Computed Usage (Mock if not in store)
 const storageUsed = computed(() => auth.user?.storage_used || 0); // bytes
@@ -78,7 +85,7 @@ const savePlan = async (updatedPlan: ModelPlan) => {
         });
         
         // Refresh plans
-        await mutatePlans();
+        await refresh();
         
         showEditDialog.value = false;
         alert('Plan updated successfully');

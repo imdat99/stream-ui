@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import type { ModelVideo } from '@/api/client';
-import { formatDuration, formatDate, formatBytes, getStatusClass } from '@/lib/utils';
-import DataTable from 'primevue/datatable';
+import { formatBytes, formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
+import ArrowDownTray from '@/components/icons/ArrowDownTray.vue';
+import LinkIcon from '@/components/icons/LinkIcon.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import VideoIcon from '@/components/icons/VideoIcon.vue';
 import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import { defineEmits, defineProps } from 'vue';
 
 defineProps<{
     videos: ModelVideo[];
@@ -29,7 +34,7 @@ const emit = defineEmits<{
                             <img v-if="data.thumbnail" :src="data.thumbnail" :alt="data.title"
                                 class="w-full h-full object-cover" />
                             <div v-else class="w-full h-full flex items-center justify-center">
-                                <span class="i-heroicons-film text-gray-400 text-xl" />
+                                <VideoIcon class="text-gray-400 text-xl w-5 h-5" />
                             </div>
                         </div>
                         <div class="min-w-0 flex-1">
@@ -42,10 +47,8 @@ const emit = defineEmits<{
 
             <Column header="Status">
                 <template #body="{ data }">
-                    <span
-                        :class="['px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap', getStatusClass(data.status)]">
-                        {{ data.status || 'Unknown' }}
-                    </span>
+                    <Tag :value="data.status" :severity="getStatusSeverity(data.status)"
+                        class="capitalize px-2 py-0.5 text-xs" />
                 </template>
             </Column>
 
@@ -73,23 +76,23 @@ const emit = defineEmits<{
                         <button
                             class="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                             title="Download">
-                            <span class="i-heroicons-arrow-down-tray w-4 h-4" />
+                            <ArrowDownTray class="w-4 h-4" />
                         </button>
                         <button
                             class="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                             title="Copy Link">
-                            <span class="i-heroicons-link w-4 h-4" />
+                            <LinkIcon class="w-4 h-4" />
                         </button>
                         <div class="w-px h-3 bg-gray-200 mx-1"></div>
-                        <button
-                            class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        <router-link :to="{ name: 'video-edit', params: { id: data.id } }"
+                            class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors inline-block"
                             title="Edit">
-                            <span class="i-heroicons-pencil w-4 h-4" />
-                        </button>
+                            <PencilIcon class="w-4 h-4" />
+                        </router-link>
                         <button @click="emit('delete', data.id)"
                             class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Delete">
-                            <span class="i-heroicons-trash w-4 h-4" />
+                            <TrashIcon class="w-4 h-4" />
                         </button>
                     </div>
                 </template>

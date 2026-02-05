@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import type { ModelVideo } from '@/api/client';
-import { formatDuration, formatDate, getStatusClass } from '@/lib/utils';
-import Checkbox from 'primevue/checkbox';
+import { formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
 import Card from 'primevue/card';
+import Checkbox from 'primevue/checkbox';
+import { defineEmits, defineProps } from 'vue';
 
 defineProps<{
     videos: ModelVideo[];
@@ -65,11 +65,8 @@ const emit = defineEmits<{
                     </p>
 
                     <div class="mt-auto flex items-center justify-between">
-                        <span
-                            :class="['px-1.5 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wider', getStatusClass(video.status)]">
-                            {{ video.status }}
-                        </span>
-
+                        <Tag :value="video.status" :severity="getStatusSeverity(video.status)"
+                            class="capitalize px-2 py-0.5 text-xs" />
                         <div class="text-[10px] text-gray-400">
                             {{ formatDate(video.created_at) }}
                         </div>

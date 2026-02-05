@@ -1,3 +1,4 @@
+import { serializeQueryCache } from '@pinia/colada';
 import { renderSSRHead } from '@unhead/vue/server';
 import { Hono } from 'hono';
 import { contextStorage } from 'hono/context-storage';
@@ -11,7 +12,6 @@ import { createApp } from './main';
 import { useAuthStore } from './stores/auth';
 // @ts-ignore
 import Base from '@primevue/core/base';
-import { createTextTransformStreamClass } from './lib/replateStreamText';
 const app = new Hono()
 const defaultNames = ['primitive', 'semantic', 'global', 'base', 'ripple-directive']
 // app.use(renderer)
@@ -56,7 +56,7 @@ app.get("/.well-known/*", (c) => {
 app.get("*", async (c) => {
   const nonce = crypto.randomUUID();
   const url = new URL(c.req.url);
-  const { app, router, head, pinia, bodyClass } = createApp();
+  const { app, router, head, pinia, bodyClass, queryCache } = createApp();
   app.provide("honoContext", c);
   const auth = useAuthStore();
   auth.$reset();
@@ -86,11 +86,12 @@ app.get("*", async (c) => {
     }
     await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
     await stream.write(`</head><body class='${bodyClass}'>`);
-    await stream.pipe(createTextTransformStreamClass(appStream, (text) => text.replace('<div id="anchor-header" class="p-4"></div>', `<div id="anchor-header" class="p-4">${ctx.teleports["#anchor-header"] || ""}</div>`).replace('<div id="anchor-top"></div>', `<div id="anchor-top">${ctx.teleports["#anchor-top"] || ""}</div>`)));
+    // await stream.pipe(createTextTransformStreamClass(appStream, (text) => text.replace('<div id="anchor-header" class="p-4"></div>', `<div id="anchor-header" class="p-4">${ctx.teleports["#anchor-header"] || ""}</div>`).replace('<div id="anchor-top"></div>', `<div id="anchor-top">${ctx.teleports["#anchor-top"] || ""}</div>`)));
+    await stream.pipe(appStream);
     delete ctx.teleports
     delete ctx.__teleportBuffers
     delete ctx.modules;
-    Object.assign(ctx, { $p: pinia.state.value });
+    Object.assign(ctx, { $p: pinia.state.value, $colada: serializeQueryCache(queryCache) });
     await stream.write(`<script type="application/json" data-ssr="true" id="__APP_DATA__" nonce="${nonce}">${htmlEscape((JSON.stringify(ctx)))}</script>`);
     await stream.write("</body></html>");
   });

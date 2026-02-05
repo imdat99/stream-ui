@@ -1,7 +1,9 @@
-import { createApp } from './main';
+import { hydrateQueryCache } from '@pinia/colada';
 import 'uno.css';
+import { createApp } from './main';
 async function render() {
-    const { app, router } = createApp();
+    const { app, router, queryCache } = createApp();
+    hydrateQueryCache(queryCache, (window as any).$colada || {});
     router.isReady().then(() => {
         app.mount('body', true)
     })

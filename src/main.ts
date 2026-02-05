@@ -1,16 +1,15 @@
+import { PiniaColada, useQueryCache } from '@pinia/colada';
+import Aura from '@primeuix/themes/aura';
 import { createHead as CSRHead } from "@unhead/vue/client";
 import { createHead as SSRHead } from "@unhead/vue/server";
+import { createPinia } from "pinia";
+import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
-import { vueSWR } from './lib/swr/use-swrv';
 import createAppRouter from './routes';
-import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
-import { createPinia } from "pinia";
-import { useAuthStore } from './stores/auth';
-import ToastService from 'primevue/toastservice';
-import Tooltip from 'primevue/tooltip';
 const bodyClass = ":uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen"
 export function createApp() {
     const pinia = createPinia();
@@ -39,6 +38,19 @@ export function createApp() {
         }
     });
     app.directive("tooltip", Tooltip)
+    app.use(pinia);
+    app.use(PiniaColada, {
+        queryOptions: {
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+            ssrCatchError: true,
+        }
+        // optional options
+    })
+    // app.use(vueSWR({ revalidateOnFocus: false }));
+    const queryCache = useQueryCache();
+    const router = createAppRouter();
+    app.use(router);
     if (!import.meta.env.SSR) {
         Object.entries(JSON.parse(document.getElementById("__APP_DATA__")?.innerText || "{}")).forEach(([key, value]) => {
             (window as any)[key] = value;
@@ -47,10 +59,5 @@ export function createApp() {
             pinia.state.value = (window as any).$p;
         }
     }
-    app.use(pinia);
-    app.use(vueSWR({ revalidateOnFocus: false }));
-    const router = createAppRouter();
-    app.use(router);
-
-    return { app, router, head, pinia, bodyClass };
+    return { app, router, head, pinia, bodyClass, queryCache };
 }

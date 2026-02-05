@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import { defineEmits, defineProps } from 'vue';
 defineProps<{
     searchQuery: string;
     selectedStatus: string;
@@ -21,7 +21,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="border-b border-gray-200 mb-6 sticky top-0 z-10">
+    <div class="border-b border-gray-200 mb-6">
         <div class="flex flex-col md:flex-row gap-4">
             <!-- Search -->
             <div class="flex-1 bg-white rounded-lg">
@@ -75,7 +75,7 @@ const emit = defineEmits<{
             </div>
         </div>
         <Paginator :pt="{
-            root: 'bg-transparent p-0 justify-end mt-2'
+            root: '!bg-transparent !p-0 !justify-end !mt-2'
         }" :rows="limit" :totalRecords="total" :first="(page - 1) * limit" :rowsPerPageOptions="[10, 20, 30]"
             @page="(e) => { emit('update:page', e.page + 1); emit('update:limit', e.rows); }">
             <template #container="{ first, last, page, pageCount, prevPageCallback, nextPageCallback, totalRecords }">

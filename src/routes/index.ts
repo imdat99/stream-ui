@@ -117,6 +117,16 @@ const routes: RouteData[] = [
             },
           },
           {
+            path: "video/:id/edit",
+            name: "video-edit",
+            component: () => import("./video/EditVideo.vue"),
+            meta: {
+              head: {
+                title: "Edit Video - Holistream",
+              },
+            },
+          },
+          {
             path: "payments-and-plans",
             name: "payments-and-plans",
             component: () => import("./plans/Plans.vue"),
