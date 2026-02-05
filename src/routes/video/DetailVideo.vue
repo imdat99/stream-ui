@@ -8,6 +8,7 @@ import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
 import Skeleton from 'primevue/skeleton';
+import { fetchMockVideoById } from '@/mocks/videos';
 
 const route = useRoute();
 const router = useRouter();
@@ -26,9 +27,9 @@ const form = ref({
 const fetchVideo = async () => {
     loading.value = true;
     try {
-        const response = await client.videos.videosDetail(videoId);
+        const videoData = await fetchMockVideoById(videoId);
         // response is HttpResponse, response.data is the body, response.data.data is the ModelVideo
-        const videoData = response.data.data;
+        // const videoData = response.data.data;
         if (videoData) {
             video.value = videoData;
             form.value.title = videoData.title || '';
@@ -76,7 +77,7 @@ onMounted(() => {
             { label: 'Videos', to: '/video' },
             { label: 'Edit' }
         ]" />
-
+        <div class="max-w-6xl mx-auto mt-6">
         <div v-if="loading" class="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
             <Skeleton width="100%" height="2rem" />
             <Skeleton width="100%" height="10rem" />
@@ -121,6 +122,7 @@ onMounted(() => {
                     <Button label="Save Changes" @click="handleSave" :loading="saving" />
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </template>

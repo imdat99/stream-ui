@@ -43,10 +43,10 @@ const links = [
                 v-bind="i.type === 'a' ? { to: i.href } : {}" v-tooltip="i.label" @click="i.action && i.action($event)"
                 :class="cn(
                     i.className,
-                    ($route.path === i.href || i.isActive?.value) && 'bg-primary/15'
+                    ($route.path === i.href || $route.path.startsWith(i.href+'/') || i.isActive?.value) && 'bg-primary/15'
                 )">
                 <component :is="i.icon" class="w-6 h-6 shrink-0"
-                    :filled="$route.path === i.href || i.isActive?.value" />
+                    :filled="$route.path === i.href || $route.path.startsWith(i.href+'/') || i.isActive?.value" />
             </component>
         </template>
     </header>

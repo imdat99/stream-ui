@@ -22,7 +22,7 @@ const iconHoist = createStaticVNode(`<svg xmlns="http://www.w3.org/2000/svg" cla
 
 // Pagination
 const page = ref(1);
-const limit = ref(100);
+const limit = ref(10);
 const total = ref(0);
 
 // Filters
@@ -122,98 +122,75 @@ watch([searchQuery, selectedStatus, limit, page], () => {
       { label: 'Dashboard', to: '/' },
       { label: 'Videos' }
     ]" :actions="[
-    {
-      label: 'Upload Video',
-      icon: iconHoist,
-      variant: 'primary',
-      onClick: () => router.push('/upload')
-    }
-  ]" />
+      {
+        label: 'Upload Video',
+        icon: iconHoist,
+        variant: 'primary',
+        onClick: () => router.push('/upload')
+      }
+    ]" />
 
     <VideoBulkActions :selectedVideos="selectedVideos" @delete="deleteSelectedVideos" @clear="selectedVideos = []" />
-    <VideoFilters v-model:searchQuery="searchQuery" v-model:selectedStatus="selectedStatus" v-model:viewMode="viewMode"
+    <VideoFilters :loading="loading" v-model:searchQuery="searchQuery" :selectedStatus="selectedStatus" v-model:viewMode="viewMode"
       v-model:page="page" v-model:limit="limit" :total="total" ref="videoFilters" :statusOptions="statusOptions"
       @search="handleSearch" @filter="handleFilter" />
 
+    <Transition name="fade" mode="out-in">
 
-    <!-- Loading State -->
-    <div v-if="loading" class="animate-pulse">
-      <!-- Grid Skeleton -->
-      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div v-for="i in 8" :key="i" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <Skeleton height="150px" width="100%"></Skeleton>
-          <div class="p-4">
-            <Skeleton width="80%" height="1.5rem" class="mb-2"></Skeleton>
-            <Skeleton width="60%" height="1rem" class="mb-4"></Skeleton>
-            <div class="flex justify-between">
-              <Skeleton width="3rem" height="1rem"></Skeleton>
-              <Skeleton width="3rem" height="1rem"></Skeleton>
+      <!-- Loading State -->
+      <div v-if="loading" class="animate-pulse">
+        <!-- Grid Skeleton -->
+        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div v-for="i in 8" :key="i" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <Skeleton height="150px" width="100%"></Skeleton>
+            <div class="p-4">
+              <Skeleton width="80%" height="1.5rem" class="mb-2"></Skeleton>
+              <Skeleton width="60%" height="1rem" class="mb-4"></Skeleton>
+              <div class="flex justify-between">
+                <Skeleton width="3rem" height="1rem"></Skeleton>
+                <Skeleton width="3rem" height="1rem"></Skeleton>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Table Skeleton -->
+        <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
+            <div class="flex gap-4 items-center">
+              <Skeleton width="5rem" height="3rem" class="rounded"></Skeleton>
+              <div class="flex-1">
+                <Skeleton width="40%" height="1.2rem" class="mb-2"></Skeleton>
+                <Skeleton width="30%" height="1rem"></Skeleton>
+              </div>
+              <Skeleton width="10%" height="1rem"></Skeleton>
+              <Skeleton width="10%" height="1rem"></Skeleton>
+              <Skeleton width="5rem" height="2rem" borderRadius="16px"></Skeleton>
             </div>
           </div>
         </div>
       </div>
-      <!-- Table Skeleton -->
-      <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
-          <div class="flex gap-4 items-center">
-            <Skeleton width="5rem" height="3rem" class="rounded"></Skeleton>
-            <div class="flex-1">
-              <Skeleton width="40%" height="1.2rem" class="mb-2"></Skeleton>
-              <Skeleton width="30%" height="1rem"></Skeleton>
-            </div>
-            <Skeleton width="10%" height="1rem"></Skeleton>
-            <Skeleton width="10%" height="1rem"></Skeleton>
-            <Skeleton width="5rem" height="2rem" borderRadius="16px"></Skeleton>
-          </div>
-        </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <span class="i-heroicons-exclamation-circle text-red-500 text-4xl mb-3 inline-block" />
+        <p class="text-red-700 font-medium">{{ error }}</p>
+        <button @click="fetchVideos"
+          class="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+          Try Again
+        </button>
       </div>
-    </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-      <span class="i-heroicons-exclamation-circle text-red-500 text-4xl mb-3 inline-block" />
-      <p class="text-red-700 font-medium">{{ error }}</p>
-      <button @click="fetchVideos"
-        class="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-        Try Again
-      </button>
-    </div>
+      <!-- Empty State -->
+      <EmptyState v-else-if="videos.length === 0" title="No videos found"
+        description="You haven't uploaded any videos yet. Start by uploading your first video!"
+        imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" actionLabel="Upload Video"
+        :onAction="() => router.push('/upload')" />
+      <!-- Grid View -->
+      <VideoGrid :videos="videos" v-model:selectedVideos="selectedVideos" @delete="deleteVideo"
+        v-else-if="viewMode === 'grid'" />
 
-    <!-- Empty State -->
-    <EmptyState v-else-if="videos.length === 0" title="No videos found"
-      description="You haven't uploaded any videos yet. Start by uploading your first video!"
-      imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" actionLabel="Upload Video"
-      :onAction="() => router.push('/upload')" />
-
-    <!-- Grid View -->
-    <div v-else-if="viewMode === 'grid'">
-      <VideoGrid :videos="videos" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" />
-
-      <!-- Grid Pagination (was manually inside grid container in original, but now grid component only has items) -->
-      <!-- Wait, VideoGrid.vue template only had the grid. Pagination was missing in Grid View in original file? -->
-      <!-- Checking Step 193... Line 462 Pagination was inside the "Table View" div (v-else). -->
-      <!-- But line 333 (Grid View) ended at line 386. -->
-      <!-- The pagination (lines 462-480) was INSIDE the v-else block for Table view. -->
-      <!-- So Grid View did NOT have pagination? That seems like a bug or oversight in original. -->
-      <!-- Or maybe pagination was intended for both but placed inside table wrapper. -->
-      <!-- I should probably add pagination to Grid View too, or place it outside both. -->
-
-      <!-- For now, I will add pagination controls here for Grid view too if needed, or better: -->
-      <!-- VideoTable has pagination built-in. VideoGrid does not. -->
-      <!-- I should probably extract Pagination to a component too? -->
-      <!-- Or just use PrimeVue Paginator? -->
-      <!-- Given the request is to split components, I'll stick to what was there. -->
-      <!-- If Grid View didn't have pagination visible, I won't add it unless I'm sure. -->
-      <!-- Actually, typically both views share pagination. The original code had pagination nested in table view. -->
-      <!-- I will pull pagination out of VideoTable and put it in Videos.vue so it's shared? -->
-      <!-- OR I will leave it as is: Grid View has no pagination? That implies infinite scroll or just showing all? -->
-      <!-- Fetch says limit=20. So pagination is needed. -->
-      <!-- I'll add common pagination below the view. -->
-    </div>
-
-    <!-- Table View -->
-    <div v-else>
-      <VideoTable :videos="videos" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" />
-    </div>
+      <!-- Table View -->
+      <VideoTable v-else :videos="videos" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" />
+    </Transition>
   </div>
 </template>

@@ -319,3 +319,12 @@ export const fetchMockVideos = async ({ page, limit, searchQuery, status }: Fetc
         total
     };
 };
+export const fetchMockVideoById = async (id: string) => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const video = mockVideos.find(v => v.id === id);
+    if (!video) {
+        throw new Error('Video not found');
+    }
+    return video;
+};

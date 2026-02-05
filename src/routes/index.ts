@@ -102,29 +102,34 @@ const routes: RouteData[] = [
           },
           {
             path: "video",
-            name: "video",
-            component: () => import("./video/Videos.vue"),
-            meta: {
-              head: {
-                title: "Videos - Holistream",
-                meta: [
-                  {
-                    name: "description",
-                    content: "Manage your video content.",
+            children: [
+              {
+                path: "",
+                name: "video",
+                component: () => import("./video/Videos.vue"),
+                meta: {
+                  head: {
+                    title: "Videos - Holistream",
+                    meta: [
+                      {
+                        name: "description",
+                        content: "Manage your video content.",
+                      },
+                    ],
                   },
-                ],
+                },
               },
-            },
-          },
-          {
-            path: "video/:id/edit",
-            name: "video-edit",
-            component: () => import("./video/EditVideo.vue"),
-            meta: {
-              head: {
-                title: "Edit Video - Holistream",
+              {
+                path: ":id",
+                name: "video-detail",
+                component: () => import("./video/DetailVideo.vue"),
+                meta: {
+                  head: {
+                    title: "Edit Video - Holistream",
+                  },
+                },
               },
-            },
+            ],
           },
           {
             path: "payments-and-plans",
@@ -174,17 +179,17 @@ const routes: RouteData[] = [
 ];
 const createAppRouter = () => {
   const router = createRouter({
-        history: import.meta.env.SSR
-            ? createMemoryHistory() // server
-            : createWebHistory(), // client
-        routes,
-        scrollBehavior(to, from, savedPosition) {
-            if (savedPosition) {
-                return savedPosition
-            }
-            return { top: 0 }
-        }
-    });
+    history: import.meta.env.SSR
+      ? createMemoryHistory() // server
+      : createWebHistory(), // client
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition;
+      }
+      return { top: 0 };
+    },
+  });
 
   router.beforeEach((to, from, next) => {
     const auth = useAuthStore();

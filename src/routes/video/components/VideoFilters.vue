@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue';
 defineProps<{
     searchQuery: string;
     selectedStatus: string;
@@ -8,6 +7,7 @@ defineProps<{
     total: number;
     page: number; // 1-based index
     limit: number;
+    loading: boolean;
 }>();
 
 const emit = defineEmits<{

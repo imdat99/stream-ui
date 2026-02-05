@@ -8,7 +8,6 @@ import TrashIcon from '@/components/icons/TrashIcon.vue';
 import VideoIcon from '@/components/icons/VideoIcon.vue';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
-import { defineEmits, defineProps } from 'vue';
 
 defineProps<{
     videos: ModelVideo[];
@@ -84,7 +83,7 @@ const emit = defineEmits<{
                             <LinkIcon class="w-4 h-4" />
                         </button>
                         <div class="w-px h-3 bg-gray-200 mx-1"></div>
-                        <router-link :to="{ name: 'video-edit', params: { id: data.id } }"
+                        <router-link :to="{ name: 'video-detail', params: { id: data.id } }"
                             class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors inline-block"
                             title="Edit">
                             <PencilIcon class="w-4 h-4" />
