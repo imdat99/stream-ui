@@ -328,3 +328,30 @@ export const fetchMockVideoById = async (id: string) => {
     }
     return video;
 };
+
+export const updateMockVideo = async (id: string, updates: { title: string; description?: string }) => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    const videoIndex = mockVideos.findIndex(v => v.id === id);
+    if (videoIndex === -1) {
+        throw new Error('Video not found');
+    }
+    mockVideos[videoIndex] = {
+        ...mockVideos[videoIndex],
+        title: updates.title,
+        description: updates.description,
+        updated_at: new Date().toISOString()
+    };
+    return mockVideos[videoIndex];
+};
+
+export const deleteMockVideo = async (id: string) => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+    const videoIndex = mockVideos.findIndex(v => v.id === id);
+    if (videoIndex === -1) {
+        throw new Error('Video not found');
+    }
+    mockVideos.splice(videoIndex, 1);
+    return { success: true };
+};

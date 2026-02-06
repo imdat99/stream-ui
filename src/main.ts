@@ -4,6 +4,7 @@ import { createHead as CSRHead } from "@unhead/vue/client";
 import { createHead as SSRHead } from "@unhead/vue/server";
 import { createPinia } from "pinia";
 import PrimeVue from 'primevue/config';
+import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 import { createSSRApp } from 'vue';
@@ -32,6 +33,7 @@ export function createApp() {
         }
     });
     app.use(ToastService);
+    app.use(ConfirmationService);
     app.directive('nh', {
         created(el) {
             el.__v_skip = true;
@@ -40,6 +42,12 @@ export function createApp() {
     app.directive("tooltip", Tooltip)
     app.use(pinia);
     app.use(PiniaColada, {
+        pinia,
+        plugins: [
+            (context) => {
+                console.log("PiniaColada plugin initialized for store:", context);
+            }
+        ],
         queryOptions: {
             refetchOnMount: false,
             refetchOnWindowFocus: false,
