@@ -12,6 +12,7 @@ import DataTable from 'primevue/datatable';
 defineProps<{
     videos: ModelVideo[];
     selectedVideos: ModelVideo[];
+    loading: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -22,7 +23,21 @@ const emit = defineEmits<{
 
 <template>
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <DataTable :value="videos" dataKey="id" tableStyle="min-width: 50rem" :selection="selectedVideos"
+            <div v-if="loading">
+        <div class="p-4 border-b border-gray-200" v-for="i in 10" :key="i">
+            <div class="flex gap-4 items-center">
+              <Skeleton width="5rem" height="3rem" class="rounded"></Skeleton>
+              <div class="flex-1">
+                <Skeleton width="40%" height="1.2rem" class="mb-2"></Skeleton>
+                <Skeleton width="30%" height="1rem"></Skeleton>
+              </div>
+              <Skeleton width="10%" height="1rem"></Skeleton>
+              <Skeleton width="10%" height="1rem"></Skeleton>
+              <Skeleton width="5rem" height="2rem" borderRadius="16px"></Skeleton>
+            </div>
+        </div>
+            </div>
+        <DataTable v-else :value="videos" dataKey="id" tableStyle="min-width: 50rem" :selection="selectedVideos"
             @update:selection="emit('update:selectedVideos', $event)">
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 

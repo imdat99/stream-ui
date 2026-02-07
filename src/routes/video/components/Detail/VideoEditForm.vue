@@ -2,11 +2,14 @@
 defineProps<{
     title: string;
     description: string;
+    saving: boolean;
 }>();
 
 const emit = defineEmits<{
     'update:title': [value: string];
     'update:description': [value: string];
+    save: [];
+    toggleEdit: [];
 }>();
 </script>
 
@@ -14,21 +17,38 @@ const emit = defineEmits<{
     <div class="mb-4 space-y-3">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-            <input 
-                :value="title"
-                type="text"
+            <input :value="title" type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter video title"
                 @input="$emit('update:title', ($event.target as HTMLInputElement).value)">
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea 
-                :value="description"
-                rows="3"
+            <textarea :value="description" rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="Enter video description"
                 @input="$emit('update:description', ($event.target as HTMLTextAreaElement).value)"></textarea>
+        </div>
+        <div class="float-right flex gap-2">
+            <Button size="small"
+                title="Save changes" :disabled="saving" @click="$emit('save')">
+                <svg v-if="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span v-if="saving"
+                    class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span class="hidden sm:inline">{{ saving ? 'Saving...' : 'Save' }}</span>
+            </Button>
+
+            <!-- Cancel Button (Edit Mode) -->
+            <Button severity="danger" size="small" title="Cancel editing"
+                @click="$emit('toggleEdit')">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+                <span class="hidden sm:inline">Cancel</span>
+            </Button>
         </div>
     </div>
 </template>

@@ -8,6 +8,7 @@ import {
 } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { inject } from "vue";
+import { TinyMqttClient } from "@/lib/liteMqtt";
 
 type RouteData = RouteRecordRaw & {
   meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean };
@@ -194,11 +195,20 @@ const createAppRouter = () => {
   router.beforeEach((to, from, next) => {
     const auth = useAuthStore();
     const head = inject(headSymbol);
+    let client: any;
     (head as any).push(to.meta.head || {});
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (!auth.user) {
+        if(client?.disconnect) (client as any)?.disconnect();
         next({ name: "login" });
       } else {
+        client = new TinyMqttClient(
+            'wss://broker.emqx.io:8084/mqtt', 
+            [['ecos1231231'+auth.user.id+'#'].join("/")], 
+            (topic, msg) => console.log(`Tín hiệu nhận được [${topic}]:`, msg)
+        );
+
+        client.connect();
         next();
       }
     } else {

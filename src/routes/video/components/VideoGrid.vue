@@ -3,11 +3,11 @@ import type { ModelVideo } from '@/api/client';
 import { formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
 import Card from 'primevue/card';
 import Checkbox from 'primevue/checkbox';
-import { defineEmits, defineProps } from 'vue';
 
 defineProps<{
     videos: ModelVideo[];
     selectedVideos: ModelVideo[];
+    loading: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -17,8 +17,19 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-        <Card v-for="video in videos" :key="video.id"
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div v-if="loading" v-for="i in 10" :key="i" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <Skeleton height="150px" width="100%"></Skeleton>
+            <div class="p-4">
+              <Skeleton width="80%" height="1.5rem" class="mb-2"></Skeleton>
+              <Skeleton width="60%" height="1rem" class="mb-4"></Skeleton>
+              <div class="flex justify-between">
+                <Skeleton width="3rem" height="1rem"></Skeleton>
+                <Skeleton width="3rem" height="1rem"></Skeleton>
+              </div>
+            </div>
+          </div>
+        <Card v-for="video in videos" :key="video.id" v-else
             class="overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative border border-gray-200"
             :class="{ '!border-primary ring-2 ring-primary': selectedVideos.some(v => v.id === video.id) }">
 

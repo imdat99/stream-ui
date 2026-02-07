@@ -136,42 +136,8 @@ watch([searchQuery, selectedStatus, limit, page], () => {
       @search="handleSearch" @filter="handleFilter" />
 
     <Transition name="fade" mode="out-in">
-
-      <!-- Loading State -->
-      <div v-if="loading" class="animate-pulse">
-        <!-- Grid Skeleton -->
-        <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div v-for="i in 8" :key="i" class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <Skeleton height="150px" width="100%"></Skeleton>
-            <div class="p-4">
-              <Skeleton width="80%" height="1.5rem" class="mb-2"></Skeleton>
-              <Skeleton width="60%" height="1rem" class="mb-4"></Skeleton>
-              <div class="flex justify-between">
-                <Skeleton width="3rem" height="1rem"></Skeleton>
-                <Skeleton width="3rem" height="1rem"></Skeleton>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Table Skeleton -->
-        <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
-            <div class="flex gap-4 items-center">
-              <Skeleton width="5rem" height="3rem" class="rounded"></Skeleton>
-              <div class="flex-1">
-                <Skeleton width="40%" height="1.2rem" class="mb-2"></Skeleton>
-                <Skeleton width="30%" height="1rem"></Skeleton>
-              </div>
-              <Skeleton width="10%" height="1rem"></Skeleton>
-              <Skeleton width="10%" height="1rem"></Skeleton>
-              <Skeleton width="5rem" height="2rem" borderRadius="16px"></Skeleton>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Error State -->
-      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+      <div v-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
         <span class="i-heroicons-exclamation-circle text-red-500 text-4xl mb-3 inline-block" />
         <p class="text-red-700 font-medium">{{ error }}</p>
         <button @click="fetchVideos"
@@ -181,16 +147,15 @@ watch([searchQuery, selectedStatus, limit, page], () => {
       </div>
 
       <!-- Empty State -->
-      <EmptyState v-else-if="videos.length === 0" title="No videos found"
+      <EmptyState v-else-if="videos.length === 0 && !loading" title="No videos found"
         description="You haven't uploaded any videos yet. Start by uploading your first video!"
         imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" actionLabel="Upload Video"
         :onAction="() => router.push('/upload')" />
       <!-- Grid View -->
-      <VideoGrid :videos="videos" v-model:selectedVideos="selectedVideos" @delete="deleteVideo"
-        v-else-if="viewMode === 'grid'" />
+      <VideoGrid :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" v-else-if="viewMode === 'grid'" />
 
       <!-- Table View -->
-      <VideoTable v-else :videos="videos" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" />
+      <VideoTable v-else :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" />
     </Transition>
   </div>
 </template>

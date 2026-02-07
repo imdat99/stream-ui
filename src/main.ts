@@ -45,7 +45,7 @@ export function createApp() {
         pinia,
         plugins: [
             (context) => {
-                console.log("PiniaColada plugin initialized for store:", context);
+                // console.log("PiniaColada plugin initialized for store:", context);
             }
         ],
         queryOptions: {

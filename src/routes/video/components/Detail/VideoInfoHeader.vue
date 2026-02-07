@@ -5,15 +5,12 @@ import Tag from 'primevue/tag';
 
 const props = defineProps<{
     video: ModelVideo;
-    isEditing: boolean;
-    saving: boolean;
 }>();
 
 const emit = defineEmits<{
     reload: [];
     toggleEdit: [];
     delete: [];
-    save: [];
 }>();
 
 const formatFileSize = (bytes?: number): string => {
@@ -52,7 +49,7 @@ const formatDate = (dateStr?: string): string => {
         <div class="flex-1">
             <!-- View Mode: Title -->
             <div class="mb-2">
-                <h1 v-if="!isEditing" class="text-2xl font-bold text-gray-900 mb-1">
+                <h1 class="text-2xl font-bold text-gray-900 mb-1">
                     {{ video.title }}
                 </h1>
                 <p v-if="video.description" class="text-sm text-gray-600 whitespace-pre-wrap">{{ video.description }}
@@ -71,31 +68,9 @@ const formatDate = (dateStr?: string): string => {
         <!-- Action Buttons -->
         <div class="flex items-center space-x-2">
             <!-- Save Button (Edit Mode) -->
-            <button v-if="isEditing"
-                class="btn-primary btn-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Save changes" :disabled="saving" @click="$emit('save')">
-                <svg v-if="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span v-if="saving"
-                    class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span class="hidden sm:inline">{{ saving ? 'Saving...' : 'Save' }}</span>
-            </button>
-
-            <!-- Cancel Button (Edit Mode) -->
-            <button v-if="isEditing" class="btn-outline btn-sm flex items-center gap-2" title="Cancel editing"
-                @click="$emit('toggleEdit')">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-                <span class="hidden sm:inline">Cancel</span>
-            </button>
-
             <!-- View Mode Buttons -->
-            <template v-if="!isEditing">
-                <button
-                    class="btn-outline btn-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                <Button size="small"
+                    severity="secondary"
                     title="Reload video" @click="$emit('reload')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,24 +78,23 @@ const formatDate = (dateStr?: string): string => {
                         </path>
                     </svg>
                     <span class="hidden sm:inline">Reload</span>
-                </button>
-                <button class="btn-outline btn-sm flex items-center gap-2" title="Edit" @click="$emit('toggleEdit')">
+                </Button>
+                <Button size="small" title="Edit" variant="outlined" @click="$emit('toggleEdit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                         </path>
                     </svg>
                     <span class="hidden sm:inline">Edit</span>
-                </button>
-                <button class="btn-danger btn-sm flex items-center gap-2" title="Delete" @click="$emit('delete')">
+                </Button>
+                <Button severity="danger" size="small" title="Delete" @click="$emit('delete')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                         </path>
                     </svg>
                     <span class="hidden sm:inline">Delete</span>
-                </button>
-            </template>
+                </Button>
         </div>
     </div>
 </template>

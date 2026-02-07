@@ -2,6 +2,7 @@ import { hydrateQueryCache } from '@pinia/colada';
 import 'uno.css';
 import PiniaSharedState from './lib/PiniaSharedState';
 import { createApp } from './main';
+
 async function render() {
     const { app, router, queryCache, pinia } = createApp();
     pinia.use(PiniaSharedState({enable: true, initialize: true}));

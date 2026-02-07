@@ -144,17 +144,16 @@ const videoInfos = computed(() => {
             <VideoSkeleton v-if="loading" />
 
             <!-- Content -->
-            <div v-else-if="video" class="flex flex-col md:flex-row gap-4">
-                <VideoPlayer :video="video" class="md:flex-1" />
+            <div v-else-if="video" class="flex flex-col lg:flex-row gap-4">
+                <VideoPlayer :video="video" class="lg:flex-1" />
 
-                <div class="bg-white rounded-lg border border-gray-200 max-w-full md:max-w-md w-full flex flex-col">
+                <div class="bg-white rounded-lg border border-gray-200 max-w-full lg:max-w-md w-full flex flex-col">
                     <div class="px-6 py-4">
-                        <VideoHeader :video="video" :is-editing="isEditing" :saving="saving" @reload="handleReload"
-                            @toggle-edit="toggleEdit" @delete="handleDelete" @save="handleSave" />
-
                         <VideoEditForm v-if="isEditing" v-model:title="form.title"
-                            v-model:description="form.description" />
-                        <div class="">
+                            v-model:description="form.description" @save="handleSave" @toggle-edit="toggleEdit" :saving="saving" />
+                        <div v-else>
+                            <VideoHeader :video="video" @reload="handleReload"
+                            @toggle-edit="toggleEdit" @delete="handleDelete" />
                             <div class="mb-4">
                                 <h3 class="text-lg font-medium text-gray-900 mb-4">Video Details</h3>
                                 <div class="flex flex-col gap-2">
