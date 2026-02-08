@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { client, ResponseResponse, type ModelUser } from '@/api/client';
+import { TinyMqttClient } from '@/lib/liteMqtt';
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<ModelUser | null>(null);
@@ -9,7 +10,25 @@ export const useAuthStore = defineStore('auth', () => {
     const loading = ref(false);
     const error = ref<string | null>(null);
     const initialized = ref(false);
-
+    
+    watch(user, (newUser) => {
+        if (import.meta.env.SSR) return;
+        let client: TinyMqttClient | undefined;
+        if (newUser?.id) {
+            client = new TinyMqttClient(
+            // 'wss://broker.emqx.io:8084/mqtt', 
+            'wss://mqtt-dashboard.com:8884/mqtt', 
+            [['ecos1231231',newUser.id,'#'].join("/")], 
+            (topic, msg) => console.log(`Tín hiệu nhận được [${topic}]:`, msg)
+        );
+            client.connect();
+            // client.auth.clearToken();
+        }
+        else {
+            if(client?.disconnect) client.disconnect();
+            client = undefined;
+        }
+    }, { deep: true });
     // Initial check for session could go here if there was a /me endpoint or token check
     async function init() {
         if (initialized.value) return;

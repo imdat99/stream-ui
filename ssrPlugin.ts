@@ -109,14 +109,23 @@ export default function ssrPlugin(): Plugin[] {
       config.define = config.define || {};
     },
     resolveId(id, importer, options) {
-      if (!id.startsWith('@httpClientAdapter')) return
-
+      if (!['@httpClientAdapter', '@liteMqtt'].includes(id)) return
+      switch (id) {
+        case '@httpClientAdapter':
       return path.resolve(
         __dirname,
         options?.ssr
           ? "./src/api/httpClientAdapter.server.ts"
           : "./src/api/httpClientAdapter.client.ts"
       );
+        case '@liteMqtt':
+      return path.resolve(
+        __dirname,
+        options?.ssr
+          ? "./src/lib/liteMqtt.server.ts"
+          : "./src/lib/liteMqtt.ts"
+      );
+      }
     },
     async configResolved(config) {
       const viteConfig = config as any;

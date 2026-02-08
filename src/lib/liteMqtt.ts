@@ -1,5 +1,7 @@
+import { ITinyMqttClient } from "./interface";
+
 export type MessageCallback = (topic: string, payload: string) => void;
-export class TinyMqttClient {
+export class TinyMqttClient implements ITinyMqttClient {
     private ws: WebSocket | null = null;
     private encoder = new TextEncoder();
     private decoder = new TextDecoder();
