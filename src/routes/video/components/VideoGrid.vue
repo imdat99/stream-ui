@@ -3,6 +3,7 @@ import type { ModelVideo } from '@/api/client';
 import { formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
 import Card from 'primevue/card';
 import Checkbox from 'primevue/checkbox';
+import CardPopover from './CardPopover.vue';
 
 defineProps<{
     videos: ModelVideo[];
@@ -30,7 +31,7 @@ const emit = defineEmits<{
             </div>
           </div>
         <Card v-for="video in videos" :key="video.id" v-else
-            class="overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative border border-gray-200"
+            class="overflow-hidden transition group relative border-2 border-gray-200 !shadow-none"
             :class="{ '!border-primary ring-2 ring-primary': selectedVideos.some(v => v.id === video.id) }">
 
             <template #header>
@@ -74,15 +75,17 @@ const emit = defineEmits<{
 
                     <p class="text-xs text-gray-500 mb-3 line-clamp-1 h-4">{{ video.description || 'No description' }}
                     </p>
-
-                    <div class="mt-auto flex items-center justify-between">
-                        <Tag :value="video.status" :severity="getStatusSeverity(video.status)"
-                            class="capitalize px-2 py-0.5 text-xs" />
-                        <div class="text-[10px] text-gray-400">
-                            {{ formatDate(video.created_at) }}
-                        </div>
+                    <div class="text-xs text-gray-400 mt-auto">
+                        {{ formatDate(video.created_at) }}
                     </div>
                 </div>
+            </template>
+            <template #footer>
+                <div class="mt-auto flex items-center justify-between">
+                        <Tag :value="video.status" :severity="getStatusSeverity(video.status)"
+                            class="capitalize px-2 py-0.5 text-xs" />
+                        <CardPopover :video="video" @delete="emit('delete', video.id || '')"/>
+                    </div>
             </template>
         </Card>
     </div>
