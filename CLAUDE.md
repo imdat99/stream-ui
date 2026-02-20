@@ -152,6 +152,7 @@ Cloudflare Worker bindings (configured in `wrangler.jsonc`):
 
 - Always use `customFetch` from `@httpClientAdapter` for API calls, never raw fetch
 - The `honoContext` is provided to Vue app for accessing request context in components
-- MQTT client in `src/lib/liteMqtt.ts` handles real-time notifications
+- MQTT client in `src/lib/liteMqtt.ts` (using `TinyMqttClient`) handles real-time notifications
 - Icons are custom Vue components in `src/components/icons/`
 - Upload indicator is a global component showing queue status
+- **Testing & Linting**: There are currently no automated test suites (like Vitest) or linting tools (like ESLint/Prettier) configured.
