@@ -17,6 +17,7 @@ export type Manifest = {
   parts: Part[]
   createdAt: number
   expiresAt: number
+  size: number
 }
 
 // ---------------------------------------------------------------------------
@@ -42,7 +43,7 @@ const OBJECT_KEY = (id: string) => `${id}.json`
 /** Persist a manifest as JSON in MinIO. */
 export async function saveManifest(manifest: Manifest): Promise<void> {
   const url = `${S3_ENDPOINT}/${BUCKET_NAME}/${OBJECT_KEY(manifest.id)}`;
-  
+
   const response = await aws.fetch(url, {
     method: 'PUT',
     headers: {
@@ -50,7 +51,7 @@ export async function saveManifest(manifest: Manifest): Promise<void> {
     },
     body: JSON.stringify(manifest),
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to save manifest: ${response.status} ${await response.text()}`)
   }
@@ -59,28 +60,28 @@ export async function saveManifest(manifest: Manifest): Promise<void> {
 /** Fetch a manifest from MinIO. */
 export async function getManifest(id: string): Promise<Manifest | null> {
   const url = `${S3_ENDPOINT}/${BUCKET_NAME}/${OBJECT_KEY(id)}`;
-  
+
   try {
     const response = await aws.fetch(url, {
       method: 'GET',
     });
-    
+
     if (response.status === 404) {
       return null
     }
-    
+
     if (!response.ok) {
       throw new Error(`Failed to get manifest: ${response.status}`)
     }
-    
+
     const text = await response.text()
     const manifest: Manifest = JSON.parse(text)
-    
+
     if (manifest.expiresAt < Date.now()) {
-      await deleteManifest(id).catch(() => {})
+      await deleteManifest(id).catch(() => { })
       return null
     }
-    
+
     return manifest
   } catch (error) {
     return null
@@ -90,11 +91,11 @@ export async function getManifest(id: string): Promise<Manifest | null> {
 /** Remove a manifest object from MinIO. */
 export async function deleteManifest(id: string): Promise<void> {
   const url = `${S3_ENDPOINT}/${BUCKET_NAME}/${OBJECT_KEY(id)}`;
-  
+
   const response = await aws.fetch(url, {
     method: 'DELETE',
   });
-  
+
   if (!response.ok && response.status !== 404) {
     throw new Error(`Failed to delete manifest: ${response.status}`)
   }
@@ -158,6 +159,7 @@ export async function getListFiles(): Promise<string[]> {
 export function createManifest(
   filename: string,
   chunks: string[],
+  size: number,
   ttlMs = 60 * 60 * 1000,
 ): Manifest {
   const id = crypto.randomUUID()
@@ -170,6 +172,7 @@ export function createManifest(
     parts: chunks.map((url, index) => ({ index, host: detectHost(url), url: formatUrl(url) })),
     createdAt: now,
     expiresAt: now + ttlMs,
+    size,
   }
 }
 

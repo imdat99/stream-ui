@@ -66,11 +66,11 @@ const emit = defineEmits<{
                 </template>
             </Column>
 
-            <Column header="Duration">
+            <!-- <Column header="Duration">
                 <template #body="{ data }">
                     <span class="text-sm text-gray-500">{{ formatDuration(data.duration) }}</span>
                 </template>
-            </Column>
+            </Column> -->
 
             <Column header="Size">
                 <template #body="{ data }">
@@ -78,9 +78,9 @@ const emit = defineEmits<{
                 </template>
             </Column>
 
-            <Column header="Upload Date">
+            <Column header="Created">
                 <template #body="{ data }">
-                    <span class="text-sm text-gray-500">{{ formatDate(data.created_at) }}</span>
+                    <span class="text-sm text-gray-500">{{ formatDate(data.created_at, true) }}</span>
                 </template>
             </Column>
 

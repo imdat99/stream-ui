@@ -91,16 +91,16 @@ const routes: RouteData[] = [
               },
             },
           },
-          {
-            path: "upload",
-            name: "upload",
-            component: () => import("./upload/Upload.vue"),
-            meta: {
-              head: {
-                title: "Upload - Holistream",
-              },
-            },
-          },
+          // {
+          //   path: "upload",
+          //   name: "upload",
+          //   component: () => import("./upload/Upload.vue"),
+          //   meta: {
+          //     head: {
+          //       title: "Upload - Holistream",
+          //     },
+          //   },
+          // },
           {
             path: "video",
             children: [

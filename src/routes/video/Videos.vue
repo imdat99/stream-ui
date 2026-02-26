@@ -10,7 +10,9 @@ import VideoFilters from './components/VideoFilters.vue';
 import VideoGrid from './components/VideoGrid.vue';
 import VideoTable from './components/VideoTable.vue';
 import VideoBulkActions from './components/VideoBulkActions.vue';
+import { useUIState } from '@/stores/uiState';
 
+const uiState = useUIState();
 const router = useRouter();
 const videos = ref<ModelVideo[]>([]);
 const loading = ref(true);
@@ -126,7 +128,7 @@ watch([searchQuery, selectedStatus, limit, page], () => {
         label: 'Upload Video',
         icon: iconHoist,
         variant: 'primary',
-        onClick: () => router.push('/upload')
+        onClick: () => uiState.toggleUploadDialog()
       }
     ]" />
 

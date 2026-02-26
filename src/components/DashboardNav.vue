@@ -3,7 +3,7 @@ import Bell from "@/components/icons/Bell.vue";
 import Home from "@/components/icons/Home.vue";
 import Video from "@/components/icons/Video.vue";
 import Credit from "@/components/icons/Credit.vue";
-import Upload from "@/components/icons/Upload.vue";
+// import Upload from "@/components/icons/Upload.vue";
 import NotificationDrawer from "./NotificationDrawer.vue";
 import { cn } from "@/lib/utils";
 import { createStaticVNode, ref } from "vue";
@@ -24,7 +24,7 @@ const handleNotificationClick = (event: Event) => {
 const links = [
     { href: "/#home", label: "app", icon: homeHoist, type: "btn", className },
     { href: "/", label: "Overview", icon: Home, type: "a", className },
-    { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
+    // { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
     { href: "/video", label: "Video", icon: Video, type: "a", className },
     { href: "/payments-and-plans", label: "Payments & Plans", icon: Credit, type: "a", className },
     { href: "/notification", label: "Notification", icon: Bell, type: "btn", className, action: handleNotificationClick, isActive: isNotificationOpen },

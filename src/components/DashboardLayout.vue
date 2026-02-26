@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import DashboardNav from "./DashboardNav.vue";
 import GlobalUploadIndicator from "./GlobalUploadIndicator.vue";
+import Upload from "@/routes/upload/Upload.vue";
 
 </script>
 
@@ -20,5 +21,6 @@ import GlobalUploadIndicator from "./GlobalUploadIndicator.vue";
             </router-view>
         </div>
         <GlobalUploadIndicator />
+        <Upload />
     </main>
 </template>

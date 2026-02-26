@@ -1,103 +1,134 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useUploadQueue } from '@/composables/useUploadQueue';
-import { useRoute, useRouter } from 'vue-router';
 import UploadQueueItem from '@/routes/upload/components/UploadQueueItem.vue';
+import { useUIState } from '@/stores/uiState';
 
-const { items, totalSize, completeCount, pendingCount } = useUploadQueue();
-const route = useRoute();
-const router = useRouter();
+const { items, completeCount, pendingCount, startQueue, removeItem, cancelItem } = useUploadQueue();
+const uiState = useUIState();
 
-const isOpen = ref(false);
+const isCollapsed = ref(false);
 
-const isVisible = computed(() => {
-    // Show if there are items AND we are NOT on the upload page
-    return items.value.length > 0 && route.path !== '/upload';
-});
+const isVisible = computed(() => items.value.length > 0);
 
-const progress = computed(() => {
+const overallProgress = computed(() => {
     if (items.value.length === 0) return 0;
-    const totalProgress = items.value.reduce((acc, item) => acc + (item.progress || 0), 0);
-    return Math.round(totalProgress / items.value.length);
+    const total = items.value.reduce((acc, item) => acc + (item.progress || 0), 0);
+    return Math.round(total / items.value.length);
 });
 
-const isUploading = computed(() => {
-    return items.value.some(i => i.status === 'uploading' || i.status === 'fetching');
+const isUploading = computed(() =>
+    items.value.some(i => i.status === 'uploading' || i.status === 'fetching' || i.status === 'processing')
+);
+
+const isAllDone = computed(() =>
+    items.value.length > 0 && items.value.every(i => i.status === 'complete' || i.status === 'error')
+);
+
+const statusText = computed(() => {
+    if (isAllDone.value) return 'All done';
+    if (isUploading.value) {
+        const count = items.value.filter(i => i.status === 'uploading' || i.status === 'fetching').length;
+        return `Uploading ${count} file${count !== 1 ? 's' : ''}...`;
+    }
+    if (pendingCount.value > 0) return `${pendingCount.value} file${pendingCount.value !== 1 ? 's' : ''} waiting`;
+    return 'Processing...';
 });
-
-const toggleOpen = () => {
-    isOpen.value = !isOpen.value;
-};
-
-const goToUploadPage = () => {
-    router.push('/upload');
-    isOpen.value = false;
-};
 </script>
 
 <template>
-    <div v-if="isVisible" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+    <Transition enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-4" enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-4">
 
-        <!-- Mini Queue Popover -->
-        <Transition enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 translate-y-2 scale-95" enter-to-class="opacity-100 translate-y-0 scale-100"
-            leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100 translate-y-0 scale-100"
-            leave-to-class="opacity-0 translate-y-2 scale-95">
-            <div v-if="isOpen"
-                class="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 mb-2 w-80 max-h-[60vh] flex flex-col">
-                <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
-                    <h3 class="font-bold text-slate-800">Uploads</h3>
-                    <button @click="goToUploadPage" class="text-xs font-bold text-accent hover:underline">
-                        View All
-                    </button>
-                </div>
+        <div v-if="isVisible"
+            class="fixed bottom-6 right-6 z-50 w-96 rounded-2xl bg-white shadow-[0_8px_40px_rgba(0,0,0,0.16)] border border-slate-100 overflow-hidden flex flex-col"
+            style="max-height: 540px;">
 
-                <div
-                    class="flex-1 overflow-y-auto min-h-0 space-y-3 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded">
-                    <UploadQueueItem v-for="item in items" :key="item.id" :item="item" :minimal="true"
-                        class="border-b border-slate-100 last:border-0 !rounded-none" />
-                </div>
-            </div>
-        </Transition>
+            <!-- Header bar -->
+            <div class="flex items-center gap-3 px-4 py-3.5 bg-slate-800 text-white shrink-0 cursor-pointer select-none"
+                @click="isCollapsed = !isCollapsed">
 
-        <!-- Floating Button -->
-        <button @click="toggleOpen"
-            class="relative flex items-center gap-3 bg-white pl-4 pr-5 py-3 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
-            <!-- Progress Ring -->
-            <div class="relative w-10 h-10 flex items-center justify-center">
-                <svg class="w-full h-full -rotate-90 text-slate-100" viewBox="0 0 36 36">
-                    <path class="stroke-current" fill="none" stroke-width="3"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-                <svg class="absolute inset-0 w-full h-full -rotate-90 text-accent transition-all duration-500"
-                    viewBox="0 0 36 36" :style="{ strokeDasharray: `${progress}, 100` }">
-                    <path class="stroke-current" fill="none" stroke-width="3" stroke-linecap="round"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-
-                <div class="absolute inset-0 flex items-center justify-center text-accent">
-                    <svg v-if="!isUploading && completeCount === items.length" xmlns="http://www.w3.org/2000/svg"
-                        class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
+                <!-- Status icon -->
+                <div class="relative w-6 h-6 shrink-0">
+                    <svg v-if="isUploading" class="w-6 h-6 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
+                        <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" />
+                        <path class="opacity-90" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <svg v-else-if="isAllDone" class="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 6 9 17l-5-5" />
                     </svg>
-                    <span v-else class="text-[10px] font-bold">{{ progress }}%</span>
+                    <svg v-else class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold leading-tight truncate">{{ statusText }}</p>
+                    <p class="text-xs text-slate-400 leading-tight mt-0.5">
+                        {{ completeCount }} of {{ items.length }} complete
+                    </p>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <!-- Start upload -->
+                    <button v-if="pendingCount > 0 && !isUploading" @click.stop="startQueue"
+                        class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-accent hover:bg-accent/80 rounded-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Start
+                    </button>
+
+                    <!-- Add more files -->
+                    <button @click.stop="uiState.uploadDialogVisible = true"
+                        class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                        title="Add more files">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                        </svg>
+                    </button>
+
+                    <!-- Collapse/expand -->
+                    <button @click.stop="isCollapsed = !isCollapsed"
+                        class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200"
+                            :class="{ 'rotate-180': isCollapsed }"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m18 15-6-6-6 6" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="text-left">
-                <div class="text-sm font-bold text-slate-800 group-hover:text-accent transition-colors">
-                    {{ isUploading ? 'Uploading...' : (completeCount === items.length ? 'Completed' : 'Pending') }}
-                </div>
-                <div class="text-xs text-slate-500">
-                    {{ completeCount }} / {{ items.length }} files
-                </div>
+            <!-- Overall progress bar -->
+            <div v-if="isUploading" class="h-0.5 w-full bg-slate-100 shrink-0">
+                <div class="h-full bg-accent transition-all duration-500"
+                    :style="{ width: `${overallProgress}%` }"></div>
             </div>
 
-            <div v-if="pendingCount"
-                class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm border-2 border-white">
-                {{ pendingCount }}
-            </div>
-        </button>
-    </div>
+            <!-- File list -->
+            <Transition enter-active-class="transition-all duration-200 ease-out"
+                enter-from-class="opacity-0" enter-to-class="opacity-100"
+                leave-active-class="transition-all duration-150 ease-in"
+                leave-from-class="opacity-100" leave-to-class="opacity-0">
+                <div v-if="!isCollapsed" class="flex-1 overflow-y-auto min-h-0">
+                    <div class="p-3 flex flex-col gap-2">
+                        <UploadQueueItem v-for="item in items" :key="item.id" :item="item"
+                            @remove="removeItem($event)" @cancel="cancelItem($event)" />
+                    </div>
+                </div>
+            </Transition>
+        </div>
+    </Transition>
 </template>

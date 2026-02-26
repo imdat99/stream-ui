@@ -18,18 +18,18 @@ export function registerSSRRoutes(app: Hono) {
   app.get("*", async (c) => {
     const nonce = crypto.randomUUID();
     const url = new URL(c.req.url);
-    
+
     const { app: vueApp, router, head, pinia, bodyClass, queryCache } = createApp();
-    
+
     vueApp.provide("honoContext", c);
-    
+
     const auth = useAuthStore();
     auth.$reset();
     await auth.init();
-    
+
     await router.push(url.pathname);
     await router.isReady();
-    
+
     const usedStyles = new Set<string>();
     Base.setLoadedStyleName = async (name: string) => usedStyles.add(name);
 
@@ -49,9 +49,9 @@ export function registerSSRRoutes(app: Hono) {
       await stream.write(headResult.headTags.replace(/\n/g, ""));
 
       // Fonts & Favicon
-      await stream.write(`<link rel="preconnect" href="https://fonts.googleapis.com">`);
-      await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">`);
-      await stream.write('<link rel="icon" href="/favicon.ico" />');
+      await stream.write('<link rel="icon" href="/favicon.ico">');
+      await stream.write(`<link rel="preconnect" href="https://fonts.googleapis.com" />`);
+      await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet" />`);
 
       // Bootstrap scripts
       await stream.write(buildBootstrapScript());
@@ -60,11 +60,11 @@ export function registerSSRRoutes(app: Hono) {
       if (usedStyles.size > 0) {
         DEFAULT_STYLE_NAMES.forEach(name => usedStyles.add(name));
       }
-      
-      const activeStyles = styleTags.filter(tag => 
+
+      const activeStyles = styleTags.filter(tag =>
         usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))
       );
-      
+
       for (const tag of activeStyles) {
         await stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`);
       }
@@ -81,9 +81,9 @@ export function registerSSRRoutes(app: Hono) {
       delete ctx.modules;
 
       // Inject state
-      Object.assign(ctx, { 
-        $p: pinia.state.value, 
-        $colada: serializeQueryCache(queryCache) 
+      Object.assign(ctx, {
+        $p: pinia.state.value,
+        $colada: serializeQueryCache(queryCache)
       });
 
       // App data script

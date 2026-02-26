@@ -30,14 +30,15 @@ const mode = computed({
 </script>
 
 <template>
-    <div class="inline-flex bg-gray-200 p-1 rounded-2xl relative z-0 w-fit">
+    <div class="inline-flex bg-slate-100 p-0.5 rounded-lg relative z-0 w-fit">
         <div
-            :class="cn(':uno: absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] bg-white rounded-xl shadow-sm transition-all duration-300 ease-out -z-10', mode === 'local' ? 'translate-x-0' : 'translate-x-full')">
+            :class="cn(':uno: absolute left-0.5 top-0.5 h-[calc(100%-4px)] w-[calc(50%-2px)] bg-white rounded-md shadow-sm transition-all duration-300 ease-out -z-10', mode === 'local' ? 'translate-x-0' : 'translate-x-full')">
         </div>
         <button v-for="item in modeList" :key="item.id" @click="mode = item.id"
-            :class="cn('flex items-center gap-2 px-6 py-3 text-sm rounded-xl transition-colors relative z-10', mode === item.id ? 'font-semibold text-slate-900' : 'font-medium text-slate-500 hover:text-slate-900 ')">
-            <span class="w-5 h-5" v-html="item.icon"></span>
+            :class="cn('flex items-center gap-1.5 px-3.5 py-1.5 text-xs rounded-md transition-colors relative z-10', mode === item.id ? 'font-semibold text-slate-800' : 'font-medium text-slate-500 hover:text-slate-700')">
+            <span class="w-3.5 h-3.5" v-html="item.icon"></span>
             {{ item.label }}
         </button>
     </div>
 </template>
+

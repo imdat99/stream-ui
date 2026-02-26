@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import { size } from 'zod';
 
 export interface QueueItem {
     id: string;
@@ -20,15 +21,32 @@ export interface QueueItem {
 
 const items = ref<QueueItem[]>([]);
 
+// Upload limits
+const MAX_ITEMS = 5;
+
 // Chunk upload configuration
 const CHUNK_SIZE = 90 * 1024 * 1024; // 90MB per chunk
 const MAX_PARALLEL = 3;
 const MAX_RETRY = 3;
 
+// Track active XHRs per item id so we can abort them on cancel
+const activeXhrs = new Map<string, Set<XMLHttpRequest>>();
+
+const abortItem = (id: string) => {
+    const xhrs = activeXhrs.get(id);
+    if (xhrs) {
+        xhrs.forEach(xhr => xhr.abort());
+        activeXhrs.delete(id);
+    }
+};
+
 export function useUploadQueue() {
-    
+
+    const remainingSlots = computed(() => Math.max(0, MAX_ITEMS - items.value.length));
+
     const addFiles = (files: FileList) => {
-        const newItems: QueueItem[] = Array.from(files).map((file) => ({
+        const allowed = Array.from(files).slice(0, remainingSlots.value);
+        const newItems: QueueItem[] = allowed.map((file) => ({
             id: Math.random().toString(36).substring(2, 9),
             name: file.name,
             type: 'local',
@@ -45,10 +63,12 @@ export function useUploadQueue() {
         }));
 
         items.value.push(...newItems);
+        return { added: newItems.length, skipped: files.length - newItems.length };
     };
 
     const addRemoteUrls = (urls: string[]) => {
-        const newItems: QueueItem[] = urls.map((url) => ({
+        const allowed = urls.slice(0, remainingSlots.value);
+        const newItems: QueueItem[] = allowed.map((url) => ({
             id: Math.random().toString(36).substring(2, 9),
             name: url.split('/').pop() || 'Remote File',
             type: 'remote',
@@ -64,27 +84,28 @@ export function useUploadQueue() {
         }));
 
         items.value.push(...newItems);
+        return { added: newItems.length, skipped: urls.length - newItems.length };
     };
 
     const removeItem = (id: string) => {
+        abortItem(id);
         const item = items.value.find(i => i.id === id);
-        if (item) {
-            item.cancelled = true;
-        }
+        if (item) item.cancelled = true;
         const index = items.value.findIndex(item => item.id === id);
-        if (index !== -1) {
-            items.value.splice(index, 1);
-        }
+        if (index !== -1) items.value.splice(index, 1);
     };
-    
+
     const cancelItem = (id: string) => {
+        abortItem(id);
         const item = items.value.find(i => i.id === id);
         if (item) {
             item.cancelled = true;
             item.status = 'error';
+            item.activeChunks = 0;
+            item.speed = '0 MB/s';
         }
     };
-    
+
     const startQueue = () => {
         items.value.forEach(item => {
             if (item.status === 'pending') {
@@ -105,12 +126,12 @@ export function useUploadQueue() {
         item.status = 'uploading';
         item.activeChunks = 0;
         item.uploadedUrls = [];
-        
+
         const file = item.file;
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
         const progressMap = new Map<number, number>(); // chunk index -> uploaded bytes
         const queue: number[] = Array.from({ length: totalChunks }, (_, i) => i);
-        
+
         const updateProgress = () => {
             let totalUploaded = 0;
             progressMap.forEach(value => {
@@ -119,7 +140,7 @@ export function useUploadQueue() {
             const percent = Math.min((totalUploaded / file.size) * 100, 100);
             item.progress = parseFloat(percent.toFixed(1));
             item.uploaded = formatSize(totalUploaded);
-            
+
             // Calculate speed (simplified)
             const currentSpeed = item.activeChunks ? item.activeChunks * 2 * 1024 * 1024 : 0;
             item.speed = formatSize(currentSpeed) + '/s';
@@ -133,7 +154,7 @@ export function useUploadQueue() {
             while ((item.activeChunks || 0) < MAX_PARALLEL && queue.length > 0) {
                 const index = queue.shift()!;
                 item.activeChunks = (item.activeChunks || 0) + 1;
-                
+
                 const promise = uploadChunk(index, file, progressMap, updateProgress, item)
                     .then(() => {
                         item.activeChunks = (item.activeChunks || 0) - 1;
@@ -149,7 +170,7 @@ export function useUploadQueue() {
 
         try {
             await processQueue();
-            
+
             if (!item.cancelled) {
                 item.status = 'processing';
                 await completeUpload(item);
@@ -183,6 +204,12 @@ export function useUploadQueue() {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', 'https://tmpfiles.org/api/v1/upload');
 
+                // Register this XHR so it can be aborted on cancel
+                if (!activeXhrs.has(item.id)) activeXhrs.set(item.id, new Set());
+                activeXhrs.get(item.id)!.add(xhr);
+
+                const unregister = () => activeXhrs.get(item.id)?.delete(xhr);
+
                 xhr.upload.onprogress = (e) => {
                     if (e.lengthComputable) {
                         progressMap.set(index, e.loaded);
@@ -190,7 +217,9 @@ export function useUploadQueue() {
                     }
                 };
 
-                xhr.onload = function() {
+                xhr.onload = function () {
+                    unregister();
+                    if (item.cancelled) return resolve();
                     if (xhr.status === 200) {
                         try {
                             const res = JSON.parse(xhr.responseText);
@@ -210,7 +239,15 @@ export function useUploadQueue() {
                     handleError();
                 };
 
-                xhr.onerror = handleError;
+                xhr.onabort = () => {
+                    unregister();
+                    resolve(); // treat abort as graceful completion — processQueue will short-circuit via item.cancelled
+                };
+
+                xhr.onerror = () => {
+                    unregister();
+                    handleError();
+                };
 
                 function handleError() {
                     retry++;
@@ -220,7 +257,7 @@ export function useUploadQueue() {
                         item.status = 'error';
                         reject(new Error(`Failed to upload chunk ${index + 1}`));
                     }
-                };
+                }
 
                 xhr.send(formData);
             };
@@ -238,12 +275,13 @@ export function useUploadQueue() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     filename: item.file.name,
-                    chunks: item.uploadedUrls
+                    chunks: item.uploadedUrls,
+                    size: item.file.size
                 })
             });
 
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.error || 'Merge failed');
             }
@@ -260,15 +298,15 @@ export function useUploadQueue() {
 
     // Mock Remote Fetch Logic
     const startMockRemoteFetch = (id: string) => {
-         const item = items.value.find(i => i.id === id);
+        const item = items.value.find(i => i.id === id);
         if (!item) return;
-        
+
         item.status = 'fetching';
 
-         setTimeout(() => {
-             item.status = 'complete';
-             item.progress = 100;
-         }, 3000 + Math.random() * 3000);
+        setTimeout(() => {
+            item.status = 'complete';
+            item.progress = 100;
+        }, 3000 + Math.random() * 3000);
     };
 
 
@@ -295,16 +333,29 @@ export function useUploadQueue() {
     const pendingCount = computed(() => {
         return items.value.filter(i => i.status === 'pending').length;
     });
-
+    function removeAll() {
+        items.value = [];
+    }
+    // watch(items, (newItems) => {
+    //     // console.log(newItems);
+    //     if (newItems.length === 0) return;
+    //     if (newItems.filter(i => i.status === 'pending' || i.status === 'uploading').length === 0) {
+    //         // startQueue();
+    //         items.value = [];
+    //     }
+    // }, { deep: true });
     return {
         items,
         addFiles,
         addRemoteUrls,
         removeItem,
         cancelItem,
+        removeAll,
         startQueue,
         totalSize,
         completeCount,
-        pendingCount
+        pendingCount,
+        remainingSlots,
+        maxItems: MAX_ITEMS,
     };
 }
