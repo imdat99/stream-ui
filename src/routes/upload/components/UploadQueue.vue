@@ -11,9 +11,10 @@ defineProps<{
 
 const emit = defineEmits<{
     removeItem: [id: string];
+    cancelItem: [id: string];
     publish: [];
     startQueue: [];
-}>();
+}>()
 </script>
 
 <template>
@@ -53,7 +54,7 @@ const emit = defineEmits<{
                 </div>
 
                 <UploadQueueItem v-for="item in items" :key="item.id" :item="item"
-                    @remove="emit('removeItem', $event)" />
+                    @remove="emit('removeItem', $event)" @cancel="emit('cancelItem', $event)" />
             </div>
 
             <div class="p-6 border-t border-border shrink-0">

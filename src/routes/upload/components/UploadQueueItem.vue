@@ -10,12 +10,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     remove: [id: string];
+    cancel: [id: string];
 }>();
 
 const statusLabel = computed(() => {
     switch (props.item.status) {
         case 'pending': return 'Pending';
-        case 'uploading': return 'Uploading...';
+        case 'uploading': return props.item.activeChunks ? `Uploading (${props.item.activeChunks} threads)` : 'Uploading...';
         case 'processing': return 'Processing...';
         case 'complete': return 'Completed';
         case 'error': return 'Failed';
@@ -31,6 +32,10 @@ const statusColor = computed(() => {
         case 'pending': return 'bg-slate-400';
         default: return 'bg-accent';
     }
+});
+
+const canCancel = computed(() => {
+    return props.item.status === 'uploading' || props.item.status === 'pending';
 });
 </script>
 
@@ -72,7 +77,16 @@ const statusColor = computed(() => {
                             <span class="w-2 h-2 rounded-full animate-pulse" :class="statusColor"></span>
                             {{ statusLabel }}
                         </span>
-                        <span class="text-accent font-bold">{{ item.progress || 0 }}%</span>
+                        <div class="flex items-center gap-2">
+                            <button 
+                                v-if="canCancel && !minimal" 
+                                @click="emit('cancel', item.id)"
+                                class="text-[10px] px-2 py-0.5 bg-red-50 text-red-500 hover:bg-red-100 rounded transition"
+                            >
+                                Cancel
+                            </button>
+                            <span class="text-accent font-bold">{{ item.progress || 0 }}%</span>
+                        </div>
                     </div>
                     <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden relative">
                         <div class="absolute inset-0 bg-accent/20 animate-pulse w-full"></div>

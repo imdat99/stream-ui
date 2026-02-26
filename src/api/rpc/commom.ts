@@ -1,1 +1,0 @@
-export const secret = "123_it-is-very-secret_123";

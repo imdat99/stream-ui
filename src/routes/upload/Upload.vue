@@ -11,7 +11,7 @@ import { useUploadQueue } from '@/composables/useUploadQueue';
 
 const mode = ref<'local' | 'remote'>('local');
 
-const { addFiles, addRemoteUrls, items, removeItem, totalSize, completeCount, pendingCount, startQueue } = useUploadQueue();
+const { addFiles, addRemoteUrls, items, removeItem, cancelItem, totalSize, completeCount, pendingCount, startQueue } = useUploadQueue();
 
 const handlePublish = () => {
     console.log('Publishing items...');
@@ -50,7 +50,7 @@ const handleRemoteUrls = (urls: string[]) => {
             </div>
         </div>
         <UploadQueue :items="items" :total-size="totalSize" :complete-count="completeCount"
-            :pending-count="pendingCount" @remove-item="removeItem" @publish="handlePublish"
+            :pending-count="pendingCount" @remove-item="removeItem" @cancel-item="cancelItem" @publish="handlePublish"
             @start-queue="startQueue" />
     </div>
 </template>

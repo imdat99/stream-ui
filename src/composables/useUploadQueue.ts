@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 export interface QueueItem {
     id: string;
@@ -12,9 +12,18 @@ export interface QueueItem {
     thumbnail?: string;
     file?: File; // Keep reference to file for local uploads
     url?: string; // Keep reference to url for remote uploads
+    // Upload chunk tracking
+    activeChunks?: number;
+    uploadedUrls?: string[];
+    cancelled?: boolean;
 }
 
 const items = ref<QueueItem[]>([]);
+
+// Chunk upload configuration
+const CHUNK_SIZE = 90 * 1024 * 1024; // 90MB per chunk
+const MAX_PARALLEL = 3;
+const MAX_RETRY = 3;
 
 export function useUploadQueue() {
     
@@ -23,13 +32,16 @@ export function useUploadQueue() {
             id: Math.random().toString(36).substring(2, 9),
             name: file.name,
             type: 'local',
-            status: 'pending', // Start as pending
+            status: 'pending',
             progress: 0,
             uploaded: '0 MB',
             total: formatSize(file.size),
             speed: '0 MB/s',
             file: file,
-            thumbnail: undefined // We could generate a thumbnail here if needed
+            thumbnail: undefined,
+            activeChunks: 0,
+            uploadedUrls: [],
+            cancelled: false
         }));
 
         items.value.push(...newItems);
@@ -40,24 +52,36 @@ export function useUploadQueue() {
             id: Math.random().toString(36).substring(2, 9),
             name: url.split('/').pop() || 'Remote File',
             type: 'remote',
-            status: 'fetching', // Remote URLs start fetching immediately or pending? User said "khi nao nhan upload". Let's use pending.
+            status: 'pending',
             progress: 0,
             uploaded: '0 MB',
             total: 'Unknown',
             speed: '0 MB/s',
-            url: url
+            url: url,
+            activeChunks: 0,
+            uploadedUrls: [],
+            cancelled: false
         }));
-        
-        // Override status to pending for consistency with user request
-        newItems.forEach(i => i.status = 'pending');
 
         items.value.push(...newItems);
     };
 
     const removeItem = (id: string) => {
+        const item = items.value.find(i => i.id === id);
+        if (item) {
+            item.cancelled = true;
+        }
         const index = items.value.findIndex(item => item.id === id);
         if (index !== -1) {
             items.value.splice(index, 1);
+        }
+    };
+    
+    const cancelItem = (id: string) => {
+        const item = items.value.find(i => i.id === id);
+        if (item) {
+            item.cancelled = true;
+            item.status = 'error';
         }
     };
     
@@ -65,7 +89,7 @@ export function useUploadQueue() {
         items.value.forEach(item => {
             if (item.status === 'pending') {
                 if (item.type === 'local') {
-                    startMockUpload(item.id);
+                    startChunkUpload(item.id);
                 } else {
                     startMockRemoteFetch(item.id);
                 }
@@ -73,42 +97,165 @@ export function useUploadQueue() {
         });
     };
 
-    // Mock Upload Logic
-    const startMockUpload = (id: string) => {
+    // Real Chunk Upload Logic
+    const startChunkUpload = async (id: string) => {
         const item = items.value.find(i => i.id === id);
-        if (!item) return;
+        if (!item || !item.file) return;
 
         item.status = 'uploading';
-        let progress = 0;
-        const totalSize = item.file ? item.file.size : 1024 * 1024 * 50; // Default 50MB if unknown
+        item.activeChunks = 0;
+        item.uploadedUrls = [];
         
-        // Random speed between 1MB/s and 5MB/s
-        const speedBytesPerStep = (1024 * 1024) + Math.random() * (1024 * 1024 * 4); 
+        const file = item.file;
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const progressMap = new Map<number, number>(); // chunk index -> uploaded bytes
+        const queue: number[] = Array.from({ length: totalChunks }, (_, i) => i);
         
-        const interval = setInterval(() => {
-            if (progress >= 100) {
-                clearInterval(interval);
-                item.status = 'complete';
-                item.progress = 100;
-                item.uploaded = item.total;
-                return;
+        const updateProgress = () => {
+            let totalUploaded = 0;
+            progressMap.forEach(value => {
+                totalUploaded += value;
+            });
+            const percent = Math.min((totalUploaded / file.size) * 100, 100);
+            item.progress = parseFloat(percent.toFixed(1));
+            item.uploaded = formatSize(totalUploaded);
+            
+            // Calculate speed (simplified)
+            const currentSpeed = item.activeChunks ? item.activeChunks * 2 * 1024 * 1024 : 0;
+            item.speed = formatSize(currentSpeed) + '/s';
+        };
+
+        const processQueue = async () => {
+            if (item.cancelled) return;
+
+            const activePromises: Promise<void>[] = [];
+
+            while ((item.activeChunks || 0) < MAX_PARALLEL && queue.length > 0) {
+                const index = queue.shift()!;
+                item.activeChunks = (item.activeChunks || 0) + 1;
+                
+                const promise = uploadChunk(index, file, progressMap, updateProgress, item)
+                    .then(() => {
+                        item.activeChunks = (item.activeChunks || 0) - 1;
+                    });
+                activePromises.push(promise);
             }
 
-            // Increment progress randomly
-            const increment = Math.random() * 5 + 1; // 1-6% increment
-            progress = Math.min(progress + increment, 100);
-            
-            item.progress = Math.floor(progress);
-             
-            // Calculate uploaded size string
-            const currentBytes = (progress / 100) * totalSize;
-            item.uploaded = formatSize(currentBytes);
-            
-            // Re-randomize speed for realism
-            const currentSpeed = (1024 * 1024) + Math.random() * (1024 * 1024 * 2);
-            item.speed = formatSize(currentSpeed) + '/s';
+            if (activePromises.length > 0) {
+                await Promise.all(activePromises);
+                await processQueue();
+            }
+        };
 
-        }, 500);
+        try {
+            await processQueue();
+            
+            if (!item.cancelled) {
+                item.status = 'processing';
+                await completeUpload(item);
+            }
+        } catch (error) {
+            item.status = 'error';
+            console.error('Upload failed:', error);
+        }
+    };
+
+    const uploadChunk = (
+        index: number,
+        file: File,
+        progressMap: Map<number, number>,
+        updateProgress: () => void,
+        item: QueueItem
+    ): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            let retry = 0;
+
+            const attempt = () => {
+                if (item.cancelled) return resolve();
+
+                const start = index * CHUNK_SIZE;
+                const end = Math.min(start + CHUNK_SIZE, file.size);
+                const chunk = file.slice(start, end);
+
+                const formData = new FormData();
+                formData.append('file', chunk, file.name);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://tmpfiles.org/api/v1/upload');
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        progressMap.set(index, e.loaded);
+                        updateProgress();
+                    }
+                };
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.status === 'success') {
+                                progressMap.set(index, chunk.size);
+                                if (item.uploadedUrls) {
+                                    item.uploadedUrls[index] = res.data.url;
+                                }
+                                updateProgress();
+                                resolve();
+                                return;
+                            }
+                        } catch {
+                            handleError();
+                        }
+                    }
+                    handleError();
+                };
+
+                xhr.onerror = handleError;
+
+                function handleError() {
+                    retry++;
+                    if (retry <= MAX_RETRY) {
+                        setTimeout(attempt, 2000);
+                    } else {
+                        item.status = 'error';
+                        reject(new Error(`Failed to upload chunk ${index + 1}`));
+                    }
+                };
+
+                xhr.send(formData);
+            };
+
+            attempt();
+        });
+    };
+
+    const completeUpload = async (item: QueueItem) => {
+        if (!item.file || !item.uploadedUrls) return;
+
+        try {
+            const response = await fetch('/merge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: item.file.name,
+                    chunks: item.uploadedUrls
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Merge failed');
+            }
+
+            item.status = 'complete';
+            item.progress = 100;
+            item.uploaded = item.total;
+            item.speed = '0 MB/s';
+        } catch (error) {
+            item.status = 'error';
+            console.error('Merge failed:', error);
+        }
     };
 
     // Mock Remote Fetch Logic
@@ -116,11 +263,9 @@ export function useUploadQueue() {
          const item = items.value.find(i => i.id === id);
         if (!item) return;
         
-        item.status = 'fetching'; // Update status to fetching
+        item.status = 'fetching';
 
-        // Remote fetch takes some time then completes
          setTimeout(() => {
-             // Switch to uploading/processing phase if we wanted, or just finish
              item.status = 'complete';
              item.progress = 100;
          }, 3000 + Math.random() * 3000);
@@ -156,6 +301,7 @@ export function useUploadQueue() {
         addFiles,
         addRemoteUrls,
         removeItem,
+        cancelItem,
         startQueue,
         totalSize,
         completeCount,

@@ -12,6 +12,8 @@ import { createApp } from './main';
 import { useAuthStore } from './stores/auth';
 // @ts-ignore
 import Base from '@primevue/core/base';
+import { baseAPIURL } from './api/httpClientAdapter.server';
+import { createManifest, getListFiles, saveManifest, validateChunkUrls } from './server/modules/merge';
 const app = new Hono()
 const defaultNames = ['primitive', 'semantic', 'global', 'base', 'ripple-directive']
 // app.use(renderer)
@@ -31,7 +33,7 @@ app.use(cors(), async (c, next) => {
     return await next()
   }
   const url = new URL(c.req.url)
-  url.host = 'api.pipic.fun'
+  url.host = baseAPIURL.replace(/^https?:\/\//, '')
   url.protocol = 'https:'
   url.pathname = path.replace(/^\/r/, '') || '/'
   url.port = ''
@@ -53,6 +55,53 @@ app.use(cors(), async (c, next) => {
 app.get("/.well-known/*", (c) => {
   return c.json({ ok: true });
 });
+app.post('/merge', async (c, next) => {
+  const headers = new Headers(c.req.header());
+  headers.delete("host");
+  headers.delete("connection");
+  return fetch(`${baseAPIURL}/me`, {
+    method: 'GET',
+    headers: headers,
+    credentials: 'include'
+  }).then(res => res.json()).then((r) => {
+    if (r.data?.user) {
+      return next();
+    }
+    else {
+      throw new Error("Unauthorized");
+    }}).catch(() => {
+      return c.json({ error: "Unauthorized" }, 401);
+    });
+}, async (c) => {
+  try {
+    const body = await c.req.json()
+    const { filename, chunks } = body
+    if (!filename || !Array.isArray(chunks) || chunks.length === 0) {
+      return c.json({ error: 'invalid payload' }, 400)
+    }
+    const hostError = validateChunkUrls(chunks)
+    if (hostError) return c.json({ error: hostError }, 400)
+
+    const manifest = createManifest(filename, chunks)
+    await saveManifest(manifest)
+
+    return c.json({
+      status: 'ok',
+      id: manifest.id,
+      filename: manifest.filename,
+      total_parts: manifest.total_parts,
+    })
+  } catch (e: any) {
+    return c.json({ error: e?.message ?? String(e) }, 500)
+  }
+})
+app.get('/manifest/:id', async (c) => {
+  const manifest = await getListFiles()
+  if (!manifest) {
+    return c.json({ error: "Manifest not found" }, 404)
+  }
+  return c.json(manifest)
+})
 app.get("*", async (c) => {
   const nonce = crypto.randomUUID();
   const url = new URL(c.req.url);

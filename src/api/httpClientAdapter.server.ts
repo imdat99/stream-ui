@@ -1,5 +1,5 @@
 import { tryGetContext } from "hono/context-storage";
-
+export const baseAPIURL = "https://api.pipic.fun";
 export const customFetch = (url: string, options: RequestInit) => {
   options.credentials = "include";
   const c = tryGetContext<any>();
@@ -21,7 +21,7 @@ export const customFetch = (url: string, options: RequestInit) => {
     ...(options.headers as Record<string, string>),
   };
 
-  const apiUrl = ["https://api.pipic.fun", url.replace(/^r/, "")].join("");
+  const apiUrl = [baseAPIURL, url.replace(/^r/, "")].join("");
   return fetch(apiUrl, options).then(async (res) => {
 	res.headers.getSetCookie()?.forEach((cookie) => {
 		  c.header("Set-Cookie", cookie);

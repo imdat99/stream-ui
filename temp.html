@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mượt mà Chunk Upload - Pro</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; padding: 50px; background: #f4f7f6; }
+        .upload-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 500px; }
+        h2 { margin-top: 0; color: #333; font-size: 1.2rem; }
+        
+        input[type="file"] { margin-bottom: 20px; width: 100%; }
+        
+        .progress-wrapper { margin: 20px 0; position: relative; }
+        progress { width: 100%; height: 20px; appearance: none; border-radius: 10px; overflow: hidden; }
+        progress::-webkit-progress-bar { background-color: #eee; border-radius: 10px; }
+        progress::-webkit-progress-value { background-color: #2ecc71; transition: width 0.3s ease; }
+        
+        .status-text { display: flex; justify-content: space-between; font-size: 0.9rem; color: #666; margin-top: 5px; }
+        
+        .btn-group { display: flex; gap: 10px; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: opacity 0.2s; }
+        .btn-start { background: #3498db; color: white; }
+        .btn-cancel { background: #e74c3c; color: white; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        #log { margin-top: 20px; font-size: 0.85rem; color: #444; background: #f9f9f9; padding: 10px; border-radius: 4px; max-height: 100px; overflow-y: auto; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+
+<div class="upload-container">
+    <h2>Tải lên đa luồng (Smooth)</h2>
+    
+    <input type="file" id="fileInput">
+    
+    <div class="btn-group">
+        <button id="startBtn" class="btn-start" onclick="startUpload()">Bắt đầu tải</button>
+        <button id="cancelBtn" class="btn-cancel" onclick="cancelUpload()" disabled>Hủy</button>
+    </div>
+
+    <div class="progress-wrapper">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <div class="status-text">
+            <span id="percent">0.0%</span>
+            <span id="speed">Sẵn sàng</span>
+        </div>
+    </div>
+
+    <p id="status" style="word-break: break-all; font-size: 0.8rem; color: #27ae60;"></p>
+    <div id="log">Lịch sử hoạt động...</div>
+</div>
+
+<script>
+const CHUNK_SIZE = 90 * 1024 * 1024; // 10MB mỗi chunk (nhỏ hơn giúp mượt hơn trên mạng yếu)
+const MAX_PARALLEL = 3; 
+const MAX_RETRY = 3;
+
+let cancelled = false;
+let activeCount = 0;
+let queue = [];
+let fileGlobal;
+let session = { uploadedUrls: [] };
+let progressMap = new Map(); // Lưu tiến độ từng chunk theo index
+
+function log(msg) {
+    const logDiv = document.getElementById("log");
+    logDiv.innerHTML += `<div>> ${msg}</div>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+async function startUpload() {
+    const file = document.getElementById("fileInput").files[0];
+    if (!file) return alert("Vui lòng chọn file!");
+
+    // Reset trạng thái
+    cancelled = false;
+    fileGlobal = file;
+    activeCount = 0;
+    progressMap.clear();
+    session.uploadedUrls = [];
+    
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("cancelBtn").disabled = false;
+    log(`Bắt đầu xử lý file: ${file.name}`);
+
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    queue = Array.from({length: totalChunks}, (_, i) => i);
+
+    processQueue();
+}
+
+function cancelUpload() {
+    cancelled = true;
+    location.reload(); // Cách đơn giản nhất để reset hoàn toàn luồng XHR
+}
+
+function processQueue() {
+    if (cancelled) return;
+
+    while (activeCount < MAX_PARALLEL && queue.length) {
+        const index = queue.shift();
+        activeCount++;
+        uploadChunk(index).then(() => {
+            activeCount--;
+            processQueue();
+        });
+    }
+
+    // Khi tất cả đã xong
+    if (activeCount === 0 && queue.length === 0 && !cancelled) {
+        completeUpload();
+    }
+}
+
+function uploadChunk(index) {
+    return new Promise((resolve) => {
+        let retry = 0;
+
+        function attempt() {
+            if (cancelled) return resolve();
+
+            const start = index * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, fileGlobal.size);
+            const chunk = fileGlobal.slice(start, end);
+
+            const formData = new FormData();
+            formData.append("file", chunk, fileGlobal.name);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://tmpfiles.org/api/v1/upload");
+
+            // Cập nhật progress mượt mà
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    progressMap.set(index, e.loaded);
+                    updateUI();
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const res = JSON.parse(xhr.responseText);
+                    if (res.status === "success") {
+                        progressMap.set(index, chunk.size); // Chốt 100% chunk này
+                        session.uploadedUrls[index] = res.data.url;
+                        updateUI();
+                        log(`Xong chunk ${index + 1}`);
+                        return resolve();
+                    }
+                }
+                handleError();
+            };
+
+            xhr.onerror = handleError;
+
+            function handleError() {
+                retry++;
+                if (retry <= MAX_RETRY) {
+                    log(`Thử lại chunk ${index + 1} (Lần ${retry})`);
+                    setTimeout(attempt, 2000);
+                } else {
+                    log(`Thất bại vĩnh viễn chunk ${index + 1}`);
+                    resolve();
+                }
+            }
+
+            xhr.send(formData);
+        }
+
+        attempt();
+    });
+}
+
+function updateUI() {
+    requestAnimationFrame(() => {
+        let totalUploaded = 0;
+        progressMap.forEach(value => {
+            totalUploaded += value;
+        });
+
+        const percent = ((totalUploaded / fileGlobal.size) * 100).toFixed(1);
+        document.getElementById("progressBar").value = percent;
+        document.getElementById("percent").innerText = percent + "%";
+        document.getElementById("speed").innerText = `Đang tải ${activeCount} luồng...`;
+    });
+}
+
+function completeUpload() {
+    log("Đang tổng hợp file...");
+    document.getElementById("speed").innerText = "Đang hoàn tất...";
+
+    // Gửi danh sách URL tới server để tạo manifest (POST /merge) — không cần merge vật lý
+    fetch("/merge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            filename: fileGlobal.name,
+            chunks: session.uploadedUrls
+        })
+    })
+    .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+            log('Server error: ' + (data.error || res.status));
+            document.getElementById("status").innerText = "Lỗi khi tạo manifest.";
+            document.getElementById("startBtn").disabled = false;
+            return;
+        }
+        const { id, filename, total_parts } = data;
+        log(`Manifest đã tạo: id=${id}, ${total_parts} part(s)`);
+        const downloadUrl = `/download/${id}`;
+        document.getElementById("status").innerHTML =
+            `Sẵn sàng! <a href="${downloadUrl}" download="${filename}" style="color:#2980b9;font-weight:600">⬇ Tải xuống ${filename}</a>`;
+        document.getElementById("speed").innerText = "Hoàn thành";
+        document.getElementById("startBtn").disabled = false;
+        log("Tất cả tiến trình kết thúc.");
+    })
+    .catch(() => {
+        log("Lỗi khi gọi server merge.");
+        document.getElementById("startBtn").disabled = false;
+    });
+}
+</script>
+
+</body>
+</html>
