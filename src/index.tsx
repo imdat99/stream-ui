@@ -1,161 +1,24 @@
-import { serializeQueryCache } from '@pinia/colada';
-import { renderSSRHead } from '@unhead/vue/server';
 import { Hono } from 'hono';
-import { contextStorage } from 'hono/context-storage';
-import { cors } from "hono/cors";
-import { streamText } from 'hono/streaming';
-import isMobile from 'is-mobile';
-import { renderToWebStream } from 'vue/server-renderer';
-import { buildBootstrapScript } from './lib/manifest';
-import { styleTags } from './lib/primePassthrough';
-import { createApp } from './main';
-import { useAuthStore } from './stores/auth';
-// @ts-ignore
-import Base from '@primevue/core/base';
-import { baseAPIURL } from './api/httpClientAdapter.server';
-import { createManifest, getListFiles, saveManifest, validateChunkUrls } from './server/modules/merge';
-const app = new Hono()
-const defaultNames = ['primitive', 'semantic', 'global', 'base', 'ripple-directive']
-// app.use(renderer)
-app.use('*', contextStorage());
-app.use(cors(), async (c, next) => {
-  c.set("fetch", app.request.bind(app));
-  const ua = c.req.header("User-Agent")
-  if (!ua) {
-    return c.json({ error: "User-Agent header is missing" }, 400);
-  };
-  c.set("isMobile", isMobile({ ua }));
-  await next();
-}, async (c, next) => {
-  const path = c.req.path
 
-  if (path !== '/r' && !path.startsWith('/r/')) {
-    return await next()
-  }
-  const url = new URL(c.req.url)
-  url.host = baseAPIURL.replace(/^https?:\/\//, '')
-  url.protocol = 'https:'
-  url.pathname = path.replace(/^\/r/, '') || '/'
-  url.port = ''
-  // console.log("url", url.toString())
-  // console.log("c.req.raw", c.req.raw)
-  const headers = new Headers(c.req.header());
-  headers.delete("host");
-  headers.delete("connection");
+import { setupMiddlewares } from './server/middlewares/setup';
+import { apiProxyMiddleware } from './server/middlewares/apiProxy';
+import { registerWellKnownRoutes } from './server/routes/wellKnown';
+import { registerMergeRoutes } from './server/routes/merge';
+import { registerManifestRoutes } from './server/routes/manifest';
+import { registerSSRRoutes } from './server/routes/ssr';
 
-  return fetch(url.toString(), {
-    method: c.req.method,
-    headers: headers,
-    body: c.req.raw.body,
-    // @ts-ignore
-    duplex: 'half',
-    credentials: 'include'
-  });
-});
-app.get("/.well-known/*", (c) => {
-  return c.json({ ok: true });
-});
-app.post('/merge', async (c, next) => {
-  const headers = new Headers(c.req.header());
-  headers.delete("host");
-  headers.delete("connection");
-  return fetch(`${baseAPIURL}/me`, {
-    method: 'GET',
-    headers: headers,
-    credentials: 'include'
-  }).then(res => res.json()).then((r) => {
-    if (r.data?.user) {
-      return next();
-    }
-    else {
-      throw new Error("Unauthorized");
-    }}).catch(() => {
-      return c.json({ error: "Unauthorized" }, 401);
-    });
-}, async (c) => {
-  try {
-    const body = await c.req.json()
-    const { filename, chunks } = body
-    if (!filename || !Array.isArray(chunks) || chunks.length === 0) {
-      return c.json({ error: 'invalid payload' }, 400)
-    }
-    const hostError = validateChunkUrls(chunks)
-    if (hostError) return c.json({ error: hostError }, 400)
+const app = new Hono();
 
-    const manifest = createManifest(filename, chunks)
-    await saveManifest(manifest)
+// Global middlewares
+setupMiddlewares(app);
 
-    return c.json({
-      status: 'ok',
-      id: manifest.id,
-      filename: manifest.filename,
-      total_parts: manifest.total_parts,
-    })
-  } catch (e: any) {
-    return c.json({ error: e?.message ?? String(e) }, 500)
-  }
-})
-app.get('/manifest/:id', async (c) => {
-  const manifest = await getListFiles()
-  if (!manifest) {
-    return c.json({ error: "Manifest not found" }, 404)
-  }
-  return c.json(manifest)
-})
-app.get("*", async (c) => {
-  const nonce = crypto.randomUUID();
-  const url = new URL(c.req.url);
-  const { app, router, head, pinia, bodyClass, queryCache } = createApp();
-  app.provide("honoContext", c);
-  const auth = useAuthStore();
-  auth.$reset();
-  // auth.initialized = false;
-  await auth.init();
-  await router.push(url.pathname);
-  await router.isReady();
-  let usedStyles = new Set<String>();
-  Base.setLoadedStyleName = async (name: string) => usedStyles.add(name)
-  return streamText(c, async (stream) => {
-    c.header("Content-Type", "text/html; charset=utf-8");
-    c.header("Content-Encoding", "Identity");
-    const ctx: Record<string, any> = {};
-    const appStream = renderToWebStream(app, ctx);
-    // console.log("ctx: ", );
-    await stream.write("<!DOCTYPE html><html lang='en'><head>");
-    await stream.write("<base href='" + url.origin + "'/>");
+// API proxy middleware (handles /r/*)
+app.use(apiProxyMiddleware);
 
-    await renderSSRHead(head).then((headString) => stream.write(headString.headTags.replace(/\n/g, "")));
-    // await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"rel="stylesheet"></link>`);
-    await stream.write(`<link rel="preconnect" href="https://fonts.googleapis.com">`);
-    await stream.write(`<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">`);
-    await stream.write('<link rel="icon" href="/favicon.ico" />');
-    await stream.write(buildBootstrapScript());
-    if (usedStyles.size > 0) {
-      defaultNames.forEach(name => usedStyles.add(name));
-    }
-    await Promise.all(styleTags.filter(tag => usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))).map(tag => stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`)));
-    await stream.write(`</head><body class='${bodyClass}'>`);
-    // await stream.pipe(createTextTransformStreamClass(appStream, (text) => text.replace('<div id="anchor-header" class="p-4"></div>', `<div id="anchor-header" class="p-4">${ctx.teleports["#anchor-header"] || ""}</div>`).replace('<div id="anchor-top"></div>', `<div id="anchor-top">${ctx.teleports["#anchor-top"] || ""}</div>`)));
-    await stream.pipe(appStream);
-    delete ctx.teleports
-    delete ctx.__teleportBuffers
-    delete ctx.modules;
-    Object.assign(ctx, { $p: pinia.state.value, $colada: serializeQueryCache(queryCache) });
-    await stream.write(`<script type="application/json" data-ssr="true" id="__APP_DATA__" nonce="${nonce}">${htmlEscape((JSON.stringify(ctx)))}</script>`);
-    await stream.write("</body></html>");
-  });
-})
-const ESCAPE_LOOKUP: { [match: string]: string } = {
-  "&": "\\u0026",
-  ">": "\\u003e",
-  "<": "\\u003c",
-  "\u2028": "\\u2028",
-  "\u2029": "\\u2029",
-};
+// Routes
+registerWellKnownRoutes(app);
+registerMergeRoutes(app);
+registerManifestRoutes(app);
+registerSSRRoutes(app);
 
-const ESCAPE_REGEX = /[&><\u2028\u2029]/g;
-
-function htmlEscape(str: string): string {
-  return str.replace(ESCAPE_REGEX, (match) => ESCAPE_LOOKUP[match]);
-}
-export default app
+export default app;
