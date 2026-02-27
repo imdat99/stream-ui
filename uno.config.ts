@@ -216,6 +216,9 @@ export default defineConfig({
     ],
     ["animate-loadingBar", ["animation", "loadingBar 1.5s linear infinite"]],
   ],
+  rules: [
+    ['animate-spring-card', { animation: 'card-spring-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both' }],
+  ],
   transformers: [transformerVariantGroup(), transformerCompileClass({
     classPrefix: "_",
   })],
@@ -264,6 +267,12 @@ export default defineConfig({
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+@keyframes card-spring-in {
+  0%   { transform: scale(0.82) translateY(12px); opacity: 0; }
+  60%  { transform: scale(1.04) translateY(-2px); opacity: 1; }
+  80%  { transform: scale(0.98) translateY(1px); }
+  100% { transform: scale(1) translateY(0); }
 }
 @keyframes glow-enter-blur {
     0% {

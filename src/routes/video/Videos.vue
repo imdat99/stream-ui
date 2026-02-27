@@ -1,25 +1,32 @@
 <script setup lang="ts">
-import { ref, onMounted, createStaticVNode, watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import PageHeader from '@/components/dashboard/PageHeader.vue';
+import { type ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
-import { client, type ModelVideo } from '@/api/client';
+import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { fetchMockVideos } from '@/mocks/videos';
+import { createStaticVNode, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
-import VideoFilters from './components/VideoFilters.vue';
-import VideoGrid from './components/VideoGrid.vue';
-import VideoTable from './components/VideoTable.vue';
-import VideoBulkActions from './components/VideoBulkActions.vue';
+import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
+import { useToast } from 'primevue/usetoast';
+import VideoBulkActions from './components/VideoBulkActions.vue';
+import VideoFilters from './components/VideoFilters.vue';
+import VideoTable from './components/VideoTable.vue';
+import CopyVideoModal from './CopyVideoModal.vue';
+import DetailVideoModal from './DetailVideoModal.vue';
+
+const detailVideoId = ref<string>("");
+const copyVideoId = ref<string>("");
 
 const uiState = useUIState();
+const { addFiles, startQueue } = useUploadQueue();
+const toast = useToast();
 const router = useRouter();
 const videos = ref<ModelVideo[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const searchQuery = ref('');
 const selectedStatus = ref<string>('all');
-const viewMode = ref<'grid' | 'table'>('table');
 const iconHoist = createStaticVNode(`<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1zM16 7l-4-4m0 0L8 7m4-4v12" /></svg>`, 1)
 
 // Pagination
@@ -113,8 +120,102 @@ onMounted(() => {
   fetchVideos();
 });
 
+// Reset drag state when upload dialog opens mid-drag
+watch(() => uiState.uploadDialogVisible, (visible) => {
+  if (visible) {
+    dragCounter = 0;
+    isDraggingOver.value = false;
+  }
+});
+
 watch([searchQuery, selectedStatus, limit, page], () => {
   fetchVideos();
+});
+const editVideo = (videoId?: string) => {
+  detailVideoId.value = videoId || "";
+};
+
+const copyVideo = (videoId?: string) => {
+  copyVideoId.value = videoId || "";
+};
+
+// ── Drag & drop upload ──────────────────────────────────────────────────
+const isDraggingOver = ref(false);
+let dragCounter = 0; // track nested dragenter/dragleave pairs
+
+// Returns true for any OS file drag (used to keep counter balanced)
+const isAnyFileDrag = (e: DragEvent) =>
+  Array.from(e.dataTransfer?.types ?? []).includes('Files');
+
+// Returns true only when dragged items contain at least one video file
+const isVideoDrag = (e: DragEvent): boolean => {
+  if (!isAnyFileDrag(e)) return false;
+  const items = e.dataTransfer?.items;
+  if (items?.length) {
+    return Array.from(items).some(item => item.kind === 'file' && item.type.startsWith('video/'));
+  }
+  return false;
+};
+
+const onWindowDragEnter = (e: DragEvent) => {
+  if (uiState.uploadDialogVisible) return; // don't show overlay if dialog is open
+  if (!isAnyFileDrag(e)) return; // same guard as leave — keeps counter balanced
+  dragCounter++;
+  if (isVideoDrag(e)) isDraggingOver.value = true; // show overlay only for video
+};
+
+const onWindowDragLeave = (e: DragEvent) => {
+  if (!isAnyFileDrag(e)) return; // same guard as enter — keeps counter balanced
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    isDraggingOver.value = false;
+  }
+};
+
+const onWindowDragOver = (e: DragEvent) => {
+  // When upload dialog is open, let the dropzone handle its own dragover/drop.
+  // Still preventDefault to block browser navigation, but stopPropagation
+  // is NOT set so the dropzone's own handler can also fire.
+  if (uiState.uploadDialogVisible) return;
+  if (isAnyFileDrag(e)) e.preventDefault();
+};
+
+const onWindowDrop = (e: DragEvent) => {
+  e.preventDefault();
+  dragCounter = 0;
+  isDraggingOver.value = false;
+  if (uiState.uploadDialogVisible) return; // let the dialog handle it
+  const allFiles = e.dataTransfer?.files;
+  if (!allFiles?.length) return;
+  // Only pass video files
+  const dt = new DataTransfer();
+  Array.from(allFiles).filter(f => f.type.startsWith('video/')).forEach(f => dt.items.add(f));
+  if (!dt.files.length) return;
+  const result = addFiles(dt.files);
+  if (result.duplicates > 0) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Duplicate files skipped',
+      detail: `${result.duplicates} file${result.duplicates > 1 ? 's are' : ' is'} already in the queue.`,
+      life: 4000,
+    });
+  }
+  if (result.added > 0) startQueue();
+};
+
+onMounted(() => {
+  window.addEventListener('dragenter', onWindowDragEnter);
+  window.addEventListener('dragleave', onWindowDragLeave);
+  window.addEventListener('dragover', onWindowDragOver);
+  window.addEventListener('drop', onWindowDrop);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('dragenter', onWindowDragEnter);
+  window.removeEventListener('dragleave', onWindowDragLeave);
+  window.removeEventListener('dragover', onWindowDragOver);
+  window.removeEventListener('drop', onWindowDrop);
 });
 </script>
 
@@ -133,7 +234,7 @@ watch([searchQuery, selectedStatus, limit, page], () => {
     ]" />
 
     <VideoBulkActions :selectedVideos="selectedVideos" @delete="deleteSelectedVideos" @clear="selectedVideos = []" />
-    <VideoFilters :loading="loading" v-model:searchQuery="searchQuery" :selectedStatus="selectedStatus" v-model:viewMode="viewMode"
+    <VideoFilters :loading="loading" v-model:searchQuery="searchQuery" :selectedStatus="selectedStatus"
       v-model:page="page" v-model:limit="limit" :total="total" ref="videoFilters" :statusOptions="statusOptions"
       @search="handleSearch" @filter="handleFilter" />
 
@@ -154,10 +255,38 @@ watch([searchQuery, selectedStatus, limit, page], () => {
         imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" actionLabel="Upload Video"
         :onAction="() => router.push('/upload')" />
       <!-- Grid View -->
-      <VideoGrid :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" v-else-if="viewMode === 'grid'" />
+      <!-- <VideoGrid :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" v-else-if="viewMode === 'grid'" /> -->
 
       <!-- Table View -->
-      <VideoTable v-else :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" />
+      <VideoTable v-else :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" @edit="editVideo" @copy="copyVideo" />
     </Transition>
+    <DetailVideoModal :videoId="detailVideoId" @close="detailVideoId = ''"/>
+    <CopyVideoModal :videoId="copyVideoId" @close="copyVideoId = ''"/>
+
+    <!-- Global drag & drop overlay -->
+    <ClientOnly>
+    <Teleport to="body">
+        <div v-if="isDraggingOver"
+          class="fixed inset-0 z-[9999] flex flex-col items-center justify-center pointer-events-none"
+          aria-hidden="true">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-primary/10 backdrop-blur-[2px]" />
+          <!-- Card -->
+          <div class="animate-spring-card relative flex flex-col items-center gap-3 select-none">
+            <div class="w-16 h-16 rounded-2xl bg-white shadow-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </div>
+            <p class="text-lg font-semibold text-primary">Drop to upload</p>
+            <p class="text-sm text-primary/70">Files will be added to the upload queue</p>
+          </div>
+        </div>
+    </Teleport>
+    </ClientOnly>
   </div>
 </template>
+

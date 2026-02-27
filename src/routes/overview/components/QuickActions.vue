@@ -3,16 +3,17 @@ import Chart from '@/components/icons/Chart.vue';
 import Credit from '@/components/icons/Credit.vue';
 import Upload from '@/components/icons/Upload.vue';
 import Video from '@/components/icons/Video.vue';
+import { useUIState } from '@/stores/uiState';
 import Skeleton from 'primevue/skeleton';
 import { useRouter } from 'vue-router';
 import Referral from './Referral.vue';
-
 interface Props {
     loading: boolean;
 }
 
 defineProps<Props>();
 
+const uiState = useUIState();
 const router = useRouter();
 
 const quickActions = [
@@ -20,7 +21,7 @@ const quickActions = [
         title: 'Upload Video',
         description: 'Upload a new video to your library',
         icon: Upload,
-        onClick: () => router.push('/upload')
+        onClick: () => uiState.toggleUploadDialog()
     },
     {
         title: 'Video Library',

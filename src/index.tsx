@@ -1,11 +1,12 @@
 import { Hono } from 'hono';
 
-import { setupMiddlewares } from './server/middlewares/setup';
 import { apiProxyMiddleware } from './server/middlewares/apiProxy';
-import { registerWellKnownRoutes } from './server/routes/wellKnown';
-import { registerMergeRoutes } from './server/routes/merge';
+import { setupMiddlewares } from './server/middlewares/setup';
+import { registerDisplayRoutes } from './server/routes/display';
 import { registerManifestRoutes } from './server/routes/manifest';
+import { registerMergeRoutes } from './server/routes/merge';
 import { registerSSRRoutes } from './server/routes/ssr';
+import { registerWellKnownRoutes } from './server/routes/wellKnown';
 
 const app = new Hono();
 
@@ -18,6 +19,7 @@ app.use(apiProxyMiddleware);
 // Routes
 registerWellKnownRoutes(app);
 registerMergeRoutes(app);
+registerDisplayRoutes(app);
 registerManifestRoutes(app);
 registerSSRRoutes(app);
 

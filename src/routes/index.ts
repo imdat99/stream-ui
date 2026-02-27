@@ -1,14 +1,12 @@
-import { type ReactiveHead, type ResolvableValue } from "@unhead/vue";
-import { headSymbol } from "@unhead/vue";
+import { useAuthStore } from "@/stores/auth";
+import { headSymbol, type ReactiveHead, type ResolvableValue } from "@unhead/vue";
+import { inject } from "vue";
 import {
   createMemoryHistory,
   createRouter,
   createWebHistory,
   type RouteRecordRaw,
 } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import { inject } from "vue";
-import { TinyMqttClient } from "@/lib/liteMqtt";
 
 type RouteData = RouteRecordRaw & {
   meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean };
@@ -102,11 +100,11 @@ const routes: RouteData[] = [
           //   },
           // },
           {
-            path: "video",
+            path: "videos",
             children: [
               {
                 path: "",
-                name: "video",
+                name: "videos",
                 component: () => import("./video/Videos.vue"),
                 meta: {
                   head: {
@@ -120,16 +118,16 @@ const routes: RouteData[] = [
                   },
                 },
               },
-              {
-                path: ":id",
-                name: "video-detail",
-                component: () => import("./video/DetailVideo.vue"),
-                meta: {
-                  head: {
-                    title: "Edit Video - Holistream",
-                  },
-                },
-              },
+              // {
+              //   path: ":id",
+              //   name: "video-detail",
+              //   component: () => import("./video/DetailVideo.vue"),
+              //   meta: {
+              //     head: {
+              //       title: "Edit Video - Holistream",
+              //     },
+              //   },
+              // },
             ],
           },
           {

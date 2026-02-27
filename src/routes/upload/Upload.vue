@@ -1,23 +1,41 @@
 <script setup lang="ts">
-import UploadDropzone from './components/UploadDropzone.vue';
-import RemoteUrlForm from './components/RemoteUrlForm.vue';
-import { ref } from 'vue';
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
+import { useToast } from 'primevue/usetoast';
+import { ref } from 'vue';
+import RemoteUrlForm from './components/RemoteUrlForm.vue';
+import UploadDropzone from './components/UploadDropzone.vue';
 
 const uiState = useUIState();
+const toast = useToast();
 const mode = ref<'local' | 'remote'>('local');
 
 const { addFiles, addRemoteUrls, pendingCount, startQueue, remainingSlots, maxItems } = useUploadQueue();
 
 const handleFilesSelected = (files: FileList) => {
-    addFiles(files);
-    uiState.uploadDialogVisible = false;
+    const result = addFiles(files);
+    if (result.duplicates > 0) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Duplicate files skipped',
+            detail: `${result.duplicates} file${result.duplicates > 1 ? 's are' : ' is'} already in the queue.`,
+            life: 4000,
+        });
+    }
+    if (result.added > 0) uiState.uploadDialogVisible = false;
 };
 
 const handleRemoteUrls = (urls: string[]) => {
-    addRemoteUrls(urls);
-    uiState.uploadDialogVisible = false;
+    const result = addRemoteUrls(urls);
+    if (result.duplicates > 0) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Duplicate URLs skipped',
+            detail: `${result.duplicates} URL${result.duplicates > 1 ? 's are' : ' is'} already in the queue.`,
+            life: 4000,
+        });
+    }
+    if (result.added > 0) uiState.uploadDialogVisible = false;
 };
 
 const handleStartUpload = () => {

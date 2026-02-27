@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
-import { formatBytes, formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
-import ArrowDownTray from '@/components/icons/ArrowDownTray.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import VideoIcon from '@/components/icons/VideoIcon.vue';
+import { formatBytes, formatDate, getStatusSeverity } from '@/lib/utils';
+import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 
@@ -18,25 +18,28 @@ defineProps<{
 const emit = defineEmits<{
     (e: 'update:selectedVideos', value: ModelVideo[]): void;
     (e: 'delete', videoId: string): void;
+    (e: 'edit', videoId: string): void;
+    (e: 'copy', videoId: string): void;
 }>();
 </script>
 
 <template>
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div v-if="loading">
-        <div class="p-4 border-b border-gray-200" v-for="i in 10" :key="i">
-            <div class="flex gap-4 items-center">
-              <Skeleton width="5rem" height="3rem" class="rounded"></Skeleton>
-              <div class="flex-1">
-                <Skeleton width="40%" height="1.2rem" class="mb-2"></Skeleton>
-                <Skeleton width="30%" height="1rem"></Skeleton>
-              </div>
-              <Skeleton width="10%" height="1rem"></Skeleton>
-              <Skeleton width="10%" height="1rem"></Skeleton>
-              <Skeleton width="5rem" height="2rem" borderRadius="16px"></Skeleton>
+    <div class="rounded-xl border border-gray-200 overflow-hidden">
+        <div v-if="loading">
+            <div class="p-4 border-b border-gray-200 last:border-b-0" v-for="i in 10" :key="i">
+                <div class="flex gap-4 items-center">
+                    <Skeleton width="5rem" height="3rem" borderRadius="6px" />
+                    <div class="flex-1">
+                        <Skeleton width="40%" height="1rem" class="mb-2" />
+                        <Skeleton width="25%" height="0.75rem" />
+                    </div>
+                    <Skeleton width="8%" height="0.75rem" />
+                    <Skeleton width="8%" height="0.75rem" />
+                    <Skeleton width="4rem" height="1.5rem" borderRadius="16px" />
+                    <Skeleton width="5.5rem" height="1.75rem" borderRadius="6px" />
+                </div>
             </div>
         </div>
-            </div>
         <DataTable v-else :value="videos" dataKey="id" tableStyle="min-width: 50rem" :selection="selectedVideos"
             @update:selection="emit('update:selectedVideos', $event)">
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
@@ -86,28 +89,19 @@ const emit = defineEmits<{
 
             <Column header="Actions">
                 <template #body="{ data }">
-                    <div class="flex items-center gap-1">
-                        <button
-                            class="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/5 rounded transition-colors"
-                            title="Download">
-                            <ArrowDownTray class="w-4 h-4" />
-                        </button>
-                        <button
-                            class="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/5 rounded transition-colors"
-                            title="Copy Link">
+                    <div class="flex items-center gap-0.5">
+                        <Button text rounded size="small" severity="secondary" title="Copy link"
+                            @click="emit('copy', data.id)">
                             <LinkIcon class="w-4 h-4" />
-                        </button>
-                        <div class="w-px h-3 bg-gray-200 mx-1"></div>
-                        <router-link :to="{ name: 'video-detail', params: { id: data.id } }"
-                            class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors inline-block"
-                            title="Edit">
+                        </Button>
+                        <Button text rounded size="small" title="Edit"
+                            @click="emit('edit', data.id)">
                             <PencilIcon class="w-4 h-4" />
-                        </router-link>
-                        <button @click="emit('delete', data.id)"
-                            class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Delete">
+                        </Button>
+                        <Button text rounded size="small" severity="danger" title="Delete"
+                            @click="emit('delete', data.id)">
                             <TrashIcon class="w-4 h-4" />
-                        </button>
+                        </Button>
                     </div>
                 </template>
             </Column>

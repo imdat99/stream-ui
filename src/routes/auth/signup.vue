@@ -4,28 +4,28 @@
             class="flex flex-col gap-4 w-full">
             <div class="flex flex-col gap-1">
                 <label for="name" class="text-sm font-medium text-gray-700">Full Name</label>
-                <InputText size="small" name="name" placeholder="John Doe" fluid />
-                <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">{{
+                <InputText  name="name" placeholder="John Doe" fluid />
+                <Message v-if="$form.name?.invalid" severity="error"  variant="simple">{{
                     $form.name.error?.message }}</Message>
             </div>
 
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
-                <InputText size="small" name="email" type="email" placeholder="you@example.com" fluid />
-                <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
+                <InputText  name="email" type="email" placeholder="you@example.com" fluid />
+                <Message v-if="$form.email?.invalid" severity="error"  variant="simple">{{
                     $form.email.error?.message }}</Message>
             </div>
 
             <div class="flex flex-col gap-1">
                 <label for="password" class="text-sm font-medium text-gray-700">Password</label>
-                <Password name="password" size="small" placeholder="Create a password" :feedback="true" toggleMask fluid
+                <Password name="password"  placeholder="Create a password" :feedback="true" toggleMask fluid
                     :inputStyle="{ width: '100%' }" />
                 <small class="text-gray-500">Must be at least 8 characters.</small>
-                <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">{{
+                <Message v-if="$form.password?.invalid" severity="error"  variant="simple">{{
                     $form.password.error?.message }}</Message>
             </div>
 
-            <Button type="submit" size="small" label="Create Account" fluid />
+            <Button type="submit"  label="Create Account" fluid />
 
             <p class="mt-4 text-center text-sm text-gray-600">
                 Already have an account?

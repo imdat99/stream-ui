@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import Bell from "@/components/icons/Bell.vue";
+import Credit from "@/components/icons/Credit.vue";
 import Home from "@/components/icons/Home.vue";
 import Video from "@/components/icons/Video.vue";
-import Credit from "@/components/icons/Credit.vue";
 // import Upload from "@/components/icons/Upload.vue";
-import NotificationDrawer from "./NotificationDrawer.vue";
 import { cn } from "@/lib/utils";
 import { createStaticVNode, ref } from "vue";
+import NotificationDrawer from "./NotificationDrawer.vue";
 
 const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
 const homeHoist = createStaticVNode(`<img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />`, 1);
@@ -25,7 +25,7 @@ const links = [
     { href: "/#home", label: "app", icon: homeHoist, type: "btn", className },
     { href: "/", label: "Overview", icon: Home, type: "a", className },
     // { href: "/upload", label: "Upload", icon: Upload, type: "a", className },
-    { href: "/video", label: "Video", icon: Video, type: "a", className },
+    { href: "/videos", label: "Videos", icon: Video, type: "a", className },
     { href: "/payments-and-plans", label: "Payments & Plans", icon: Credit, type: "a", className },
     { href: "/notification", label: "Notification", icon: Bell, type: "btn", className, action: handleNotificationClick, isActive: isNotificationOpen },
     { href: "/profile", label: "Profile", icon: profileHoist, type: "a", className: 'w-12 h-12 rounded-2xl hover:bg-primary/15 flex shrink-0' },

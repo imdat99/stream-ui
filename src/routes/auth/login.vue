@@ -5,23 +5,23 @@
             class="flex flex-col gap-4 w-full">
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email</label>
-                <InputText size="small" name="email" type="text" placeholder="Enter your email" fluid
+                <InputText name="email" type="text" placeholder="Enter your email" fluid
                     :disabled="auth.loading" />
-                <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
+                <Message v-if="$form.email?.invalid" severity="error" variant="simple">{{
                     $form.email.error?.message }}</Message>
             </div>
 
             <div class="flex flex-col gap-1">
                 <label for="password" class="text-sm font-medium text-gray-700">Password</label>
-                <Password name="password" size="small" placeholder="Enter your password" :feedback="false" toggleMask
+                <Password name="password" placeholder="Enter your password" :feedback="false" toggleMask
                     fluid :inputStyle="{ width: '100%' }" :disabled="auth.loading" />
-                <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">{{
+                <Message v-if="$form.password?.invalid" severity="error" variant="simple">{{
                     $form.password.error?.message }}</Message>
             </div>
 
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <Checkbox inputId="remember-me" size="small" name="rememberMe" binary :disabled="auth.loading" />
+                    <Checkbox inputId="remember-me" name="rememberMe" binary :disabled="auth.loading" />
                     <label for="remember-me" class="text-sm text-gray-900">Remember me</label>
                 </div>
                 <div class="text-sm">
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <Button type="submit" size="small" :label="auth.loading ? 'Signing in...' : 'Sign in'" fluid
+            <Button type="submit" :label="auth.loading ? 'Signing in...' : 'Sign in'" fluid
                 :loading="auth.loading" />
 
             <div class="relative">
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <Button size="small" type="button" variant="outlined" severity="secondary"
+            <Button type="button" variant="outlined" severity="secondary"
                 class="w-full flex items-center justify-center gap-2" @click="loginWithGoogle" :disabled="auth.loading">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                     <path

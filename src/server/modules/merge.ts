@@ -214,3 +214,19 @@ export function streamManifest(manifest: Manifest): ReadableStream<Uint8Array> {
     },
   })
 }
+export async function saveImageFromStream(stream: ArrayBuffer, filename: string): Promise<void> {
+  // Implement this function to save the thumbnail image stream to storage and update the database with the thumbnail URL
+  const url = `${S3_ENDPOINT}/${BUCKET_NAME}/${filename}.jpg`;
+
+  const response = await aws.fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'image/jpeg',
+    },
+    body: stream,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to save thumbnail: ${response.status} ${await response.text()}`)
+  }
+}

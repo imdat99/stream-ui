@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import UploadQueueItem from '@/routes/upload/components/UploadQueueItem.vue';
 import { useUIState } from '@/stores/uiState';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const { items, completeCount, pendingCount, startQueue, removeItem, cancelItem } = useUploadQueue();
+const router = useRouter();
+const { items, completeCount, pendingCount, startQueue, removeItem, cancelItem, removeAll } = useUploadQueue();
 const uiState = useUIState();
 
 const isCollapsed = ref(false);
@@ -34,12 +36,27 @@ const statusText = computed(() => {
     if (pendingCount.value > 0) return `${pendingCount.value} file${pendingCount.value !== 1 ? 's' : ''} waiting`;
     return 'Processing...';
 });
+const isDoneWithErrors = computed(() =>
+    isAllDone.value &&
+    items.value.some(i => i.status === 'error') && items.value.every(i => i.status === 'complete' || i.status === 'error')
+);
+const doneUpload = () => {
+    router.push({ name: 'videos', query: { uploaded: 'true' } });
+    removeAll();
+}
+watch(isAllDone, (newItems) => {
+    if (newItems && items.value.every(i => i.status === 'complete')) {
+        const timeout = setTimeout(() => {
+            doneUpload();
+            clearTimeout(timeout);
+        }, 3000);
+    }
+});
 </script>
 
 <template>
-    <Transition enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 translate-y-4" enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all duration-200 ease-in"
+    <Transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 translate-y-4"
+        enter-to-class="opacity-100 translate-y-0" leave-active-class="transition-all duration-200 ease-in"
         leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-4">
 
         <div v-if="isVisible"
@@ -54,15 +71,14 @@ const statusText = computed(() => {
                 <div class="relative w-6 h-6 shrink-0">
                     <svg v-if="isUploading" class="w-6 h-6 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
                         <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" />
-                        <path class="opacity-90" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     <svg v-else-if="isAllDone" class="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 6 9 17l-5-5" />
                     </svg>
-                    <svg v-else class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg v-else class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                     </svg>
@@ -86,7 +102,11 @@ const statusText = computed(() => {
                         </svg>
                         Start
                     </button>
-
+                    <button v-else-if="isDoneWithErrors" @click.stop="doneUpload"
+                        class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-green-500 hover:bg-green-500/80 text-white rounded-lg transition-all">
+                        View Videos
+                    </button>
+                    <!-- Clear queue -->
                     <!-- Add more files -->
                     <button @click.stop="uiState.uploadDialogVisible = true"
                         class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
@@ -102,9 +122,8 @@ const statusText = computed(() => {
                     <button @click.stop="isCollapsed = !isCollapsed"
                         class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform duration-200"
-                            :class="{ 'rotate-180': isCollapsed }"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                            stroke-linecap="round" stroke-linejoin="round">
+                            :class="{ 'rotate-180': isCollapsed }" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="m18 15-6-6-6 6" />
                         </svg>
                     </button>
@@ -113,19 +132,18 @@ const statusText = computed(() => {
 
             <!-- Overall progress bar -->
             <div v-if="isUploading" class="h-0.5 w-full bg-slate-100 shrink-0">
-                <div class="h-full bg-accent transition-all duration-500"
-                    :style="{ width: `${overallProgress}%` }"></div>
+                <div class="h-full bg-accent transition-all duration-500" :style="{ width: `${overallProgress}%` }">
+                </div>
             </div>
 
             <!-- File list -->
-            <Transition enter-active-class="transition-all duration-200 ease-out"
-                enter-from-class="opacity-0" enter-to-class="opacity-100"
-                leave-active-class="transition-all duration-150 ease-in"
+            <Transition enter-active-class="transition-all duration-200 ease-out" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="transition-all duration-150 ease-in"
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
                 <div v-if="!isCollapsed" class="flex-1 overflow-y-auto min-h-0">
                     <div class="p-3 flex flex-col gap-2">
-                        <UploadQueueItem v-for="item in items" :key="item.id" :item="item"
-                            @remove="removeItem($event)" @cancel="cancelItem($event)" />
+                        <UploadQueueItem v-for="item in items" :key="item.id" :item="item" @remove="removeItem($event)"
+                            @cancel="cancelItem($event)" />
                     </div>
                 </div>
             </Transition>

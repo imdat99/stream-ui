@@ -1,5 +1,4 @@
 import { computed, ref } from 'vue';
-import { size } from 'zod';
 
 export interface QueueItem {
     id: string;
@@ -46,7 +45,18 @@ export function useUploadQueue() {
 
     const addFiles = (files: FileList) => {
         const allowed = Array.from(files).slice(0, remainingSlots.value);
-        const newItems: QueueItem[] = allowed.map((file) => ({
+        const duplicates: File[] = [];
+        const fresh: File[] = [];
+
+        for (const file of allowed) {
+            const isDupe = items.value.some(
+                item => item.type === 'local' && item.name === file.name && item.file?.size === file.size
+            );
+            if (isDupe) duplicates.push(file);
+            else fresh.push(file);
+        }
+
+        const newItems: QueueItem[] = fresh.map((file) => ({
             id: Math.random().toString(36).substring(2, 9),
             name: file.name,
             type: 'local',
@@ -63,12 +73,14 @@ export function useUploadQueue() {
         }));
 
         items.value.push(...newItems);
-        return { added: newItems.length, skipped: files.length - newItems.length };
+        return { added: newItems.length, skipped: files.length - allowed.length, duplicates: duplicates.length };
     };
 
     const addRemoteUrls = (urls: string[]) => {
         const allowed = urls.slice(0, remainingSlots.value);
-        const newItems: QueueItem[] = allowed.map((url) => ({
+        const fresh = allowed.filter(url => !items.value.some(item => item.type === 'remote' && item.url === url));
+        const duplicateCount = allowed.length - fresh.length;
+        const newItems: QueueItem[] = fresh.map((url) => ({
             id: Math.random().toString(36).substring(2, 9),
             name: url.split('/').pop() || 'Remote File',
             type: 'remote',
@@ -84,7 +96,7 @@ export function useUploadQueue() {
         }));
 
         items.value.push(...newItems);
-        return { added: newItems.length, skipped: urls.length - newItems.length };
+        return { added: newItems.length, skipped: urls.length - allowed.length, duplicates: duplicateCount };
     };
 
     const removeItem = (id: string) => {

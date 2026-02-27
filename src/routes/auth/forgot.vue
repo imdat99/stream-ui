@@ -9,12 +9,12 @@
 
             <div class="flex flex-col gap-1">
                 <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
-                <InputText size="small" name="email" type="email" placeholder="you@example.com" fluid />
-                <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">{{
+                <InputText  name="email" type="email" placeholder="you@example.com" fluid />
+                <Message v-if="$form.email?.invalid" severity="error"  variant="simple">{{
                     $form.email.error?.message }}</Message>
             </div>
 
-            <Button type="submit" size="small" label="Send Reset Link" fluid />
+            <Button type="submit"  label="Send Reset Link" fluid />
 
             <div class="text-center mt-2">
                 <router-link to="/login" replace

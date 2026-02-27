@@ -1,4 +1,5 @@
 import { PiniaColada, useQueryCache } from '@pinia/colada';
+import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import { createHead as CSRHead } from "@unhead/vue/client";
 import { createHead as SSRHead } from "@unhead/vue/server";
@@ -11,6 +12,25 @@ import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import createAppRouter from './routes';
+
+const CompactAura = definePreset(Aura, {
+    semantic: {
+        formField: {
+            paddingX: '0.625rem',
+            paddingY: '0.375rem',
+            sm: {
+                fontSize: '0.75rem',
+                paddingX: '0.5rem',
+                paddingY: '0.25rem',
+            },
+            lg: {
+                fontSize: '1rem',
+                paddingX: '0.75rem',
+                paddingY: '0.5rem',
+            },
+        },
+    },
+});
 const bodyClass = ":uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen"
 export function createApp() {
     const pinia = createPinia();
@@ -21,14 +41,10 @@ export function createApp() {
     app.use(PrimeVue, {
         // unstyled: true,
         theme: {
-            preset: Aura,
+            preset: CompactAura,
             options: {
                 darkModeSelector: '.my-app-dark',
                 cssLayer: false,
-                // cssLayer: {
-                //     name: 'primevue',
-                //     order: 'theme, base, primevue'
-                // }
             }
         }
     });
