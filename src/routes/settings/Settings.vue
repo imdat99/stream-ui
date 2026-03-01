@@ -61,12 +61,10 @@ import { useRoute } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import GlobeIcon from '@/components/icons/Globe.vue';
-import ActivityIcon from '@/components/icons/ActivityIcon.vue';
 import AlertTriangle from '@/components/icons/AlertTriangle.vue';
 import { useAuthStore } from '@/stores/auth';
 import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
 import Bell from '@/components/icons/Bell.vue';
-import VideoIcon from '@/components/icons/VideoIcon.vue';
 import AdvertisementIcon from '@/components/icons/AdvertisementIcon.vue';
 import VideoPlayIcon from '@/components/icons/VideoPlayIcon.vue';
 

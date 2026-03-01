@@ -226,6 +226,17 @@ export default defineConfig({
     {
       getCSS: (context) => {
         return `
+      html {
+        scrollbar-gutter: stable;
+      }
+      body {
+        scrollbar-gutter: stable !important;
+      }
+      /* Prevent layout shift when PrimeVue dialogs open */
+      body.p-overflow-hidden {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+      }
       :root {
         --font-sans: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
         --font-serif: 'Playfair Display', serif, 'Times New Roman', Times, serif;

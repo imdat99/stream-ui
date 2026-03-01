@@ -4,21 +4,31 @@ import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
 import { computed, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import WalletBalanceCard from '../components/WalletBalanceCard.vue';
-import CurrentPlanCard from '../components/CurrentPlanCard.vue';
-import UsageStatsCard from '../components/UsageStatsCard.vue';
-import AvailablePlansCard from '../components/AvailablePlansCard.vue';
-import PaymentHistoryCard from '../components/PaymentHistoryCard.vue';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import CoinsIcon from '@/components/icons/CoinsIcon.vue';
+import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
+import UploadIcon from '@/components/icons/UploadIcon.vue';
+import ActivityIcon from '@/components/icons/ActivityIcon.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 
 const toast = useToast();
 const auth = useAuthStore();
 
-const { data, isPending, isLoading, refresh } = useQuery({
+const { data, isPending, isLoading } = useQuery({
     key: () => ['payments-and-plans'],
     query: () => client.plans.plansList(),
 });
 
 const subscribing = ref<string | null>(null);
+
+// Top-up state
+const topupDialogVisible = ref(false);
+const topupAmount = ref<number | null>(null);
+const topupLoading = ref(false);
+const topupPresets = [10, 20, 50, 100];
 
 // Mock Payment History Data
 const paymentHistory = ref([
@@ -28,14 +38,14 @@ const paymentHistory = ref([
     { id: 'inv_004', date: 'Jan 24, 2026', amount: 19.99, plan: 'Pro Plan', status: 'pending', invoiceId: 'INV-2026-001' },
 ]);
 
-// Computed Usage (Mock if not in store)
+// Computed Usage (from user data)
 const storageUsed = computed(() => auth.user?.storage_used || 0);
 const storageLimit = computed(() => 10737418240);
 const uploadsUsed = ref(12);
 const uploadsLimit = ref(50);
 
 // Wallet balance (from user data or mock)
-const walletBalance = computed(() => 0);
+const walletBalance = computed(() => auth.user?.wallet_balance || 0);
 
 const currentPlanId = computed(() => {
     if (auth.user?.plan_id) return auth.user.plan_id;
@@ -47,6 +57,42 @@ const currentPlan = computed(() => {
     if (!Array.isArray(data?.value?.data?.data.plans)) return undefined;
     return data.value.data.data.plans.find(p => p.id === currentPlanId.value);
 });
+
+// Percentages
+const storagePercentage = computed(() =>
+    Math.min(Math.round((storageUsed.value / storageLimit.value) * 100), 100)
+);
+const uploadsPercentage = computed(() =>
+    Math.min(Math.round((uploadsUsed.value / uploadsLimit.value) * 100), 100)
+);
+
+const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const formatDuration = (seconds?: number) => {
+    if (!seconds) return '0 mins';
+    return `${Math.floor(seconds / 60)} mins`;
+};
+
+const getStatusStyles = (status: string) => {
+    switch (status) {
+        case 'success':
+            return 'bg-success/10 text-success';
+        case 'failed':
+            return 'bg-danger/10 text-danger';
+        case 'pending':
+            return 'bg-warning/10 text-warning';
+        default:
+            return 'bg-info/10 text-info';
+    }
+};
+
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const subscribe = async (plan: ModelPlan) => {
     if (!plan.id) return;
@@ -85,8 +131,9 @@ const subscribe = async (plan: ModelPlan) => {
 };
 
 const handleTopup = async (amount: number) => {
+    topupLoading.value = true;
     try {
-        // Simulate API call for top-up
+        // TODO: Add API endpoint for top-up
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         toast.add({
@@ -95,6 +142,8 @@ const handleTopup = async (amount: number) => {
             detail: `$${amount} has been added to your wallet.`,
             life: 3000
         });
+        topupDialogVisible.value = false;
+        topupAmount.value = null;
     } catch (e: any) {
         toast.add({
             severity: 'error',
@@ -102,6 +151,8 @@ const handleTopup = async (amount: number) => {
             detail: e.message || 'Failed to process top-up.',
             life: 5000
         });
+    } finally {
+        topupLoading.value = false;
     }
 };
 
@@ -122,38 +173,314 @@ const handleDownloadInvoice = (item: typeof paymentHistory.value[number]) => {
         });
     }, 1500);
 };
+
+const openTopupDialog = () => {
+    topupAmount.value = null;
+    topupDialogVisible.value = true;
+};
+
+const selectPreset = (amount: number) => {
+    topupAmount.value = amount;
+};
 </script>
 
 <template>
-    <div class="space-y-6">
-        <WalletBalanceCard
-            :balance="walletBalance"
-            @topup="handleTopup"
-        />
+    <div class="bg-surface border border-border rounded-lg">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-border">
+            <h2 class="text-base font-semibold text-foreground">Billing & Plans</h2>
+            <p class="text-sm text-foreground/60 mt-0.5">
+                Manage your subscription, wallet, and billing information.
+            </p>
+        </div>
 
-        <CurrentPlanCard
-            :current-plan="currentPlan"
-            @manage="() => {}"
-        />
+        <!-- Content -->
+        <div class="divide-y divide-border">
+            <!-- Wallet Balance -->
+            <div class="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                        <CoinsIcon class="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Wallet Balance</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            Current balance: ${{ walletBalance.toFixed(2) }}
+                        </p>
+                    </div>
+                </div>
+                <Button
+                    label="Top Up"
+                    icon="pi pi-plus"
+                    size="small"
+                    @click="openTopupDialog"
+                    class="press-animated"
+                />
+            </div>
 
-        <UsageStatsCard
-            :storage-used="storageUsed"
-            :storage-limit="storageLimit"
-            :uploads-used="uploadsUsed"
-            :uploads-limit="uploadsLimit"
-        />
+            <!-- Current Plan -->
+            <div class="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                        <CreditCardIcon class="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">{{ currentPlan?.name || 'Standard Plan' }}</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            ${{ currentPlan?.price || 0 }}/month
+                        </p>
+                    </div>
+                </div>
+                <span class="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded">Active</span>
+            </div>
 
-        <AvailablePlansCard
-            :plans="data?.data?.data.plans || []"
-            :is-loading="isLoading"
-            :current-plan-id="currentPlanId"
-            :subscribing-plan-id="subscribing"
-            @subscribe="subscribe"
-        />
+            <!-- Storage Usage -->
+            <div class="px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
+                        <ActivityIcon class="w-5 h-5 text-accent" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Storage</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            {{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full bg-muted/50 rounded-full overflow-hidden" style="height: 6px">
+                    <div
+                        class="bg-primary h-full rounded-full transition-all duration-300"
+                        :style="{ width: `${storagePercentage}%` }"
+                    ></div>
+                </div>
+            </div>
 
-        <PaymentHistoryCard
-            :history="paymentHistory"
-            @download="handleDownloadInvoice"
-        />
+            <!-- Uploads Usage -->
+            <div class="px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
+                        <UploadIcon class="w-5 h-5 text-info" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Monthly Uploads</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            {{ uploadsUsed }} of {{ uploadsLimit }} uploads
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full bg-muted/50 rounded-full overflow-hidden" style="height: 6px">
+                    <div
+                        class="bg-info h-full rounded-full transition-all duration-300"
+                        :style="{ width: `${uploadsPercentage}%` }"
+                    ></div>
+                </div>
+            </div>
+
+            <!-- Available Plans -->
+            <div class="px-6 py-4">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                        <CreditCardIcon class="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Available Plans</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            Choose the plan that best fits your needs
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div v-for="i in 3" :key="i">
+                        <div class="h-[200px] rounded-lg bg-muted/50 animate-pulse"></div>
+                    </div>
+                </div>
+
+                <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div
+                        v-for="plan in data?.data?.data.plans || []"
+                        :key="plan.id"
+                        class="border border-border rounded-lg p-4 hover:bg-muted/30 transition-all"
+                    >
+                        <div class="mb-3">
+                            <h3 class="text-lg font-semibold text-foreground">{{ plan.name }}</h3>
+                            <p class="text-sm text-foreground/60 mt-1 min-h-[2.5rem]">{{ plan.description }}</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="text-2xl font-bold text-foreground">${{ plan.price }}</span>
+                            <span class="text-foreground/60 text-sm">/{{ plan.cycle }}</span>
+                        </div>
+
+                        <ul class="space-y-2 mb-4 text-sm">
+                            <li class="flex items-center gap-2 text-foreground/70">
+                                <CheckIcon class="w-4 h-4 text-success shrink-0" />
+                                {{ formatBytes(plan.storage_limit || 0) }} Storage
+                            </li>
+                            <li class="flex items-center gap-2 text-foreground/70">
+                                <CheckIcon class="w-4 h-4 text-success shrink-0" />
+                                {{ formatDuration(plan.duration_limit) }} Max Duration
+                            </li>
+                            <li class="flex items-center gap-2 text-foreground/70">
+                                <CheckIcon class="w-4 h-4 text-success shrink-0" />
+                                {{ plan.upload_limit }} Uploads / day
+                            </li>
+                        </ul>
+
+                        <button
+                            :disabled="!!subscribing || plan.id === currentPlanId"
+                            :class="[
+                                'w-full py-2 px-4 rounded-md text-sm font-medium transition-all',
+                                plan.id === currentPlanId
+                                    ? 'bg-muted/50 text-foreground/60 cursor-not-allowed'
+                                    : subscribing === plan.id
+                                        ? 'bg-muted/50 text-foreground/60 cursor-wait'
+                                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            ]"
+                            @click="subscribe(plan)"
+                        >
+                            {{ plan.id === currentPlanId ? 'Current Plan' : (subscribing === plan.id ? 'Processing...' : 'Upgrade') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="px-6 py-4">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
+                        <DownloadIcon class="w-5 h-5 text-info" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Payment History</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            Your past payments and invoices
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border border-border rounded-lg overflow-hidden">
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-medium text-foreground/60 uppercase tracking-wider bg-muted/30">
+                        <div class="col-span-3">Date</div>
+                        <div class="col-span-2">Amount</div>
+                        <div class="col-span-3">Plan</div>
+                        <div class="col-span-2">Status</div>
+                        <div class="col-span-2 text-right">Invoice</div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-if="paymentHistory.length === 0" class="text-center py-12 text-foreground/60">
+                        <div class="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                            <DownloadIcon class="w-8 h-8 text-foreground/40" />
+                        </div>
+                        <p>No payment history found.</p>
+                    </div>
+
+                    <!-- Table Rows -->
+                    <div
+                        v-for="item in paymentHistory"
+                        :key="item.id"
+                        class="grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-muted/30 transition-all border-t border-border"
+                    >
+                        <div class="col-span-3">
+                            <p class="text-sm font-medium text-foreground">{{ item.date }}</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-sm text-foreground">${{ item.amount }}</p>
+                        </div>
+                        <div class="col-span-3">
+                            <p class="text-sm text-foreground">{{ item.plan }}</p>
+                        </div>
+                        <div class="col-span-2">
+                            <span
+                                :class="`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(item.status)}`"
+                            >
+                                {{ capitalize(item.status) }}
+                            </span>
+                        </div>
+                        <div class="col-span-2 flex justify-end">
+                            <button
+                                class="flex items-center gap-2 px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground hover:bg-muted/50 rounded-md transition-all"
+                                @click="handleDownloadInvoice(item)"
+                            >
+                                <DownloadIcon class="w-4 h-4" />
+                                <span>Download</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top-up Dialog -->
+        <Dialog
+            v-model:visible="topupDialogVisible"
+            modal
+            header="Top Up Wallet"
+            :style="{ width: '28rem' }"
+        >
+            <div class="space-y-4">
+                <p class="text-sm text-foreground/70">
+                    Select an amount or enter a custom amount to add to your wallet.
+                </p>
+
+                <!-- Preset Amounts -->
+                <div class="grid grid-cols-4 gap-3">
+                    <button
+                        v-for="preset in topupPresets"
+                        :key="preset"
+                        :class="[
+                            'py-2 px-3 rounded-md text-sm font-medium transition-all',
+                            topupAmount === preset
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted/50 text-foreground hover:bg-muted'
+                        ]"
+                        @click="selectPreset(preset)"
+                    >
+                        ${{ preset }}
+                    </button>
+                </div>
+
+                <!-- Custom Amount -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-foreground">Custom Amount</label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-semibold text-foreground">$</span>
+                        <InputText
+                            v-model.number="topupAmount"
+                            type="number"
+                            placeholder="Enter amount"
+                            class="flex-1"
+                            min="1"
+                            step="1"
+                        />
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="bg-muted/30 rounded-md p-3 text-xs text-foreground/60">
+                    <p>Minimum top-up amount is $1. Funds will be added to your wallet immediately after payment.</p>
+                </div>
+            </div>
+            <template #footer>
+                <Button
+                    label="Cancel"
+                    text
+                    severity="secondary"
+                    @click="topupDialogVisible = false"
+                    :disabled="topupLoading"
+                    class="press-animated"
+                />
+                <Button
+                    label="Proceed to Payment"
+                    @click="handleTopup(topupAmount || 0)"
+                    :disabled="!topupAmount || topupAmount < 1 || topupLoading"
+                    :loading="topupLoading"
+                    class="press-animated"
+                />
+            </template>
+        </Dialog>
     </div>
 </template>

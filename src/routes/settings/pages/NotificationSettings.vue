@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
+import ToggleSwitch from 'primevue/toggleswitch';
+import Button from 'primevue/button';
 import MailIcon from '@/components/icons/MailIcon.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
 import SendIcon from '@/components/icons/SendIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
+
+const toast = useToast();
 
 const notificationSettings = ref({
     email: true,
@@ -11,6 +16,8 @@ const notificationSettings = ref({
     marketing: false,
     telegram: false,
 });
+
+const saving = ref(false);
 
 const notificationTypes = [
     {
@@ -47,19 +54,48 @@ const notificationTypes = [
     },
 ];
 
-defineEmits<{
-    save: [];
-}>();
+const handleSave = async () => {
+    saving.value = true;
+    try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast.add({
+            severity: 'success',
+            summary: 'Settings Saved',
+            detail: 'Your notification settings have been saved.',
+            life: 3000
+        });
+    } catch (e: any) {
+        toast.add({
+            severity: 'error',
+            summary: 'Save Failed',
+            detail: e.message || 'Failed to save settings.',
+            life: 5000
+        });
+    } finally {
+        saving.value = false;
+    }
+};
 </script>
 
 <template>
     <div class="bg-surface border border-border rounded-lg">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-border">
-            <h2 class="text-base font-semibold text-foreground">Notifications</h2>
-            <p class="text-sm text-foreground/60 mt-0.5">
-                Choose how you want to receive notifications and updates.
-            </p>
+        <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold text-foreground">Notifications</h2>
+                <p class="text-sm text-foreground/60 mt-0.5">
+                    Choose how you want to receive notifications and updates.
+                </p>
+            </div>
+            <Button
+                label="Save Changes"
+                icon="pi pi-check"
+                size="small"
+                :loading="saving"
+                @click="handleSave"
+                class="press-animated"
+            />
         </div>
 
         <!-- Content -->
