@@ -1,0 +1,13 @@
+<script lang="ts" setup>
+defineProps<{
+    filled?: boolean;
+}>();
+</script>
+
+<template>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 16V8"/>
+        <path d="M9.5 10a2.5 2.5 0 0 1 5 0v4a2.5 2.5 0 0 1-5 0"/>
+    </svg>
+</template>

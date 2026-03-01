@@ -24,12 +24,10 @@ const routes: RouteData[] = [
           {
             path: "",
             component: () => import("./home/Home.vue"),
-            beforeEnter: (to, from, next) => {
+            beforeEnter: (to, from) => {
               const auth = useAuthStore();
               if (auth.user) {
-                next({ name: "overview" });
-              } else {
-                next();
+                return { name: "overview" };
               }
             },
           },
@@ -48,12 +46,10 @@ const routes: RouteData[] = [
       {
         path: "",
         component: () => import("./auth/layout.vue"),
-        beforeEnter: (to, from, next) => {
+        beforeEnter: (to, from) => {
           const auth = useAuthStore();
           if (auth.user) {
-            next({ name: "overview" });
-          } else {
-            next();
+            return { name: "overview" };
           }
         },
         children: [
@@ -131,22 +127,6 @@ const routes: RouteData[] = [
             ],
           },
           {
-            path: "payments-and-plans",
-            name: "payments-and-plans",
-            component: () => import("./plans/Plans.vue"),
-            meta: {
-              head: {
-                title: "Payments & Plans - Holistream",
-                meta: [
-                  {
-                    name: "description",
-                    content: "Manage your plans and billing information.",
-                  },
-                ],
-              },
-            },
-          },
-          {
             path: "notification",
             name: "notification",
             component: () => import("./notification/Notification.vue"), // TODO: create notification page
@@ -157,14 +137,99 @@ const routes: RouteData[] = [
             },
           },
           {
-            path: "profile",
-            name: "profile",
-            component: () => import("./profile/Profile.vue"), // TODO: create profile page
+            path: "settings",
+            name: "settings",
+            component: () => import("./settings/Settings.vue"),
             meta: {
               head: {
-                title: "Profile - Holistream",
+                title: "Settings - Holistream",
+                meta: [
+                  {
+                    name: "description",
+                    content: "Manage your account settings and preferences.",
+                  },
+                ],
               },
             },
+            redirect: '/settings/security',
+            children: [
+              {
+                path: "security",
+                name: "settings-security",
+                component: () => import("./settings/pages/SecurityNConnected.vue"),
+                meta: {
+                  head: {
+                    title: "Security & Connected Apps - Holistream",
+                  },
+                },
+              },
+              {
+                path: "billing",
+                name: "settings-billing",
+                component: () => import("./settings/pages/Billing.vue"),
+                meta: {
+                  head: {
+                    title: "Billing & Plans - Holistream",
+                    meta: [
+                      {
+                        name: "description",
+                        content: "Manage your plans and billing information.",
+                      },
+                    ],
+                  },
+                },
+              },
+              {
+                path: "notifications",
+                name: "settings-notifications",
+                component: () => import("./settings/pages/NotificationSettings.vue"),
+                meta: {
+                  head: {
+                    title: "Notifications - Holistream",
+                  },
+                },
+              },
+              {
+                path: "player",
+                name: "settings-player",
+                component: () => import("./settings/pages/PlayerSettings.vue"),
+                meta: {
+                  head: {
+                    title: "Player Settings - Holistream",
+                  },
+                },
+              },
+              {
+                path: "domains",
+                name: "settings-domains",
+                component: () => import("./settings/pages/DomainsDns.vue"),
+                meta: {
+                  head: {
+                    title: "Allowed Domains - Holistream",
+                  },
+                },
+              },
+              {
+                path: "ads",
+                name: "settings-ads",
+                component: () => import("./settings/pages/AdsVast.vue"),
+                meta: {
+                  head: {
+                    title: "Ads & VAST - Holistream",
+                  },
+                },
+              },
+              {
+                path: "danger",
+                name: "settings-danger",
+                component: () => import("./settings/pages/DangerZone.vue"),
+                meta: {
+                  head: {
+                    title: "Danger Zone - Holistream",
+                  },
+                },
+              },
+            ],
           },
         ],
       },
@@ -190,18 +255,14 @@ const createAppRouter = () => {
     },
   });
 
-  router.beforeEach((to, from, next) => {
+  router.beforeEach((to, from) => {
     const auth = useAuthStore();
     const head = inject(headSymbol);
     (head as any).push(to.meta.head || {});
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (!auth.user) {
-        next({ name: "login" });
-      } else {
-        next();
+        return { name: "login" };
       }
-    } else {
-      next();
     }
   });
   return router;

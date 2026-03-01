@@ -40,6 +40,8 @@ bun run cf-typegen
 bun run tail
 ```
 
+**Note**: The project uses Bun as the package manager. If using npm/yarn, replace `bun` with `npm run` or `yarn`.
+
 ## Architecture
 
 ### SSR Architecture
@@ -70,9 +72,10 @@ Uses **Pinia Colada** for server state with SSR hydration:
 
 The API client (`src/api/client.ts`) is auto-generated from OpenAPI spec:
 - Uses `customFetch` adapter that differs between client/server
-- Server adapter (`httpClientAdapter.server.ts`): Forwards cookies, merges headers, calls `api.pipic.fun`
-- Client adapter (`httpClientAdapter.client.ts`): Standard fetch with credentials
-- API proxy route: `/r/*` paths proxy to `https://api.pipic.fun`
+- Server adapter (`httpClientAdapter.server.ts`): Forwards cookies via `hono/context-storage`, merges headers, calls `https://api.pipic.fun`
+- Client adapter (`httpClientAdapter.client.ts`): Standard fetch with `credentials: "include"`
+- API proxy route: `/r/*` paths proxy to `https://api.pipic.fun` via `apiProxyMiddleware`
+- Base API URL constant: `baseAPIURL = "https://api.pipic.fun"`
 
 ### Routing Structure
 
@@ -119,6 +122,10 @@ Upload queue (`src/composables/useUploadQueue.ts`):
 - Presigned POST URLs fetched from API
 - Parallel chunk upload for large files
 - Progress tracking with speed calculation
+- **Chunk configuration**: 90MB chunks, max 3 parallel uploads, max 3 retries
+- **Upload limits**: Max 5 items in queue
+- Uses `tmpfiles.org` API for chunk uploads, `/merge` endpoint for finalizing
+- Cancel support via XHR abort tracking
 
 ### Type Safety
 
@@ -148,6 +155,18 @@ Cloudflare Worker bindings (configured in `wrangler.jsonc`):
 | Wrangler config | `wrangler.jsonc` |
 | Vite config | `vite.config.ts` |
 
+## Server Structure
+
+Middleware and routes are organized in `src/server/`:
+
+**Middlewares** (`src/server/middlewares/`):
+- `setup.ts` - Global middleware: `contextStorage`, CORS, mobile detection via `is-mobile`
+- `apiProxy.ts` - Proxies `/r/*` requests to external API
+
+**Routes** (`src/server/routes/`):
+- `ssr.ts` - Handles SSR rendering and state serialization
+- `display.ts`, `merge.ts`, `manifest.ts`, `wellKnown.ts` - API endpoints
+
 ## Development Notes
 
 - Always use `customFetch` from `@httpClientAdapter` for API calls, never raw fetch
@@ -155,4 +174,25 @@ Cloudflare Worker bindings (configured in `wrangler.jsonc`):
 - MQTT client in `src/lib/liteMqtt.ts` (using `TinyMqttClient`) handles real-time notifications
 - Icons are custom Vue components in `src/components/icons/`
 - Upload indicator is a global component showing queue status
+- Root component uses error boundary wrapper: `withErrorBoundary(RouterView)` in `src/main.ts`
 - **Testing & Linting**: There are currently no automated test suites (like Vitest) or linting tools (like ESLint/Prettier) configured.
+
+## Code Organization
+
+### Component Structure
+
+- Keep view components small and focused - extract logical sections into child components
+- Page views should compose child components, not contain all logic inline
+- Example: `src/routes/settings/Settings.vue` uses child components in `src/routes/settings/components/`
+- Components that exceed ~200 lines should be considered for refactoring
+- Use `components/` subfolder pattern for page-specific components: `src/routes/{feature}/components/`
+
+### Icons
+
+- **Use custom SVG icon components** from `src/components/icons/` for UI icons (e.g., `Home`, `Video`, `Bell`, `SettingsIcon`)
+- Custom icons are Vue components with `filled` prop for active/filled state
+- PrimeIcons (`pi pi-*` class) should **only** be used for:
+  - Button icons in PrimeVue components (e.g., `icon="pi pi-check"`)
+  - Dialog/action icons where no custom SVG exists
+- **Do NOT use** `<i class="pi pi-*">` for navigation icons, action buttons, or UI elements that have custom SVG equivalents
+- When adding new icons, create SVG components in `src/components/icons/` following the existing pattern (support `filled` prop)
