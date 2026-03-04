@@ -49,6 +49,12 @@
             <!-- Main Content Area -->
             <main class="flex-1 min-w-0">
                 <router-view />
+
+                <!-- Settings-only toast/confirm hosts (no PrimeVue dependency) -->
+                <ClientOnly>
+                    <AppToastHost />
+                    <AppConfirmHost />
+                </ClientOnly>
             </main>
         </div>
     </div>
@@ -59,6 +65,9 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
+import AppConfirmHost from '@/components/app/AppConfirmHost.vue';
+import AppToastHost from '@/components/app/AppToastHost.vue';
+import ClientOnly from '@/components/ClientOnly';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import GlobeIcon from '@/components/icons/Globe.vue';
 import AlertTriangle from '@/components/icons/AlertTriangle.vue';

@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { client, type ModelPlan } from '@/api/client';
-import { useAuthStore } from '@/stores/auth';
-import { useQuery } from '@pinia/colada';
-import { computed, ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
+import ActivityIcon from '@/components/icons/ActivityIcon.vue';
 import CoinsIcon from '@/components/icons/CoinsIcon.vue';
 import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
-import UploadIcon from '@/components/icons/UploadIcon.vue';
-import ActivityIcon from '@/components/icons/ActivityIcon.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import UploadIcon from '@/components/icons/UploadIcon.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useQuery } from '@pinia/colada';
+import AppButton from '@/components/app/AppButton.vue';
+import AppDialog from '@/components/app/AppDialog.vue';
+import AppInput from '@/components/app/AppInput.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import PlusIcon from '@/components/icons/PlusIcon.vue';
+import { useAppToast } from '@/composables/useAppToast';
+import { computed, ref } from 'vue';
 
-const toast = useToast();
+const toast = useAppToast();
 const auth = useAuthStore();
 
 const { data, isPending, isLoading } = useQuery({
@@ -26,7 +27,7 @@ const subscribing = ref<string | null>(null);
 
 // Top-up state
 const topupDialogVisible = ref(false);
-const topupAmount = ref<number | null>(null);
+const topupAmount = ref<number | null>(0);
 const topupLoading = ref(false);
 const topupPresets = [10, 20, 50, 100];
 
@@ -209,74 +210,14 @@ const selectPreset = (amount: number) => {
                         </p>
                     </div>
                 </div>
-                <Button
-                    label="Top Up"
-                    icon="pi pi-plus"
-                    size="small"
-                    @click="openTopupDialog"
-                    class="press-animated"
-                />
+                <AppButton size="sm" @click="openTopupDialog">
+                    <template #icon>
+                        <PlusIcon class="w-4 h-4" />
+                    </template>
+                    Top Up
+                </AppButton>
             </div>
-
-            <!-- Current Plan -->
-            <div class="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-all">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                        <CreditCardIcon class="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-foreground">{{ currentPlan?.name || 'Standard Plan' }}</p>
-                        <p class="text-xs text-foreground/60 mt-0.5">
-                            ${{ currentPlan?.price || 0 }}/month
-                        </p>
-                    </div>
-                </div>
-                <span class="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded">Active</span>
-            </div>
-
-            <!-- Storage Usage -->
-            <div class="px-6 py-4 hover:bg-muted/30 transition-all">
-                <div class="flex items-center gap-4 mb-3">
-                    <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
-                        <ActivityIcon class="w-5 h-5 text-accent" />
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-foreground">Storage</p>
-                        <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used
-                        </p>
-                    </div>
-                </div>
-                <div class="w-full bg-muted/50 rounded-full overflow-hidden" style="height: 6px">
-                    <div
-                        class="bg-primary h-full rounded-full transition-all duration-300"
-                        :style="{ width: `${storagePercentage}%` }"
-                    ></div>
-                </div>
-            </div>
-
-            <!-- Uploads Usage -->
-            <div class="px-6 py-4 hover:bg-muted/30 transition-all">
-                <div class="flex items-center gap-4 mb-3">
-                    <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
-                        <UploadIcon class="w-5 h-5 text-info" />
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-foreground">Monthly Uploads</p>
-                        <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ uploadsUsed }} of {{ uploadsLimit }} uploads
-                        </p>
-                    </div>
-                </div>
-                <div class="w-full bg-muted/50 rounded-full overflow-hidden" style="height: 6px">
-                    <div
-                        class="bg-info h-full rounded-full transition-all duration-300"
-                        :style="{ width: `${uploadsPercentage}%` }"
-                    ></div>
-                </div>
-            </div>
-
-            <!-- Available Plans -->
+             <!-- Available Plans -->
             <div class="px-6 py-4">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
@@ -343,6 +284,47 @@ const selectPreset = (amount: number) => {
                             {{ plan.id === currentPlanId ? 'Current Plan' : (subscribing === plan.id ? 'Processing...' : 'Upgrade') }}
                         </button>
                     </div>
+                </div>
+            </div>
+            <!-- Storage Usage -->
+            <div class="px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
+                        <ActivityIcon class="w-5 h-5 text-accent" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Storage</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            {{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full bg-muted/50 rounded-full overflow-hidden" style="height: 6px">
+                    <div
+                        class="bg-primary h-full rounded-full transition-all duration-300"
+                        :style="{ width: `${storagePercentage}%` }"
+                    ></div>
+                </div>
+            </div>
+
+            <!-- Uploads Usage -->
+            <div class="px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
+                        <UploadIcon class="w-5 h-5 text-info" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">Monthly Uploads</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">
+                            {{ uploadsUsed }} of {{ uploadsLimit }} uploads
+                        </p>
+                    </div>
+                </div>
+                <div class="w-full bg-muted/50 rounded-full overflow-hidden" style="height: 6px">
+                    <div
+                        class="bg-info h-full rounded-full transition-all duration-300"
+                        :style="{ width: `${uploadsPercentage}%` }"
+                    ></div>
                 </div>
             </div>
 
@@ -415,11 +397,11 @@ const selectPreset = (amount: number) => {
         </div>
 
         <!-- Top-up Dialog -->
-        <Dialog
-            v-model:visible="topupDialogVisible"
-            modal
-            header="Top Up Wallet"
-            :style="{ width: '28rem' }"
+        <AppDialog
+            :visible="topupDialogVisible"
+            @update:visible="topupDialogVisible = $event"
+            title="Top Up Wallet"
+            maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
@@ -448,11 +430,11 @@ const selectPreset = (amount: number) => {
                     <label class="text-sm font-medium text-foreground">Custom Amount</label>
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-semibold text-foreground">$</span>
-                        <InputText
+                        <AppInput
                             v-model.number="topupAmount"
                             type="number"
                             placeholder="Enter amount"
-                            class="flex-1"
+                            inputClass="flex-1"
                             min="1"
                             step="1"
                         />
@@ -465,22 +447,28 @@ const selectPreset = (amount: number) => {
                 </div>
             </div>
             <template #footer>
-                <Button
-                    label="Cancel"
-                    text
-                    severity="secondary"
-                    @click="topupDialogVisible = false"
-                    :disabled="topupLoading"
-                    class="press-animated"
-                />
-                <Button
-                    label="Proceed to Payment"
-                    @click="handleTopup(topupAmount || 0)"
-                    :disabled="!topupAmount || topupAmount < 1 || topupLoading"
-                    :loading="topupLoading"
-                    class="press-animated"
-                />
+                <div class="flex justify-end gap-2">
+                    <AppButton
+                        variant="secondary"
+                        size="sm"
+                        :disabled="topupLoading"
+                        @click="topupDialogVisible = false"
+                    >
+                        Cancel
+                    </AppButton>
+                    <AppButton
+                        size="sm"
+                        :loading="topupLoading"
+                        :disabled="!topupAmount || topupAmount < 1 || topupLoading"
+                        @click="handleTopup(topupAmount || 0)"
+                    >
+                        <template #icon>
+                            <CheckIcon class="w-4 h-4" />
+                        </template>
+                        Proceed to Payment
+                    </AppButton>
+                </div>
             </template>
-        </Dialog>
+        </AppDialog>
     </div>
 </template>

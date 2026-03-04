@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { ref, h } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import ToggleSwitch from 'primevue/toggleswitch';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
+import { ref } from 'vue';
+import AppButton from '@/components/app/AppButton.vue';
+import AppDialog from '@/components/app/AppDialog.vue';
+import AppInput from '@/components/app/AppInput.vue';
+import AppSwitch from '@/components/app/AppSwitch.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
-
-const toast = useToast();
+import XIcon from '@/components/icons/XIcon.vue';
 
 const props = defineProps<{
     twoFactorEnabled: boolean;
@@ -49,17 +46,8 @@ const confirmTwoFactor = async () => {
     twoFactorDialogVisible.value = false;
     twoFactorCode.value = '';
 };
-const items = [
-    {
-        label: "Account Status",
-        description: "Your account is in good standing",
-        action: h(ToggleSwitch, {
-            modelValue: props.twoFactorEnabled,
-            "onUpdate:modelValue": (value: boolean) => emit('update:twoFactorEnabled', value),
-            onChange: handleToggle2FA
-        })
-    }
-];
+// (kept minimal; no dynamic items list needed)
+
 </script>
 
 <template>
@@ -104,7 +92,7 @@ const items = [
                         </p>
                     </div>
                 </div>
-                <ToggleSwitch
+                <AppSwitch
                     :model-value="twoFactorEnabled"
                     @update:model-value="emit('update:twoFactorEnabled', $event)"
                     @change="handleToggle2FA"
@@ -125,22 +113,18 @@ const items = [
                         </p>
                     </div>
                 </div>
-                <Button
-                    label="Change Password"
-                    @click="$emit('change-password')"
-                    size="small"
-                >
-                Change Password
-                </Button>
+                <AppButton size="sm" @click="$emit('change-password')">
+                    Change Password
+                </AppButton>
             </div>
         </div>
 
         <!-- 2FA Setup Dialog -->
-        <Dialog
-            v-model:visible="twoFactorDialogVisible"
-            modal
-            header="Enable Two-Factor Authentication"
-            :style="{ width: '26rem' }"
+        <AppDialog
+            :visible="twoFactorDialogVisible"
+            @update:visible="twoFactorDialogVisible = $event"
+            title="Enable Two-Factor Authentication"
+            maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
@@ -168,31 +152,30 @@ const items = [
                 <!-- Verification Code Input -->
                 <div class="grid gap-2">
                     <label for="twoFactorCode" class="text-sm font-medium text-foreground">Verification Code</label>
-                    <InputText
+                    <AppInput
                         id="twoFactorCode"
                         v-model="twoFactorCode"
                         placeholder="Enter 6-digit code"
-                        maxlength="6"
-                        class="w-full"
+                        :maxlength="6"
                     />
                 </div>
             </div>
             <template #footer>
                 <div class="flex justify-end gap-3">
-                    <Button
-                        label="Cancel"
-                        text
-                        severity="secondary"
-                        @click="twoFactorDialogVisible = false"
-                        class="press-animated"
-                    />
-                    <Button
-                        label="Verify & Enable"
-                        @click="confirmTwoFactor"
-                        class="press-animated"
-                    />
+                    <AppButton variant="secondary" size="sm" @click="twoFactorDialogVisible = false">
+                        <template #icon>
+                            <XIcon class="w-4 h-4" />
+                        </template>
+                        Cancel
+                    </AppButton>
+                    <AppButton size="sm" @click="confirmTwoFactor">
+                        <template #icon>
+                            <CheckIcon class="w-4 h-4" />
+                        </template>
+                        Verify & Enable
+                    </AppButton>
                 </div>
             </template>
-        </Dialog>
+        </AppDialog>
     </div>
 </template>

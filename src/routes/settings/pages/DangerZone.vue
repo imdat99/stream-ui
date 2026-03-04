@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
-import Button from 'primevue/button';
 import AlertTriangleIcon from '@/components/icons/AlertTriangle.vue';
+import InfoIcon from '@/components/icons/InfoIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import SlidersIcon from '@/components/icons/SlidersIcon.vue';
+import AppButton from '@/components/app/AppButton.vue';
+import { useAppConfirm } from '@/composables/useAppConfirm';
+import { useAppToast } from '@/composables/useAppToast';
 
-const toast = useToast();
-const confirm = useConfirm();
+const toast = useAppToast();
+const confirm = useAppConfirm();
 
 const handleDeleteAccount = () => {
     confirm.require({
         message: 'Are you sure you want to delete your account? This action cannot be undone.',
         header: 'Delete Account',
-        icon: 'pi pi-exclamation-triangle',
         acceptLabel: 'Delete',
         rejectLabel: 'Cancel',
-        acceptClass: 'p-button-danger',
         accept: () => {
             toast.add({
                 severity: 'info',
@@ -30,10 +31,8 @@ const handleClearData = () => {
     confirm.require({
         message: 'Are you sure you want to clear all your data? This action cannot be undone.',
         header: 'Clear All Data',
-        icon: 'pi pi-exclamation-triangle',
         acceptLabel: 'Clear',
         rejectLabel: 'Cancel',
-        acceptClass: 'p-button-danger',
         accept: () => {
             toast.add({
                 severity: 'info',
@@ -71,14 +70,12 @@ const handleClearData = () => {
                         </p>
                     </div>
                 </div>
-                <Button
-                    label="Delete Account"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    size="small"
-                    @click="handleDeleteAccount"
-                    class="press-animated"
-                />
+                <AppButton variant="danger" size="sm" @click="handleDeleteAccount">
+                    <template #icon>
+                        <TrashIcon class="w-4 h-4" />
+                    </template>
+                    Delete Account
+                </AppButton>
             </div>
 
             <!-- Clear All Data -->
@@ -98,22 +95,19 @@ const handleClearData = () => {
                         </p>
                     </div>
                 </div>
-                <Button
-                    label="Clear Data"
-                    icon="pi pi-eraser"
-                    severity="danger"
-                    size="small"
-                    outlined
-                    @click="handleClearData"
-                    class="press-animated"
-                />
+                <AppButton variant="danger" size="sm" @click="handleClearData">
+                    <template #icon>
+                        <SlidersIcon class="w-4 h-4" />
+                    </template>
+                    Clear Data
+                </AppButton>
             </div>
         </div>
 
         <!-- Warning Banner -->
-        <div class="mx-6 mt-4 border border-warning/30 bg-warning/5 rounded-md p-4">
+        <div class="mx-6 my-4 border border-warning/30 bg-warning/5 rounded-md p-4">
             <div class="flex items-start gap-2">
-                <i class="pi pi-exclamation-triangle text-warning text-sm mt-0.5"></i>
+                <InfoIcon class="w-4 h-4 text-warning mt-0.5" />
                 <div class="text-xs text-foreground/70">
                     <p class="font-medium text-foreground mb-1">Warning</p>
                     <p>

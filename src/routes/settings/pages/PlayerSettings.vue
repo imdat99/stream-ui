@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import ToggleSwitch from 'primevue/toggleswitch';
-import Button from 'primevue/button';
+import AppButton from '@/components/app/AppButton.vue';
+import AppSwitch from '@/components/app/AppSwitch.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import { useAppToast } from '@/composables/useAppToast';
 import PlayIcon from '@/components/icons/PlayIcon.vue';
 import RepeatIcon from '@/components/icons/RepeatIcon.vue';
 import VolumeOffIcon from '@/components/icons/VolumeOffIcon.vue';
 import SlidersIcon from '@/components/icons/SlidersIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 
-const toast = useToast();
+const toast = useAppToast();
 
 const playerSettings = ref({
     autoplay: true,
@@ -102,14 +103,16 @@ const settingsItems = [
                     Configure default video player behavior and features.
                 </p>
             </div>
-            <Button
-                label="Save Changes"
-                icon="pi pi-check"
-                size="small"
+            <AppButton
+                size="sm"
                 :loading="saving"
                 @click="handleSave"
-                class="press-animated"
-            />
+            >
+                <template #icon>
+                    <CheckIcon class="w-4 h-4" />
+                </template>
+                Save Changes
+            </AppButton>
         </div>
 
         <!-- Content -->
@@ -130,7 +133,7 @@ const settingsItems = [
                         <p class="text-xs text-foreground/60 mt-0.5">{{ item.description }}</p>
                     </div>
                 </div>
-                <ToggleSwitch v-model="playerSettings[item.key]" />
+                <AppSwitch v-model="playerSettings[item.key]" />
             </div>
         </div>
     </div>

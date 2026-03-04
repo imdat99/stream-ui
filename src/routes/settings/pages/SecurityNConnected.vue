@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { useToast } from 'primevue/usetoast';
-import { ref } from 'vue';
-import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import ToggleSwitch from 'primevue/toggleswitch';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
+import AppButton from '@/components/app/AppButton.vue';
+import AppDialog from '@/components/app/AppDialog.vue';
+import AppInput from '@/components/app/AppInput.vue';
+import AppSwitch from '@/components/app/AppSwitch.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
+import { useAppToast } from '@/composables/useAppToast';
+import { ref } from 'vue';
 
 const auth = useAuthStore();
-const toast = useToast();
+const toast = useAppToast();
 
 // 2FA state
 const twoFactorEnabled = ref(false);
@@ -219,7 +218,7 @@ const disconnectTelegram = async () => {
                         </p>
                     </div>
                 </div>
-                <ToggleSwitch v-model="twoFactorEnabled" @change="handleToggle2FA" />
+                <AppSwitch v-model="twoFactorEnabled" @change="handleToggle2FA" />
             </div>
 
             <!-- Change Password -->
@@ -235,12 +234,9 @@ const disconnectTelegram = async () => {
                         <p class="text-xs text-foreground/60 mt-0.5">Update your account password</p>
                     </div>
                 </div>
-                <Button
-                    label="Change Password"
-                    @click="openChangePassword"
-                    size="small"
-                    class="press-animated"
-                />
+                <AppButton size="sm" @click="openChangePassword">
+                    Change Password
+                </AppButton>
             </div>
 
             <!-- Email Connection -->
@@ -277,31 +273,30 @@ const disconnectTelegram = async () => {
                         </p>
                     </div>
                 </div>
-                <Button
+                <AppButton
                     v-if="telegramConnected"
-                    label="Disconnect"
-                    size="small"
-                    text
-                    severity="danger"
+                    variant="danger"
+                    size="sm"
                     @click="disconnectTelegram"
-                    class="press-animated"
-                />
-                <Button
+                >
+                    Disconnect
+                </AppButton>
+                <AppButton
                     v-else
-                    label="Connect"
-                    size="small"
+                    size="sm"
                     @click="connectTelegram"
-                    class="press-animated"
-                />
+                >
+                    Connect
+                </AppButton>
             </div>
         </div>
 
         <!-- 2FA Setup Dialog -->
-        <Dialog
-            v-model:visible="twoFactorDialogVisible"
-            modal
-            header="Enable Two-Factor Authentication"
-            :style="{ width: '26rem' }"
+        <AppDialog
+            :visible="twoFactorDialogVisible"
+            @update:visible="twoFactorDialogVisible = $event"
+            title="Enable Two-Factor Authentication"
+            maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
@@ -329,40 +324,35 @@ const disconnectTelegram = async () => {
                 <!-- Verification Code Input -->
                 <div class="grid gap-2">
                     <label for="twoFactorCode" class="text-sm font-medium text-foreground">Verification Code</label>
-                    <InputText
+                    <AppInput
                         id="twoFactorCode"
                         v-model="twoFactorCode"
                         placeholder="Enter 6-digit code"
-                        maxlength="6"
-                        class="w-full"
+                        :maxlength="6"
                     />
                 </div>
             </div>
             <template #footer>
                 <div class="flex justify-end gap-3">
-                    <Button
-                        label="Cancel"
-                        text
-                        severity="secondary"
-                        @click="twoFactorDialogVisible = false"
-                        class="press-animated"
-                    />
-                    <Button
-                        label="Verify & Enable"
-                        @click="confirmTwoFactor"
-                        class="press-animated"
-                    />
+                    <AppButton variant="secondary" size="sm" @click="twoFactorDialogVisible = false">
+                        Cancel
+                    </AppButton>
+                    <AppButton size="sm" @click="confirmTwoFactor">
+                        <template #icon>
+                            <CheckIcon class="w-4 h-4" />
+                        </template>
+                        Verify & Enable
+                    </AppButton>
                 </div>
             </template>
-        </Dialog>
+        </AppDialog>
 
         <!-- Change Password Dialog -->
-        <Dialog
+        <AppDialog
             :visible="changePasswordDialogVisible"
             @update:visible="changePasswordDialogVisible = $event"
-            modal
-            header="Change Password"
-            :style="{ width: '26rem' }"
+            title="Change Password"
+            maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
@@ -377,72 +367,70 @@ const disconnectTelegram = async () => {
                 <!-- Current Password -->
                 <div class="grid gap-2">
                     <label for="currentPassword" class="text-sm font-medium text-foreground">Current Password</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="currentPassword"
+                        v-model="currentPassword"
+                        type="password"
+                        placeholder="Enter current password"
+                    >
+                        <template #prefix>
                             <LockIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="currentPassword"
-                            v-model="currentPassword"
-                            type="password"
-                            placeholder="Enter current password"
-                            class="w-full"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
 
                 <!-- New Password -->
                 <div class="grid gap-2">
                     <label for="newPassword" class="text-sm font-medium text-foreground">New Password</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="newPassword"
+                        v-model="newPassword"
+                        type="password"
+                        placeholder="Enter new password"
+                    >
+                        <template #prefix>
                             <LockIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="newPassword"
-                            v-model="newPassword"
-                            type="password"
-                            placeholder="Enter new password"
-                            class="w-full"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
 
                 <!-- Confirm Password -->
                 <div class="grid gap-2">
                     <label for="confirmPassword" class="text-sm font-medium text-foreground">Confirm New Password</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="confirmPassword"
+                        v-model="confirmPassword"
+                        type="password"
+                        placeholder="Confirm new password"
+                    >
+                        <template #prefix>
                             <LockIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="confirmPassword"
-                            v-model="confirmPassword"
-                            type="password"
-                            placeholder="Confirm new password"
-                            class="w-full"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
             </div>
             <template #footer>
                 <div class="flex justify-end gap-3">
-                    <Button
-                        label="Cancel"
-                        text
-                        severity="secondary"
-                        @click="changePasswordDialogVisible = false"
+                    <AppButton
+                        variant="secondary"
+                        size="sm"
                         :disabled="changePasswordLoading"
-                        class="press-animated"
-                    />
-                    <Button
-                        label="Change Password"
-                        @click="changePassword"
+                        @click="changePasswordDialogVisible = false"
+                    >
+                        Cancel
+                    </AppButton>
+                    <AppButton
+                        size="sm"
                         :loading="changePasswordLoading"
-                        class="press-animated"
-                    />
+                        @click="changePassword"
+                    >
+                        <template #icon>
+                            <CheckIcon class="w-4 h-4" />
+                        </template>
+                        Change Password
+                    </AppButton>
                 </div>
             </template>
-        </Dialog>
+        </AppDialog>
     </div>
 </template>

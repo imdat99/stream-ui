@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import Dialog from 'primevue/dialog';
-import Button from 'primevue/button';
+import AppButton from '@/components/app/AppButton.vue';
+import AppDialog from '@/components/app/AppDialog.vue';
+import AppInput from '@/components/app/AppInput.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
-
-const toast = useToast();
+import XIcon from '@/components/icons/XIcon.vue';
 
 const props = defineProps<{
     dialogVisible: boolean;
@@ -82,32 +78,30 @@ const handleChangePassword = () => {
                         </p>
                     </div>
                 </div>
-                <Button
+                <AppButton
                     v-if="telegramConnected"
-                    label="Disconnect"
-                    size="small"
-                    text
-                    severity="danger"
+                    variant="danger"
+                    size="sm"
                     @click="$emit('disconnect-telegram')"
-                    class="press-animated"
-                />
-                <Button
+                >
+                    Disconnect
+                </AppButton>
+                <AppButton
                     v-else
-                    label="Connect"
-                    size="small"
+                    size="sm"
                     @click="$emit('connect-telegram')"
-                    class="press-animated"
-                />
+                >
+                    Connect
+                </AppButton>
             </div>
         </div>
 
         <!-- Change Password Dialog -->
-        <Dialog
+        <AppDialog
             :visible="dialogVisible"
             @update:visible="$emit('update:dialogVisible', $event)"
-            modal
-            header="Change Password"
-            :style="{ width: '26rem' }"
+            title="Change Password"
+            maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
@@ -122,75 +116,76 @@ const handleChangePassword = () => {
                 <!-- Current Password -->
                 <div class="grid gap-2">
                     <label for="currentPassword" class="text-sm font-medium text-foreground">Current Password</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="currentPassword"
+                        :model-value="currentPassword"
+                        type="password"
+                        placeholder="Enter current password"
+                        @update:model-value="$emit('update:currentPassword', $event)"
+                    >
+                        <template #prefix>
                             <LockIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="currentPassword"
-                            :model-value="currentPassword"
-                            type="password"
-                            placeholder="Enter current password"
-                            class="w-full"
-                            @update:model-value="$emit('update:currentPassword', $event)"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
 
                 <!-- New Password -->
                 <div class="grid gap-2">
                     <label for="newPassword" class="text-sm font-medium text-foreground">New Password</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="newPassword"
+                        :model-value="newPassword"
+                        type="password"
+                        placeholder="Enter new password"
+                        @update:model-value="$emit('update:newPassword', $event)"
+                    >
+                        <template #prefix>
                             <LockIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="newPassword"
-                            :model-value="newPassword"
-                            type="password"
-                            placeholder="Enter new password"
-                            class="w-full"
-                            @update:model-value="$emit('update:newPassword', $event)"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
 
                 <!-- Confirm Password -->
                 <div class="grid gap-2">
                     <label for="confirmPassword" class="text-sm font-medium text-foreground">Confirm New Password</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="confirmPassword"
+                        :model-value="confirmPassword"
+                        type="password"
+                        placeholder="Confirm new password"
+                        @update:model-value="$emit('update:confirmPassword', $event)"
+                    >
+                        <template #prefix>
                             <LockIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="confirmPassword"
-                            :model-value="confirmPassword"
-                            type="password"
-                            placeholder="Confirm new password"
-                            class="w-full"
-                            @update:model-value="$emit('update:confirmPassword', $event)"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
             </div>
             <template #footer>
                 <div class="flex justify-end gap-3">
-                    <Button
-                        label="Cancel"
-                        text
-                        severity="secondary"
-                        @click="$emit('close')"
+                    <AppButton
+                        variant="secondary"
+                        size="sm"
                         :disabled="loading"
-                        class="press-animated"
-                    />
-                    <Button
-                        label="Change Password"
-                        @click="handleChangePassword"
+                        @click="$emit('close')"
+                    >
+                        <template #icon>
+                            <XIcon class="w-4 h-4" />
+                        </template>
+                        Cancel
+                    </AppButton>
+                    <AppButton
+                        size="sm"
                         :loading="loading"
-                        class="press-animated"
-                    />
+                        @click="handleChangePassword"
+                    >
+                        <template #icon>
+                            <CheckIcon class="w-4 h-4" />
+                        </template>
+                        Change Password
+                    </AppButton>
                 </div>
             </template>
-        </Dialog>
+        </AppDialog>
     </div>
 </template>

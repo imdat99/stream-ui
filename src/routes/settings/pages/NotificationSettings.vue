@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import ToggleSwitch from 'primevue/toggleswitch';
-import Button from 'primevue/button';
+import AppButton from '@/components/app/AppButton.vue';
+import AppSwitch from '@/components/app/AppSwitch.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import { useAppToast } from '@/composables/useAppToast';
 import MailIcon from '@/components/icons/MailIcon.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
 import SendIcon from '@/components/icons/SendIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
 
-const toast = useToast();
+const toast = useAppToast();
 
 const notificationSettings = ref({
     email: true,
@@ -88,14 +89,16 @@ const handleSave = async () => {
                     Choose how you want to receive notifications and updates.
                 </p>
             </div>
-            <Button
-                label="Save Changes"
-                icon="pi pi-check"
-                size="small"
+            <AppButton
+                size="sm"
                 :loading="saving"
                 @click="handleSave"
-                class="press-animated"
-            />
+            >
+                <template #icon>
+                    <CheckIcon class="w-4 h-4" />
+                </template>
+                Save Changes
+            </AppButton>
         </div>
 
         <!-- Content -->
@@ -116,7 +119,7 @@ const handleSave = async () => {
                         <p class="text-xs text-foreground/60 mt-0.5">{{ type.description }}</p>
                     </div>
                 </div>
-                <ToggleSwitch v-model="notificationSettings[type.key]" />
+                <AppSwitch v-model="notificationSettings[type.key]" />
             </div>
         </div>
     </div>

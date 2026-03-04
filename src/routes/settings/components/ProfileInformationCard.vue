@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { useToast } from 'primevue/usetoast';
-import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import ProgressBar from 'primevue/progressbar';
-import Button from 'primevue/button';
+import AppButton from '@/components/app/AppButton.vue';
+import AppInput from '@/components/app/AppInput.vue';
+import AppProgressBar from '@/components/app/AppProgressBar.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import MailIcon from '@/components/icons/MailIcon.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
+import XIcon from '@/components/icons/XIcon.vue';
 
 const auth = useAuthStore();
-const toast = useToast();
 
 const props = defineProps<{
     editing: boolean;
@@ -71,36 +71,31 @@ const formatBytes = (bytes: number) => {
             <div class="grid gap-6 max-w-2xl">
                 <div class="grid gap-2">
                     <label for="username" class="text-sm font-medium text-foreground">Username</label>
-                    <IconField>
-                        <InputIcon>
+                    <AppInput
+                        id="username"
+                        :model-value="username"
+                        :readonly="!editing"
+                        :inputClass="editing ? 'bg-surface' : 'bg-muted/30'"
+                        @update:model-value="emit('update:username', String($event))"
+                    >
+                        <template #prefix>
                             <UserIcon class="w-5 h-5" />
-                        </InputIcon>
-                        <InputText
-                            id="username"
-                            :model-value="username"
-                            :readonly="!editing"
-                            :class="['w-full', editing ? 'bg-surface' : 'bg-muted/30']"
-                            @update:model-value="emit('update:username', String($event))"
-                        />
-                    </IconField>
+                        </template>
+                    </AppInput>
                 </div>
                 <div class="grid gap-2">
                     <label for="email" class="text-sm font-medium text-foreground">Email Address</label>
-                    <IconField>
-                        <InputIcon>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect width="20" height="16" x="2" y="4" rx="2"/>
-                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                            </svg>
-                        </InputIcon>
-                        <InputText
-                            id="email"
-                            :model-value="email"
-                            :readonly="!editing"
-                            :class="['w-full', editing ? 'bg-surface' : 'bg-muted/30']"
-                            @update:model-value="emit('update:email', $event|| '')"
-                        />
-                    </IconField>
+                    <AppInput
+                        id="email"
+                        :model-value="email"
+                        :readonly="!editing"
+                        :inputClass="editing ? 'bg-surface' : 'bg-muted/30'"
+                        @update:model-value="emit('update:email', $event || '')"
+                    >
+                        <template #prefix>
+                            <MailIcon class="w-5 h-5" />
+                        </template>
+                    </AppInput>
                 </div>
             </div>
 
@@ -120,45 +115,36 @@ const formatBytes = (bytes: number) => {
                     </div>
                     <span class="text-sm font-semibold text-foreground">{{ storagePercentage }}%</span>
                 </div>
-                <ProgressBar :value="storagePercentage" :showValue="false" style="height: 6px" />
+                <AppProgressBar :value="storagePercentage" />
             </div>
         </div>
 
         <!-- Footer -->
         <div class="px-6 py-4 bg-muted/30 border-t border-border flex items-center gap-3">
             <template v-if="editing">
-                <Button
-                    label="Save Changes"
-                    size="small"
-                    :loading="saving"
-                    @click="emit('save')"
-                    class="press-animated"
-                />
-                <Button
-                    label="Cancel"
-                    size="small"
-                    text
-                    severity="secondary"
-                    @click="emit('cancel-edit')"
-                    :disabled="saving"
-                    class="press-animated"
-                />
+                <AppButton size="sm" :loading="saving" @click="emit('save')">
+                    <template #icon>
+                        <CheckIcon class="w-4 h-4" />
+                    </template>
+                    Save Changes
+                </AppButton>
+                <AppButton variant="secondary" size="sm" :disabled="saving" @click="emit('cancel-edit')">
+                    <template #icon>
+                        <XIcon class="w-4 h-4" />
+                    </template>
+                    Cancel
+                </AppButton>
             </template>
             <template v-else>
-                <Button
-                    label="Edit Profile"
-                    size="small"
-                    @click="emit('start-edit')"
-                    class="press-animated"
-                />
-                <Button
-                    label="Change Password"
-                    size="small"
-                    text
-                    severity="secondary"
-                    @click="emit('change-password')"
-                    class="press-animated"
-                />
+                <AppButton size="sm" @click="emit('start-edit')">
+                    <template #icon>
+                        <PencilIcon class="w-4 h-4" />
+                    </template>
+                    Edit Profile
+                </AppButton>
+                <AppButton variant="secondary" size="sm" @click="emit('change-password')">
+                    Change Password
+                </AppButton>
             </template>
         </div>
     </div>

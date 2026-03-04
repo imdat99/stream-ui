@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import { useConfirm } from 'primevue/useconfirm';
-import ToggleSwitch from 'primevue/toggleswitch';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Dialog from 'primevue/dialog';
+import AppButton from '@/components/app/AppButton.vue';
+import AppDialog from '@/components/app/AppDialog.vue';
+import AppInput from '@/components/app/AppInput.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import InfoIcon from '@/components/icons/InfoIcon.vue';
+import LinkIcon from '@/components/icons/LinkIcon.vue';
+import PlusIcon from '@/components/icons/PlusIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import AlertTriangleIcon from '@/components/icons/AlertTriangleIcon.vue';
+import { useAppConfirm } from '@/composables/useAppConfirm';
+import { useAppToast } from '@/composables/useAppToast';
 
-const toast = useToast();
-const confirm = useConfirm();
+const toast = useAppToast();
+const confirm = useAppConfirm();
 
 // Domain whitelist for iframe embedding
 const domains = ref([
@@ -42,9 +47,10 @@ const handleAddDomain = () => {
         return;
     }
 
+    const domainName = newDomain.value.trim().toLowerCase();
     domains.value.push({
         id: Math.random().toString(36).substring(2, 9),
-        name: newDomain.value.trim().toLowerCase(),
+        name: domainName,
         addedAt: new Date().toISOString().split('T')[0]
     });
 
@@ -53,7 +59,7 @@ const handleAddDomain = () => {
     toast.add({
         severity: 'success',
         summary: 'Domain Added',
-        detail: `${newDomain.value} has been added to your whitelist.`,
+        detail: `${domainName} has been added to your whitelist.`,
         life: 3000
     });
 };
@@ -62,10 +68,8 @@ const handleRemoveDomain = (domain: typeof domains.value[0]) => {
     confirm.require({
         message: `Are you sure you want to remove ${domain.name} from your whitelist? Embedded iframes from this domain will no longer work.`,
         header: 'Remove Domain',
-        icon: 'pi pi-exclamation-triangle',
         acceptLabel: 'Remove',
         rejectLabel: 'Cancel',
-        acceptClass: 'p-button-danger',
         accept: () => {
             const index = domains.value.findIndex(d => d.id === domain.id);
             if (index !== -1) {
@@ -106,19 +110,18 @@ const copyIframeCode = () => {
                     Add domains to your whitelist to allow embedding content via iframe.
                 </p>
             </div>
-            <Button
-                label="Add Domain"
-                icon="pi pi-plus"
-                size="small"
-                @click="showAddDialog = true"
-                class="press-animated"
-            />
+            <AppButton size="sm" @click="showAddDialog = true">
+                <template #icon>
+                    <PlusIcon class="w-4 h-4" />
+                </template>
+                Add Domain
+            </AppButton>
         </div>
 
         <!-- Info Banner -->
         <div class="px-6 py-3 bg-info/5 border-b border-info/20">
             <div class="flex items-start gap-2">
-                <i class="pi pi-info-circle text-info text-sm mt-0.5"></i>
+                <InfoIcon class="w-4 h-4 text-info mt-0.5" />
                 <div class="text-xs text-foreground/70">
                     Only domains in your whitelist can embed your content using iframe.
                 </div>
@@ -143,24 +146,22 @@ const copyIframeCode = () => {
                     >
                         <td class="px-6 py-3">
                             <div class="flex items-center gap-2">
-                                <i class="pi pi-globe text-foreground/40 text-sm"></i>
+                                <LinkIcon class="w-4 h-4 text-foreground/40" />
                                 <span class="text-sm font-medium text-foreground">{{ domain.name }}</span>
                             </div>
                         </td>
                         <td class="px-6 py-3 text-sm text-foreground/60">{{ domain.addedAt }}</td>
                         <td class="px-6 py-3 text-right">
-                            <Button
-                                icon="pi pi-trash"
-                                text
-                                severity="danger"
-                                size="small"
-                                @click="handleRemoveDomain(domain)"
-                            />
+                            <AppButton variant="ghost" size="sm" @click="handleRemoveDomain(domain)">
+                                <template #icon>
+                                    <TrashIcon class="w-4 h-4 text-danger" />
+                                </template>
+                            </AppButton>
                         </td>
                     </tr>
                     <tr v-if="domains.length === 0">
                         <td colspan="3" class="px-6 py-12 text-center">
-                            <i class="pi pi-globe text-3xl text-foreground/30 mb-3 block"></i>
+                            <LinkIcon class="w-10 h-10 text-foreground/30 mb-3 block mx-auto" />
                             <p class="text-sm text-foreground/60 mb-1">No domains in whitelist</p>
                             <p class="text-xs text-foreground/40">Add a domain to allow iframe embedding</p>
                         </td>
@@ -173,13 +174,12 @@ const copyIframeCode = () => {
         <div class="px-6 py-4 bg-muted/30">
             <div class="flex items-center justify-between mb-3">
                 <h4 class="text-sm font-medium text-foreground">Embed Code</h4>
-                <Button
-                    label="Copy Code"
-                    icon="pi pi-copy"
-                    size="small"
-                    text
-                    @click="copyIframeCode"
-                />
+                <AppButton variant="secondary" size="sm" @click="copyIframeCode">
+                    <template #icon>
+                        <CheckIcon class="w-4 h-4" />
+                    </template>
+                    Copy Code
+                </AppButton>
             </div>
             <p class="text-xs text-foreground/60 mb-2">
                 Use this iframe code to embed content on your whitelisted domains.
@@ -188,29 +188,27 @@ const copyIframeCode = () => {
         </div>
 
         <!-- Add Domain Dialog -->
-        <Dialog
-            v-model:visible="showAddDialog"
-            header="Add Domain to Whitelist"
-            :modal="true"
-            :closable="true"
-            class="w-full max-w-md"
+        <AppDialog
+            :visible="showAddDialog"
+            @update:visible="showAddDialog = $event"
+            title="Add Domain to Whitelist"
+            maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <div class="grid gap-2">
                     <label for="domain" class="text-sm font-medium text-foreground">Domain Name</label>
-                    <InputText
+                    <AppInput
                         id="domain"
                         v-model="newDomain"
                         placeholder="example.com"
-                        class="w-full"
-                        @keyup.enter="handleAddDomain"
+                        @enter="handleAddDomain"
                     />
                     <p class="text-xs text-foreground/50">Enter domain without www or https:// (e.g., example.com)</p>
                 </div>
 
                 <div class="bg-warning/5 border border-warning/20 rounded-md p-3">
                     <div class="flex items-start gap-2">
-                        <i class="pi pi-exclamation-triangle text-warning text-sm mt-0.5"></i>
+                        <AlertTriangleIcon class="w-4 h-4 text-warning mt-0.5" />
                         <div class="text-xs text-foreground/70">
                             <p class="font-medium text-foreground mb-1">Important</p>
                             <p>Only add domains that you own and control.</p>
@@ -220,18 +218,16 @@ const copyIframeCode = () => {
             </div>
 
             <template #footer>
-                <Button
-                    label="Cancel"
-                    text
-                    @click="showAddDialog = false"
-                />
-                <Button
-                    label="Add Domain"
-                    icon="pi pi-check"
-                    @click="handleAddDomain"
-                    class="press-animated"
-                />
+                <AppButton variant="secondary" size="sm" @click="showAddDialog = false">
+                    Cancel
+                </AppButton>
+                <AppButton size="sm" @click="handleAddDomain">
+                    <template #icon>
+                        <CheckIcon class="w-4 h-4" />
+                    </template>
+                    Add Domain
+                </AppButton>
             </template>
-        </Dialog>
+        </AppDialog>
     </div>
 </template>
