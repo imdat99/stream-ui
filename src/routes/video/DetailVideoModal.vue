@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { fetchMockVideoById, updateMockVideo } from '@/mocks/videos';
-import { Form, type FormSubmitEvent } from '@primevue/forms';
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import Skeleton from 'primevue/skeleton';
-import Tag from 'primevue/tag';
-import Textarea from 'primevue/textarea';
-import { useToast } from 'primevue/usetoast';
+import { useAppToast } from '@/composables/useAppToast';
 import { ref, watch } from 'vue';
-import { z } from 'zod';
 
 const props = defineProps<{
     videoId: string;
@@ -22,22 +12,17 @@ const emit = defineEmits<{
     (e: 'close'): void;
 }>();
 
-const toast = useToast();
+const toast = useAppToast();
 const video = ref<ModelVideo | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 
-const initialValues = ref({
+const form = ref({
     title: '',
     description: '',
 });
 
-const resolver = zodResolver(
-    z.object({
-        title: z.string().min(1, { message: 'Title is required.' }),
-        description: z.string().optional(),
-    })
-);
+const errors = ref<{ title?: string; description?: string }>({});
 
 const subtitleForm = ref({
     file: null as File | null,
@@ -51,7 +36,7 @@ const fetchVideo = async () => {
         const videoData = await fetchMockVideoById(props.videoId);
         if (videoData) {
             video.value = videoData;
-            initialValues.value = {
+            form.value = {
                 title: videoData.title || '',
                 description: videoData.description || '',
             };
@@ -64,20 +49,27 @@ const fetchVideo = async () => {
     }
 };
 
-const onFormSubmit = async ({ valid, values }: FormSubmitEvent) => {
-    if (!valid) return;
+const validate = (): boolean => {
+    errors.value = {};
+    if (!form.value.title.trim()) {
+        errors.value.title = 'Title is required.';
+    }
+    return Object.keys(errors.value).length === 0;
+};
+
+const onFormSubmit = async () => {
+    if (!validate()) return;
     saving.value = true;
     try {
-        const payload = { title: values.title as string, description: values.description as string };
-        await updateMockVideo(props.videoId, payload);
+        await updateMockVideo(props.videoId, form.value);
 
         if (video.value) {
-            video.value.title = payload.title;
-            video.value.description = payload.description;
+            video.value.title = form.value.title;
+            video.value.description = form.value.description;
         }
 
         toast.add({ severity: 'success', summary: 'Success', detail: 'Video updated successfully', life: 3000 });
-        close();
+        emit('close');
     } catch (error) {
         console.error('Failed to save video:', error);
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to save changes', life: 3000 });
@@ -102,80 +94,77 @@ const handleUploadSubtitle = () => {
 
 watch(() => props.videoId, (newId) => {
     if (newId) {
+        errors.value = {};
         fetchVideo();
     }
 }, { immediate: true });
 </script>
 
 <template>
-    <Dialog :visible="!!videoId" @update:visible="emit('close')" modal dismissableMask
-        :style="{ width: '600px', maxWidth: '90vw' }">
-        <!-- Header -->
-        <template #header>
-            <div v-if="loading" class="flex items-center gap-3">
-                <Skeleton width="8rem" height="1.25rem" />
-            </div>
-            <span v-else class="font-semibold text-lg">Edit video</span>
-        </template>
+    <AppDialog :visible="!!videoId" @update:visible="emit('close')" max-width-class="max-w-xl"
+        :title="loading ? '' : 'Edit video'">
 
         <!-- Loading Skeleton -->
         <div v-if="loading" class="flex flex-col gap-4">
             <!-- Title skeleton -->
             <div class="flex flex-col gap-2">
-                <Skeleton width="3rem" height="0.875rem" />
-                <Skeleton width="100%" height="2.5rem" borderRadius="6px" />
+                <div class="w-12 h-3.5 bg-gray-200 rounded animate-pulse" />
+                <div class="w-full h-10 bg-gray-200 rounded-md animate-pulse" />
             </div>
             <!-- Description skeleton -->
             <div class="flex flex-col gap-2">
-                <Skeleton width="5rem" height="0.875rem" />
-                <Skeleton width="100%" height="6rem" borderRadius="6px" />
+                <div class="w-20 h-3.5 bg-gray-200 rounded animate-pulse" />
+                <div class="w-full h-24 bg-gray-200 rounded-md animate-pulse" />
             </div>
             <!-- Subtitles section skeleton -->
-            <div class="flex flex-col gap-3 border-t border-surface pt-4">
+            <div class="flex flex-col gap-3 border-t border-gray-200 pt-4">
                 <div class="flex items-center justify-between">
-                    <Skeleton width="4rem" height="0.875rem" />
-                    <Skeleton width="4.5rem" height="1.5rem" borderRadius="16px" />
+                    <div class="w-16 h-3.5 bg-gray-200 rounded animate-pulse" />
+                    <div class="w-[4.5rem] h-6 bg-gray-200 rounded-full animate-pulse" />
                 </div>
-                <Skeleton width="60%" height="0.875rem" />
-                <div class="flex flex-col gap-3 rounded-lg border border-surface p-3">
-                    <Skeleton width="6rem" height="0.875rem" />
-                    <Skeleton width="100%" height="2.25rem" borderRadius="6px" />
+                <div class="w-3/5 h-3.5 bg-gray-200 rounded animate-pulse" />
+                <div class="flex flex-col gap-3 rounded-lg border border-gray-200 p-3">
+                    <div class="w-24 h-3.5 bg-gray-200 rounded animate-pulse" />
+                    <div class="w-full h-9 bg-gray-200 rounded-md animate-pulse" />
                     <div class="grid grid-cols-2 gap-3">
-                        <Skeleton width="100%" height="2.25rem" borderRadius="6px" />
-                        <Skeleton width="100%" height="2.25rem" borderRadius="6px" />
+                        <div class="w-full h-9 bg-gray-200 rounded-md animate-pulse" />
+                        <div class="w-full h-9 bg-gray-200 rounded-md animate-pulse" />
                     </div>
-                    <Skeleton width="100%" height="2.5rem" borderRadius="6px" />
+                    <div class="w-full h-10 bg-gray-200 rounded-md animate-pulse" />
                 </div>
+            </div>
+            <!-- Footer skeleton -->
+            <div class="flex justify-end gap-2 border-t border-gray-200 pt-4">
+                <div class="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
+                <div class="w-32 h-10 bg-gray-200 rounded-md animate-pulse" />
             </div>
         </div>
 
         <!-- Form Content -->
-        <Form v-else v-slot="$form" :resolver="resolver" :initialValues="initialValues" @submit="onFormSubmit"
-            class="flex flex-col gap-4">
+        <form v-else @submit.prevent="onFormSubmit" class="flex flex-col gap-4">
             <!-- Title -->
             <div class="flex flex-col gap-1">
                 <label for="edit-title" class="text-sm font-medium">Title</label>
-                <InputText id="edit-title" name="title" placeholder="Enter video title" fluid />
-                <Message v-if="$form.title?.invalid" severity="error" size="small" variant="simple">
-                    {{ $form.title.error?.message }}
-                </Message>
+                <AppInput id="edit-title" v-model="form.title" placeholder="Enter video title" />
+                <p v-if="errors.title" class="text-xs text-red-500 mt-0.5">{{ errors.title }}</p>
             </div>
 
             <!-- Description -->
             <div class="flex flex-col gap-1">
                 <label for="edit-description" class="text-sm font-medium">Description</label>
-                <Textarea id="edit-description" name="description" placeholder="Enter video description"
-                    :rows="4" autoResize fluid />
-                <Message v-if="$form.description?.invalid" severity="error" size="small" variant="simple">
-                    {{ $form.description.error?.message }}
-                </Message>
+                <textarea id="edit-description" v-model="form.description" placeholder="Enter video description"
+                    rows="4"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-y" />
+                <p v-if="errors.description" class="text-xs text-red-500 mt-0.5">{{ errors.description }}</p>
             </div>
 
             <!-- Subtitles Section -->
             <div class="flex flex-col gap-3 border-t-2 border-gray-200 pt-4">
                 <div class="flex items-center justify-between">
                     <label class="text-sm font-medium">Subtitles</label>
-                    <Tag value="0 tracks" severity="secondary" />
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        0 tracks
+                    </span>
                 </div>
                 <p class="text-sm text-muted-foreground">No subtitles uploaded yet</p>
 
@@ -196,34 +185,27 @@ watch(() => props.videoId, (newId) => {
                     <div class="grid grid-cols-2 gap-3">
                         <div class="flex flex-col gap-1">
                             <label for="subtitle-language" class="text-xs font-medium">Language Code *</label>
-                            <InputText id="subtitle-language" v-model="subtitleForm.language" placeholder="en, vi, etc."
-                                :maxlength="10" size="small" />
+                            <AppInput id="subtitle-language" v-model="subtitleForm.language" placeholder="en, vi, etc."
+                                :maxlength="10" />
                         </div>
                         <div class="flex flex-col gap-1">
                             <label for="subtitle-name" class="text-xs font-medium">Display Name (Optional)</label>
-                            <InputText id="subtitle-name" v-model="subtitleForm.displayName"
-                                placeholder="English, Tiếng Việt, etc." size="small" />
+                            <AppInput id="subtitle-name" v-model="subtitleForm.displayName"
+                                placeholder="English, Tiếng Việt, etc." />
                         </div>
                     </div>
 
-                    <Button label="Upload Subtitle" icon="i-carbon-upload" severity="secondary" outlined
-                        class="w-full" :disabled="!canUploadSubtitle" @click="handleUploadSubtitle" />
+                    <AppButton variant="secondary" class="w-full" :disabled="!canUploadSubtitle" @click="handleUploadSubtitle">
+                        Upload Subtitle
+                    </AppButton>
                 </div>
             </div>
 
             <!-- Footer inside Form so submit works -->
-            <div class="flex justify-end gap-2 border-t border-surface pt-4">
-                <Button label="Cancel" type="button" text severity="secondary" @click="emit('close')" />
-                <Button label="Save Changes" type="submit" icon="i-carbon-checkmark" :loading="saving" />
+            <div class="flex justify-end gap-2 border-t border-gray-200 pt-4">
+                <AppButton variant="ghost" type="button" @click="emit('close')">Cancel</AppButton>
+                <AppButton type="submit" :loading="saving">Save Changes</AppButton>
             </div>
-        </Form>
-
-        <!-- Footer skeleton when loading -->
-        <template v-if="loading" #footer>
-            <div class="flex justify-end gap-2">
-                <Skeleton width="5rem" height="2.5rem" borderRadius="6px" />
-                <Skeleton width="8rem" height="2.5rem" borderRadius="6px" />
-            </div>
-        </template>
-    </Dialog>
+        </form>
+    </AppDialog>
 </template>

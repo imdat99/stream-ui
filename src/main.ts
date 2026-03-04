@@ -1,36 +1,12 @@
 import { PiniaColada, useQueryCache } from '@pinia/colada';
-import { definePreset } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
 import { createHead as CSRHead } from "@unhead/vue/client";
 import { createHead as SSRHead } from "@unhead/vue/server";
 import { createPinia } from "pinia";
-import PrimeVue from 'primevue/config';
-import ConfirmationService from 'primevue/confirmationservice';
-import ToastService from 'primevue/toastservice';
-import Tooltip from 'primevue/tooltip';
 import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import createAppRouter from './routes';
 
-const CompactAura = definePreset(Aura, {
-    semantic: {
-        formField: {
-            paddingX: '0.625rem',
-            paddingY: '0.375rem',
-            sm: {
-                fontSize: '0.75rem',
-                paddingX: '0.5rem',
-                paddingY: '0.25rem',
-            },
-            lg: {
-                fontSize: '1rem',
-                paddingX: '0.75rem',
-                paddingY: '0.5rem',
-            },
-        },
-    },
-});
 const bodyClass = ":uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen"
 export function createApp() {
     const pinia = createPinia();
@@ -38,24 +14,11 @@ export function createApp() {
     const head = import.meta.env.SSR ? SSRHead() : CSRHead();
 
     app.use(head);
-    app.use(PrimeVue, {
-        // unstyled: true,
-        theme: {
-            preset: CompactAura,
-            options: {
-                darkModeSelector: '.my-app-dark',
-                cssLayer: false,
-            }
-        }
-    });
-    app.use(ToastService);
-    app.use(ConfirmationService);
     app.directive('nh', {
         created(el) {
             el.__v_skip = true;
         }
     });
-    app.directive("tooltip", Tooltip)
     app.use(pinia);
     app.use(PiniaColada, {
         pinia,

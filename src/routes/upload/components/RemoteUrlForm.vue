@@ -23,29 +23,49 @@ const handleSubmit = () => {
 <template>
     <div class="flex flex-col gap-3 h-full">
         <div class="relative flex-1">
-            <textarea v-model="urls"
+            <textarea
+                v-model="urls"
                 placeholder="Paste video URLs here, one per line&#10;&#10;https://example.com/video.mp4&#10;https://drive.google.com/..."
                 class="w-full h-full min-h-[200px] px-4 py-3.5 bg-white border border-slate-200
                        rounded-xl focus:border-accent focus:ring-2 focus:ring-accent/10 focus:outline-none
                        transition-all resize-none text-base text-slate-700 placeholder:text-slate-300
-                       leading-relaxed font-[inherit]"></textarea>
+                       leading-relaxed font-[inherit]"
+            />
         </div>
 
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2 text-sm text-slate-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 16v-4" />
                     <path d="M12 8h.01" />
                 </svg>
                 Google Drive, Dropbox supported
             </div>
-            <button @click="handleSubmit"
+            <button
+                @click="handleSubmit"
                 class="flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white
-                       text-sm font-semibold rounded-xl transition-all active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                       text-sm font-semibold rounded-xl transition-all active:scale-95"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
                     <path d="M5 12h14" />
                     <path d="m12 5 7 7-7 7" />
                 </svg>

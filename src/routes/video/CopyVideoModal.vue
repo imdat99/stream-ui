@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { fetchMockVideoById } from '@/mocks/videos';
-import Button from 'primevue/button';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import Skeleton from 'primevue/skeleton';
-import { useToast } from 'primevue/usetoast';
+import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -16,7 +12,7 @@ const emit = defineEmits<{
     (e: 'close'): void;
 }>();
 
-const toast = useToast();
+const toast = useAppToast();
 const video = ref<ModelVideo | null>(null);
 const loading = ref(true);
 const copiedField = ref<string | null>(null);
@@ -90,31 +86,24 @@ watch(() => props.videoId, (newId) => {
 </script>
 
 <template>
-    <Dialog :visible="!!videoId" @update:visible="emit('close')" modal dismissableMask
-        :style="{ width: '600px', maxWidth: '90vw' }">
-        <!-- Header -->
-        <template #header>
-            <div v-if="loading" class="flex items-center gap-3">
-                <Skeleton width="12rem" height="1.25rem" />
-            </div>
-            <span v-else class="font-semibold text-lg">Get sharing address</span>
-        </template>
+    <AppDialog :visible="!!videoId" @update:visible="emit('close')" max-width-class="max-w-xl"
+        :title="loading ? '' : 'Get sharing address'">
 
         <!-- Loading Skeleton -->
         <div v-if="loading" class="flex flex-col gap-5">
             <div>
-                <Skeleton width="8rem" height="0.75rem" class="mb-3" />
+                <div class="w-32 h-3 bg-gray-200 rounded animate-pulse mb-3" />
                 <div v-for="i in 3" :key="i" class="flex flex-col gap-1.5 mb-4">
-                    <Skeleton width="40%" height="0.75rem" />
+                    <div class="w-2/5 h-3 bg-gray-200 rounded animate-pulse" />
                     <div class="flex gap-2">
-                        <Skeleton width="100%" height="2.25rem" borderRadius="6px" />
-                        <Skeleton width="2.75rem" height="2.25rem" borderRadius="6px" />
+                        <div class="w-full h-9 bg-gray-200 rounded-md animate-pulse" />
+                        <div class="w-11 h-9 bg-gray-200 rounded-md animate-pulse" />
                     </div>
                 </div>
             </div>
             <div class="flex flex-col gap-2">
-                <Skeleton width="100%" height="4rem" borderRadius="6px" />
-                <Skeleton width="100%" height="4rem" borderRadius="6px" />
+                <div class="w-full h-16 bg-gray-200 rounded-md animate-pulse" />
+                <div class="w-full h-16 bg-gray-200 rounded-md animate-pulse" />
             </div>
         </div>
 
@@ -127,9 +116,9 @@ watch(() => props.videoId, (newId) => {
                     <div v-for="link in shareLinks" :key="link.key" class="flex flex-col gap-1.5">
                         <p class="text-sm font-medium text-muted-foreground">{{ link.label }}</p>
                         <div class="flex gap-2">
-                            <InputText :value="link.value || ''" :placeholder="link.placeholder" readonly
-                                class="flex-1 !font-mono !text-xs" @click="($event.target as HTMLInputElement)?.select()" />
-                            <Button severity="secondary" outlined :disabled="!link.value || copiedField === link.key"
+                            <AppInput :model-value="link.value || ''" :placeholder="link.placeholder" readonly
+                                input-class="!font-mono !text-xs" @click="($event.target as HTMLInputElement)?.select()" />
+                            <AppButton variant="secondary" :disabled="!link.value || copiedField === link.key"
                                 @click="copyToClipboard(link.value, link.key)" class="shrink-0">
                                 <!-- Copy icon -->
                                 <svg v-if="copiedField !== link.key" xmlns="http://www.w3.org/2000/svg" width="16"
@@ -144,7 +133,7 @@ watch(() => props.videoId, (newId) => {
                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M20 6 9 17l-5-5" />
                                 </svg>
-                            </Button>
+                            </AppButton>
                         </div>
                         <p v-if="link.hint" class="text-xs text-muted-foreground">{{ link.hint }}</p>
                     </div>
@@ -154,14 +143,14 @@ watch(() => props.videoId, (newId) => {
             <!-- Notices -->
             <div class="flex flex-col gap-2 text-sm">
                 <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 flex items-start gap-3">
-                    
+
                     <div class="flex-1 text-sm">
                         <p class="font-medium text-red-900 dark:text-red-100 mb-1">Warning</p>
                         <p class="text-red-800 dark:text-red-200">Make sure shared files comply with <strong>local laws</strong> and confirm you understand the responsibilities involved when distributing content.</p>
                     </div>
                 </div>
                 <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-3">
-                    
+
                     <div class="flex-1 text-sm">
                         <p class="font-medium text-amber-900 dark:text-amber-100 mb-1">Reminder</p>
                         <p class="text-amber-800 dark:text-amber-200">The embed player can auto switch fallback nodes and works well on mobile. Raw HLS links
@@ -170,5 +159,5 @@ watch(() => props.videoId, (newId) => {
                 </div>
             </div>
         </div>
-    </Dialog>
+    </AppDialog>
 </template>

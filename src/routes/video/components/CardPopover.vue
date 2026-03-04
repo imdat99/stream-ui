@@ -1,21 +1,37 @@
-
 <template>
-    <div class="card flex justify-center">
-        <Button type="button" class="!border-none" @click="toggle" severity="secondary" variant="text" aria-haspopup="true" aria-controls="overlay_menu">
+    <div class="relative" ref="containerRef">
+        <button type="button" class="p-1.5 rounded-md hover:bg-gray-100 transition-colors" @click="toggle"
+            aria-haspopup="true" :aria-expanded="isOpen">
             <EllipsisVerticalIcon class="w-4 h-4 text-gray-500" />
-        </Button>
-        <Menu ref="menu" id="overlay_menu" :model="items as any" :popup="true" class="min-w-[160px]">
-            <template #item="{ item, props }">
-                <router-link v-if="(item as any).route" v-bind="props.action" :to="(item as any).route" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                    <component :is="(item as any).icon" class="w-4 h-4" :class="(item as any).iconClass" />
-                    <span :class="(item as any).labelClass">{{ item.label }}</span>
-                </router-link>
-                <a v-else-if="!(item as any).separator" v-bind="props.action" @click="(item as any).command" class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                    <component :is="(item as any).icon" class="w-4 h-4" :class="(item as any).iconClass" />
-                    <span :class="(item as any).labelClass">{{ item.label }}</span>
-                </a>
-            </template>
-        </Menu>
+        </button>
+
+        <Teleport to="body">
+            <div v-if="isOpen" class="fixed inset-0 z-40" @click="isOpen = false" />
+            <Transition enter-active-class="transition duration-100 ease-out"
+                enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition duration-75 ease-in"
+                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+                <div v-if="isOpen" ref="menuRef"
+                    class="fixed z-50 min-w-[160px] bg-white rounded-lg border border-gray-200 shadow-lg py-1"
+                    :style="menuStyle">
+                    <template v-for="(item, index) in items" :key="index">
+                        <div v-if="item.separator" class="h-px bg-gray-200 my-1" />
+                        <router-link v-else-if="item.route" :to="item.route"
+                            class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            @click="isOpen = false">
+                            <component :is="item.icon" class="w-4 h-4" :class="item.iconClass" />
+                            <span :class="item.labelClass">{{ item.label }}</span>
+                        </router-link>
+                        <button v-else type="button"
+                            class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm w-full text-left"
+                            @click="item.command?.(); isOpen = false">
+                            <component :is="item.icon" class="w-4 h-4" :class="item.iconClass" />
+                            <span :class="item.labelClass">{{ item.label }}</span>
+                        </button>
+                    </template>
+                </div>
+            </Transition>
+        </Teleport>
     </div>
 </template>
 
@@ -27,9 +43,8 @@ import PencilIcon from "@/components/icons/PencilIcon.vue";
 import TrashIcon from "@/components/icons/TrashIcon.vue";
 import EllipsisVerticalIcon from "@/components/icons/EllipsisVerticalIcon.vue";
 import type { ModelVideo } from '@/api/client';
-import { useToast } from "primevue/usetoast";
-import Menu from "primevue/menu";
-import { computed, ref, shallowRef } from "vue";
+import { useAppToast } from "@/composables/useAppToast";
+import { computed, nextTick, ref, shallowRef } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 
 const props = defineProps<{
@@ -40,12 +55,33 @@ const emit = defineEmits<{
     (e: 'delete'): void;
 }>();
 
-const toast = useToast();
-const menu = ref<InstanceType<typeof Menu>>();
+const toast = useAppToast();
+const isOpen = ref(false);
+const containerRef = ref<HTMLElement>();
+const menuRef = ref<HTMLElement>();
+const menuStyle = ref<Record<string, string>>({});
 
 const videoUrl = computed(() => {
     return `${window.location.origin}/videos/${props.video.id}`;
 });
+
+const toggle = async () => {
+    isOpen.value = !isOpen.value;
+    if (isOpen.value) {
+        await nextTick();
+        positionMenu();
+    }
+};
+
+const positionMenu = () => {
+    if (!containerRef.value) return;
+    const rect = containerRef.value.getBoundingClientRect();
+    menuStyle.value = {
+        top: `${rect.bottom + 4}px`,
+        left: `${rect.right}px`,
+        transform: 'translateX(-100%)',
+    };
+};
 
 const handleCopyLink = async () => {
     try {
@@ -74,7 +110,7 @@ const handleDownload = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         toast.add({
             severity: 'success',
             summary: 'Thành công',
@@ -132,8 +168,4 @@ const items = shallowRef<CustomMenuItem[]>([
         command: handleDelete
     }
 ]);
-
-const toggle = (event: Event) => {
-    menu.value?.toggle(event);
-};
 </script>

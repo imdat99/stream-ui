@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { getStatusSeverity } from '@/lib/utils';
-import Tag from 'primevue/tag';
 
 const props = defineProps<{
     video: ModelVideo;
@@ -42,6 +41,15 @@ const formatDate = (dateStr?: string): string => {
         minute: '2-digit'
     });
 };
+
+const severityClasses: Record<string, string> = {
+    success: 'bg-green-100 text-green-800',
+    info: 'bg-blue-100 text-blue-800',
+    warn: 'bg-yellow-100 text-yellow-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    danger: 'bg-red-100 text-red-800',
+    secondary: 'bg-gray-100 text-gray-800',
+};
 </script>
 
 <template>
@@ -60,17 +68,17 @@ const formatDate = (dateStr?: string): string => {
                 <span>{{ formatDate(video.created_at) }}</span>
                 <span>{{ formatFileSize(video.size) }}</span>
                 <span>{{ formatDuration(video.duration) }}</span>
-                <Tag :value="video.status" :severity="getStatusSeverity(video.status)"
-                    class="capitalize px-2 py-0.5 text-xs" />
+                <span
+                    class="capitalize px-2 py-0.5 text-xs font-medium rounded-full"
+                    :class="severityClasses[getStatusSeverity(video.status) || 'secondary']">
+                    {{ video.status }}
+                </span>
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="flex items-center space-x-2">
-            <!-- Save Button (Edit Mode) -->
-            <!-- View Mode Buttons -->
-                <Button size="small"
-                    severity="secondary"
+                <AppButton size="sm" variant="secondary"
                     title="Reload video" @click="$emit('reload')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -78,23 +86,25 @@ const formatDate = (dateStr?: string): string => {
                         </path>
                     </svg>
                     <span class="hidden sm:inline">Reload</span>
-                </Button>
-                <Button size="small" title="Edit" variant="outlined" @click="$emit('toggleEdit')">
+                </AppButton>
+                <AppButton size="sm" variant="ghost"
+                    title="Edit" @click="$emit('toggleEdit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                         </path>
                     </svg>
                     <span class="hidden sm:inline">Edit</span>
-                </Button>
-                <Button severity="danger" size="small" title="Delete" @click="$emit('delete')">
+                </AppButton>
+                <AppButton variant="danger" size="sm"
+                    title="Delete" @click="$emit('delete')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                         </path>
                     </svg>
                     <span class="hidden sm:inline">Delete</span>
-                </Button>
+                </AppButton>
         </div>
     </div>
 </template>

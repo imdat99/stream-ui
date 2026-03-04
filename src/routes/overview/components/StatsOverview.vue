@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import { formatBytes } from '@/lib/utils';
-import Skeleton from 'primevue/skeleton';
 
 interface Props {
     loading: boolean;
@@ -22,12 +21,11 @@ defineProps<Props>();
         <div v-for="i in 4" :key="i" class="bg-surface rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <div class="space-y-2">
-                    <Skeleton width="5rem" height="1rem" class="mb-2"></Skeleton>
-                    <Skeleton width="8rem" height="2rem"></Skeleton>
+                    <div class="w-20 h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                    <div class="w-32 h-8 bg-gray-200 rounded animate-pulse" />
                 </div>
-                <!-- <Skeleton shape="circle" size="3rem"></Skeleton> -->
             </div>
-            <Skeleton width="4rem" height="1rem"></Skeleton>
+            <div class="w-16 h-4 bg-gray-200 rounded animate-pulse" />
         </div>
     </div>
 

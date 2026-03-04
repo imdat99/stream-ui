@@ -27,6 +27,7 @@ const links = [
 ];
 
 
+//v-tooltip="i.label"
 </script>
 
 <template>
@@ -35,7 +36,8 @@ const links = [
 
         <template v-for="i in links" :key="i.label">
             <component :name="i.label" :is="i.type === 'a' ? 'router-link' : 'div'"
-                v-bind="i.type === 'a' ? { to: i.href } : {}" v-tooltip="i.label" @click="i.action && i.action($event)"
+                v-bind="i.type === 'a' ? { to: i.href } : {}"
+                @click="i.action && i.action($event)"
                 :class="cn(
                     i.className,
                     ($route.path === i.href || $route.path.startsWith(i.href+'/') || i.isActive?.value) && 'bg-primary/15'
@@ -45,7 +47,5 @@ const links = [
             </component>
         </template>
     </header>
-    <ClientOnly>
-        <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
-    </ClientOnly>
+    <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
 </template>

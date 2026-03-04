@@ -4,7 +4,6 @@ import Credit from '@/components/icons/Credit.vue';
 import Upload from '@/components/icons/Upload.vue';
 import Video from '@/components/icons/Video.vue';
 import { useUIState } from '@/stores/uiState';
-import Skeleton from 'primevue/skeleton';
 import { useRouter } from 'vue-router';
 import Referral from './Referral.vue';
 interface Props {
@@ -46,19 +45,19 @@ const quickActions = [
 
 <template>
     <div v-if="loading" class="mb-8">
-        <Skeleton width="10rem" height="1.5rem" class="mb-4"></Skeleton>
+        <div class="w-40 h-6 bg-gray-200 rounded animate-pulse mb-4" />
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div v-for="i in 4" :key="i" class="p-6 rounded-xl border border-gray-200">
-                    <Skeleton shape="circle" size="3rem" class="mb-4"></Skeleton>
-                    <Skeleton width="8rem" height="1.25rem" class="mb-2"></Skeleton>
-                    <Skeleton width="100%" height="1rem"></Skeleton>
+                    <div class="w-12 h-12 bg-gray-200 rounded-full animate-pulse mb-4" />
+                    <div class="w-32 h-5 bg-gray-200 rounded animate-pulse mb-2" />
+                    <div class="w-full h-4 bg-gray-200 rounded animate-pulse" />
                 </div>
             </div>
             <div class="flex flex-col justify-between p-6 rounded-xl border border-gray-200">
-                <Skeleton width="10rem" height="2rem"></Skeleton>
-                <Skeleton width="100%" height="1.25rem" class="my-4"></Skeleton>
-                <Skeleton width="100%" height="1rem"></Skeleton>
+                <div class="w-40 h-8 bg-gray-200 rounded animate-pulse" />
+                <div class="w-full h-5 bg-gray-200 rounded animate-pulse my-4" />
+                <div class="w-full h-4 bg-gray-200 rounded animate-pulse" />
             </div>
         </div>
     </div>

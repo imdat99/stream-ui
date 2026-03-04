@@ -2,7 +2,6 @@
 import { ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import { formatBytes, formatDate, formatDuration } from '@/lib/utils';
-import Skeleton from 'primevue/skeleton';
 import { useRouter } from 'vue-router';
 
 interface Props {
@@ -28,16 +27,16 @@ const getStatusClass = (status?: string) => {
     <div class="mb-8">
         <div v-if="loading">
             <div class="flex items-center justify-between mb-4">
-                <Skeleton width="8rem" height="1.5rem"></Skeleton>
-                <Skeleton width="5rem" height="1rem"></Skeleton>
+                <div class="w-32 h-6 bg-gray-200 rounded animate-pulse" />
+                <div class="w-20 h-4 bg-gray-200 rounded animate-pulse" />
             </div>
             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div class="p-4 border-b border-gray-200" v-for="i in 5" :key="i">
                     <div class="flex gap-4">
-                        <Skeleton width="4rem" height="2.5rem" class="rounded"></Skeleton>
+                        <div class="w-16 h-10 bg-gray-200 rounded animate-pulse" />
                         <div class="flex-1 space-y-2">
-                            <Skeleton width="30%" height="1rem"></Skeleton>
-                            <Skeleton width="20%" height="0.8rem"></Skeleton>
+                            <div class="w-[30%] h-4 bg-gray-200 rounded animate-pulse" />
+                            <div class="w-[20%] h-3 bg-gray-200 rounded animate-pulse" />
                         </div>
                     </div>
                 </div>

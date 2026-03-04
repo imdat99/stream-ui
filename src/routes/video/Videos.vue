@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router';
 
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
-import { useToast } from 'primevue/usetoast';
+import { useAppToast } from '@/composables/useAppToast';
 import VideoBulkActions from './components/VideoBulkActions.vue';
 import VideoFilters from './components/VideoFilters.vue';
 import VideoTable from './components/VideoTable.vue';
@@ -20,7 +20,7 @@ const copyVideoId = ref<string>("");
 
 const uiState = useUIState();
 const { addFiles, startQueue } = useUploadQueue();
-const toast = useToast();
+const toast = useAppToast();
 const router = useRouter();
 const videos = ref<ModelVideo[]>([]);
 const loading = ref(true);

@@ -2,9 +2,8 @@
 import type { ModelVideo } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { deleteMockVideo, fetchMockVideoById, updateMockVideo } from '@/mocks/videos';
-import ConfirmDialog from 'primevue/confirmdialog';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
+import { useAppConfirm } from '@/composables/useAppConfirm';
+import { useAppToast } from '@/composables/useAppToast';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import VideoEditForm from './components/Detail/VideoEditForm.vue';
@@ -14,8 +13,8 @@ import VideoSkeleton from './components/Detail/VideoSkeleton.vue';
 
 const route = useRoute();
 const router = useRouter();
-const toast = useToast();
-const confirm = useConfirm();
+const toast = useAppToast();
+const confirm = useAppConfirm();
 
 const videoId = route.params.id as string;
 const video = ref<ModelVideo | null>(null);
@@ -83,8 +82,8 @@ const handleDelete = () => {
     confirm.require({
         message: 'Are you sure you want to delete this video? This action cannot be undone.',
         header: 'Confirm Delete',
-        icon: 'pi pi-exclamation-triangle',
-        acceptClass: 'p-button-danger',
+        acceptLabel: 'Delete',
+        rejectLabel: 'Cancel',
         accept: async () => {
             try {
                 await deleteMockVideo(videoId);
@@ -132,7 +131,6 @@ const videoInfos = computed(() => {
 
 <template>
     <div>
-        <ConfirmDialog />
         <PageHeader title="Video Detail" description="View and manage video details" :breadcrumbs="[
             { label: 'Dashboard', to: '/' },
             { label: 'Videos', to: '/video' },

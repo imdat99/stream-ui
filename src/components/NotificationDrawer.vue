@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import NotificationItem from '@/routes/notification/components/NotificationItem.vue';
 import { onClickOutside } from '@vueuse/core';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+
+// Ensure client-side only rendering to avoid hydration mismatch
+const isMounted = ref(false);
+onMounted(() => {
+    isMounted.value = true;
+});
 
 // Emit event when visibility changes
 const emit = defineEmits(['change']);
@@ -121,7 +127,7 @@ defineExpose({ toggle });
 </script>
 
 <template>
-    <Teleport to="body">
+    <Teleport v-if="isMounted" to="body">
         <Transition enter-active-class="transition-all duration-300 ease-out"
             enter-from-class="opacity-0 -translate-x-4" enter-to-class="opacity-100 translate-x-0"
             leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100 translate-x-0"

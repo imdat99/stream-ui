@@ -30,7 +30,7 @@ const emit = defineEmits<{
                 @input="$emit('update:description', ($event.target as HTMLTextAreaElement).value)"></textarea>
         </div>
         <div class="float-right flex gap-2">
-            <Button size="small"
+            <AppButton size="sm"
                 title="Save changes" :disabled="saving" @click="$emit('save')">
                 <svg v-if="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -38,17 +38,17 @@ const emit = defineEmits<{
                 <span v-if="saving"
                     class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 <span class="hidden sm:inline">{{ saving ? 'Saving...' : 'Save' }}</span>
-            </Button>
+            </AppButton>
 
             <!-- Cancel Button (Edit Mode) -->
-            <Button severity="danger" size="small" title="Cancel editing"
+            <AppButton variant="danger" size="sm" title="Cancel editing"
                 @click="$emit('toggleEdit')">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
                 </svg>
                 <span class="hidden sm:inline">Cancel</span>
-            </Button>
+            </AppButton>
         </div>
     </div>
 </template>

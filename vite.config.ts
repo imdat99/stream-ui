@@ -1,5 +1,4 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "node:path";
@@ -25,7 +24,6 @@ export default defineConfig((env) => {
         dts: true,
         dtsTsx: true,
         directives: false,
-        resolvers: [PrimeVueResolver()],
       }),
       ssrPlugin(),
       cloudflare(),

@@ -2,17 +2,12 @@ import { serializeQueryCache } from '@pinia/colada';
 import { renderSSRHead } from '@unhead/vue/server';
 import { streamText } from 'hono/streaming';
 import { renderToWebStream } from 'vue/server-renderer';
-// @ts-ignore
-import Base from '@primevue/core/base';
 
 import { createApp } from '@/main';
 import { useAuthStore } from '@/stores/auth';
 import { buildBootstrapScript } from '@/lib/manifest';
-import { styleTags } from '@/lib/primePassthrough';
 import { htmlEscape } from '@/server/utils/htmlEscape';
 import type { Hono } from 'hono';
-
-const DEFAULT_STYLE_NAMES = ['primitive', 'semantic', 'global', 'base', 'ripple-directive'];
 
 export function registerSSRRoutes(app: Hono) {
   app.get("*", async (c) => {
@@ -29,9 +24,6 @@ export function registerSSRRoutes(app: Hono) {
 
     await router.push(url.pathname);
     await router.isReady();
-
-    const usedStyles = new Set<string>();
-    Base.setLoadedStyleName = async (name: string) => usedStyles.add(name);
 
     return streamText(c, async (stream) => {
       c.header("Content-Type", "text/html; charset=utf-8");
@@ -55,19 +47,6 @@ export function registerSSRRoutes(app: Hono) {
 
       // Bootstrap scripts
       await stream.write(buildBootstrapScript());
-
-      // PrimeVue styles
-      if (usedStyles.size > 0) {
-        DEFAULT_STYLE_NAMES.forEach(name => usedStyles.add(name));
-      }
-
-      const activeStyles = styleTags.filter(tag =>
-        usedStyles.has(tag.name.replace(/-(variables|style)$/, ""))
-      );
-
-      for (const tag of activeStyles) {
-        await stream.write(`<style type="text/css" data-primevue-style-id="${tag.name}">${tag.value}</style>`);
-      }
 
       // Body start
       await stream.write(`</head><body class='${bodyClass}'>`);
