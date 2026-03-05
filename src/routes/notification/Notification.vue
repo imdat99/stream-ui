@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import PageHeader from '@/components/dashboard/PageHeader.vue';
 import NotificationActions from './components/NotificationActions.vue';
 import NotificationList from './components/NotificationList.vue';
 import NotificationTabs from './components/NotificationTabs.vue';
@@ -20,72 +21,74 @@ interface Notification {
 
 const loading = ref(false);
 const activeTab = ref('all');
+const { t } = useI18n();
 
-// Mock notifications data
 const notifications = ref<Notification[]>([
     {
         id: '1',
         type: 'video',
-        title: 'Video processing complete',
-        message: 'Your video "Summer Vacation 2024" has been successfully processed and is now ready to stream.',
-        time: '2 minutes ago',
+        title: t('notification.mocks.videoProcessed.title'),
+        message: t('notification.mocks.videoProcessed.message'),
+        time: t('notification.time.minutesAgo', { count: 2 }),
         read: false,
         actionUrl: '/video',
-        actionLabel: 'View video'
+        actionLabel: t('notification.actions.viewVideo')
     },
     {
         id: '2',
         type: 'payment',
-        title: 'Payment successful',
-        message: 'Your subscription to Pro Plan has been renewed successfully. Next billing date: Feb 25, 2026.',
-        time: '1 hour ago',
+        title: t('notification.mocks.paymentSuccess.title'),
+        message: t('notification.mocks.paymentSuccess.message'),
+        time: t('notification.time.hoursAgo', { count: 1 }),
         read: false,
         actionUrl: '/payments-and-plans',
-        actionLabel: 'View receipt'
+        actionLabel: t('notification.actions.viewReceipt')
     },
     {
         id: '3',
         type: 'warning',
-        title: 'Storage almost full',
-        message: 'You have used 85% of your storage quota. Consider upgrading your plan for more space.',
-        time: '3 hours ago',
+        title: t('notification.mocks.storageWarning.title'),
+        message: t('notification.mocks.storageWarning.message'),
+        time: t('notification.time.hoursAgo', { count: 3 }),
         read: false,
         actionUrl: '/payments-and-plans',
-        actionLabel: 'Upgrade plan'
+        actionLabel: t('notification.actions.upgradePlan')
     },
     {
         id: '4',
         type: 'success',
-        title: 'Upload successful',
-        message: 'Your video "Product Demo v2" has been uploaded successfully.',
-        time: '1 day ago',
+        title: t('notification.mocks.uploadSuccess.title'),
+        message: t('notification.mocks.uploadSuccess.message'),
+        time: t('notification.time.daysAgo', { count: 1 }),
         read: true
     },
     {
         id: '5',
         type: 'system',
-        title: 'Scheduled maintenance',
-        message: 'We will perform scheduled maintenance on Jan 30, 2026 from 2:00 AM to 4:00 AM UTC.',
-        time: '2 days ago',
+        title: t('notification.mocks.maintenance.title'),
+        message: t('notification.mocks.maintenance.message'),
+        time: t('notification.time.daysAgo', { count: 2 }),
         read: true
     },
     {
         id: '6',
         type: 'info',
-        title: 'New feature available',
-        message: 'We just launched video analytics! Track your video performance with detailed insights.',
-        time: '3 days ago',
+        title: t('notification.mocks.newFeature.title'),
+        message: t('notification.mocks.newFeature.message'),
+        time: t('notification.time.daysAgo', { count: 3 }),
         read: true,
         actionUrl: '/video',
-        actionLabel: 'Try it now'
+        actionLabel: t('notification.actions.tryNow')
     }
 ]);
 
+const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
+
 const tabs = computed(() => [
-    { key: 'all', label: 'All', icon: 'i-lucide-inbox', count: notifications.value.length },
-    { key: 'unread', label: 'Unread', icon: 'i-lucide-bell-dot', count: unreadCount.value },
-    { key: 'video', label: 'Videos', icon: 'i-lucide-video', count: notifications.value.filter(n => n.type === 'video').length },
-    { key: 'payment', label: 'Payments', icon: 'i-lucide-credit-card', count: notifications.value.filter(n => n.type === 'payment').length }
+    { key: 'all', label: t('notification.tabs.all'), icon: 'i-lucide-inbox', count: notifications.value.length },
+    { key: 'unread', label: t('notification.tabs.unread'), icon: 'i-lucide-bell-dot', count: unreadCount.value },
+    { key: 'video', label: t('notification.tabs.videos'), icon: 'i-lucide-video', count: notifications.value.filter(n => n.type === 'video').length },
+    { key: 'payment', label: t('notification.tabs.payments'), icon: 'i-lucide-credit-card', count: notifications.value.filter(n => n.type === 'payment').length }
 ]);
 
 const filteredNotifications = computed(() => {
@@ -93,8 +96,6 @@ const filteredNotifications = computed(() => {
     if (activeTab.value === 'unread') return notifications.value.filter(n => !n.read);
     return notifications.value.filter(n => n.type === activeTab.value);
 });
-
-const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
 
 const handleMarkRead = (id: string) => {
     const notification = notifications.value.find(n => n.id === id);
@@ -116,37 +117,37 @@ const handleClearAll = () => {
 
 <template>
     <div>
-        <PageHeader 
-            title="Notifications" 
-            description="Stay updated with your latest activities and alerts."
+        <PageHeader
+            :title="t('notification.title')"
+            :description="t('notification.subtitle')"
             :breadcrumbs="[
-                { label: 'Dashboard', to: '/' },
-                { label: 'Notifications' }
+                { label: t('pageHeader.dashboard'), to: '/' },
+                { label: t('nav.notification') }
             ]"
         />
-    <div class="w-full max-w-4xl mx-auto mt-6">
-        <div class="notification-container bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <NotificationActions
-                :loading="loading"
-                :total-count="notifications.length"
-                :unread-count="unreadCount"
-                @mark-all-read="handleMarkAllRead"
-                @clear-all="handleClearAll"
-            />
+        <div class="w-full max-w-4xl mx-auto mt-6">
+            <div class="notification-container bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <NotificationActions
+                    :loading="loading"
+                    :total-count="notifications.length"
+                    :unread-count="unreadCount"
+                    @mark-all-read="handleMarkAllRead"
+                    @clear-all="handleClearAll"
+                />
 
-            <NotificationTabs
-                :tabs="tabs"
-                :active-tab="activeTab"
-                @update:active-tab="activeTab = $event"
-            />
+                <NotificationTabs
+                    :tabs="tabs"
+                    :active-tab="activeTab"
+                    @update:active-tab="activeTab = $event"
+                />
 
-            <NotificationList
-                :notifications="filteredNotifications"
-                :loading="loading"
-                @mark-read="handleMarkRead"
-                @delete="handleDelete"
-            />
+                <NotificationList
+                    :notifications="filteredNotifications"
+                    :loading="loading"
+                    @mark-read="handleMarkRead"
+                    @delete="handleDelete"
+                />
+            </div>
         </div>
-    </div>
     </div>
 </template>

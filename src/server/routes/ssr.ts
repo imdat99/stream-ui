@@ -4,23 +4,50 @@ import { streamText } from 'hono/streaming';
 import { renderToWebStream } from 'vue/server-renderer';
 
 import { createApp } from '@/main';
+import { defaultLocale, localeCookieKey } from '@/i18n/constants';
+import { normalizeLocale, resolveLocaleFromAcceptLanguage } from '@/i18n';
 import { useAuthStore } from '@/stores/auth';
 import { buildBootstrapScript } from '@/lib/manifest';
 import { htmlEscape } from '@/server/utils/htmlEscape';
 import type { Hono } from 'hono';
+
+const parseCookie = (cookieHeader: string | undefined, key: string): string | undefined => {
+  if (!cookieHeader) return undefined;
+  const segments = cookieHeader.split(';');
+  for (const segment of segments) {
+    const [rawKey, ...rest] = segment.trim().split('=');
+    if (rawKey !== key) continue;
+    return decodeURIComponent(rest.join('='));
+  }
+  return undefined;
+};
+
+const resolveLocaleFromAuthUser = (authUser: unknown): string | undefined => {
+  if (!authUser || typeof authUser !== 'object') return undefined;
+  const maybeLanguage = (authUser as any).language ?? (authUser as any).locale;
+  return typeof maybeLanguage === 'string' ? maybeLanguage : undefined;
+};
 
 export function registerSSRRoutes(app: Hono) {
   app.get("*", async (c) => {
     const nonce = crypto.randomUUID();
     const url = new URL(c.req.url);
 
-    const { app: vueApp, router, head, pinia, bodyClass, queryCache } = createApp();
+    const cookieLocaleRaw = parseCookie(c.req.header('cookie'), localeCookieKey);
+    const acceptLocale = resolveLocaleFromAcceptLanguage(c.req.header('accept-language'));
+    const bootstrapLocale = normalizeLocale(cookieLocaleRaw ?? acceptLocale ?? defaultLocale);
+
+    const { app: vueApp, router, head, pinia, bodyClass, queryCache, i18n } = createApp(bootstrapLocale);
 
     vueApp.provide("honoContext", c);
 
     const auth = useAuthStore();
     auth.$reset();
     await auth.init();
+
+    const userPreferredLocale = resolveLocaleFromAuthUser(auth.user);
+    const resolvedLocale = normalizeLocale(userPreferredLocale ?? cookieLocaleRaw ?? acceptLocale ?? defaultLocale);
+    i18n.global.locale.value = resolvedLocale;
 
     await router.push(url.pathname);
     await router.isReady();
@@ -33,7 +60,7 @@ export function registerSSRRoutes(app: Hono) {
       const appStream = renderToWebStream(vueApp, ctx);
 
       // HTML Head
-      await stream.write("<!DOCTYPE html><html lang='en'><head>");
+      await stream.write(`<!DOCTYPE html><html lang='${resolvedLocale}'><head>`);
       await stream.write("<base href='" + url.origin + "'/>");
 
       // SSR Head tags
@@ -62,7 +89,8 @@ export function registerSSRRoutes(app: Hono) {
       // Inject state
       Object.assign(ctx, {
         $p: pinia.state.value,
-        $colada: serializeQueryCache(queryCache)
+        $colada: serializeQueryCache(queryCache),
+        $locale: resolvedLocale,
       });
 
       // App data script

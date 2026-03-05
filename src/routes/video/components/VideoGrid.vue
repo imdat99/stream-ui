@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
+import { useI18n } from 'vue-i18n';
 import CardPopover from './CardPopover.vue';
 
 const props = defineProps<{
@@ -13,6 +14,8 @@ const emit = defineEmits<{
     (e: 'update:selectedVideos', value: ModelVideo[]): void;
     (e: 'delete', videoId: string): void;
 }>();
+
+const { t } = useI18n();
 
 const severityClasses: Record<string, string> = {
     success: 'bg-green-100 text-green-800',
@@ -90,7 +93,7 @@ const toggleSelection = (video: ModelVideo) => {
                     </button>
                 </div>
 
-                <p class="text-xs text-gray-500 mb-3 line-clamp-1 h-4">{{ video.description || 'No description' }}
+                <p class="text-xs text-gray-500 mb-3 line-clamp-1 h-4">{{ video.description || t('video.table.noDescription') }}
                 </p>
                 <div class="text-xs text-gray-400 mt-auto">
                     {{ formatDate(video.created_at) }}

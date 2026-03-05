@@ -1,37 +1,36 @@
 <script setup lang="ts">
 import { client, type ModelPlan } from '@/api/client';
+import AppButton from '@/components/app/AppButton.vue';
+import AppDialog from '@/components/app/AppDialog.vue';
+import AppInput from '@/components/app/AppInput.vue';
 import ActivityIcon from '@/components/icons/ActivityIcon.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import CoinsIcon from '@/components/icons/CoinsIcon.vue';
 import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import UploadIcon from '@/components/icons/UploadIcon.vue';
+import { useAppToast } from '@/composables/useAppToast';
 import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
-import AppButton from '@/components/app/AppButton.vue';
-import AppDialog from '@/components/app/AppDialog.vue';
-import AppInput from '@/components/app/AppInput.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
-import PlusIcon from '@/components/icons/PlusIcon.vue';
-import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const toast = useAppToast();
 const auth = useAuthStore();
+const { t, locale } = useI18n();
 
-const { data, isPending, isLoading } = useQuery({
+const { data, isLoading } = useQuery({
     key: () => ['payments-and-plans'],
     query: () => client.plans.plansList(),
 });
 
 const subscribing = ref<string | null>(null);
 
-// Top-up state
 const topupDialogVisible = ref(false);
 const topupAmount = ref<number | null>(0);
 const topupLoading = ref(false);
 const topupPresets = [10, 20, 50, 100];
 
-// Mock Payment History Data
 const paymentHistory = ref([
     { id: 'inv_001', date: 'Oct 24, 2025', amount: 9.99, plan: 'Basic Plan', status: 'success', invoiceId: 'INV-2025-001' },
     { id: 'inv_002', date: 'Nov 24, 2025', amount: 9.99, plan: 'Basic Plan', status: 'success', invoiceId: 'INV-2025-002' },
@@ -39,13 +38,11 @@ const paymentHistory = ref([
     { id: 'inv_004', date: 'Jan 24, 2026', amount: 19.99, plan: 'Pro Plan', status: 'pending', invoiceId: 'INV-2026-001' },
 ]);
 
-// Computed Usage (from user data)
 const storageUsed = computed(() => auth.user?.storage_used || 0);
 const storageLimit = computed(() => 10737418240);
 const uploadsUsed = ref(12);
 const uploadsLimit = ref(50);
 
-// Wallet balance (from user data or mock)
 const walletBalance = computed(() => auth.user?.wallet_balance || 0);
 
 const currentPlanId = computed(() => {
@@ -54,12 +51,6 @@ const currentPlanId = computed(() => {
     return undefined;
 });
 
-const currentPlan = computed(() => {
-    if (!Array.isArray(data?.value?.data?.data.plans)) return undefined;
-    return data.value.data.data.plans.find(p => p.id === currentPlanId.value);
-});
-
-// Percentages
 const storagePercentage = computed(() =>
     Math.min(Math.round((storageUsed.value / storageLimit.value) * 100), 100)
 );
@@ -76,8 +67,8 @@ const formatBytes = (bytes: number) => {
 };
 
 const formatDuration = (seconds?: number) => {
-    if (!seconds) return '0 mins';
-    return `${Math.floor(seconds / 60)} mins`;
+    if (!seconds) return t('settings.billing.durationMinutes', { minutes: 0 });
+    return t('settings.billing.durationMinutes', { minutes: Math.floor(seconds / 60) });
 };
 
 const getStatusStyles = (status: string) => {
@@ -93,7 +84,22 @@ const getStatusStyles = (status: string) => {
     }
 };
 
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+const getStatusLabel = (status: string) => {
+    const map: Record<string, string> = {
+        success: t('settings.billing.status.success'),
+        failed: t('settings.billing.status.failed'),
+        pending: t('settings.billing.status.pending'),
+    };
+    return map[status] || status;
+};
+
+const currencyFormatter = computed(() => new Intl.NumberFormat(locale.value === 'vi' ? 'vi-VN' : 'en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+}));
+
+const formatMoney = (amount: number) => currencyFormatter.value.format(amount);
 
 const subscribe = async (plan: ModelPlan) => {
     if (!plan.id) return;
@@ -101,30 +107,30 @@ const subscribe = async (plan: ModelPlan) => {
     try {
         await client.payments.paymentsCreate({
             amount: plan.price || 0,
-            plan_id: plan.id
+            plan_id: plan.id,
         });
         toast.add({
             severity: 'success',
-            summary: 'Subscription Successful',
-            detail: `Successfully subscribed to ${plan.name}`,
-            life: 3000
+            summary: t('settings.billing.toast.subscriptionSuccessSummary'),
+            detail: t('settings.billing.toast.subscriptionSuccessDetail', { plan: plan.name || '' }),
+            life: 3000,
         });
 
         paymentHistory.value.unshift({
             id: `inv_${Date.now()}`,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            date: new Date().toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             amount: plan.price || 0,
-            plan: plan.name || 'Unknown',
+            plan: plan.name || t('settings.billing.unknownPlan'),
             status: 'success',
-            invoiceId: `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`
+            invoiceId: `INV-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
         });
     } catch (err: any) {
         console.error(err);
         toast.add({
             severity: 'error',
-            summary: 'Subscription Failed',
-            detail: err.message || 'Failed to subscribe',
-            life: 5000
+            summary: t('settings.billing.toast.subscriptionFailedSummary'),
+            detail: err.message || t('settings.billing.toast.subscriptionFailedDetail'),
+            life: 5000,
         });
     } finally {
         subscribing.value = null;
@@ -134,23 +140,22 @@ const subscribe = async (plan: ModelPlan) => {
 const handleTopup = async (amount: number) => {
     topupLoading.value = true;
     try {
-        // TODO: Add API endpoint for top-up
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         toast.add({
             severity: 'success',
-            summary: 'Top-up Successful',
-            detail: `$${amount} has been added to your wallet.`,
-            life: 3000
+            summary: t('settings.billing.toast.topupSuccessSummary'),
+            detail: t('settings.billing.toast.topupSuccessDetail', { amount: formatMoney(amount) }),
+            life: 3000,
         });
         topupDialogVisible.value = false;
         topupAmount.value = null;
     } catch (e: any) {
         toast.add({
             severity: 'error',
-            summary: 'Top-up Failed',
-            detail: e.message || 'Failed to process top-up.',
-            life: 5000
+            summary: t('settings.billing.toast.topupFailedSummary'),
+            detail: e.message || t('settings.billing.toast.topupFailedDetail'),
+            life: 5000,
         });
     } finally {
         topupLoading.value = false;
@@ -160,17 +165,17 @@ const handleTopup = async (amount: number) => {
 const handleDownloadInvoice = (item: typeof paymentHistory.value[number]) => {
     toast.add({
         severity: 'info',
-        summary: 'Downloading',
-        detail: `Downloading invoice #${item.invoiceId}...`,
-        life: 2000
+        summary: t('settings.billing.toast.downloadingSummary'),
+        detail: t('settings.billing.toast.downloadingDetail', { invoiceId: item.invoiceId }),
+        life: 2000,
     });
 
     setTimeout(() => {
         toast.add({
             severity: 'success',
-            summary: 'Downloaded',
-            detail: `Invoice #${item.invoiceId} downloaded successfully`,
-            life: 3000
+            summary: t('settings.billing.toast.downloadedSummary'),
+            detail: t('settings.billing.toast.downloadedDetail', { invoiceId: item.invoiceId }),
+            life: 3000,
         });
     }, 1500);
 };
@@ -187,26 +192,23 @@ const selectPreset = (amount: number) => {
 
 <template>
     <div class="bg-surface border border-border rounded-lg">
-        <!-- Header -->
         <div class="px-6 py-4 border-b border-border">
-            <h2 class="text-base font-semibold text-foreground">Billing & Plans</h2>
+            <h2 class="text-base font-semibold text-foreground">{{ t('settings.content.billing.title') }}</h2>
             <p class="text-sm text-foreground/60 mt-0.5">
-                Manage your subscription, wallet, and billing information.
+                {{ t('settings.content.billing.subtitle') }}
             </p>
         </div>
 
-        <!-- Content -->
         <div class="divide-y divide-border">
-            <!-- Wallet Balance -->
             <div class="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-all">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
                         <CoinsIcon class="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Wallet Balance</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.walletBalance') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            Current balance: ${{ walletBalance.toFixed(2) }}
+                            {{ t('settings.billing.currentBalance', { balance: formatMoney(walletBalance) }) }}
                         </p>
                     </div>
                 </div>
@@ -214,24 +216,23 @@ const selectPreset = (amount: number) => {
                     <template #icon>
                         <PlusIcon class="w-4 h-4" />
                     </template>
-                    Top Up
+                    {{ t('settings.billing.topUp') }}
                 </AppButton>
             </div>
-             <!-- Available Plans -->
+
             <div class="px-6 py-4">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
                         <CreditCardIcon class="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Available Plans</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.availablePlans') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            Choose the plan that best fits your needs
+                            {{ t('settings.billing.availablePlansHint') }}
                         </p>
                     </div>
                 </div>
 
-                <!-- Loading State -->
                 <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div v-for="i in 3" :key="i">
                         <div class="h-[200px] rounded-lg bg-muted/50 animate-pulse"></div>
@@ -250,22 +251,22 @@ const selectPreset = (amount: number) => {
                         </div>
 
                         <div class="mb-4">
-                            <span class="text-2xl font-bold text-foreground">${{ plan.price }}</span>
+                            <span class="text-2xl font-bold text-foreground">{{ formatMoney(plan.price || 0) }}</span>
                             <span class="text-foreground/60 text-sm">/{{ plan.cycle }}</span>
                         </div>
 
                         <ul class="space-y-2 mb-4 text-sm">
                             <li class="flex items-center gap-2 text-foreground/70">
                                 <CheckIcon class="w-4 h-4 text-success shrink-0" />
-                                {{ formatBytes(plan.storage_limit || 0) }} Storage
+                                {{ t('settings.billing.planStorage', { storage: formatBytes(plan.storage_limit || 0) }) }}
                             </li>
                             <li class="flex items-center gap-2 text-foreground/70">
                                 <CheckIcon class="w-4 h-4 text-success shrink-0" />
-                                {{ formatDuration(plan.duration_limit) }} Max Duration
+                                {{ t('settings.billing.planDuration', { duration: formatDuration(plan.duration_limit) }) }}
                             </li>
                             <li class="flex items-center gap-2 text-foreground/70">
                                 <CheckIcon class="w-4 h-4 text-success shrink-0" />
-                                {{ plan.upload_limit }} Uploads / day
+                                {{ t('settings.billing.planUploads', { count: plan.upload_limit }) }}
                             </li>
                         </ul>
 
@@ -281,21 +282,23 @@ const selectPreset = (amount: number) => {
                             ]"
                             @click="subscribe(plan)"
                         >
-                            {{ plan.id === currentPlanId ? 'Current Plan' : (subscribing === plan.id ? 'Processing...' : 'Upgrade') }}
+                            {{ plan.id === currentPlanId
+                                ? t('settings.billing.currentPlan')
+                                : (subscribing === plan.id ? t('settings.billing.processing') : t('settings.billing.upgrade')) }}
                         </button>
                     </div>
                 </div>
             </div>
-            <!-- Storage Usage -->
+
             <div class="px-6 py-4 hover:bg-muted/30 transition-all">
                 <div class="flex items-center gap-4 mb-3">
                     <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
                         <ActivityIcon class="w-5 h-5 text-accent" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Storage</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.storage') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used
+                            {{ t('settings.billing.storageUsedOfLimit', { used: formatBytes(storageUsed), limit: formatBytes(storageLimit) }) }}
                         </p>
                     </div>
                 </div>
@@ -307,16 +310,15 @@ const selectPreset = (amount: number) => {
                 </div>
             </div>
 
-            <!-- Uploads Usage -->
             <div class="px-6 py-4 hover:bg-muted/30 transition-all">
                 <div class="flex items-center gap-4 mb-3">
                     <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
                         <UploadIcon class="w-5 h-5 text-info" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Monthly Uploads</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.monthlyUploads') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ uploadsUsed }} of {{ uploadsLimit }} uploads
+                            {{ t('settings.billing.uploadsUsedOfLimit', { used: uploadsUsed, limit: uploadsLimit }) }}
                         </p>
                     </div>
                 </div>
@@ -328,39 +330,35 @@ const selectPreset = (amount: number) => {
                 </div>
             </div>
 
-            <!-- Payment History -->
             <div class="px-6 py-4">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
                         <DownloadIcon class="w-5 h-5 text-info" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Payment History</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.paymentHistory') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            Your past payments and invoices
+                            {{ t('settings.billing.paymentHistorySubtitle') }}
                         </p>
                     </div>
                 </div>
 
                 <div class="border border-border rounded-lg overflow-hidden">
-                    <!-- Table Header -->
                     <div class="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-medium text-foreground/60 uppercase tracking-wider bg-muted/30">
-                        <div class="col-span-3">Date</div>
-                        <div class="col-span-2">Amount</div>
-                        <div class="col-span-3">Plan</div>
-                        <div class="col-span-2">Status</div>
-                        <div class="col-span-2 text-right">Invoice</div>
+                        <div class="col-span-3">{{ t('settings.billing.table.date') }}</div>
+                        <div class="col-span-2">{{ t('settings.billing.table.amount') }}</div>
+                        <div class="col-span-3">{{ t('settings.billing.table.plan') }}</div>
+                        <div class="col-span-2">{{ t('settings.billing.table.status') }}</div>
+                        <div class="col-span-2 text-right">{{ t('settings.billing.table.invoice') }}</div>
                     </div>
 
-                    <!-- Empty State -->
                     <div v-if="paymentHistory.length === 0" class="text-center py-12 text-foreground/60">
                         <div class="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                             <DownloadIcon class="w-8 h-8 text-foreground/40" />
                         </div>
-                        <p>No payment history found.</p>
+                        <p>{{ t('settings.billing.noPaymentHistory') }}</p>
                     </div>
 
-                    <!-- Table Rows -->
                     <div
                         v-for="item in paymentHistory"
                         :key="item.id"
@@ -370,7 +368,7 @@ const selectPreset = (amount: number) => {
                             <p class="text-sm font-medium text-foreground">{{ item.date }}</p>
                         </div>
                         <div class="col-span-2">
-                            <p class="text-sm text-foreground">${{ item.amount }}</p>
+                            <p class="text-sm text-foreground">{{ formatMoney(item.amount) }}</p>
                         </div>
                         <div class="col-span-3">
                             <p class="text-sm text-foreground">{{ item.plan }}</p>
@@ -379,7 +377,7 @@ const selectPreset = (amount: number) => {
                             <span
                                 :class="`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(item.status)}`"
                             >
-                                {{ capitalize(item.status) }}
+                                {{ getStatusLabel(item.status) }}
                             </span>
                         </div>
                         <div class="col-span-2 flex justify-end">
@@ -388,7 +386,7 @@ const selectPreset = (amount: number) => {
                                 @click="handleDownloadInvoice(item)"
                             >
                                 <DownloadIcon class="w-4 h-4" />
-                                <span>Download</span>
+                                <span>{{ t('settings.billing.download') }}</span>
                             </button>
                         </div>
                     </div>
@@ -396,19 +394,17 @@ const selectPreset = (amount: number) => {
             </div>
         </div>
 
-        <!-- Top-up Dialog -->
         <AppDialog
             :visible="topupDialogVisible"
             @update:visible="topupDialogVisible = $event"
-            title="Top Up Wallet"
+            :title="t('settings.billing.topupDialog.title')"
             maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
-                    Select an amount or enter a custom amount to add to your wallet.
+                    {{ t('settings.billing.topupDialog.subtitle') }}
                 </p>
 
-                <!-- Preset Amounts -->
                 <div class="grid grid-cols-4 gap-3">
                     <button
                         v-for="preset in topupPresets"
@@ -421,19 +417,18 @@ const selectPreset = (amount: number) => {
                         ]"
                         @click="selectPreset(preset)"
                     >
-                        ${{ preset }}
+                        {{ formatMoney(preset) }}
                     </button>
                 </div>
 
-                <!-- Custom Amount -->
                 <div class="space-y-2">
-                    <label class="text-sm font-medium text-foreground">Custom Amount</label>
+                    <label class="text-sm font-medium text-foreground">{{ t('settings.billing.topupDialog.customAmount') }}</label>
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-semibold text-foreground">$</span>
                         <AppInput
                             v-model.number="topupAmount"
                             type="number"
-                            placeholder="Enter amount"
+                            :placeholder="t('settings.billing.topupDialog.enterAmount')"
                             inputClass="flex-1"
                             min="1"
                             step="1"
@@ -441,9 +436,8 @@ const selectPreset = (amount: number) => {
                     </div>
                 </div>
 
-                <!-- Info -->
                 <div class="bg-muted/30 rounded-md p-3 text-xs text-foreground/60">
-                    <p>Minimum top-up amount is $1. Funds will be added to your wallet immediately after payment.</p>
+                    <p>{{ t('settings.billing.topupDialog.hint') }}</p>
                 </div>
             </div>
             <template #footer>
@@ -454,7 +448,7 @@ const selectPreset = (amount: number) => {
                         :disabled="topupLoading"
                         @click="topupDialogVisible = false"
                     >
-                        Cancel
+                        {{ t('common.cancel') }}
                     </AppButton>
                     <AppButton
                         size="sm"
@@ -465,7 +459,7 @@ const selectPreset = (amount: number) => {
                         <template #icon>
                             <CheckIcon class="w-4 h-4" />
                         </template>
-                        Proceed to Payment
+                        {{ t('settings.billing.topupDialog.proceed') }}
                     </AppButton>
                 </div>
             </template>

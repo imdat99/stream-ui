@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AppButton from '@/components/app/AppButton.vue';
 import AppInput from '@/components/app/AppInput.vue';
 import AppProgressBar from '@/components/app/AppProgressBar.vue';
@@ -11,6 +12,7 @@ import UserIcon from '@/components/icons/UserIcon.vue';
 import XIcon from '@/components/icons/XIcon.vue';
 
 const auth = useAuthStore();
+const { t } = useI18n();
 
 const props = defineProps<{
     editing: boolean;
@@ -46,31 +48,27 @@ const formatBytes = (bytes: number) => {
 
 <template>
     <div class="bg-surface border border-border rounded-lg">
-        <!-- Header -->
         <div class="px-6 py-4 border-b border-border">
-            <h2 class="text-base font-semibold text-foreground">Profile Information</h2>
+            <h2 class="text-base font-semibold text-foreground">{{ t('settings.profile.title') }}</h2>
             <p class="text-sm text-foreground/60 mt-0.5">
-                Manage your personal information and account details.
+                {{ t('settings.profile.subtitle') }}
             </p>
         </div>
 
-        <!-- Content -->
         <div class="p-6 space-y-6">
-            <!-- User Avatar & Name -->
             <div class="flex items-center gap-4 pb-4 border-b border-border">
                 <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <UserIcon class="w-8 h-8 text-primary" :filled="true" />
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold text-foreground">{{ auth.user?.username || 'User' }}</h3>
+                    <h3 class="text-lg font-semibold text-foreground">{{ auth.user?.username || t('settings.profile.userFallback') }}</h3>
                     <p class="text-sm text-foreground/60">{{ auth.user?.email || '' }}</p>
                 </div>
             </div>
 
-            <!-- Form Fields -->
             <div class="grid gap-6 max-w-2xl">
                 <div class="grid gap-2">
-                    <label for="username" class="text-sm font-medium text-foreground">Username</label>
+                    <label for="username" class="text-sm font-medium text-foreground">{{ t('settings.profile.username') }}</label>
                     <AppInput
                         id="username"
                         :model-value="username"
@@ -84,7 +82,7 @@ const formatBytes = (bytes: number) => {
                     </AppInput>
                 </div>
                 <div class="grid gap-2">
-                    <label for="email" class="text-sm font-medium text-foreground">Email Address</label>
+                    <label for="email" class="text-sm font-medium text-foreground">{{ t('settings.profile.email') }}</label>
                     <AppInput
                         id="email"
                         :model-value="email"
@@ -99,7 +97,6 @@ const formatBytes = (bytes: number) => {
                 </div>
             </div>
 
-            <!-- Storage Usage -->
             <div class="pt-4 border-t border-border">
                 <div class="flex items-center gap-4 mb-3">
                     <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
@@ -110,8 +107,8 @@ const formatBytes = (bytes: number) => {
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm font-medium text-foreground">Storage Usage</p>
-                        <p class="text-xs text-foreground/60 mt-0.5">{{ formatBytes(storageUsed) }} of {{ formatBytes(storageLimit) }} used</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.profile.storageUsage') }}</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">{{ t('settings.profile.storageUsedOfLimit', { used: formatBytes(storageUsed), limit: formatBytes(storageLimit) }) }}</p>
                     </div>
                     <span class="text-sm font-semibold text-foreground">{{ storagePercentage }}%</span>
                 </div>
@@ -119,20 +116,19 @@ const formatBytes = (bytes: number) => {
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="px-6 py-4 bg-muted/30 border-t border-border flex items-center gap-3">
             <template v-if="editing">
                 <AppButton size="sm" :loading="saving" @click="emit('save')">
                     <template #icon>
                         <CheckIcon class="w-4 h-4" />
                     </template>
-                    Save Changes
+                    {{ t('common.save') }}
                 </AppButton>
                 <AppButton variant="secondary" size="sm" :disabled="saving" @click="emit('cancel-edit')">
                     <template #icon>
                         <XIcon class="w-4 h-4" />
                     </template>
-                    Cancel
+                    {{ t('common.cancel') }}
                 </AppButton>
             </template>
             <template v-else>
@@ -140,10 +136,10 @@ const formatBytes = (bytes: number) => {
                     <template #icon>
                         <PencilIcon class="w-4 h-4" />
                     </template>
-                    Edit Profile
+                    {{ t('settings.profile.editProfile') }}
                 </AppButton>
                 <AppButton variant="secondary" size="sm" @click="emit('change-password')">
-                    Change Password
+                    {{ t('settings.profile.changePassword') }}
                 </AppButton>
             </template>
         </div>

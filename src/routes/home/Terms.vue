@@ -20,48 +20,57 @@
     </div>
 </template>
 <script setup lang="ts">
-import {useHead} from "@unhead/vue";
-const title = "Terms and Conditions - Ecostream";
-const description = "Read Ecostream's terms and conditions for using our video hosting and streaming services.";
-const pageContent = {
-    head: {
-        title,
-        meta: [
-            { name: "description", content: description },
-            { property: "og:title", content: title },
-            { property: "og:description", content: description },
-            { property: "twitter:title", content: title },
-            { property: "twitter:description", content: description },
-            { property: "twitter:image", content: "https://Ecostream.com/thumb.png" }
-        ]
-    },
-    data: {
-        pageHeading: "Terms and Conditions Details",
-        pageSubheading: "Terms and Conditions",
-        description: "Our terms and conditions set forth important guidelines and rules for using Ecostream's services.",
-        list: [
-            {
-                heading: "1. Acceptance of Terms",
-                text: "By accessing and using Ecostream, you accept and agree to be bound by the terms and provision of this agreement."
-            },
-            {
-                heading: "2. Service Usage",
-                text: "You agree to use our service only for lawful purposes. You are prohibited from posting or transmitting any unlawful, threatening, libelous, defamatory, obscene, or profane material. We reserve the right to terminate accounts that violate these terms."
-            },
-            {
-                heading: "3. Content Ownership",
-                text: "You retain all rights and ownership of the content you upload to Ecostream. However, by uploading content, you grant us a license to host, store, and display the content as necessary to provide our services."
-            },
-            {
-                heading: "4. Limitation of Liability",
-                text: "Ecostream shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use our service."
-            },
-            {
-                heading: "5. Changes to Terms",
-                text: "We reserve the right to modify these terms at any time. Your continued use of the service after any such changes constitutes your acceptance of the new terms."
-            }
-        ]
-    }
-}
-useHead(pageContent.head);
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useHead } from '@unhead/vue';
+
+const { t } = useI18n();
+
+const pageContent = computed(() => {
+    const title = t('legal.terms.title');
+    const description = t('legal.terms.description');
+
+    return {
+        head: {
+            title,
+            meta: [
+                { name: 'description', content: description },
+                { property: 'og:title', content: title },
+                { property: 'og:description', content: description },
+                { property: 'twitter:title', content: title },
+                { property: 'twitter:description', content: description },
+                { property: 'twitter:image', content: 'https://Ecostream.com/thumb.png' }
+            ]
+        },
+        data: {
+            pageHeading: t('legal.terms.pageHeading'),
+            pageSubheading: t('legal.terms.pageSubheading'),
+            description: t('legal.terms.pageDescription'),
+            list: [
+                {
+                    heading: t('legal.terms.sections.acceptanceTitle'),
+                    text: t('legal.terms.sections.acceptanceText')
+                },
+                {
+                    heading: t('legal.terms.sections.usageTitle'),
+                    text: t('legal.terms.sections.usageText')
+                },
+                {
+                    heading: t('legal.terms.sections.ownershipTitle'),
+                    text: t('legal.terms.sections.ownershipText')
+                },
+                {
+                    heading: t('legal.terms.sections.liabilityTitle'),
+                    text: t('legal.terms.sections.liabilityText')
+                },
+                {
+                    heading: t('legal.terms.sections.changesTitle'),
+                    text: t('legal.terms.sections.changesText')
+                }
+            ]
+        }
+    };
+});
+
+useHead(() => pageContent.value.head);
 </script>

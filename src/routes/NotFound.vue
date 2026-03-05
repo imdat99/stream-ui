@@ -1,12 +1,15 @@
 <template>
-    <vue-head :input="{title: '404 - Page Not Found'}"/>
+    <vue-head :input="{ title: t('notFound.headTitle') }" />
     <div class="mx-auto text-center mt-20 flex flex-col items-center gap-4">
-        <h1>404 - Page Not Found</h1>
-        <p>The page you are looking for does not exist.</p>
-        <router-link class="btn btn-primary" to="/">Go back to Home</router-link>
+        <h1>{{ t('notFound.title') }}</h1>
+        <p>{{ t('notFound.description') }}</p>
+        <router-link class="btn btn-primary" to="/">{{ t('notFound.backHome') }}</router-link>
     </div>
 </template>
 
 <script setup lang="ts">
-import { VueHead } from "@/components/VueHead";
+import { VueHead } from '@/components/VueHead';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>

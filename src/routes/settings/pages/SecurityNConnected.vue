@@ -7,11 +7,30 @@ import AppSwitch from '@/components/app/AppSwitch.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
+import XCircleIcon from '@/components/icons/XCircleIcon.vue';
+import { supportedLocales, type SupportedLocale } from '@/i18n/constants';
+import { normalizeLocale } from '@/i18n';
+import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const auth = useAuthStore();
 const toast = useAppToast();
+const confirm = useAppConfirm();
+const { t } = useI18n();
+
+const selectedLanguage = ref<SupportedLocale>(normalizeLocale((auth.user as any)?.language ?? (auth.user as any)?.locale));
+const languageSaving = ref(false);
+
+const languageOptions = computed(() => supportedLocales.map((value) => ({
+    value,
+    label: t(`settings.securityConnected.language.options.${value}`)
+})));
+
+watch(() => auth.user, (nextUser) => {
+    selectedLanguage.value = normalizeLocale((nextUser as any)?.language ?? (nextUser as any)?.locale);
+}, { deep: true });
 
 // 2FA state
 const twoFactorEnabled = ref(false);
@@ -45,12 +64,12 @@ const changePassword = async () => {
     changePasswordError.value = '';
 
     if (newPassword.value !== confirmPassword.value) {
-        changePasswordError.value = 'Passwords do not match';
+        changePasswordError.value = t('settings.securityConnected.changePassword.dialog.errors.mismatch');
         return;
     }
 
     if (newPassword.value.length < 6) {
-        changePasswordError.value = 'Password must be at least 6 characters';
+        changePasswordError.value = t('settings.securityConnected.changePassword.dialog.errors.minLength');
         return;
     }
 
@@ -63,14 +82,51 @@ const changePassword = async () => {
         confirmPassword.value = '';
         toast.add({
             severity: 'success',
-            summary: 'Password Changed',
-            detail: 'Your password has been changed successfully.',
+            summary: t('settings.securityConnected.changePassword.toast.successSummary'),
+            detail: t('settings.securityConnected.changePassword.toast.successDetail'),
             life: 3000
         });
     } catch (e: any) {
-        changePasswordError.value = e.message || 'Failed to change password';
+        changePasswordError.value = e.message || t('settings.securityConnected.changePassword.dialog.errors.default');
     } finally {
         changePasswordLoading.value = false;
+    }
+};
+
+const handleLogout = () => {
+    confirm.require({
+        message: t('settings.securityConnected.logout.confirm.message'),
+        header: t('settings.securityConnected.logout.confirm.header'),
+        acceptLabel: t('settings.securityConnected.logout.confirm.accept'),
+        rejectLabel: t('settings.securityConnected.logout.confirm.reject'),
+        accept: async () => {
+            await auth.logout();
+        }
+    });
+};
+
+const saveLanguage = async () => {
+    languageSaving.value = true;
+    try {
+        const result = await auth.setLanguage(selectedLanguage.value);
+        if (result.ok && !result.fallbackOnly) {
+            toast.add({
+                severity: 'success',
+                summary: t('settings.securityConnected.language.toast.successSummary'),
+                detail: t('settings.securityConnected.language.toast.successDetail'),
+                life: 3000,
+            });
+            return;
+        }
+
+        toast.add({
+            severity: 'warn',
+            summary: t('settings.securityConnected.language.toast.errorSummary'),
+            detail: t('settings.securityConnected.language.toast.errorDetail'),
+            life: 5000,
+        });
+    } finally {
+        languageSaving.value = false;
     }
 };
 
@@ -83,8 +139,8 @@ const handleToggle2FA = async () => {
         } catch (e) {
             toast.add({
                 severity: 'error',
-                summary: 'Enable 2FA Failed',
-                detail: 'Failed to enable two-factor authentication.',
+                summary: t('settings.securityConnected.toast.twoFactorEnableFailedSummary'),
+                detail: t('settings.securityConnected.toast.twoFactorEnableFailedDetail'),
                 life: 5000
             });
             twoFactorEnabled.value = false;
@@ -94,15 +150,15 @@ const handleToggle2FA = async () => {
             await new Promise(resolve => setTimeout(resolve, 500));
             toast.add({
                 severity: 'success',
-                summary: '2FA Disabled',
-                detail: 'Two-factor authentication has been disabled.',
+                summary: t('settings.securityConnected.toast.twoFactorDisabledSummary'),
+                detail: t('settings.securityConnected.toast.twoFactorDisabledDetail'),
                 life: 3000
             });
         } catch (e) {
             toast.add({
                 severity: 'error',
-                summary: 'Disable 2FA Failed',
-                detail: 'Failed to disable two-factor authentication.',
+                summary: t('settings.securityConnected.toast.twoFactorDisableFailedSummary'),
+                detail: t('settings.securityConnected.toast.twoFactorDisableFailedDetail'),
                 life: 5000
             });
             twoFactorEnabled.value = true;
@@ -117,15 +173,15 @@ const confirmTwoFactor = async () => {
         twoFactorEnabled.value = true;
         toast.add({
             severity: 'success',
-            summary: '2FA Enabled',
-            detail: 'Two-factor authentication has been enabled successfully.',
+            summary: t('settings.securityConnected.toast.twoFactorEnabledSummary'),
+            detail: t('settings.securityConnected.toast.twoFactorEnabledDetail'),
             life: 3000
         });
     } catch (e) {
         toast.add({
             severity: 'error',
-            summary: 'Enable 2FA Failed',
-            detail: 'Invalid verification code. Please try again.',
+            summary: t('settings.securityConnected.toast.twoFactorInvalidCodeSummary'),
+            detail: t('settings.securityConnected.toast.twoFactorInvalidCodeDetail'),
             life: 5000
         });
     }
@@ -139,15 +195,15 @@ const connectTelegram = async () => {
         telegramUsername.value = '@telegram_user';
         toast.add({
             severity: 'success',
-            summary: 'Telegram Connected',
-            detail: `Connected to ${telegramUsername.value}`,
+            summary: t('settings.securityConnected.toast.telegramConnectedSummary'),
+            detail: t('settings.securityConnected.toast.telegramConnectedDetail', { username: telegramUsername.value }),
             life: 3000
         });
     } catch (e) {
         toast.add({
             severity: 'error',
-            summary: 'Connection Failed',
-            detail: 'Failed to connect Telegram account.',
+            summary: t('settings.securityConnected.toast.telegramConnectFailedSummary'),
+            detail: t('settings.securityConnected.toast.telegramConnectFailedDetail'),
             life: 5000
         });
     }
@@ -161,15 +217,15 @@ const disconnectTelegram = async () => {
         telegramUsername.value = '';
         toast.add({
             severity: 'info',
-            summary: 'Telegram Disconnected',
-            detail: 'Your Telegram account has been disconnected.',
+            summary: t('settings.securityConnected.toast.telegramDisconnectedSummary'),
+            detail: t('settings.securityConnected.toast.telegramDisconnectedDetail'),
             life: 3000
         });
     } catch (e) {
         toast.add({
             severity: 'error',
-            summary: 'Disconnect Failed',
-            detail: 'Failed to disconnect Telegram account.',
+            summary: t('settings.securityConnected.toast.telegramDisconnectFailedSummary'),
+            detail: t('settings.securityConnected.toast.telegramDisconnectFailedDetail'),
             life: 5000
         });
     }
@@ -180,9 +236,9 @@ const disconnectTelegram = async () => {
     <div class="bg-surface border border-border rounded-lg">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-border">
-            <h2 class="text-base font-semibold text-foreground">Security & Connected Accounts</h2>
+            <h2 class="text-base font-semibold text-foreground">{{ t('settings.securityConnected.header.title') }}</h2>
             <p class="text-sm text-foreground/60 mt-0.5">
-                Manage your security settings and connected services.
+                {{ t('settings.securityConnected.header.subtitle') }}
             </p>
         </div>
 
@@ -198,11 +254,52 @@ const disconnectTelegram = async () => {
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Account Status</p>
-                        <p class="text-xs text-foreground/60 mt-0.5">Your account is in good standing</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.accountStatus.label') }}</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">{{ t('settings.securityConnected.accountStatus.detail') }}</p>
                     </div>
                 </div>
-                <span class="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded">Active</span>
+                <span class="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded">{{ t('settings.securityConnected.accountStatus.badge') }}</span>
+            </div>
+
+            <!-- Language -->
+            <div class="flex items-center justify-between gap-4 px-6 py-4 hover:bg-muted/30 transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M2 12h20" />
+                            <path d="M12 2a15 15 0 0 1 0 20" />
+                            <path d="M12 2a15 15 0 0 0 0 20" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.language.label') }}</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">{{ t('settings.securityConnected.language.detail') }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select
+                        v-model="selectedLanguage"
+                        :disabled="languageSaving"
+                        class="rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground disabled:opacity-60"
+                    >
+                        <option
+                            v-for="option in languageOptions"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </option>
+                    </select>
+                    <AppButton
+                        size="sm"
+                        :loading="languageSaving"
+                        :disabled="languageSaving"
+                        @click="saveLanguage"
+                    >
+                        {{ t('settings.securityConnected.language.save') }}
+                    </AppButton>
+                </div>
             </div>
 
             <!-- Two-Factor Authentication -->
@@ -212,9 +309,9 @@ const disconnectTelegram = async () => {
                         <LockIcon class="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Two-Factor Authentication</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.twoFactor.label') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ twoFactorEnabled ? '2FA is enabled' : 'Add an extra layer of security' }}
+                            {{ twoFactorEnabled ? t('settings.securityConnected.twoFactor.enabled') : t('settings.securityConnected.twoFactor.disabled') }}
                         </p>
                     </div>
                 </div>
@@ -230,12 +327,31 @@ const disconnectTelegram = async () => {
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Change Password</p>
-                        <p class="text-xs text-foreground/60 mt-0.5">Update your account password</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.label') }}</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">{{ t('settings.securityConnected.changePassword.detail') }}</p>
                     </div>
                 </div>
                 <AppButton size="sm" @click="openChangePassword">
-                    Change Password
+                    {{ t('settings.securityConnected.changePassword.button') }}
+                </AppButton>
+            </div>
+
+            <!-- Logout -->
+            <div class="flex items-center justify-between px-6 py-4 hover:bg-danger/5 transition-all">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-md bg-danger/10 flex items-center justify-center shrink-0">
+                        <XCircleIcon class="w-5 h-5 text-danger" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.logout.label') }}</p>
+                        <p class="text-xs text-foreground/60 mt-0.5">{{ t('settings.securityConnected.logout.detail') }}</p>
+                    </div>
+                </div>
+                <AppButton variant="danger" size="sm" @click="handleLogout">
+                    <template #icon>
+                        <XCircleIcon class="w-4 h-4" />
+                    </template>
+                    {{ t('settings.securityConnected.logout.button') }}
                 </AppButton>
             </div>
 
@@ -249,14 +365,14 @@ const disconnectTelegram = async () => {
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Email</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.email.label') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ emailConnected ? 'Connected' : 'Not connected' }}
+                            {{ emailConnected ? t('settings.securityConnected.email.connected') : t('settings.securityConnected.email.disconnected') }}
                         </p>
                     </div>
                 </div>
                 <span class="text-xs font-medium px-2 py-1 rounded" :class="emailConnected ? 'text-success bg-success/10' : 'text-muted bg-muted/20'">
-                    {{ emailConnected ? 'Connected' : 'Disconnected' }}
+                    {{ emailConnected ? t('settings.securityConnected.email.badgeConnected') : t('settings.securityConnected.email.badgeDisconnected') }}
                 </span>
             </div>
 
@@ -267,9 +383,9 @@ const disconnectTelegram = async () => {
                         <TelegramIcon class="w-5 h-5 text-[#0088cc]" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-foreground">Telegram</p>
+                        <p class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.telegram.label') }}</p>
                         <p class="text-xs text-foreground/60 mt-0.5">
-                            {{ telegramConnected ? (telegramUsername || 'Connected') : 'Get notified via Telegram' }}
+                            {{ telegramConnected ? (telegramUsername || t('settings.securityConnected.telegram.connectedFallback')) : t('settings.securityConnected.telegram.detailDisconnected') }}
                         </p>
                     </div>
                 </div>
@@ -279,14 +395,14 @@ const disconnectTelegram = async () => {
                     size="sm"
                     @click="disconnectTelegram"
                 >
-                    Disconnect
+                    {{ t('settings.securityConnected.telegram.disconnect') }}
                 </AppButton>
                 <AppButton
                     v-else
                     size="sm"
                     @click="connectTelegram"
                 >
-                    Connect
+                    {{ t('settings.securityConnected.telegram.connect') }}
                 </AppButton>
             </div>
         </div>
@@ -295,12 +411,12 @@ const disconnectTelegram = async () => {
         <AppDialog
             :visible="twoFactorDialogVisible"
             @update:visible="twoFactorDialogVisible = $event"
-            title="Enable Two-Factor Authentication"
+            :title="t('settings.securityConnected.twoFactorDialog.title')"
             maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
-                    Scan the QR code below with your authenticator app (Google Authenticator, Authy, etc.)
+                    {{ t('settings.securityConnected.twoFactorDialog.subtitle') }}
                 </p>
 
                 <!-- QR Code Placeholder -->
@@ -317,17 +433,17 @@ const disconnectTelegram = async () => {
 
                 <!-- Secret Key -->
                 <div class="bg-muted/30 rounded-md p-3">
-                    <p class="text-xs text-foreground/60 mb-1">Secret Key:</p>
+                    <p class="text-xs text-foreground/60 mb-1">{{ t('settings.securityConnected.twoFactorDialog.secret') }}</p>
                     <code class="text-sm font-mono text-primary">{{ twoFactorSecret }}</code>
                 </div>
 
                 <!-- Verification Code Input -->
                 <div class="grid gap-2">
-                    <label for="twoFactorCode" class="text-sm font-medium text-foreground">Verification Code</label>
+                    <label for="twoFactorCode" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.twoFactorDialog.codeLabel') }}</label>
                     <AppInput
                         id="twoFactorCode"
                         v-model="twoFactorCode"
-                        placeholder="Enter 6-digit code"
+                        :placeholder="t('settings.securityConnected.twoFactorDialog.codePlaceholder')"
                         :maxlength="6"
                     />
                 </div>
@@ -335,13 +451,13 @@ const disconnectTelegram = async () => {
             <template #footer>
                 <div class="flex justify-end gap-3">
                     <AppButton variant="secondary" size="sm" @click="twoFactorDialogVisible = false">
-                        Cancel
+                        {{ t('settings.securityConnected.twoFactorDialog.cancel') }}
                     </AppButton>
                     <AppButton size="sm" @click="confirmTwoFactor">
                         <template #icon>
                             <CheckIcon class="w-4 h-4" />
                         </template>
-                        Verify & Enable
+                        {{ t('settings.securityConnected.twoFactorDialog.verify') }}
                     </AppButton>
                 </div>
             </template>
@@ -351,12 +467,12 @@ const disconnectTelegram = async () => {
         <AppDialog
             :visible="changePasswordDialogVisible"
             @update:visible="changePasswordDialogVisible = $event"
-            title="Change Password"
+            :title="t('settings.securityConnected.changePassword.dialog.title')"
             maxWidthClass="max-w-md"
         >
             <div class="space-y-4">
                 <p class="text-sm text-foreground/70">
-                    Enter your current password and choose a new password.
+                    {{ t('settings.securityConnected.changePassword.dialog.subtitle') }}
                 </p>
 
                 <!-- Error Message -->
@@ -366,12 +482,12 @@ const disconnectTelegram = async () => {
 
                 <!-- Current Password -->
                 <div class="grid gap-2">
-                    <label for="currentPassword" class="text-sm font-medium text-foreground">Current Password</label>
+                    <label for="currentPassword" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.dialog.current') }}</label>
                     <AppInput
                         id="currentPassword"
                         v-model="currentPassword"
                         type="password"
-                        placeholder="Enter current password"
+                        :placeholder="t('settings.securityConnected.changePassword.dialog.currentPlaceholder')"
                     >
                         <template #prefix>
                             <LockIcon class="w-5 h-5" />
@@ -381,12 +497,12 @@ const disconnectTelegram = async () => {
 
                 <!-- New Password -->
                 <div class="grid gap-2">
-                    <label for="newPassword" class="text-sm font-medium text-foreground">New Password</label>
+                    <label for="newPassword" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.dialog.new') }}</label>
                     <AppInput
                         id="newPassword"
                         v-model="newPassword"
                         type="password"
-                        placeholder="Enter new password"
+                        :placeholder="t('settings.securityConnected.changePassword.dialog.newPlaceholder')"
                     >
                         <template #prefix>
                             <LockIcon class="w-5 h-5" />
@@ -396,12 +512,12 @@ const disconnectTelegram = async () => {
 
                 <!-- Confirm Password -->
                 <div class="grid gap-2">
-                    <label for="confirmPassword" class="text-sm font-medium text-foreground">Confirm New Password</label>
+                    <label for="confirmPassword" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.dialog.confirm') }}</label>
                     <AppInput
                         id="confirmPassword"
                         v-model="confirmPassword"
                         type="password"
-                        placeholder="Confirm new password"
+                        :placeholder="t('settings.securityConnected.changePassword.dialog.confirmPlaceholder')"
                     >
                         <template #prefix>
                             <LockIcon class="w-5 h-5" />
@@ -417,7 +533,7 @@ const disconnectTelegram = async () => {
                         :disabled="changePasswordLoading"
                         @click="changePasswordDialogVisible = false"
                     >
-                        Cancel
+                        {{ t('settings.securityConnected.changePassword.dialog.cancel') }}
                     </AppButton>
                     <AppButton
                         size="sm"
@@ -427,7 +543,7 @@ const disconnectTelegram = async () => {
                         <template #icon>
                             <CheckIcon class="w-4 h-4" />
                         </template>
-                        Change Password
+                        {{ t('settings.securityConnected.changePassword.dialog.submit') }}
                     </AppButton>
                 </div>
             </template>

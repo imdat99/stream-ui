@@ -2,6 +2,7 @@
 import FileUploadType from '@/components/icons/FileUploadType.vue';
 import type { QueueItem } from '@/composables/useUploadQueue';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     item: QueueItem;
@@ -12,14 +13,18 @@ const emit = defineEmits<{
     cancel: [id: string];
 }>();
 
+const { t } = useI18n();
+
 const statusLabel = computed(() => {
     switch (props.item.status) {
-        case 'pending': return 'Pending';
-        case 'uploading': return props.item.activeChunks ? `Uploading · ${props.item.activeChunks} threads` : 'Uploading...';
-        case 'processing': return 'Processing...';
-        case 'complete': return 'Done';
-        case 'error': return 'Failed';
-        case 'fetching': return 'Fetching...';
+        case 'pending': return t('upload.queueItem.status.pending');
+        case 'uploading': return props.item.activeChunks
+            ? t('upload.queueItem.status.uploadingThreads', { threads: props.item.activeChunks })
+            : t('upload.queueItem.status.uploading');
+        case 'processing': return t('upload.queueItem.status.processing');
+        case 'complete': return t('upload.queueItem.status.complete');
+        case 'error': return t('upload.queueItem.status.error');
+        case 'fetching': return t('upload.queueItem.status.fetching');
         default: return props.item.status;
     }
 });
@@ -103,7 +108,7 @@ const progress = computed(() => props.item.progress || 0);
                             <!-- Cancel button -->
                             <button v-if="canCancel" @click="emit('cancel', item.id)"
                                 class="text-[10px] font-medium text-slate-400 hover:text-red-500 transition-colors">
-                                Cancel
+                                {{ t('common.cancel') }}
                             </button>
                         </div>
                     </div>

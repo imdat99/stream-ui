@@ -36,16 +36,17 @@
 </template>
 
 <script setup lang="ts">
-import type { DefineComponent } from "vue";
-import ArrowDownTray from "@/components/icons/ArrowDownTray.vue";
-import LinkIcon from "@/components/icons/LinkIcon.vue";
-import PencilIcon from "@/components/icons/PencilIcon.vue";
-import TrashIcon from "@/components/icons/TrashIcon.vue";
-import EllipsisVerticalIcon from "@/components/icons/EllipsisVerticalIcon.vue";
+import type { DefineComponent } from 'vue';
+import ArrowDownTray from '@/components/icons/ArrowDownTray.vue';
+import LinkIcon from '@/components/icons/LinkIcon.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import EllipsisVerticalIcon from '@/components/icons/EllipsisVerticalIcon.vue';
 import type { ModelVideo } from '@/api/client';
-import { useAppToast } from "@/composables/useAppToast";
-import { computed, nextTick, ref, shallowRef } from "vue";
-import type { RouteLocationRaw } from "vue-router";
+import { useAppToast } from '@/composables/useAppToast';
+import { computed, nextTick, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 
 const props = defineProps<{
     video: ModelVideo
@@ -60,6 +61,7 @@ const isOpen = ref(false);
 const containerRef = ref<HTMLElement>();
 const menuRef = ref<HTMLElement>();
 const menuStyle = ref<Record<string, string>>({});
+const { t } = useI18n();
 
 const videoUrl = computed(() => {
     return `${window.location.origin}/videos/${props.video.id}`;
@@ -88,15 +90,15 @@ const handleCopyLink = async () => {
         await navigator.clipboard.writeText(videoUrl.value);
         toast.add({
             severity: 'success',
-            summary: 'Thành công',
-            detail: 'Đã sao chép link video',
+            summary: t('video.cardPopover.toast.copySuccessSummary'),
+            detail: t('video.cardPopover.toast.copySuccessDetail'),
             life: 3000
         });
     } catch {
         toast.add({
             severity: 'error',
-            summary: 'Lỗi',
-            detail: 'Không thể sao chép link',
+            summary: t('video.cardPopover.toast.copyErrorSummary'),
+            detail: t('video.cardPopover.toast.copyErrorDetail'),
             life: 3000
         });
     }
@@ -113,15 +115,15 @@ const handleDownload = () => {
 
         toast.add({
             severity: 'success',
-            summary: 'Thành công',
-            detail: 'Đang tải xuống video...',
+            summary: t('video.cardPopover.toast.downloadSuccessSummary'),
+            detail: t('video.cardPopover.toast.downloadSuccessDetail'),
             life: 3000
         });
     } else {
         toast.add({
             severity: 'error',
-            summary: 'Lỗi',
-            detail: 'Không tìm thấy file video',
+            summary: t('video.cardPopover.toast.downloadErrorSummary'),
+            detail: t('video.cardPopover.toast.downloadErrorDetail'),
             life: 3000
         });
     }
@@ -141,14 +143,14 @@ interface CustomMenuItem {
     command?: () => void;
 }
 
-const items = shallowRef<CustomMenuItem[]>([
+const items = computed<CustomMenuItem[]>(() => [
     {
-        label: 'Tải xuống',
+        label: t('video.cardPopover.download'),
         icon: ArrowDownTray,
         command: handleDownload
     },
     {
-        label: 'Sao chép link',
+        label: t('video.cardPopover.copyLink'),
         icon: LinkIcon,
         command: handleCopyLink
     },
@@ -156,12 +158,12 @@ const items = shallowRef<CustomMenuItem[]>([
         separator: true
     },
     {
-        label: 'Chỉnh sửa',
+        label: t('video.cardPopover.edit'),
         icon: PencilIcon,
         route: { name: 'video-detail', params: { id: props.video.id } }
     },
     {
-        label: 'Xóa',
+        label: t('video.cardPopover.delete'),
         icon: TrashIcon,
         iconClass: 'text-red-500',
         labelClass: 'text-red-500',

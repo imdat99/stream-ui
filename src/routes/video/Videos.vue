@@ -3,7 +3,8 @@ import { type ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { fetchMockVideos } from '@/mocks/videos';
-import { createStaticVNode, onMounted, onUnmounted, ref, watch } from 'vue';
+import { createStaticVNode, computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { useUploadQueue } from '@/composables/useUploadQueue';
@@ -15,13 +16,14 @@ import VideoTable from './components/VideoTable.vue';
 import CopyVideoModal from './CopyVideoModal.vue';
 import DetailVideoModal from './DetailVideoModal.vue';
 
-const detailVideoId = ref<string>("");
-const copyVideoId = ref<string>("");
+const detailVideoId = ref<string>('');
+const copyVideoId = ref<string>('');
 
 const uiState = useUIState();
 const { addFiles, startQueue } = useUploadQueue();
 const toast = useAppToast();
 const router = useRouter();
+const { t } = useI18n();
 const videos = ref<ModelVideo[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -35,12 +37,12 @@ const limit = ref(10);
 const total = ref(0);
 
 // Filters
-const statusOptions = [
-  { label: 'All Status', value: 'all' },
-  { label: 'Ready', value: 'ready' },
-  { label: 'Processing', value: 'processing' },
-  { label: 'Failed', value: 'failed' },
-];
+const statusOptions = computed(() => [
+  { label: t('video.filters.allStatus'), value: 'all' },
+  { label: t('video.filters.ready'), value: 'ready' },
+  { label: t('video.filters.processing'), value: 'processing' },
+  { label: t('video.filters.failed'), value: 'failed' },
+]);
 
 const fetchVideos = async () => {
   loading.value = true;
@@ -91,7 +93,7 @@ const handlePageChange = (newPage: number) => {
 const selectedVideos = ref<ModelVideo[]>([]);
 
 const deleteSelectedVideos = async () => {
-  if (!selectedVideos.value.length || !confirm(`Delete ${selectedVideos.value.length} videos?`)) return;
+  if (!selectedVideos.value.length || !confirm(t('video.page.deleteSelectedConfirm', { count: selectedVideos.value.length }))) return;
 
   try {
     // Mock delete
@@ -100,12 +102,12 @@ const deleteSelectedVideos = async () => {
     selectedVideos.value = [];
     // In real app: await client.videos.bulkDelete(...) or loop
   } catch (err) {
-    console.error("Failed to delete videos", err);
+    console.error('Failed to delete videos', err);
   }
 };
 
 const deleteVideo = async (videoId?: string) => {
-  if (!videoId || !confirm('Are you sure you want to delete this video?')) return;
+  if (!videoId || !confirm(t('video.page.deleteSingleConfirm'))) return;
 
   try {
     videos.value = videos.value.filter(v => v.id !== videoId);
@@ -132,11 +134,11 @@ watch([searchQuery, selectedStatus, limit, page], () => {
   fetchVideos();
 });
 const editVideo = (videoId?: string) => {
-  detailVideoId.value = videoId || "";
+  detailVideoId.value = videoId || '';
 };
 
 const copyVideo = (videoId?: string) => {
-  copyVideoId.value = videoId || "";
+  copyVideoId.value = videoId || '';
 };
 
 // ── Drag & drop upload ──────────────────────────────────────────────────
@@ -196,8 +198,10 @@ const onWindowDrop = (e: DragEvent) => {
   if (result.duplicates > 0) {
     toast.add({
       severity: 'warn',
-      summary: 'Duplicate files skipped',
-      detail: `${result.duplicates} file${result.duplicates > 1 ? 's are' : ' is'} already in the queue.`,
+      summary: t('video.page.duplicateSummary'),
+      detail: result.duplicates > 1
+        ? t('video.page.duplicateDetailOther', { count: result.duplicates })
+        : t('video.page.duplicateDetailOne', { count: result.duplicates }),
       life: 4000,
     });
   }
@@ -221,12 +225,12 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <PageHeader title="My Videos" description="Manage and organize your video library" :breadcrumbs="[
-      { label: 'Dashboard', to: '/' },
-      { label: 'Videos' }
+    <PageHeader :title="t('video.page.title')" :description="t('video.page.description')" :breadcrumbs="[
+      { label: t('pageHeader.dashboard'), to: '/' },
+      { label: t('nav.videos') }
     ]" :actions="[
       {
-        label: 'Upload Video',
+        label: t('video.page.uploadAction'),
         icon: iconHoist,
         variant: 'primary',
         onClick: () => uiState.toggleUploadDialog()
@@ -245,27 +249,28 @@ onUnmounted(() => {
         <p class="text-red-700 font-medium">{{ error }}</p>
         <button @click="fetchVideos"
           class="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-          Try Again
+          {{ t('video.page.retry') }}
         </button>
       </div>
 
       <!-- Empty State -->
-      <EmptyState v-else-if="videos.length === 0 && !loading" title="No videos found"
-        description="You haven't uploaded any videos yet. Start by uploading your first video!"
-        imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" actionLabel="Upload Video"
+      <EmptyState v-else-if="videos.length === 0 && !loading" :title="t('video.page.emptyTitle')"
+        :description="t('video.page.emptyDescription')"
+        imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" :actionLabel="t('video.page.emptyAction')"
         :onAction="() => router.push('/upload')" />
       <!-- Grid View -->
       <!-- <VideoGrid :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" v-else-if="viewMode === 'grid'" /> -->
 
       <!-- Table View -->
-      <VideoTable v-else :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" @edit="editVideo" @copy="copyVideo" />
+      <VideoTable v-else :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo"
+        @edit="editVideo" @copy="copyVideo" />
     </Transition>
-    <DetailVideoModal :videoId="detailVideoId" @close="detailVideoId = ''"/>
-    <CopyVideoModal :videoId="copyVideoId" @close="copyVideoId = ''"/>
+    <DetailVideoModal :videoId="detailVideoId" @close="detailVideoId = ''" />
+    <CopyVideoModal :videoId="copyVideoId" @close="copyVideoId = ''" />
 
     <!-- Global drag & drop overlay -->
     <ClientOnly>
-    <Teleport to="body">
+      <Teleport to="body">
         <div v-if="isDraggingOver"
           class="fixed inset-0 z-[9999] flex flex-col items-center justify-center pointer-events-none"
           aria-hidden="true">
@@ -281,12 +286,11 @@ onUnmounted(() => {
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
-            <p class="text-lg font-semibold text-primary">Drop to upload</p>
-            <p class="text-sm text-primary/70">Files will be added to the upload queue</p>
+            <p class="text-lg font-semibold text-primary">{{ t('video.page.uploadDropTitle') }}</p>
+            <p class="text-sm text-primary/70">{{ t('video.page.uploadDropSubtitle') }}</p>
           </div>
         </div>
-    </Teleport>
+      </Teleport>
     </ClientOnly>
   </div>
 </template>
-

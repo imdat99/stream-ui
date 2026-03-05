@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
-import { getStatusSeverity } from '@/lib/utils';
+import { formatBytes, getStatusSeverity } from '@/lib/utils';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     video: ModelVideo;
@@ -12,11 +14,11 @@ const emit = defineEmits<{
     delete: [];
 }>();
 
+const { t, locale } = useI18n();
+
 const formatFileSize = (bytes?: number): string => {
     if (!bytes) return '-';
-    const mb = bytes / (1024 * 1024);
-    if (mb < 1) return `${(bytes / 1024).toFixed(2)} KB`;
-    return `${mb.toFixed(2)} MB`;
+    return formatBytes(bytes);
 };
 
 const formatDuration = (seconds?: number): string => {
@@ -33,7 +35,7 @@ const formatDuration = (seconds?: number): string => {
 const formatDate = (dateStr?: string): string => {
     if (!dateStr) return '-';
     const date = new Date(dateStr);
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString(locale.value === 'vi' ? 'vi-VN' : 'en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',
@@ -50,6 +52,19 @@ const severityClasses: Record<string, string> = {
     danger: 'bg-red-100 text-red-800',
     secondary: 'bg-gray-100 text-gray-800',
 };
+
+const statusLabel = computed(() => {
+    switch (props.video.status) {
+        case 'ready':
+            return t('video.filters.ready');
+        case 'processing':
+            return t('video.filters.processing');
+        case 'failed':
+            return t('video.filters.failed');
+        default:
+            return props.video.status;
+    }
+});
 </script>
 
 <template>
@@ -71,7 +86,7 @@ const severityClasses: Record<string, string> = {
                 <span
                     class="capitalize px-2 py-0.5 text-xs font-medium rounded-full"
                     :class="severityClasses[getStatusSeverity(video.status) || 'secondary']">
-                    {{ video.status }}
+                    {{ statusLabel }}
                 </span>
             </div>
         </div>
@@ -79,31 +94,31 @@ const severityClasses: Record<string, string> = {
         <!-- Action Buttons -->
         <div class="flex items-center space-x-2">
                 <AppButton size="sm" variant="secondary"
-                    title="Reload video" @click="$emit('reload')">
+                    :title="t('video.detailPage.reloadTitle')" @click="$emit('reload')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                         </path>
                     </svg>
-                    <span class="hidden sm:inline">Reload</span>
+                    <span class="hidden sm:inline">{{ t('video.detailPage.reloadButton') }}</span>
                 </AppButton>
                 <AppButton size="sm" variant="ghost"
-                    title="Edit" @click="$emit('toggleEdit')">
+                    :title="t('video.table.edit')" @click="$emit('toggleEdit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                         </path>
                     </svg>
-                    <span class="hidden sm:inline">Edit</span>
+                    <span class="hidden sm:inline">{{ t('video.table.edit') }}</span>
                 </AppButton>
                 <AppButton variant="danger" size="sm"
-                    title="Delete" @click="$emit('delete')">
+                    :title="t('video.table.delete')" @click="$emit('delete')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                         </path>
                     </svg>
-                    <span class="hidden sm:inline">Delete</span>
+                    <span class="hidden sm:inline">{{ t('video.table.delete') }}</span>
                 </AppButton>
         </div>
     </div>

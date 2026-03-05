@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     modelValue: 'local' | 'remote';
@@ -10,18 +11,20 @@ const emit = defineEmits<{
     'update:modelValue': [value: 'local' | 'remote'];
 }>();
 
-const modeList: { id: 'local' | 'remote'; label: string; icon: string }[] = [
+const { t } = useI18n();
+
+const modeList = computed<{ id: 'local' | 'remote'; label: string; icon: string }[]>(() => [
     {
         id: 'local',
-        label: 'Local Upload',
+        label: t('upload.dialog.mode.local'),
         icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 7.38 16.75"/><path d="M12 8v8"/><path d="m8 12 4-4 4 4"/><path d="M2.5 8.875a10 10 0 0 0-.5 3"/><path d="M2.83 16a10 10 0 0 0 2.43 3.4"/><path d="M4.636 5.235a10 10 0 0 1 .891-.857"/><rect width="6" height="6" x="16" y="16" rx="1"/></svg>`
     },
     {
         id: 'remote',
-        label: 'Remote URL',
+        label: t('upload.dialog.mode.remote'),
         icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`
     }
-];
+]);
 
 const mode = computed({
     get: () => props.modelValue,

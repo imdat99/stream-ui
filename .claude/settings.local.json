@@ -3,7 +3,9 @@
     "allow": [
       "Bash(bun run build)",
       "mcp__ide__getDiagnostics",
-      "Bash(bun install:*)"
+      "Bash(bun install:*)",
+      "Bash(bun preview:*)",
+      "Bash(curl:*)"
     ]
   }
 }

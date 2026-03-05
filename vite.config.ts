@@ -10,6 +10,9 @@ import ssrPlugin from "./ssrPlugin";
 export default defineConfig((env) => {
   // console.log("env:", env, import.meta.env);
   return {
+    server: {
+	host: '0.0.0.0'
+	},
     plugins: [
       unocss(),
       vue(),

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import UploadQueueItem from './UploadQueueItem.vue';
 import type { QueueItem } from '@/composables/useUploadQueue';
+import { useI18n } from 'vue-i18n';
 
 defineProps<{
     items?: QueueItem[];
@@ -15,6 +16,8 @@ const emit = defineEmits<{
     publish: [];
     startQueue: [];
 }>()
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -33,7 +36,7 @@ const emit = defineEmits<{
                         <path d="M3 9h18" />
                         <path d="M9 21V9" />
                     </svg>
-                    <p class="text-slate-400 font-medium">Empty queue!</p>
+                    <p class="text-slate-400 font-medium">{{ t('upload.queue.empty') }}</p>
                 </div>
 
                 
@@ -41,8 +44,8 @@ const emit = defineEmits<{
 
             <div class="p-6 border-t border-border shrink-0">
                 <div class="flex items-center justify-between text-sm mb-4 font-medium">
-                    <span class="text-slate-500">Total size:</span>
-                    <span class="text-slate-900">{{ totalSize || '0 MB' }}</span>
+                    <span class="text-slate-500">{{ t('upload.queue.totalSize') }}</span>
+                    <span class="text-slate-900">{{ totalSize || t('upload.queue.zeroSize') }}</span>
                 </div>
 
                 <button :disabled="!!(!pendingCount || pendingCount < 1)" @click="emit('startQueue')"
@@ -53,7 +56,7 @@ const emit = defineEmits<{
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    Start Upload ({{ pendingCount }})
+                    {{ t('upload.dialog.startUpload', { count: pendingCount || 0 }) }}
                 </button>
             </div>
         </div>

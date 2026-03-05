@@ -3,6 +3,7 @@ import type { ModelVideo } from '@/api/client';
 import { fetchMockVideoById } from '@/mocks/videos';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     videoId: string;
@@ -16,6 +17,7 @@ const toast = useAppToast();
 const video = ref<ModelVideo | null>(null);
 const loading = ref(true);
 const copiedField = ref<string | null>(null);
+const { t } = useI18n();
 
 const fetchVideo = async () => {
     loading.value = true;
@@ -26,7 +28,12 @@ const fetchVideo = async () => {
         }
     } catch (error) {
         console.error('Failed to fetch video:', error);
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load video details', life: 3000 });
+        toast.add({
+            severity: 'error',
+            summary: t('video.copyModal.toastErrorSummary'),
+            detail: t('video.copyModal.toastErrorDetail'),
+            life: 3000
+        });
     } finally {
         loading.value = false;
     }
@@ -40,20 +47,20 @@ const shareLinks = computed(() => {
     return [
         {
             key: 'embed',
-            label: 'Embed player (recommended)',
+            label: t('video.copyModal.embedPlayer'),
             value: `${baseUrl.value}/play/index/${v.id}`,
         },
         {
             key: 'thumbnail',
-            label: 'Thumbnail URL',
+            label: t('video.copyModal.thumbnail'),
             value: v.thumbnail || '',
         },
         {
             key: 'hls',
-            label: 'HLS link (VIP only)',
+            label: t('video.copyModal.hls'),
             value: v.hls_path ? `${baseUrl.value}/hls/getlink/${v.id}/${v.hls_token}/${v.hls_path}` : '',
-            placeholder: 'HLS link available for VIP with whitelisted domain',
-            hint: 'This link redirects to a signed HLS URL and only works on whitelisted domains.',
+            placeholder: t('video.copyModal.hlsPlaceholder'),
+            hint: t('video.copyModal.hlsHint'),
         },
     ];
 });
@@ -70,7 +77,12 @@ const copyToClipboard = async (text: string, key: string) => {
         document.body.removeChild(textArea);
     }
     copiedField.value = key;
-    toast.add({ severity: 'success', summary: 'Copied', detail: 'Copied to clipboard', life: 2000 });
+    toast.add({
+        severity: 'success',
+        summary: t('video.copyModal.toastCopiedSummary'),
+        detail: t('video.copyModal.toastCopiedDetail'),
+        life: 2000
+    });
     setTimeout(() => {
         copiedField.value = null;
     }, 2000);
@@ -87,7 +99,7 @@ watch(() => props.videoId, (newId) => {
 
 <template>
     <AppDialog :visible="!!videoId" @update:visible="emit('close')" max-width-class="max-w-xl"
-        :title="loading ? '' : 'Get sharing address'">
+        :title="loading ? '' : t('video.copyModal.title')">
 
         <!-- Loading Skeleton -->
         <div v-if="loading" class="flex flex-col gap-5">
@@ -111,7 +123,7 @@ watch(() => props.videoId, (newId) => {
         <div v-else class="flex flex-col gap-5">
             <!-- Player addresses -->
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Player address</p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">{{ t('video.copyModal.playerAddress') }}</p>
                 <div class="flex flex-col gap-4">
                     <div v-for="link in shareLinks" :key="link.key" class="flex flex-col gap-1.5">
                         <p class="text-sm font-medium text-muted-foreground">{{ link.label }}</p>
@@ -143,18 +155,15 @@ watch(() => props.videoId, (newId) => {
             <!-- Notices -->
             <div class="flex flex-col gap-2 text-sm">
                 <div class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 flex items-start gap-3">
-
                     <div class="flex-1 text-sm">
-                        <p class="font-medium text-red-900 dark:text-red-100 mb-1">Warning</p>
-                        <p class="text-red-800 dark:text-red-200">Make sure shared files comply with <strong>local laws</strong> and confirm you understand the responsibilities involved when distributing content.</p>
+                        <p class="font-medium text-red-900 dark:text-red-100 mb-1">{{ t('video.copyModal.warningTitle') }}</p>
+                        <p class="text-red-800 dark:text-red-200">{{ t('video.copyModal.warningDetail') }}</p>
                     </div>
                 </div>
                 <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-3">
-
                     <div class="flex-1 text-sm">
-                        <p class="font-medium text-amber-900 dark:text-amber-100 mb-1">Reminder</p>
-                        <p class="text-amber-800 dark:text-amber-200">The embed player can auto switch fallback nodes and works well on mobile. Raw HLS links
-                                rely on your own player and must be used only on whitelisted domains.</p>
+                        <p class="font-medium text-amber-900 dark:text-amber-100 mb-1">{{ t('video.copyModal.reminderTitle') }}</p>
+                        <p class="text-amber-800 dark:text-amber-200">{{ t('video.copyModal.reminderDetail') }}</p>
                     </div>
                 </div>
             </div>

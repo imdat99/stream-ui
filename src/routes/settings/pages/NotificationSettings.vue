@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import AppButton from '@/components/app/AppButton.vue';
 import AppSwitch from '@/components/app/AppSwitch.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
-import { useAppToast } from '@/composables/useAppToast';
-import MailIcon from '@/components/icons/MailIcon.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import MailIcon from '@/components/icons/MailIcon.vue';
 import SendIcon from '@/components/icons/SendIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
+import { useAppToast } from '@/composables/useAppToast';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const toast = useAppToast();
+const { t } = useI18n();
 
 const notificationSettings = ref({
     email: true,
@@ -20,58 +22,57 @@ const notificationSettings = ref({
 
 const saving = ref(false);
 
-const notificationTypes = [
+const notificationTypes = computed(() => [
     {
         key: 'email' as const,
-        title: 'Email Notifications',
-        description: 'Receive updates and alerts via email',
+        title: t('settings.notificationSettings.types.email.title'),
+        description: t('settings.notificationSettings.types.email.description'),
         icon: MailIcon,
         bgColor: 'bg-primary/10',
         iconColor: 'text-primary',
     },
     {
         key: 'push' as const,
-        title: 'Push Notifications',
-        description: 'Get instant alerts in your browser',
+        title: t('settings.notificationSettings.types.push.title'),
+        description: t('settings.notificationSettings.types.push.description'),
         icon: BellIcon,
         bgColor: 'bg-accent/10',
         iconColor: 'text-accent',
     },
     {
         key: 'marketing' as const,
-        title: 'Marketing Emails',
-        description: 'Receive promotions and product updates',
+        title: t('settings.notificationSettings.types.marketing.title'),
+        description: t('settings.notificationSettings.types.marketing.description'),
         icon: SendIcon,
         bgColor: 'bg-info/10',
         iconColor: 'text-info',
     },
     {
         key: 'telegram' as const,
-        title: 'Telegram Notifications',
-        description: 'Receive updates via Telegram',
+        title: t('settings.notificationSettings.types.telegram.title'),
+        description: t('settings.notificationSettings.types.telegram.description'),
         icon: TelegramIcon,
         bgColor: 'bg-info/10',
         iconColor: 'text-info',
     },
-];
+]);
 
 const handleSave = async () => {
     saving.value = true;
     try {
-        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast.add({
             severity: 'success',
-            summary: 'Settings Saved',
-            detail: 'Your notification settings have been saved.',
-            life: 3000
+            summary: t('settings.notificationSettings.toast.savedSummary'),
+            detail: t('settings.notificationSettings.toast.savedDetail'),
+            life: 3000,
         });
     } catch (e: any) {
         toast.add({
             severity: 'error',
-            summary: 'Save Failed',
-            detail: e.message || 'Failed to save settings.',
-            life: 5000
+            summary: t('settings.notificationSettings.toast.failedSummary'),
+            detail: e.message || t('settings.notificationSettings.toast.failedDetail'),
+            life: 5000,
         });
     } finally {
         saving.value = false;
@@ -81,12 +82,11 @@ const handleSave = async () => {
 
 <template>
     <div class="bg-surface border border-border rounded-lg">
-        <!-- Header -->
         <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold text-foreground">Notifications</h2>
+                <h2 class="text-base font-semibold text-foreground">{{ t('settings.content.notifications.title') }}</h2>
                 <p class="text-sm text-foreground/60 mt-0.5">
-                    Choose how you want to receive notifications and updates.
+                    {{ t('settings.content.notifications.subtitle') }}
                 </p>
             </div>
             <AppButton
@@ -97,11 +97,10 @@ const handleSave = async () => {
                 <template #icon>
                     <CheckIcon class="w-4 h-4" />
                 </template>
-                Save Changes
+                {{ t('settings.notificationSettings.saveChanges') }}
             </AppButton>
         </div>
 
-        <!-- Content -->
         <div class="divide-y divide-border">
             <div
                 v-for="type in notificationTypes"

@@ -2,22 +2,22 @@
     <div class="w-full">
         <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 w-full">
             <div class="flex flex-col gap-1">
-                <label for="name" class="text-sm font-medium text-gray-700">Full Name</label>
-                <AppInput id="name" v-model="form.name" placeholder="John Doe" />
+                <label for="name" class="text-sm font-medium text-gray-700">{{ t('auth.signup.fullName') }}</label>
+                <AppInput id="name" v-model="form.name" :placeholder="t('auth.signup.placeholders.name')" />
                 <p v-if="errors.name" class="text-xs text-red-500 mt-0.5">{{ errors.name }}</p>
             </div>
 
             <div class="flex flex-col gap-1">
-                <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
-                <AppInput id="email" v-model="form.email" type="email" placeholder="you@example.com" />
+                <label for="email" class="text-sm font-medium text-gray-700">{{ t('auth.signup.email') }}</label>
+                <AppInput id="email" v-model="form.email" type="email" :placeholder="t('auth.signup.placeholders.email')" />
                 <p v-if="errors.email" class="text-xs text-red-500 mt-0.5">{{ errors.email }}</p>
             </div>
 
             <div class="flex flex-col gap-1">
-                <label for="password" class="text-sm font-medium text-gray-700">Password</label>
+                <label for="password" class="text-sm font-medium text-gray-700">{{ t('auth.signup.password') }}</label>
                 <div class="relative">
                     <AppInput id="password" v-model="form.password" :type="showPassword ? 'text' : 'password'"
-                        placeholder="Create a password" />
+                        :placeholder="t('auth.signup.placeholders.password')" />
                     <button type="button"
                         class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                         @click="showPassword = !showPassword" tabindex="-1">
@@ -33,16 +33,16 @@
                         </svg>
                     </button>
                 </div>
-                <small class="text-gray-500">Must be at least 8 characters.</small>
+                <small class="text-gray-500">{{ t('auth.signup.passwordHint') }}</small>
                 <p v-if="errors.password" class="text-xs text-red-500 mt-0.5">{{ errors.password }}</p>
             </div>
 
-            <AppButton type="submit" class="w-full">Create Account</AppButton>
+            <AppButton type="submit" class="w-full">{{ t('auth.signup.createAccount') }}</AppButton>
 
             <p class="mt-4 text-center text-sm text-gray-600">
-                Already have an account?
+                {{ t('auth.signup.alreadyHave') }}
                 <router-link to="/login"
-                    class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign in</router-link>
+                    class="font-medium text-blue-600 hover:text-blue-500 hover:underline">{{ t('auth.signup.signIn') }}</router-link>
             </p>
         </form>
     </div>
@@ -51,10 +51,12 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import { reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
 
 const auth = useAuthStore();
 const showPassword = ref(false);
+const { t } = useI18n();
 
 const form = reactive({
     name: '',
@@ -65,9 +67,9 @@ const form = reactive({
 const errors = reactive<{ name?: string; email?: string; password?: string }>({});
 
 const schema = z.object({
-    name: z.string().min(1, { message: 'Name is required.' }),
-    email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address.' }),
-    password: z.string().min(8, { message: 'Password must be at least 8 characters.' })
+    name: z.string().min(1, { message: t('auth.signup.errors.nameRequired') }),
+    email: z.string().min(1, { message: t('auth.signup.errors.emailRequired') }).email({ message: t('auth.signup.errors.emailInvalid') }),
+    password: z.string().min(8, { message: t('auth.signup.errors.passwordMin') })
 });
 
 const onFormSubmit = () => {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import AlertTriangleIcon from '@/components/icons/AlertTriangleIcon.vue';
@@ -30,6 +31,8 @@ const emit = defineEmits<{
     markRead: [id: string];
     delete: [id: string];
 }>();
+
+const { t } = useI18n();
 
 const iconComponent = computed(() => {
     const icons: Record<string, any> = {
@@ -70,12 +73,10 @@ const bgClass = computed(() => {
         'flex items-start gap-4 group cursor-pointer relative',
         bgClass
     ]" @click="emit('markRead', notification.id)">
-        <!-- Icon -->
         <div v-if="!isDrawer" class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
             <component :is="iconComponent" :class="[iconColorClass, 'w-5 h-5']" />
         </div>
 
-        <!-- Content -->
         <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between gap-2">
                 <h4 :class="['font-semibold text-gray-900', !notification.read && 'text-primary-700']">
@@ -85,30 +86,27 @@ const bgClass = computed(() => {
             </div>
             <p class="text-sm text-gray-600 mt-1 line-clamp-2">{{ notification.message }}</p>
 
-            <!-- Action Button -->
             <router-link v-if="notification.actionUrl" :to="notification.actionUrl"
                 class="inline-flex items-center gap-1 text-sm text-primary font-medium mt-2 hover:underline">
-                {{ notification.actionLabel || 'View Details' }}
+                {{ notification.actionLabel || t('notification.item.viewDetails') }}
                 <ArrowRightIcon class="w-4 h-4" />
             </router-link>
         </div>
 
-        <!-- Actions -->
         <div v-if="!isDrawer"
             class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
             <button v-if="!notification.read" @click.stop="emit('markRead', notification.id)"
                 class="p-2 rounded-lg hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors"
-                title="Mark as read">
+                :title="t('notification.item.markAsRead')">
                 <CheckMarkIcon class="w-4 h-4" />
             </button>
             <button @click.stop="emit('delete', notification.id)"
                 class="p-2 rounded-lg hover:bg-red-100 text-gray-500 hover:text-red-600 transition-colors"
-                title="Delete">
+                :title="t('notification.item.delete')">
                 <TrashIcon class="w-4 h-4" />
             </button>
         </div>
 
-        <!-- Unread indicator -->
         <div v-if="!notification.read"
             class="absolute left-2 top-1/10 -translate-y-1/2 w-2 h-2 rounded-full bg-primary">
         </div>

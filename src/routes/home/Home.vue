@@ -1,6 +1,5 @@
 <template>
     <section class=":m: relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-svh flex">
-        <!-- <div class="absolute inset-0 bg-grid-pattern opacity-[0.4] -z-10"></div> -->
         <div
             class=":m: absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[800px] h-[800px] bg-primary-light/40 rounded-full blur-3xl -z-10 mix-blend-multiply animate-pulse duration-1000">
         </div>
@@ -12,13 +11,12 @@
         <div class="max-w-7xl m-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1
                 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.1] animate-backwards">
-                Video infrastructure for <br>
-                <span class="text-gradient">modern internet.</span>
+                {{ t('home.hero.titleLine1') }} <br>
+                <span class="text-gradient">{{ t('home.hero.titleLine2') }}</span>
             </h1>
 
             <p class="text-xl text-slate-500 max-w-2xl mx-auto mb-10 leading-relaxed animate-backwards delay-50">
-                Seamlessly host, encode, and stream video with our developer-first API.
-                Optimized for speed, built for scale.
+                {{ t('home.hero.subtitle') }}
             </p>
 
             <div class="flex flex-col sm:flex-row justify-center gap-4">
@@ -26,7 +24,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="46 -286 524 580">
                         <path d="M56 284v-560L560 4 56 284z" fill="#fff" />
                     </svg>&nbsp;
-                    Get Started
+                    {{ t('home.hero.getStarted') }}
                 </RouterLink>
                 <RouterLink to="/docs" class="flex btn btn-outline-primary !rounded-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" viewBox="0 0 596 468">
@@ -34,10 +32,10 @@
                             d="M10 314c0-63 41-117 98-136-1-8-2-16-2-24 0-79 65-144 144-144 55 0 104 31 128 77 14-8 30-13 48-13 53 0 96 43 96 96 0 16-4 31-10 44 44 20 74 64 74 116 0 71-57 128-128 128H154c-79 0-144-64-144-144zm199-73c-9 9-9 25 0 34s25 9 34 0l31-31v102c0 13 11 24 24 24s24-11 24-24V244l31 31c9 9 25 9 34 0s9-25 0-34l-72-72c-10-9-25-9-34 0l-72 72z"
                             fill="#14a74b" />
                         <path
-                            d="M281 169c9-9 25-9 34 0l72 72c9 9 9 25 0 34s-25 9-34 0l-31-31v102c0 13-11 24-24 24s-24-11-24-24V244l-31 31c-9 9-25 9-34 0s-9-25 0-34l72-72z"
+                            d="M281 169c9-9 25-9 34 0l72 72c9 9 9 25 0 34s-25 9-34 0l-31-31v102c0 13-11 24-24 24s24-11 24-24V244l-31 31c-9 9-25 9-34 0s-9-25 0-34l72-72z"
                             fill="#fff" />
                     </svg>&nbsp;
-                    Upload video
+                    {{ t('home.hero.uploadVideo') }}
                 </RouterLink>
             </div>
         </div>
@@ -45,9 +43,8 @@
     <section id="features" class="py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-16 md:text-center max-w-3xl mx-auto">
-                <h2 class="text-3xl font-bold text-slate-900 mb-4">Everything you need to ship video</h2>
-                <p class="text-lg text-slate-500">Focus on building your product. We'll handle the complex video
-                    infrastructure.</p>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">{{ t('home.features.heading') }}</h2>
+                <p class="text-lg text-slate-500">{{ t('home.features.subtitle') }}</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -62,9 +59,8 @@
                                     fill="#059669" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">Global Edge Network</h3>
-                        <p class="text-slate-500 max-w-md">Content delivered from 200+ PoPs worldwide. Automatic region
-                            selection ensures the lowest latency for every viewer.</p>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">{{ t('home.features.global.title') }}</h3>
+                        <p class="text-slate-500 max-w-md">{{ t('home.features.global.description') }}</p>
                     </div>
                     <div class="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-10 -258 532 532">
@@ -86,32 +82,29 @@
                                     fill="#fff" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Live Streaming API</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-8">Scale to millions of concurrent viewers
-                            with ultra-low latency. RTMP ingest and HLS playback supported natively.</p>
+                        <h3 class="text-xl font-bold mb-2">{{ t('home.features.live.title') }}</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-8">{{ t('home.features.live.description') }}</p>
 
-                        <!-- Visual -->
                         <div
                             class="bg-slate-800/50 rounded-lg p-4 border border-white/5 font-mono text-xs text-brand-300">
                             <div class="flex justify-between items-center mb-3 border-b border-white/5 pb-2">
-                                <span class="text-slate-500">Live Status</span>
+                                <span class="text-slate-500">{{ t('home.features.live.status') }}</span>
                                 <span
                                     class=":m: flex items-center gap-1.5 text-red-500 text-[10px] uppercase font-bold tracking-wider animate-pulse"><span
-                                        class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> On Air</span>
+                                        class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> {{ t('home.features.live.onAir') }}</span>
                             </div>
                             <div class="space-y-1">
-                                <div class="flex justify-between"><span class="text-slate-400">Bitrate:</span> <span
-                                        class="text-white">6000 kbps</span></div>
-                                <div class="flex justify-between"><span class="text-slate-400">FPS:</span> <span
-                                        class="text-white">60</span></div>
-                                <div class="flex justify-between"><span class="text-slate-400">Latency:</span> <span
-                                        class="text-brand-400">~2s</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">{{ t('home.features.live.bitrate') }}</span> <span
+                                        class="text-white">{{ t('home.features.live.bitrateValue') }}</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">{{ t('home.features.live.fps') }}</span> <span
+                                        class="text-white">{{ t('home.features.live.fpsValue') }}</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">{{ t('home.features.live.latency') }}</span> <span
+                                        class="text-brand-400">{{ t('home.features.live.latencyValue') }}</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Standard Feature -->
                 <div
                     class=":m: bg-slate-50 rounded-2xl p-8 border border-slate-100 transition-all group hover:(border-brand-200 shadow-lg shadow-brand-500/5)">
                     <div
@@ -125,12 +118,10 @@
                                 fill="#1e3050" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-2">Instant Encoding</h3>
-                    <p class="text-slate-500 text-sm">Upload raw files and get optimized HLS/DASH streams in seconds.
-                    </p>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">{{ t('home.features.encoding.title') }}</h3>
+                    <p class="text-slate-500 text-sm">{{ t('home.features.encoding.description') }}</p>
                 </div>
 
-                <!-- Standard Feature -->
                 <div
                     class=":m: bg-slate-50 rounded-2xl p-8 border border-slate-100 transition-all group hover:(border-brand-200 shadow-lg shadow-brand-500/5)">
                     <div
@@ -141,14 +132,12 @@
                                 fill="#1e3050" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-2">Deep Analytics</h3>
-                    <p class="text-slate-500 text-sm">Session-level insights, quality of experience (QoE) metrics, and
-                        more.</p>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">{{ t('home.features.analytics.title') }}</h3>
+                    <p class="text-slate-500 text-sm">{{ t('home.features.analytics.description') }}</p>
                 </div>
             </div>
         </div>
     </section>
-    <!-- Pricing -->
     <section id="pricing" class="py-24 border-t border-slate-100 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -158,7 +147,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
                 <div v-for="pack in pricing.packs" :key="pack.name"
-                    :class="cn(':uno: p-8 rounded-2xl relative overflow-hidden hover:border-primary transition-colors flex flex-col justify-between', pack.tag == 'POPULAR' ? 'border-primary/80 border-2' : 'border-slate-200 border')"
+                    :class="cn(':uno: p-8 rounded-2xl relative overflow-hidden hover:border-primary transition-colors flex flex-col justify-between', pack.tag == t('home.pricing.pro.tag') ? 'border-primary/80 border-2' : 'border-slate-200 border')"
                     :style="{ background: pack.bg }">
                     <div v-if="pack.tag"
                         class=":m: absolute top-0 right-0 bg-primary/80 text-white text-xs font-bold px-3 py-1 rounded-bl-lg uppercase">
@@ -167,7 +156,7 @@
                         <h3 class="font-semibold text-slate-900 text-xl mb-2">{{ pack.name }}</h3>
                         <div class="flex items-baseline gap-1 mb-6">
                             <span class="text-4xl font-bold text-slate-900">{{ pack.price }}</span>
-                            <span class="text-slate-500">/mo</span>
+                            <span class="text-slate-500">{{ t('home.pricing.perMonth') }}</span>
                         </div>
                     </div>
                     <ul class="space-y-3 mb-8 text-sm text-slate-600">
@@ -175,7 +164,7 @@
                                 class="fas fa-check text-brand-500" /> {{ value }}</li>
                     </ul>
                     <router-link to="/sign-up"
-                        :class="cn('btn flex justify-center w-full !py-2.5', pack.tag == 'POPULAR' ? 'btn-primary' : 'btn-outline-primary')">{{
+                        :class="cn('btn flex justify-center w-full !py-2.5', pack.tag == t('home.pricing.pro.tag') ? 'btn-primary' : 'btn-outline-primary')">{{
                         pack.buttonText }}</router-link>
                 </div>
             </div>
@@ -183,49 +172,45 @@
     </section>
 </template>
 <script lang="ts" setup>
-import { Head } from '@unhead/vue/components'
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { cn } from '@/lib/utils';
-const pricing = {
-    title: "Simple, transparent pricing",
-    subtitle: "Choose the plan that fits your needs. No hidden fees.",
+
+const { t, tm } = useI18n();
+
+const getFeatureList = (key: string): string[] => {
+    const localized = tm(key);
+    return Array.isArray(localized) ? localized.map((item) => String(item)) : [];
+};
+
+const pricing = computed(() => ({
+    title: t('home.pricing.title'),
+    subtitle: t('home.pricing.subtitle'),
     packs: [
         {
-            name: "Hobby",
-            price: "$0",
-            features: [
-                "Unlimited upload",
-                "1 Hour of Storage",
-                "Standard Support",
-            ],
-            buttonText: "Start Free",
-            tag: "",
-            bg: "#f9fafb",
+            name: t('home.pricing.hobby.name'),
+            price: '$0',
+            features: getFeatureList('home.pricing.hobby.features'),
+            buttonText: t('home.pricing.hobby.button'),
+            tag: '',
+            bg: '#f9fafb',
         },
         {
-            name: "Pro",
-            price: "$29",
-            features: [
-                "Ads free player",
-                "Support M3U8",
-                "Unlimited upload",
-                "Custom ads"
-            ],
-            buttonText: "Get Started",
-            tag: "POPULAR",
-            bg: "#eff6ff",
+            name: t('home.pricing.pro.name'),
+            price: '$29',
+            features: getFeatureList('home.pricing.pro.features'),
+            buttonText: t('home.pricing.pro.button'),
+            tag: t('home.pricing.pro.tag'),
+            bg: '#eff6ff',
         },
         {
-            name: "Scale",
-            price: "$99",
-            features: [
-                "5 TB Bandwidth",
-                "500 Hours Storage",
-                "Priority Support"
-            ],
-            buttonText: "Contact Sales",
-            tag: "Best Value",
-            bg: "#eef4f7",
+            name: t('home.pricing.scale.name'),
+            price: '$99',
+            features: getFeatureList('home.pricing.scale.features'),
+            buttonText: t('home.pricing.scale.button'),
+            tag: t('home.pricing.scale.tag'),
+            bg: '#eef4f7',
         }
     ]
-}
+}));
 </script>

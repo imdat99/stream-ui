@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -11,10 +14,8 @@
             <path d="M12 8h.01"></path>
         </svg>
         <div class="flex-1 text-sm">
-            <p class="font-medium text-blue-900 dark:text-blue-100 mb-1">Tip: For fastest processing</p>
-            <p class="text-blue-800 dark:text-blue-200">Upload videos in <strong>H.264 video codec + AAC
-                    audio codec</strong> format (e.g., MP4 with H.264/AAC). Videos in this format will be
-                processed much faster (seconds instead of minutes) because they don't need re-encoding.</p>
+            <p class="font-medium text-blue-900 dark:text-blue-100 mb-1">{{ t('upload.infoTip.title') }}</p>
+            <p class="text-blue-800 dark:text-blue-200">{{ t('upload.infoTip.description') }}</p>
         </div>
     </div>
 </template>

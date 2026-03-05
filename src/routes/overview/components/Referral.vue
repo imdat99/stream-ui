@@ -1,14 +1,13 @@
 <template>
     <div class="rounded-xl border border-gray-300 hover:border-primary hover:shadow-lg text-card-foreground bg-surface">
         <div class="flex flex-col space-y-1.5 p-6">
-            <h3 class="text-lg font-semibold leading-none tracking-tight">Referral Link</h3>
+            <h3 class="text-lg font-semibold leading-none tracking-tight">{{ t('overview.referral.title') }}</h3>
         </div>
         <div class="p-6 pt-0 space-y-4">
-            <p class="text-sm text-gray-600 font-medium">Share your referral link and earn commissions from
-                referred users!</p>
+            <p class="text-sm text-gray-600 font-medium">{{ t('overview.referral.subtitle') }}</p>
             <div class="flex gap-2">
                 <AppInput class="w-full" readonly type="text" :modelValue="url" @click="copyToClipboard" />
-                <button class="btn btn-primary" @click="copyToClipboard" :disabled="isCopied">
+                <button class="btn btn-primary" @click="copyToClipboard" :disabled="isCopied" :aria-label="t('common.copy')">
                     <svg v-if="!isCopied" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="lucide lucide-copy" aria-hidden="true">
@@ -28,19 +27,25 @@
 </template>
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth';
-import { ref } from 'vue';
-const auth = useAuthStore()
-const isCopied = ref(false)
-const url = location.origin + '/ref/' + auth.user?.username
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const auth = useAuthStore();
+const isCopied = ref(false);
+const { t } = useI18n();
+
+const url = computed(() => `${location.origin}/ref/${auth.user?.username || ''}`);
+
 const copyToClipboard = ($event: MouseEvent) => {
-    // ($event.target as HTMLInputElement)?.select
     if ($event.target instanceof HTMLInputElement) {
-        $event.target.select()
+        $event.target.select();
     }
-    navigator.clipboard.writeText(url)
-    isCopied.value = true
+
+    navigator.clipboard.writeText(url.value);
+    isCopied.value = true;
+
     setTimeout(() => {
-        isCopied.value = false
-    }, 3000)
-}
+        isCopied.value = false;
+    }, 3000);
+};
 </script>

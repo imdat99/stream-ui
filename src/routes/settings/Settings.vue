@@ -1,8 +1,8 @@
 <template>
     <section>
     <PageHeader
-        :title="content[route.name as keyof typeof content]?.title || 'Settings'"
-        :description="content[route.name as keyof typeof content]?.subtitle || 'Manage your account settings and preferences.'"
+        :title="content[route.name as keyof typeof content]?.title || t('settings.content.fallbackTitle')"
+        :description="content[route.name as keyof typeof content]?.subtitle || t('settings.content.fallbackSubtitle')"
         :breadcrumbs="breadcrumbs"
     />
     <div class="max-w-7xl mx-auto pb-12">
@@ -15,7 +15,7 @@
                         <UserIcon class="w-8 h-8 text-primary" :filled="true" />
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-foreground">{{ auth.user?.username || 'User' }}</h3>
+                        <h3 class="text-lg font-semibold text-foreground">{{ auth.user?.username || t('app.name') }}</h3>
                         <p class="text-sm text-foreground/60">{{ auth.user?.email || '' }}</p>
                     </div>
                 </div>
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import AppConfirmHost from '@/components/app/AppConfirmHost.vue';
@@ -79,6 +80,7 @@ import VideoPlayIcon from '@/components/icons/VideoPlayIcon.vue';
 
 const route = useRoute();
 const auth = useAuthStore();
+const { t } = useI18n();
 // Map tab values to their paths
 const tabPaths: Record<string, string> = {
     profile: '/settings',
@@ -92,37 +94,37 @@ const tabPaths: Record<string, string> = {
 };
 
 // Menu items grouped by category (GitHub-style)
-const menuSections: { title?: string; items: { value: string; label: string; icon: any; danger?: boolean }[] }[] = [
+const menuSections = computed(() => [
     {
-        title: 'Security',
+        title: t('settings.menu.securityGroup'),
         items: [
-            { value: 'security', label: 'Security', icon: UserIcon },
-            { value: 'billing', label: 'Billing & Plans', icon: CreditCardIcon },
+            { value: 'security', label: t('settings.menu.security'), icon: UserIcon },
+            { value: 'billing', label: t('settings.menu.billing'), icon: CreditCardIcon },
         ],
     },
     {
-        title: 'Preferences',
+        title: t('settings.menu.preferencesGroup'),
         items: [
-            { value: 'notifications', label: 'Notifications', icon: Bell },
-            { value: 'player', label: 'Player', icon: VideoPlayIcon },
+            { value: 'notifications', label: t('settings.menu.notifications'), icon: Bell },
+            { value: 'player', label: t('settings.menu.player'), icon: VideoPlayIcon },
         ],
     },
     {
-        title: 'Integrations',
+        title: t('settings.menu.integrationsGroup'),
         items: [
-            { value: 'domains', label: 'Allowed Domains', icon: GlobeIcon },
-            { value: 'ads', label: 'Ads & VAST', icon: AdvertisementIcon },
+            { value: 'domains', label: t('settings.menu.domains'), icon: GlobeIcon },
+            { value: 'ads', label: t('settings.menu.ads'), icon: AdvertisementIcon },
         ],
     },
     {
-        title: 'Danger Zone',
+        title: t('settings.menu.dangerGroup'),
         items: [
-            { value: 'danger', label: 'Danger Zone', icon: AlertTriangle, danger: true },
+            { value: 'danger', label: t('settings.menu.danger'), icon: AlertTriangle, danger: true },
         ],
     },
-] as const;
+] as const);
 
-type TabValue = typeof menuSections[number]['items'][number]['value'];
+type TabValue = 'profile' | 'security' | 'notifications' | 'player' | 'billing' | 'domains' | 'ads' | 'danger';
 
 // Get current tab from route path
 const currentTab = computed<TabValue>(() => {
@@ -133,43 +135,43 @@ const currentTab = computed<TabValue>(() => {
 });
 
 // Breadcrumbs with dynamic tab
-const allMenuItems = menuSections.flatMap(section => section.items);
-const currentItem = allMenuItems.find(item => item.value === currentTab.value);
+const allMenuItems = computed(() => menuSections.value.flatMap(section => section.items));
+const currentItem = computed(() => allMenuItems.value.find(item => item.value === currentTab.value));
 
-const breadcrumbs = [
-    { label: 'Dashboard', to: '/overview' },
-    { label: 'Settings', to: '/settings' },
-    ...(currentItem ? [{ label: currentItem.label }] : []),
-];
+const breadcrumbs = computed(() => [
+    { label: t('pageHeader.dashboard'), to: '/overview' },
+    { label: t('pageHeader.settings'), to: '/settings' },
+    ...(currentItem.value ? [{ label: currentItem.value.label }] : []),
+]);
 
-const content = {
-    security: {
-        title: 'Security & Connected Apps',
-        subtitle: 'Manage your security settings and connected applications.'
+const content = computed(() => ({
+    'settings-security': {
+        title: t('settings.content.security.title'),
+        subtitle: t('settings.content.security.subtitle')
     },
-    notifications: {
-        title: 'Notifications',
-        subtitle: 'Choose how you want to receive notifications and updates.'
+    'settings-notifications': {
+        title: t('settings.content.notifications.title'),
+        subtitle: t('settings.content.notifications.subtitle')
     },
-    player: {
-        title: 'Player Settings',
-        subtitle: 'Configure default video player behavior and features.'
+    'settings-player': {
+        title: t('settings.content.player.title'),
+        subtitle: t('settings.content.player.subtitle')
     },
-    billing: {
-        title: 'Billing & Plans',
-        subtitle: 'Your current subscription and billing information.'
+    'settings-billing': {
+        title: t('settings.content.billing.title'),
+        subtitle: t('settings.content.billing.subtitle')
     },
-    domains: {
-        title: 'Allowed Domains',
-        subtitle: 'Add domains to your whitelist to allow embedding content via iframe.'
+    'settings-domains': {
+        title: t('settings.content.domains.title'),
+        subtitle: t('settings.content.domains.subtitle')
     },
-    ads: {
-        title: 'Ads & VAST',
-        subtitle: 'Create and manage VAST ad templates for your videos.'
+    'settings-ads': {
+        title: t('settings.content.ads.title'),
+        subtitle: t('settings.content.ads.subtitle')
     },
-    danger: {
-        title: 'Danger Zone',
-        subtitle: 'Irreversible and destructive actions. Be careful!'
+    'settings-danger': {
+        title: t('settings.content.danger.title'),
+        subtitle: t('settings.content.danger.subtitle')
     }
-}
+}));
 </script>

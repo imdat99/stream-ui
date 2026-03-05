@@ -2,17 +2,17 @@
     <div class="w-full">
         <form @submit.prevent="onFormSubmit" class="flex flex-col gap-4 w-full">
             <div class="flex flex-col gap-1">
-                <label for="email" class="text-sm font-medium text-gray-700">Email</label>
-                <AppInput id="email" v-model="form.email" type="text" placeholder="Enter your email"
+                <label for="email" class="text-sm font-medium text-gray-700">{{ t('auth.login.email') }}</label>
+                <AppInput id="email" v-model="form.email" type="text" :placeholder="t('auth.signup.placeholders.email')"
                     :disabled="auth.loading" />
                 <p v-if="errors.email" class="text-xs text-red-500 mt-0.5">{{ errors.email }}</p>
             </div>
 
             <div class="flex flex-col gap-1">
-                <label for="password" class="text-sm font-medium text-gray-700">Password</label>
+                <label for="password" class="text-sm font-medium text-gray-700">{{ t('auth.login.password') }}</label>
                 <div class="relative">
                     <AppInput id="password" v-model="form.password" :type="showPassword ? 'text' : 'password'"
-                        placeholder="Enter your password" :disabled="auth.loading" />
+                        :placeholder="t('auth.signup.placeholders.password')" :disabled="auth.loading" />
                     <button type="button"
                         class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                         @click="showPassword = !showPassword" tabindex="-1">
@@ -36,17 +36,16 @@
                     <input id="remember-me" v-model="form.rememberMe" type="checkbox"
                         class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                         :disabled="auth.loading" />
-                    <label for="remember-me" class="text-sm text-gray-900">Remember me</label>
+                    <label for="remember-me" class="text-sm text-gray-900">{{ t('auth.login.signIn') }}</label>
                 </div>
                 <div class="text-sm">
                     <router-link to="/forgot"
-                        class="text-blue-600 hover:text-blue-500 hover:underline">Forgot
-                        password?</router-link>
+                        class="text-blue-600 hover:text-blue-500 hover:underline">{{ t('auth.login.forgotPassword') }}</router-link>
                 </div>
             </div>
 
             <AppButton type="submit" :loading="auth.loading" class="w-full">
-                {{ auth.loading ? 'Signing in...' : 'Sign in' }}
+                {{ auth.loading ? `${t('common.loading')}...` : t('auth.login.signIn') }}
             </AppButton>
 
             <div class="relative">
@@ -54,7 +53,7 @@
                     <div class="w-full border-t border-gray-300"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                    <span class="px-2 bg-white text-gray-500">{{ t('auth.login.google') }}</span>
                 </div>
             </div>
 
@@ -64,13 +63,13 @@
                     <path
                         d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
                 </svg>
-                Google
+                {{ t('auth.login.google') }}
             </AppButton>
             <div class="mt-2 flex flex-col items-center justify-center gap-1 text-sm text-gray-600">
                 <p class="text-center text-sm text-gray-600">
-                    Don't have an account?
+                    {{ t('auth.login.noAccount') }}
                     <router-link to="/sign-up"
-                        class="font-medium text-blue-600 hover:text-blue-500 hover:underline">Sign up</router-link>
+                        class="font-medium text-blue-600 hover:text-blue-500 hover:underline">{{ t('auth.login.signUp') }}</router-link>
                 </p>
             </div>
         </form>
@@ -81,11 +80,13 @@
 import { useAuthStore } from '@/stores/auth';
 import { useAppToast } from '@/composables/useAppToast';
 import { reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { z } from 'zod';
 
 const toast = useAppToast();
 const auth = useAuthStore();
 const showPassword = ref(false);
+const { t } = useI18n();
 
 const form = reactive({
     email: '',
@@ -96,8 +97,8 @@ const form = reactive({
 const errors = reactive<{ email?: string; password?: string }>({});
 
 const schema = z.object({
-    email: z.string().min(1, { message: 'Email or username is required.' }),
-    password: z.string().min(1, { message: 'Password is required.' })
+    email: z.string().min(1, { message: t('auth.login.errors.emailRequired') }),
+    password: z.string().min(1, { message: t('auth.login.errors.passwordRequired') })
 });
 
 watch(() => auth.error, (newError) => {

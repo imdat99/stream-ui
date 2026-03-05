@@ -1,24 +1,48 @@
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { client, ResponseResponse, type ModelUser } from '@/api/client';
+import { defaultLocale, localeCookieKey, type SupportedLocale } from '@/i18n/constants';
+import { getActiveI18n, normalizeLocale } from '@/i18n';
 import { TinyMqttClient } from '@/lib/liteMqtt';
+
+type ProfileUpdatePayload = { username?: string; email?: string; language?: string; locale?: string };
+
+const cookieMaxAge = 60 * 60 * 24 * 365;
+
+const writeLocaleCookie = (locale: SupportedLocale) => {
+    if (typeof document === 'undefined') return;
+    document.cookie = `${localeCookieKey}=${encodeURIComponent(locale)}; path=/; max-age=${cookieMaxAge}; samesite=lax`;
+};
+
+const resolveUserLocale = (target: Partial<ModelUser> | null | undefined): SupportedLocale => {
+    const userLocale = (target as any)?.language ?? (target as any)?.locale;
+    return normalizeLocale(typeof userLocale === 'string' ? userLocale : defaultLocale);
+};
+
+const applyRuntimeLocale = (locale: SupportedLocale) => {
+    const i18n = getActiveI18n();
+    if (!i18n) return;
+    i18n.global.locale.value = locale;
+};
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<ModelUser | null>(null);
     const router = useRouter();
+    const t = (key: string, params?: Record<string, unknown>) =>
+        getActiveI18n()?.global.t(key, params) ?? key;
     const loading = ref(false);
     const error = ref<string | null>(null);
     const initialized = ref(false);
-    
+
     watch(user, (newUser) => {
         if (import.meta.env.SSR) return;
         let client: TinyMqttClient | undefined;
         if (newUser?.id) {
             client = new TinyMqttClient(
-            // 'wss://broker.emqx.io:8084/mqtt', 
-            'wss://mqtt-dashboard.com:8884/mqtt', 
-            [['ecos1231231',newUser.id,'#'].join("/")], 
+            // 'wss://broker.emqx.io:8084/mqtt',
+            'wss://mqtt-dashboard.com:8884/mqtt',
+            [['ecos1231231',newUser.id,'#'].join("/")],
             (topic, msg) => console.log(`Tín hiệu nhận được [${topic}]:`, msg)
         );
             client.connect();
@@ -29,6 +53,13 @@ export const useAuthStore = defineStore('auth', () => {
             client = undefined;
         }
     }, { deep: true });
+
+    watch(user, (newUser) => {
+        if (import.meta.env.SSR) return;
+        const locale = resolveUserLocale(newUser);
+        applyRuntimeLocale(locale);
+        writeLocaleCookie(locale);
+    }, { deep: true, immediate: true });
     // Initial check for session could go here if there was a /me endpoint or token check
     async function init() {
         if (initialized.value) return;
@@ -39,6 +70,8 @@ export const useAuthStore = defineStore('auth', () => {
         }).then(r => r.json()).then(r => {
             if (r.data) {
                 user.value = r.data.user as ModelUser;
+                const resolvedLocale = resolveUserLocale(user.value);
+                applyRuntimeLocale(resolvedLocale);
             }
         }).catch(() => { }).finally(() => {
             initialized.value = true;
@@ -75,13 +108,16 @@ export const useAuthStore = defineStore('auth', () => {
             console.log("body", body);
             if (body && body.data) {
                 user.value = body.data.user;
+                const resolvedLocale = resolveUserLocale(user.value);
+                applyRuntimeLocale(resolvedLocale);
+                writeLocaleCookie(resolvedLocale);
                 router.push('/');
             } else {
-                throw new Error('Login failed: No user data received');
+                throw new Error(t('auth.errors.loginNoUserData'));
             }
         } catch (e: any) {
             console.error(e);
-            error.value = 'Login failed: ' + (e.message || 'Unknown error');
+            error.value = t('auth.errors.loginFailed', { error: e.message || t('auth.errors.unknown') });
             throw e;
         } finally {
             loading.value = false;
@@ -112,18 +148,18 @@ export const useAuthStore = defineStore('auth', () => {
                 // Usually register returns success, user must login.
                 router.push('/login');
             } else {
-                throw new Error(body.message || 'Registration failed');
+                throw new Error(body.message || t('auth.errors.registrationFailedFallback'));
             }
         } catch (e: any) {
             console.error(e);
-            error.value = 'Registration failed: ' + (e.message || 'Unknown error');
+            error.value = t('auth.errors.registrationFailed', { error: e.message || t('auth.errors.unknown') });
             throw e;
         } finally {
             loading.value = false;
         }
     }
 
-    async function updateProfile(data: { username?: string; email?: string }) {
+    async function updateProfile(data: ProfileUpdatePayload) {
         loading.value = true;
         error.value = null;
         try {
@@ -139,15 +175,48 @@ export const useAuthStore = defineStore('auth', () => {
 
             const body = response.data as any;
             if (body && body.data) {
-                user.value = { ...user.value, ...body.data };
+                user.value = { ...(user.value ?? {}), ...body.data } as ModelUser;
             }
             return true;
         } catch (e: any) {
             console.error('Update profile error', e);
-            error.value = 'Failed to update profile: ' + (e.message || 'Unknown error');
+            error.value = t('auth.errors.updateProfileFailed', { error: e.message || t('auth.errors.unknown') });
             throw e;
         } finally {
             loading.value = false;
+        }
+    }
+
+    async function setLanguage(locale: string) {
+        const normalizedLocale = normalizeLocale(locale);
+        const previousLocale = resolveUserLocale(user.value);
+        const previousUser = user.value ? { ...user.value } : null;
+
+        applyRuntimeLocale(normalizedLocale);
+        writeLocaleCookie(normalizedLocale);
+
+        if (user.value) {
+            user.value = {
+                ...user.value,
+                language: normalizedLocale,
+                locale: normalizedLocale,
+            } as ModelUser;
+        }
+
+        if (!user.value?.id) {
+            return { ok: true as const, fallbackOnly: true as const };
+        }
+
+        try {
+            await updateProfile({ language: normalizedLocale, locale: normalizedLocale });
+            return { ok: true as const, fallbackOnly: false as const };
+        } catch (e) {
+            applyRuntimeLocale(previousLocale);
+            if (previousUser) {
+                user.value = previousUser as ModelUser;
+            }
+            writeLocaleCookie(normalizedLocale);
+            return { ok: false as const, fallbackOnly: true as const, error: e };
         }
     }
 
@@ -167,7 +236,7 @@ export const useAuthStore = defineStore('auth', () => {
             return true;
         } catch (e: any) {
             console.error('Change password error', e);
-            error.value = 'Failed to change password: ' + (e.message || 'Unknown error');
+            error.value = t('auth.errors.changePasswordFailed', { error: e.message || t('auth.errors.unknown') });
             throw e;
         } finally {
             loading.value = false;
@@ -185,8 +254,10 @@ export const useAuthStore = defineStore('auth', () => {
         register,
         updateProfile,
         changePassword,
+        setLanguage,
         logout: async () => {
             loading.value = true;
+            const localeBeforeLogout = resolveUserLocale(user.value);
             try {
                 await client.auth.logoutCreate();
                 user.value = null;
@@ -196,6 +267,8 @@ export const useAuthStore = defineStore('auth', () => {
                 user.value = null;
                 router.push('/login');
             } finally {
+                writeLocaleCookie(localeBeforeLogout);
+                applyRuntimeLocale(localeBeforeLogout);
                 loading.value = false;
             }
         },

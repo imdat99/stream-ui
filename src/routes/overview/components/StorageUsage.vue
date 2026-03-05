@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatBytes } from '@/lib/utils';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 interface Props {
     loading: boolean;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const storagePercentage = computed(() => {
     return Math.round((props.stats.storageUsed / props.stats.storageLimit) * 100);
@@ -24,21 +26,21 @@ const storageBreakdown = computed(() => {
     const total = videoSize + thumbSize + otherSize;
 
     return [
-        { label: 'Videos', size: videoSize, percentage: (videoSize / (total || 1)) * 100, color: 'bg-primary' },
-        { label: 'Thumbnails & Assets', size: thumbSize, percentage: (thumbSize / (total || 1)) * 100, color: 'bg-blue-500' },
-        { label: 'Other Files', size: otherSize, percentage: (otherSize / (total || 1)) * 100, color: 'bg-gray-400' },
+        { label: t('overview.storage.breakdown.videos'), size: videoSize, percentage: (videoSize / (total || 1)) * 100, color: 'bg-primary' },
+        { label: t('overview.storage.breakdown.thumbnails'), size: thumbSize, percentage: (thumbSize / (total || 1)) * 100, color: 'bg-blue-500' },
+        { label: t('overview.storage.breakdown.other'), size: otherSize, percentage: (otherSize / (total || 1)) * 100, color: 'bg-gray-400' },
     ];
 });
 </script>
 
 <template>
     <div v-if="!loading" class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-xl font-semibold mb-4">Storage Usage</h2>
+        <h2 class="text-xl font-semibold mb-4">{{ t('overview.storage.title') }}</h2>
 
         <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-sm font-medium text-gray-700">
-                    {{ formatBytes(stats.storageUsed) }} of {{ formatBytes(stats.storageLimit) }} used
+                    {{ t('overview.storage.usedOfLimit', { used: formatBytes(stats.storageUsed), limit: formatBytes(stats.storageLimit) }) }}
                 </span>
                 <span class="text-sm font-medium" :class="storagePercentage > 80 ? 'text-danger' : 'text-gray-700'">
                     {{ storagePercentage }}%
@@ -66,10 +68,10 @@ const storageBreakdown = computed(() => {
             <div class="flex gap-2">
                 <span class="i-heroicons-exclamation-triangle w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                 <div>
-                    <p class="text-sm font-medium text-yellow-800">Storage running low</p>
+                    <p class="text-sm font-medium text-yellow-800">{{ t('overview.storage.lowStorage.title') }}</p>
                     <p class="text-sm text-yellow-700 mt-1">
-                        Consider upgrading your plan to get more storage.
-                        <router-link to="/plans" class="underline font-medium">View plans</router-link>
+                        {{ t('overview.storage.lowStorage.message') }}
+                        <router-link to="/plans" class="underline font-medium">{{ t('overview.storage.lowStorage.viewPlans') }}</router-link>
                     </p>
                 </div>
             </div>

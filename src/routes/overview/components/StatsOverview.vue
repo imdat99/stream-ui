@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import { formatBytes } from '@/lib/utils';
 
@@ -14,6 +15,7 @@ interface Props {
 }
 
 defineProps<Props>();
+const { t } = useI18n();
 </script>
 
 <template>
@@ -30,15 +32,15 @@ defineProps<Props>();
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatsCard title="Total Videos" :value="stats.totalVideos" :trend="{ value: 12, isPositive: true }" />
+        <StatsCard :title="t('overview.stats.totalVideos')" :value="stats.totalVideos" :trend="{ value: 12, isPositive: true }" />
 
-        <StatsCard title="Total Views" :value="stats.totalViews.toLocaleString()"
+        <StatsCard :title="t('overview.stats.totalViews')" :value="stats.totalViews.toLocaleString()"
             :trend="{ value: 8, isPositive: true }" />
 
-        <StatsCard title="Storage Used"
+        <StatsCard :title="t('overview.stats.storageUsed')"
             :value="`${formatBytes(stats.storageUsed)} / ${formatBytes(stats.storageLimit)}`" color="warning" />
 
-        <StatsCard title="Uploads This Month" :value="stats.uploadsThisMonth" color="success"
+        <StatsCard :title="t('overview.stats.uploadsThisMonth')" :value="stats.uploadsThisMonth" color="success"
             :trend="{ value: 25, isPositive: true }" />
     </div>
 </template>

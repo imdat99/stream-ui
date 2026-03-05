@@ -1,3 +1,4 @@
+import { getActiveI18n } from '@/i18n';
 import { computed, ref } from 'vue';
 
 export interface QueueItem {
@@ -40,6 +41,8 @@ const abortItem = (id: string) => {
 };
 
 export function useUploadQueue() {
+    const t = (key: string, params?: Record<string, unknown>) =>
+        getActiveI18n()?.global.t(key, params) ?? key;
 
     const remainingSlots = computed(() => Math.max(0, MAX_ITEMS - items.value.length));
 
@@ -82,12 +85,12 @@ export function useUploadQueue() {
         const duplicateCount = allowed.length - fresh.length;
         const newItems: QueueItem[] = fresh.map((url) => ({
             id: Math.random().toString(36).substring(2, 9),
-            name: url.split('/').pop() || 'Remote File',
+            name: url.split('/').pop() || t('upload.queueItem.remoteFileName'),
             type: 'remote',
             status: 'pending',
             progress: 0,
             uploaded: '0 MB',
-            total: 'Unknown',
+            total: t('upload.queueItem.unknownSize'),
             speed: '0 MB/s',
             url: url,
             activeChunks: 0,
@@ -267,7 +270,7 @@ export function useUploadQueue() {
                         setTimeout(attempt, 2000);
                     } else {
                         item.status = 'error';
-                        reject(new Error(`Failed to upload chunk ${index + 1}`));
+                        reject(new Error(t('upload.errors.chunkUploadFailed', { index: index + 1 })));
                     }
                 }
 
@@ -295,7 +298,7 @@ export function useUploadQueue() {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Merge failed');
+                throw new Error(data.error || t('upload.errors.mergeFailed'));
             }
 
             item.status = 'complete';
@@ -327,7 +330,8 @@ export function useUploadQueue() {
         const k = 1024;
         const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
+        return `${new Intl.NumberFormat(getActiveI18n()?.global.locale.value === 'vi' ? 'vi-VN' : 'en-US').format(value)} ${sizes[i]}`;
     };
 
     const totalSize = computed(() => {

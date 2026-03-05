@@ -1,26 +1,29 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
+import { useI18n } from 'vue-i18n';
 
 defineProps<{
     video: ModelVideo;
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
     <div class="rounded-xl">
         <div v-if="video.url" class="aspect-video rounded-xl bg-black overflow-hidden">
-            <video 
-                :src="video.url" 
-                controls 
-                class="w-full h-full object-contain" 
+            <video
+                :src="video.url"
+                controls
+                class="w-full h-full object-contain"
                 :poster="video.thumbnail">
-                Your browser does not support the video tag.
+                {{ t('video.detailPage.videoTagFallback') }}
             </video>
         </div>
         <div v-else class="w-full h-48 bg-gray-200 overflow-hidden flex-shrink-0">
-            <img 
-                v-if="video.thumbnail" 
-                :src="video.thumbnail" 
+            <img
+                v-if="video.thumbnail"
+                :src="video.thumbnail"
                 :alt="video.title"
                 class="w-full h-full object-cover" />
             <div v-else class="w-full h-full flex items-center justify-center">

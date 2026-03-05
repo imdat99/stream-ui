@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{ maxUrls?: number }>();
 const urls = ref('');
 
 const emit = defineEmits<{ submit: [urls: string[]] }>();
+const { t } = useI18n();
 
 const handleSubmit = () => {
     const limit = props.maxUrls ?? 5;
@@ -25,7 +27,7 @@ const handleSubmit = () => {
         <div class="relative flex-1">
             <textarea
                 v-model="urls"
-                placeholder="Paste video URLs here, one per line&#10;&#10;https://example.com/video.mp4&#10;https://drive.google.com/..."
+                :placeholder="t('upload.remote.placeholder')"
                 class="w-full h-full min-h-[200px] px-4 py-3.5 bg-white border border-slate-200
                        rounded-xl focus:border-accent focus:ring-2 focus:ring-accent/10 focus:outline-none
                        transition-all resize-none text-base text-slate-700 placeholder:text-slate-300
@@ -49,7 +51,7 @@ const handleSubmit = () => {
                     <path d="M12 16v-4" />
                     <path d="M12 8h.01" />
                 </svg>
-                Google Drive, Dropbox supported
+                {{ t('upload.remote.providersHint') }}
             </div>
             <button
                 @click="handleSubmit"
@@ -69,7 +71,7 @@ const handleSubmit = () => {
                     <path d="M5 12h14" />
                     <path d="m12 5 7 7-7 7" />
                 </svg>
-                Add URLs
+                {{ t('upload.remote.addUrls') }}
             </button>
         </div>
     </div>

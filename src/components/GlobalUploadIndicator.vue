@@ -3,11 +3,13 @@ import { useUploadQueue } from '@/composables/useUploadQueue';
 import UploadQueueItem from '@/routes/upload/components/UploadQueueItem.vue';
 import { useUIState } from '@/stores/uiState';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const { items, completeCount, pendingCount, startQueue, removeItem, cancelItem, removeAll } = useUploadQueue();
 const uiState = useUIState();
+const { t } = useI18n();
 
 const isCollapsed = ref(false);
 
@@ -28,13 +30,13 @@ const isAllDone = computed(() =>
 );
 
 const statusText = computed(() => {
-    if (isAllDone.value) return 'All done';
+    if (isAllDone.value) return t('upload.indicator.allDone');
     if (isUploading.value) {
         const count = items.value.filter(i => i.status === 'uploading' || i.status === 'fetching').length;
-        return `Uploading ${count} file${count !== 1 ? 's' : ''}...`;
+        return t('upload.indicator.uploading', { count });
     }
-    if (pendingCount.value > 0) return `${pendingCount.value} file${pendingCount.value !== 1 ? 's' : ''} waiting`;
-    return 'Processing...';
+    if (pendingCount.value > 0) return t('upload.indicator.waiting', { count: pendingCount.value });
+    return t('upload.queueItem.status.processing');
 });
 const isDoneWithErrors = computed(() =>
     isAllDone.value &&
@@ -87,7 +89,7 @@ watch(isAllDone, (newItems) => {
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold leading-tight truncate">{{ statusText }}</p>
                     <p class="text-xs text-slate-400 leading-tight mt-0.5">
-                        {{ completeCount }} of {{ items.length }} complete
+                        {{ t('upload.indicator.completeProgress', { complete: completeCount, total: items.length }) }}
                     </p>
                 </div>
 
@@ -100,17 +102,17 @@ watch(isAllDone, (newItems) => {
                             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="5 3 19 12 5 21 5 3" />
                         </svg>
-                        Start
+                        {{ t('upload.indicator.start') }}
                     </button>
                     <button v-else-if="isDoneWithErrors" @click.stop="doneUpload"
                         class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 bg-green-500 hover:bg-green-500/80 text-white rounded-lg transition-all">
-                        View Videos
+                        {{ t('upload.indicator.viewVideos') }}
                     </button>
                     <!-- Clear queue -->
                     <!-- Add more files -->
                     <button @click.stop="uiState.uploadDialogVisible = true"
                         class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                        title="Add more files">
+                        :title="t('upload.indicator.addMoreFiles')">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M5 12h14" />

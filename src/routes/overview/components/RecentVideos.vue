@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
-import { formatBytes, formatDate, formatDuration } from '@/lib/utils';
+import { formatDate, formatDuration } from '@/lib/utils';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 defineProps<Props>();
 
 const router = useRouter();
+const { t } = useI18n();
 
 const getStatusClass = (status?: string) => {
     switch (status?.toLowerCase()) {
@@ -45,17 +47,17 @@ const getStatusClass = (status?: string) => {
 
         <div v-else>
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold">Recent Videos</h2>
+                <h2 class="text-xl font-semibold">{{ t('overview.recentVideos.title') }}</h2>
                 <router-link to="/video"
                     class="text-sm text-primary hover:underline font-medium flex items-center gap-1">
-                    View all
+                    {{ t('overview.recentVideos.viewAll') }}
                     <span class="i-heroicons-arrow-right w-4 h-4" />
                 </router-link>
             </div>
 
-            <EmptyState v-if="videos.length === 0" title="No videos found"
-                description="You haven't uploaded any videos yet. Start by uploading your first video!"
-                imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" actionLabel="Upload Video"
+            <EmptyState v-if="videos.length === 0" :title="t('overview.recentVideos.emptyTitle')"
+                :description="t('overview.recentVideos.emptyDescription')"
+                imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" :actionLabel="t('overview.recentVideos.emptyAction')"
                 :onAction="() => router.push('/upload')" />
 
             <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -65,19 +67,19 @@ const getStatusClass = (status?: string) => {
                             <tr>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Video</th>
+                                    {{ t('overview.recentVideos.table.video') }}</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status</th>
+                                    {{ t('overview.recentVideos.table.status') }}</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Duration</th>
+                                    {{ t('overview.recentVideos.table.duration') }}</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Upload Date</th>
+                                    {{ t('overview.recentVideos.table.uploadDate') }}</th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions</th>
+                                    {{ t('overview.recentVideos.table.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -94,14 +96,14 @@ const getStatusClass = (status?: string) => {
                                         <div class="min-w-0 flex-1">
                                             <p class="font-medium text-gray-900 truncate">{{ video.title }}</p>
                                             <p class="text-sm text-gray-500 truncate">
-                                                {{ video.description || 'No description' }}</p>
+                                                {{ video.description || t('overview.recentVideos.noDescription') }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <span
                                         :class="['px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap', getStatusClass(video.status)]">
-                                        {{ video.status || 'Unknown' }}
+                                        {{ video.status || t('overview.recentVideos.unknownStatus') }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">
@@ -112,13 +114,13 @@ const getStatusClass = (status?: string) => {
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <button class="p-1.5 hover:bg-gray-100 rounded transition-colors" title="Edit">
+                                        <button class="p-1.5 hover:bg-gray-100 rounded transition-colors" :title="t('overview.recentVideos.actionEdit')">
                                             <span class="i-heroicons-pencil w-4 h-4 text-gray-600" />
                                         </button>
-                                        <button class="p-1.5 hover:bg-gray-100 rounded transition-colors" title="Share">
+                                        <button class="p-1.5 hover:bg-gray-100 rounded transition-colors" :title="t('overview.recentVideos.actionShare')">
                                             <span class="i-heroicons-share w-4 h-4 text-gray-600" />
                                         </button>
-                                        <button class="p-1.5 hover:bg-red-100 rounded transition-colors" title="Delete">
+                                        <button class="p-1.5 hover:bg-red-100 rounded transition-colors" :title="t('overview.recentVideos.actionDelete')">
                                             <span class="i-heroicons-trash w-4 h-4 text-red-600" />
                                         </button>
                                     </div>

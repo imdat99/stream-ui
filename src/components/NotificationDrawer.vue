@@ -2,6 +2,7 @@
 import NotificationItem from '@/routes/notification/components/NotificationItem.vue';
 import { onClickOutside } from '@vueuse/core';
 import { computed, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 // Ensure client-side only rendering to avoid hydration mismatch
 const isMounted = ref(false);
@@ -27,50 +28,57 @@ interface Notification {
 
 const visible = ref(false);
 const drawerRef = ref(null);
+const { t } = useI18n();
 
 // Mock notifications data
-const notifications = ref<Notification[]>([
+const notifications = computed<Notification[]>(() => [
     {
         id: '1',
         type: 'video',
-        title: 'Video processing complete',
-        message: 'Your video "Summer Vacation 2024" has been successfully processed.',
-        time: '2 min ago',
+        title: t('notification.mocks.videoProcessed.title'),
+        message: t('notification.mocks.videoProcessed.message'),
+        time: t('notification.time.minutesAgo', { count: 2 }),
         read: false,
         actionUrl: '/video',
-        actionLabel: 'View'
+        actionLabel: t('notification.actions.viewVideo')
     },
     {
         id: '2',
         type: 'payment',
-        title: 'Payment successful',
-        message: 'Your subscription to Pro Plan has been renewed successfully.',
-        time: '1 hour ago',
+        title: t('notification.mocks.paymentSuccess.title'),
+        message: t('notification.mocks.paymentSuccess.message'),
+        time: t('notification.time.hoursAgo', { count: 1 }),
         read: false,
         actionUrl: '/payments-and-plans',
-        actionLabel: 'Receipt'
+        actionLabel: t('notification.actions.viewReceipt')
     },
     {
         id: '3',
         type: 'warning',
-        title: 'Storage almost full',
-        message: 'You have used 85% of your storage quota.',
-        time: '3 hours ago',
+        title: t('notification.mocks.storageWarning.title'),
+        message: t('notification.mocks.storageWarning.message'),
+        time: t('notification.time.hoursAgo', { count: 3 }),
         read: false,
         actionUrl: '/payments-and-plans',
-        actionLabel: 'Upgrade'
+        actionLabel: t('notification.actions.upgradePlan')
     },
     {
         id: '4',
         type: 'success',
-        title: 'Upload successful',
-        message: 'Your video "Product Demo v2" has been uploaded.',
-        time: '1 day ago',
+        title: t('notification.mocks.uploadSuccess.title'),
+        message: t('notification.mocks.uploadSuccess.message'),
+        time: t('notification.time.daysAgo', { count: 1 }),
         read: true
     }
 ]);
 
-const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
+const mutableNotifications = ref<Notification[]>([]);
+
+watch(notifications, (value) => {
+    mutableNotifications.value = value.map(item => ({ ...item }));
+}, { immediate: true });
+
+const unreadCount = computed(() => mutableNotifications.value.filter(n => !n.read).length);
 
 const toggle = (event?: Event) => {
     console.log(event);
@@ -107,16 +115,16 @@ onClickOutside(drawerRef, (event) => {
 });
 
 const handleMarkRead = (id: string) => {
-    const notification = notifications.value.find(n => n.id === id);
+    const notification = mutableNotifications.value.find(n => n.id === id);
     if (notification) notification.read = true;
 };
 
 const handleDelete = (id: string) => {
-    notifications.value = notifications.value.filter(n => n.id !== id);
+    mutableNotifications.value = mutableNotifications.value.filter(n => n.id !== id);
 };
 
 const handleMarkAllRead = () => {
-    notifications.value.forEach(n => n.read = true);
+    mutableNotifications.value.forEach(n => n.read = true);
 };
 
 watch(visible, (val) => {
@@ -137,7 +145,7 @@ defineExpose({ toggle });
                 <!-- Header -->
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center gap-2">
-                        <h3 class="font-semibold text-gray-900">Notifications</h3>
+                        <h3 class="font-semibold text-gray-900">{{ t('notification.title') }}</h3>
                         <span v-if="unreadCount > 0"
                             class="px-2 py-0.5 text-xs font-medium bg-primary text-white rounded-full">
                             {{ unreadCount }}
@@ -145,14 +153,14 @@ defineExpose({ toggle });
                     </div>
                     <button v-if="unreadCount > 0" @click="handleMarkAllRead"
                         class="text-sm text-primary hover:underline font-medium">
-                        Mark all read
+                        {{ t('notification.actions.markAllRead') }}
                     </button>
                 </div>
 
                 <!-- Notification List -->
                 <div class="flex flex-col flex-1 overflow-y-auto gap-2">
-                    <template v-if="notifications.length > 0">
-                        <div v-for="notification in notifications" :key="notification.id"
+                    <template v-if="mutableNotifications.length > 0">
+                        <div v-for="notification in mutableNotifications" :key="notification.id"
                             class="border-b border-gray-50 last:border-0">
                             <NotificationItem :notification="notification" @mark-read="handleMarkRead"
                                 @delete="handleDelete" isDrawer />
@@ -162,16 +170,16 @@ defineExpose({ toggle });
                     <!-- Empty state -->
                     <div v-else class="py-12 text-center">
                         <span class="i-lucide-bell-off w-12 h-12 text-gray-300 mx-auto block mb-3"></span>
-                        <p class="text-gray-500 text-sm">No notifications</p>
+                        <p class="text-gray-500 text-sm">{{ t('notification.empty.title') }}</p>
                     </div>
                 </div>
 
                 <!-- Footer -->
-                <div v-if="notifications.length > 0" class="p-3 border-t border-gray-100 bg-gray-50/50">
+                <div v-if="mutableNotifications.length > 0" class="p-3 border-t border-gray-100 bg-gray-50/50">
                     <router-link to="/notification"
                         class="block w-full text-center text-sm text-primary font-medium hover:underline"
                         @click="visible = false">
-                        View all notifications
+                        {{ t('notification.actions.viewAll') }}
                     </router-link>
                 </div>
             </div>

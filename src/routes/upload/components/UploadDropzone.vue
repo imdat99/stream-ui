@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{ maxFiles?: number }>();
 const emit = defineEmits<{ filesSelected: [files: FileList] }>();
+const { t } = useI18n();
 
 const isDragOver = ref(false);
 let dragCounter = 0;
@@ -91,9 +93,9 @@ const onDrop = (e: DragEvent) => {
 
             <div class="text-center">
                 <p :class="['text-base font-semibold transition-colors', isDragOver ? 'text-accent' : 'text-slate-700 group-hover:text-slate-900']">
-                    {{ isDragOver ? 'Release to add' : 'Drop videos here' }}
+                    {{ isDragOver ? t('upload.dropzone.releaseToAdd') : t('upload.dropzone.dropHere') }}
                 </p>
-                <p class="text-sm text-slate-400 mt-1.5">or click anywhere to browse</p>
+                <p class="text-sm text-slate-400 mt-1.5">{{ t('upload.dropzone.browse') }}</p>
             </div>
 
             <!-- Format badges -->

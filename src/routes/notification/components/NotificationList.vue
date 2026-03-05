@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import NotificationItem from './NotificationItem.vue';
 
 interface Notification {
@@ -22,15 +23,16 @@ const emit = defineEmits<{
     markRead: [id: string];
     delete: [id: string];
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
     <div class="notification-list space-y-3">
-        <!-- Loading skeleton -->
         <template v-if="loading">
-            <div 
-                v-for="i in 5" 
-                :key="i" 
+            <div
+                v-for="i in 5"
+                :key="i"
                 class="p-4 rounded-xl border border-gray-200 animate-pulse"
             >
                 <div class="flex items-start gap-4">
@@ -43,7 +45,6 @@ const emit = defineEmits<{
             </div>
         </template>
 
-        <!-- Notification items -->
         <template v-else-if="notifications.length > 0">
             <NotificationItem
                 v-for="notification in notifications"
@@ -54,16 +55,15 @@ const emit = defineEmits<{
             />
         </template>
 
-        <!-- Empty state -->
-        <div 
-            v-else 
+        <div
+            v-else
             class="py-16 text-center"
         >
             <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                 <span class="i-lucide-bell-off w-10 h-10 text-gray-400"></span>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-1">No notifications</h3>
-            <p class="text-gray-500">You're all caught up! Check back later.</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ t('notification.empty.title') }}</h3>
+            <p class="text-gray-500">{{ t('notification.empty.subtitle') }}</p>
         </div>
     </div>
 </template>

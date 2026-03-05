@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import { VNode } from 'vue';
 
 interface Trend {
@@ -17,6 +18,8 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   color: 'primary'
 });
+
+const { t } = useI18n();
 
 // const gradients = {
 //   primary: 'from-primary/20 to-primary/5',
@@ -76,7 +79,7 @@ const iconColors = {
           </svg>
           {{ Math.abs(trend.value) }}%
         </span>
-        <span class="text-gray-500">vs last month</span>
+        <span class="text-gray-500">{{ t('overview.stats.trendVsLastMonth') }}</span>
       </div>
     </div>
   </div>

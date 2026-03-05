@@ -2,6 +2,7 @@
 import XIcon from '@/components/icons/XIcon.vue';
 import { cn } from '@/lib/utils';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 // Ensure client-side only rendering to avoid hydration mismatch
 const isMounted = ref(false);
@@ -24,6 +25,8 @@ const emit = defineEmits<{
   (e: 'update:visible', value: boolean): void;
   (e: 'close'): void;
 }>();
+
+const { t } = useI18n();
 
 const close = () => {
   emit('update:visible', false);
@@ -87,7 +90,7 @@ onBeforeUnmount(() => {
                 type="button"
                 class="p-1 rounded-md text-foreground/60 hover:text-foreground hover:bg-muted/50 transition-all"
                 @click="close"
-                aria-label="Close"
+                :aria-label="t('common.close')"
               >
                 <XIcon class="w-4 h-4" />
               </button>

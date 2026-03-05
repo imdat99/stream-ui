@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 defineProps<{
     pendingCount?: number;
@@ -8,6 +9,7 @@ defineProps<{
 
 const category = ref('');
 const visibility = ref('public');
+const { t } = useI18n();
 </script>
 
 <template>
@@ -15,20 +17,20 @@ const visibility = ref('public');
         style="transition: all 500ms;">
         <div class="p-6 bg-indigo-50/50 rounded-3xl border border-indigo-100/50 flex items-center justify-between">
             <div>
-                <h4 class="text-lg font-semibold text-slate-900">Quick Settings</h4>
-                <p class="text-slate-500 text-sm">Apply to {{ pendingCount || 0 }} pending files</p>
+                <h4 class="text-lg font-semibold text-slate-900">{{ t('upload.bulkActions.title') }}</h4>
+                <p class="text-slate-500 text-sm">{{ t('upload.bulkActions.applyToPending', { count: pendingCount || 0 }) }}</p>
             </div>
             <div class="flex gap-3">
                 <select v-model="category"
                     class="px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:border-accent outline-none transition">
-                    <option value="">Select category...</option>
-                    <option value="learning">Learning</option>
-                    <option value="entertainment">Entertainment</option>
+                    <option value="">{{ t('upload.bulkActions.selectCategory') }}</option>
+                    <option value="learning">{{ t('upload.bulkActions.category.learning') }}</option>
+                    <option value="entertainment">{{ t('upload.bulkActions.category.entertainment') }}</option>
                 </select>
                 <select v-model="visibility"
                     class="px-4 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:border-accent outline-none transition">
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
+                    <option value="public">{{ t('upload.bulkActions.visibility.public') }}</option>
+                    <option value="private">{{ t('upload.bulkActions.visibility.private') }}</option>
                 </select>
             </div>
         </div>

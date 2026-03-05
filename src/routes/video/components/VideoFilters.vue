@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
 const props = defineProps<{
     searchQuery: string;
     selectedStatus: string;
@@ -17,6 +19,7 @@ const emit = defineEmits<{
     (e: 'search'): void;
 }>();
 
+const { t } = useI18n();
 const pageCount = computed(() => Math.ceil(props.total / props.limit) || 1);
 const first = computed(() => Math.min((props.page - 1) * props.limit + 1, props.total));
 const last = computed(() => Math.min(props.page * props.limit, props.total));
@@ -35,7 +38,7 @@ const nextPage = () => {
         <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
             <!-- Search -->
             <AppInput :model-value="searchQuery" @update:model-value="emit('update:searchQuery', $event as string)"
-                @enter="emit('search')" placeholder="Search videos..." class="flex-1">
+                @enter="emit('search')" :placeholder="t('video.filters.searchPlaceholder')" class="flex-1">
                 <template #prefix>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -56,18 +59,18 @@ const nextPage = () => {
         <!-- Paginator -->
         <div class="flex justify-end w-full gap-2 mt-3 mb-2">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                {{ first }}&ndash;{{ last }} of {{ total }}
+                {{ t('video.filters.rangeOfTotal', { first, last, total }) }}
             </span>
             <div class="flex items-center gap-1">
                 <button class="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    @click="prevPage" :disabled="page <= 1" aria-label="Previous page">
+                    @click="prevPage" :disabled="page <= 1" :aria-label="t('video.filters.previousPageAria')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m15 18-6-6 6-6" />
                     </svg>
                 </button>
                 <button class="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    @click="nextPage" :disabled="page >= pageCount" aria-label="Next page">
+                    @click="nextPage" :disabled="page >= pageCount" :aria-label="t('video.filters.nextPageAria')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m9 18 6-6-6-6" />

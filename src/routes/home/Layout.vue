@@ -5,21 +5,21 @@
                 <div class="flex items-center justify-between h-16">
                     <router-link to="/" class="flex items-center gap-2 cursor-pointer">
                         <img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />
-                        <span class="font-bold text-xl tracking-tight text-slate-900">EcoStream</span>
+                        <span class="font-bold text-xl tracking-tight text-slate-900">{{ t('app.name') }}</span>
                     </router-link>
                     <div class="hidden md:flex items-center space-x-8">
                         <a href="#features"
-                            class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Features</a>
+                            class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">{{ t('home.nav.features') }}</a>
                         <a href="#pricing"
-                            class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Pricing</a>
+                            class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">{{ t('home.nav.pricing') }}</a>
                     </div>
                     <div class="hidden md:flex items-center gap-4">
                         <RouterLink to="/login"
-                            class="text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">Log in
+                            class="text-sm font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">{{ t('home.nav.login') }}
                         </RouterLink>
                         <RouterLink to="/sign-up"
                             class="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-semibold cursor-pointer">
-                            Start for free
+                            {{ t('home.nav.startFree') }}
                         </RouterLink>
                     </div>
                 </div>
@@ -38,47 +38,49 @@
                         <div class="w-6 h-6 bg-brand-600 rounded flex items-center justify-center text-white">
                             <img class="h-6 w-6" src="/apple-touch-icon.png" alt="Logo" />
                         </div>
-                        <span class="font-bold text-lg text-slate-900">EcoStream</span>
+                        <span class="font-bold text-lg text-slate-900">{{ t('app.name') }}</span>
                     </div>
-                    <p class="text-slate-500 text-sm max-w-xs">Building the video layer of the internet. Designed for
-                        developers.</p>
+                    <p class="text-slate-500 text-sm max-w-xs">{{ t('home.footer.description') }}</p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">Product</h4>
+                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">{{ t('home.footer.product') }}</h4>
                     <ul class="space-y-2 text-sm text-slate-500">
-                        <li><a href="#" class="hover:text-brand-600">Features</a></li>
-                        <li><a href="#" class="hover:text-brand-600">Pricing</a></li>
-                        <li><a href="#" class="hover:text-brand-600">Showcase</a></li>
+                        <li><a href="#" class="hover:text-brand-600">{{ t('home.footer.productFeatures') }}</a></li>
+                        <li><a href="#" class="hover:text-brand-600">{{ t('home.footer.productPricing') }}</a></li>
+                        <li><a href="#" class="hover:text-brand-600">{{ t('home.footer.productShowcase') }}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">Company</h4>
+                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">{{ t('home.footer.company') }}</h4>
                     <ul class="space-y-2 text-sm text-slate-500">
-                        <li><a href="#" class="hover:text-brand-600">About</a></li>
-                        <li><a href="#" class="hover:text-brand-600">Blog</a></li>
-                        <li><a href="#" class="hover:text-brand-600">Careers</a></li>
+                        <li><a href="#" class="hover:text-brand-600">{{ t('home.footer.companyAbout') }}</a></li>
+                        <li><a href="#" class="hover:text-brand-600">{{ t('home.footer.companyBlog') }}</a></li>
+                        <li><a href="#" class="hover:text-brand-600">{{ t('home.footer.companyCareers') }}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">Legal</h4>
+                    <h4 class="font-semibold text-slate-900 mb-4 text-sm">{{ t('home.footer.legal') }}</h4>
                     <ul class="space-y-2 text-sm text-slate-500">
-                        <li><router-link to="/privacy" class="hover:text-brand-600">Privacy</router-link></li>
-                        <li><router-link to="/terms" class="hover:text-brand-600">Terms</router-link></li>
+                        <li><router-link to="/privacy" class="hover:text-brand-600">{{ t('home.footer.privacy') }}</router-link></li>
+                        <li><router-link to="/terms" class="hover:text-brand-600">{{ t('home.footer.terms') }}</router-link></li>
                     </ul>
                 </div>
             </div>
             <div class="pt-8 border-t border-slate-100 text-center text-sm text-slate-400">
-                &copy; 2026 EcoStream Inc. All rights reserved.
+                {{ t('home.footer.copyright', { year: 2026 }) }}
             </div>
         </div>
     </footer>
 
     <Head>
-        <title>EcoStream - Video infrastructure for modern internet</title>
+        <title>{{ t('home.head.title') }}</title>
         <meta name="description"
-            content="Seamlessly host, encode, and stream video with our developer-first API. Optimized for speed, built for scale." />
+            :content="t('home.head.description')" />
     </Head>
 </template>
 <script lang="ts" setup>
 import { Head } from '@unhead/vue/components'
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 </script>

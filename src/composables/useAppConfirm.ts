@@ -1,4 +1,5 @@
 import { computed, reactive, readonly } from 'vue';
+import { getActiveI18n } from '@/i18n';
 
 export type AppConfirmOptions = {
   message: string;
@@ -30,12 +31,17 @@ const state = reactive<AppConfirmState>({
 });
 
 const requireConfirm = (options: AppConfirmOptions) => {
+  const i18n = getActiveI18n();
+  const defaultHeader = i18n?.global.t('confirm.defaultHeader') ?? 'Confirm';
+  const defaultAccept = i18n?.global.t('confirm.defaultAccept') ?? 'OK';
+  const defaultReject = i18n?.global.t('confirm.defaultReject') ?? 'Cancel';
+
   state.visible = true;
   state.loading = false;
   state.message = options.message;
-  state.header = options.header ?? 'Confirm';
-  state.acceptLabel = options.acceptLabel ?? 'OK';
-  state.rejectLabel = options.rejectLabel ?? 'Cancel';
+  state.header = options.header ?? defaultHeader;
+  state.acceptLabel = options.acceptLabel ?? defaultAccept;
+  state.rejectLabel = options.rejectLabel ?? defaultReject;
   state.accept = options.accept;
   state.reject = options.reject;
 };

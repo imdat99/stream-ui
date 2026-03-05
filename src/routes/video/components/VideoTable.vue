@@ -5,6 +5,7 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import VideoIcon from '@/components/icons/VideoIcon.vue';
 import { formatBytes, formatDate, getStatusSeverity } from '@/lib/utils';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
     videos: ModelVideo[];
@@ -18,6 +19,8 @@ const emit = defineEmits<{
     (e: 'edit', videoId: string): void;
     (e: 'copy', videoId: string): void;
 }>();
+
+const { t } = useI18n();
 
 const severityClasses: Record<string, string> = {
     success: 'bg-green-100 text-green-800',
@@ -77,11 +80,11 @@ const isSelected = (video: ModelVideo) =>
                         <input type="checkbox" :checked="isAllSelected" @change="toggleAll"
                             class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" />
                     </th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Video</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Size</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Created</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ t('video.table.video') }}</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ t('video.table.status') }}</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ t('video.table.size') }}</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ t('video.table.created') }}</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">{{ t('video.table.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -103,7 +106,7 @@ const isSelected = (video: ModelVideo) =>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="font-medium text-gray-900 truncate">{{ data.title }}</p>
-                                <p class="text-sm text-gray-500 truncate">{{ data.description || 'No description' }}</p>
+                                <p class="text-sm text-gray-500 truncate">{{ data.description || t('video.table.noDescription') }}</p>
                             </div>
                         </div>
                     </td>
@@ -122,15 +125,15 @@ const isSelected = (video: ModelVideo) =>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-0.5">
                             <button class="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
-                                title="Copy link" @click="emit('copy', data.id!)">
+                                :title="t('video.table.copyLink')" @click="emit('copy', data.id!)">
                                 <LinkIcon class="w-4 h-4" />
                             </button>
                             <button class="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors"
-                                title="Edit" @click="emit('edit', data.id!)">
+                                :title="t('video.table.edit')" @click="emit('edit', data.id!)">
                                 <PencilIcon class="w-4 h-4" />
                             </button>
                             <button class="p-1.5 rounded-md hover:bg-red-50 text-gray-500 hover:text-red-500 transition-colors"
-                                title="Delete" @click="emit('delete', data.id!)">
+                                :title="t('video.table.delete')" @click="emit('delete', data.id!)">
                                 <TrashIcon class="w-4 h-4" />
                             </button>
                         </div>
