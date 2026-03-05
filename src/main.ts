@@ -4,7 +4,10 @@ import { createHead as SSRHead } from '@unhead/vue/server';
 import { createPinia } from 'pinia';
 import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
-import { createI18n, normalizeLocale } from './i18n';
+
+import I18NextVue from 'i18next-vue';
+import i18next from '@/lib/translation';
+
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import createAppRouter from './routes';
 
@@ -15,17 +18,12 @@ const getSerializedAppData = () => {
     return JSON.parse(document.getElementById('__APP_DATA__')?.innerText || '{}') as Record<string, any>;
 };
 
-export function createApp(initialLocale?: string | null) {
+export async function createApp(lng: string = 'en') {
     const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));
+    
     const head = import.meta.env.SSR ? SSRHead() : CSRHead();
     const appData = !import.meta.env.SSR ? getSerializedAppData() : ({} as Record<string, any>);
-
-    const resolvedInitialLocale = initialLocale
-        ?? (!import.meta.env.SSR ? appData.$locale : undefined)
-        ?? undefined;
-
-    const i18n = createI18n(normalizeLocale(resolvedInitialLocale));
 
     app.use(head);
     app.directive('nh', {
@@ -34,7 +32,8 @@ export function createApp(initialLocale?: string | null) {
         }
     });
     app.use(pinia);
-    app.use(i18n);
+    await i18next.init({lng});
+    app.use(I18NextVue, {i18next});
     app.use(PiniaColada, {
         pinia,
         plugins: [
@@ -62,5 +61,5 @@ export function createApp(initialLocale?: string | null) {
         }
     }
 
-    return { app, router, head, pinia, bodyClass, queryCache, i18n };
+    return { app, router, head, pinia, bodyClass, queryCache };
 }

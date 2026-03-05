@@ -9,8 +9,7 @@ const readAppData = () => {
 
 async function render() {
     const appData = readAppData();
-    const { app, router, queryCache, pinia } = createApp(appData.$locale);
-
+    const { app, router, queryCache, pinia } = await createApp(appData.$locale);
     pinia.use(PiniaSharedState({ enable: true, initialize: true }));
     hydrateQueryCache(queryCache, appData.$colada || {});
 

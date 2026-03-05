@@ -22,5 +22,5 @@
     "src/**/*.vue",
     "auto-imports.d.ts",
     "components.d.ts"
-  ]
+, "public/locales/vi/vi.ts", "public/locales/en/en.ts"  ]
 }

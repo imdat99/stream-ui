@@ -1,0 +1,1052 @@
+{
+  "common": {
+    "save": "Lưu",
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "connect": "Kết nối",
+    "disconnect": "Ngắt kết nối",
+    "upload": "Tải lên",
+    "loading": "Đang tải",
+    "actions": "Hành động",
+    "status": "Trạng thái",
+    "videos": "Video",
+    "selected": "{count} mục đã chọn",
+    "copy": "Sao chép"
+  },
+  "app": {
+    "name": "EcoStream"
+  },
+  "auth": {
+    "layout": {
+      "login": {
+        "headTitle": "Đăng nhập vào tài khoản",
+        "title": "Đăng nhập vào bảng điều khiển",
+        "subtitle": "Vui lòng nhập thông tin để đăng nhập."
+      },
+      "signup": {
+        "headTitle": "Tạo tài khoản",
+        "title": "Tạo tài khoản",
+        "subtitle": "Vui lòng điền thông tin để tạo tài khoản."
+      },
+      "forgot": {
+        "headTitle": "Đặt lại mật khẩu",
+        "title": "Quên mật khẩu?",
+        "subtitle": "Nhập email và chúng tôi sẽ gửi liên kết đặt lại mật khẩu."
+      }
+    },
+    "login": {
+      "email": "Email",
+      "password": "Mật khẩu",
+      "forgotPassword": "Quên mật khẩu?",
+      "signIn": "Đăng nhập",
+      "google": "Google",
+      "noAccount": "Chưa có tài khoản?",
+      "signUp": "Đăng ký",
+      "errors": {
+        "emailRequired": "Email là bắt buộc.",
+        "emailInvalid": "Địa chỉ email không hợp lệ.",
+        "passwordRequired": "Mật khẩu là bắt buộc."
+      }
+    },
+    "signup": {
+      "fullName": "Họ và tên",
+      "email": "Địa chỉ email",
+      "password": "Mật khẩu",
+      "passwordHint": "Tối thiểu 8 ký tự.",
+      "createAccount": "Tạo tài khoản",
+      "alreadyHave": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "placeholders": {
+        "name": "Nguyễn Văn A",
+        "email": "ban@example.com",
+        "password": "Tạo mật khẩu"
+      },
+      "errors": {
+        "nameRequired": "Tên là bắt buộc.",
+        "emailRequired": "Email là bắt buộc.",
+        "emailInvalid": "Địa chỉ email không hợp lệ.",
+        "passwordMin": "Mật khẩu phải có ít nhất 8 ký tự."
+      }
+    },
+    "forgot": {
+      "description": "Nhập email và chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
+      "email": "Địa chỉ email",
+      "sendResetLink": "Gửi liên kết đặt lại",
+      "backToSignIn": "Quay lại đăng nhập",
+      "placeholders": {
+        "email": "ban@example.com"
+      },
+      "errors": {
+        "emailRequired": "Email là bắt buộc.",
+        "emailInvalid": "Địa chỉ email không hợp lệ."
+      },
+      "toast": {
+        "successSummary": "Thành công",
+        "successDetail": "Đã gửi liên kết đặt lại",
+        "errorSummary": "Lỗi",
+        "errorDetail": "Đã xảy ra lỗi"
+      }
+    },
+    "errors": {
+      "loginNoUserData": "Đăng nhập thất bại: Không nhận được dữ liệu người dùng",
+      "loginFailed": "Đăng nhập thất bại: {error}",
+      "registrationFailedFallback": "Đăng ký thất bại",
+      "registrationFailed": "Đăng ký thất bại: {error}",
+      "updateProfileFailed": "Cập nhật hồ sơ thất bại: {error}",
+      "changePasswordFailed": "Đổi mật khẩu thất bại: {error}",
+      "unknown": "Lỗi không xác định"
+    }
+  },
+  "nav": {
+    "overview": "Tổng quan",
+    "videos": "Video",
+    "notification": "Thông báo",
+    "settings": "Cài đặt"
+  },
+  "settings": {
+    "menu": {
+      "securityGroup": "Bảo mật",
+      "preferencesGroup": "Tùy chọn",
+      "integrationsGroup": "Tích hợp",
+      "dangerGroup": "Vùng nguy hiểm",
+      "security": "Bảo mật",
+      "billing": "Thanh toán & Gói",
+      "notifications": "Thông báo",
+      "player": "Trình phát",
+      "domains": "Tên miền được phép",
+      "ads": "Quảng cáo & VAST",
+      "danger": "Vùng nguy hiểm"
+    },
+    "content": {
+      "fallbackTitle": "Cài đặt",
+      "fallbackSubtitle": "Quản lý cài đặt và tùy chọn tài khoản của bạn.",
+      "security": {
+        "title": "Bảo mật & Tài khoản liên kết",
+        "subtitle": "Quản lý bảo mật và ứng dụng đã liên kết."
+      },
+      "notifications": {
+        "title": "Thông báo",
+        "subtitle": "Chọn cách bạn muốn nhận thông báo và cập nhật."
+      },
+      "player": {
+        "title": "Cài đặt trình phát",
+        "subtitle": "Cấu hình hành vi và tính năng mặc định của trình phát video."
+      },
+      "billing": {
+        "title": "Thanh toán & Gói",
+        "subtitle": "Thông tin gói và thanh toán hiện tại của bạn."
+      },
+      "domains": {
+        "title": "Tên miền được phép",
+        "subtitle": "Thêm tên miền vào whitelist để cho phép nhúng nội dung qua iframe."
+      },
+      "ads": {
+        "title": "Quảng cáo & VAST",
+        "subtitle": "Tạo và quản lý mẫu quảng cáo VAST cho video."
+      },
+      "danger": {
+        "title": "Vùng nguy hiểm",
+        "subtitle": "Hành động không thể hoàn tác và có tính phá hủy. Hãy cẩn thận!"
+      }
+    },
+    "notificationSettings": {
+      "saveChanges": "Lưu thay đổi",
+      "types": {
+        "email": {
+          "title": "Thông báo Email",
+          "description": "Nhận cập nhật và cảnh báo qua email"
+        },
+        "push": {
+          "title": "Thông báo đẩy",
+          "description": "Nhận cảnh báo tức thì trên trình duyệt"
+        },
+        "marketing": {
+          "title": "Email marketing",
+          "description": "Nhận khuyến mãi và cập nhật sản phẩm"
+        },
+        "telegram": {
+          "title": "Thông báo Telegram",
+          "description": "Nhận cập nhật qua Telegram"
+        }
+      },
+      "toast": {
+        "savedSummary": "Đã lưu cài đặt",
+        "savedDetail": "Cài đặt thông báo của bạn đã được lưu.",
+        "failedSummary": "Lưu thất bại",
+        "failedDetail": "Không thể lưu cài đặt."
+      }
+    },
+    "playerSettings": {
+      "toast": {
+        "savedSummary": "Đã lưu cài đặt",
+        "savedDetail": "Cài đặt trình phát của bạn đã được lưu.",
+        "failedSummary": "Lưu thất bại",
+        "failedDetail": "Không thể lưu cài đặt."
+      },
+      "items": {
+        "autoplay": {
+          "title": "Tự phát",
+          "description": "Tự động phát video khi tải xong"
+        },
+        "loop": {
+          "title": "Lặp lại",
+          "description": "Phát lại video khi kết thúc"
+        },
+        "muted": {
+          "title": "Tắt tiếng",
+          "description": "Bắt đầu video với âm thanh tắt"
+        },
+        "showControls": {
+          "title": "Hiển thị điều khiển",
+          "description": "Hiển thị thanh điều khiển (phát, tạm dừng, âm lượng)"
+        },
+        "pip": {
+          "title": "Picture in Picture",
+          "description": "Bật chế độ Picture-in-Picture"
+        },
+        "airplay": {
+          "title": "AirPlay",
+          "description": "Cho phép phát tới thiết bị Apple qua AirPlay"
+        },
+        "chromecast": {
+          "title": "Chromecast",
+          "description": "Cho phép cast tới thiết bị Chromecast"
+        }
+      }
+    },
+    "dangerZone": {
+      "deleteAccount": {
+        "title": "Xóa tài khoản",
+        "description": "Xóa vĩnh viễn tài khoản và toàn bộ dữ liệu liên quan.",
+        "button": "Xóa tài khoản"
+      },
+      "clearData": {
+        "title": "Xóa toàn bộ dữ liệu",
+        "description": "Xóa tất cả video, danh sách phát và lịch sử hoạt động của bạn.",
+        "button": "Xóa dữ liệu"
+      },
+      "warning": {
+        "title": "Cảnh báo",
+        "description": "Các hành động này là vĩnh viễn và không thể hoàn tác. Hãy đảm bảo bạn đã sao lưu dữ liệu quan trọng trước khi tiếp tục."
+      },
+      "confirm": {
+        "deleteAccountMessage": "Bạn có chắc muốn xóa tài khoản? Hành động này không thể hoàn tác.",
+        "deleteAccountHeader": "Xóa tài khoản",
+        "deleteAccountAccept": "Xóa",
+        "deleteAccountReject": "Hủy",
+        "clearDataMessage": "Bạn có chắc muốn xóa toàn bộ dữ liệu? Hành động này không thể hoàn tác.",
+        "clearDataHeader": "Xóa toàn bộ dữ liệu",
+        "clearDataAccept": "Xóa",
+        "clearDataReject": "Hủy"
+      },
+      "toast": {
+        "deleteAccountSummary": "Đã gửi yêu cầu xóa tài khoản",
+        "deleteAccountDetail": "Yêu cầu xóa tài khoản của bạn đã được gửi.",
+        "clearDataSummary": "Đã xóa dữ liệu",
+        "clearDataDetail": "Toàn bộ dữ liệu của bạn đã bị xóa vĩnh viễn."
+      }
+    },
+    "domainsDns": {
+      "addDomain": "Thêm tên miền",
+      "infoBanner": "Chỉ các tên miền trong whitelist mới có thể nhúng nội dung của bạn qua iframe.",
+      "table": {
+        "domain": "Tên miền",
+        "addedDate": "Ngày thêm"
+      },
+      "emptyTitle": "Chưa có tên miền trong whitelist",
+      "emptySubtitle": "Thêm tên miền để cho phép nhúng iframe",
+      "embedCodeTitle": "Mã nhúng",
+      "copyCode": "Sao chép mã",
+      "embedCodeHint": "Dùng đoạn iframe này để nhúng nội dung trên các tên miền đã whitelist.",
+      "dialog": {
+        "title": "Thêm tên miền vào whitelist",
+        "domainLabel": "Tên miền",
+        "domainPlaceholder": "example.com",
+        "domainHint": "Nhập tên miền không kèm www hoặc https:// (ví dụ: example.com)",
+        "importantTitle": "Quan trọng",
+        "importantDetail": "Chỉ thêm những tên miền bạn sở hữu và kiểm soát."
+      },
+      "confirm": {
+        "removeMessage": "Bạn có chắc muốn xóa {domain} khỏi whitelist? Các iframe nhúng từ tên miền này sẽ không còn hoạt động.",
+        "removeHeader": "Xóa tên miền",
+        "removeAccept": "Xóa",
+        "removeReject": "Hủy"
+      },
+      "toast": {
+        "invalidSummary": "Tên miền không hợp lệ",
+        "invalidDetail": "Vui lòng nhập tên miền hợp lệ.",
+        "duplicateSummary": "Tên miền đã tồn tại",
+        "duplicateDetail": "Tên miền này đã có trong whitelist.",
+        "addedSummary": "Đã thêm tên miền",
+        "addedDetail": "{domain} đã được thêm vào whitelist.",
+        "removedSummary": "Đã xóa tên miền",
+        "removedDetail": "{domain} đã được xóa khỏi whitelist.",
+        "copiedSummary": "Đã sao chép",
+        "copiedDetail": "Đã sao chép mã nhúng vào clipboard."
+      }
+    },
+    "adsVast": {
+      "createTemplate": "Tạo mẫu",
+      "infoBanner": "VAST (Video Ad Serving Template) là schema XML dùng để phân phối ad tags cho trình phát video.",
+      "createdOn": "Tạo ngày {date}",
+      "emptyTitle": "Chưa có mẫu VAST",
+      "emptySubtitle": "Tạo mẫu để bắt đầu kiếm tiền từ video",
+      "formats": {
+        "preRoll": "Pre-roll",
+        "midRoll": "Mid-roll",
+        "postRoll": "Post-roll"
+      },
+      "state": {
+        "enabled": "bật",
+        "disabled": "tắt"
+      },
+      "table": {
+        "template": "Mẫu",
+        "format": "Định dạng",
+        "vastUrl": "VAST URL"
+      },
+      "dialog": {
+        "editTitle": "Sửa mẫu",
+        "createTitle": "Tạo mẫu VAST",
+        "templateName": "Tên mẫu",
+        "templateNamePlaceholder": "ví dụ: Main Pre-roll Ad",
+        "vastUrlLabel": "VAST Tag URL",
+        "vastUrlPlaceholder": "https://ads.example.com/vast/tag.xml",
+        "adFormat": "Định dạng quảng cáo",
+        "adInterval": "Khoảng cách quảng cáo (giây)",
+        "adIntervalPlaceholder": "30",
+        "update": "Cập nhật",
+        "create": "Tạo"
+      },
+      "confirm": {
+        "deleteMessage": "Bạn có chắc muốn xóa \"{name}\"?",
+        "deleteHeader": "Xóa mẫu",
+        "deleteAccept": "Xóa",
+        "deleteReject": "Hủy"
+      },
+      "toast": {
+        "nameRequiredSummary": "Thiếu tên mẫu",
+        "nameRequiredDetail": "Vui lòng nhập tên mẫu.",
+        "urlRequiredSummary": "Thiếu VAST URL",
+        "urlRequiredDetail": "Vui lòng nhập VAST tag URL.",
+        "invalidUrlSummary": "URL không hợp lệ",
+        "invalidUrlDetail": "Vui lòng nhập URL hợp lệ.",
+        "durationRequiredSummary": "Thiếu thời lượng",
+        "durationRequiredDetail": "Quảng cáo mid-roll yêu cầu thời lượng/khoảng cách.",
+        "updatedSummary": "Đã cập nhật mẫu",
+        "updatedDetail": "Mẫu VAST đã được cập nhật.",
+        "createdSummary": "Đã tạo mẫu",
+        "createdDetail": "Mẫu VAST đã được tạo.",
+        "enabledSummary": "Đã bật mẫu",
+        "disabledSummary": "Đã tắt mẫu",
+        "toggleDetail": "{name} đã được {state}.",
+        "deletedSummary": "Đã xóa mẫu",
+        "deletedDetail": "Mẫu VAST đã được gỡ bỏ.",
+        "copiedSummary": "Đã sao chép",
+        "copiedDetail": "Đã sao chép URL vào clipboard."
+      }
+    },
+    "profile": {
+      "title": "Thông tin hồ sơ",
+      "subtitle": "Quản lý thông tin cá nhân và chi tiết tài khoản của bạn.",
+      "userFallback": "Người dùng",
+      "username": "Tên người dùng",
+      "email": "Địa chỉ email",
+      "storageUsage": "Dung lượng sử dụng",
+      "storageUsedOfLimit": "Đã dùng {used} trên {limit}",
+      "editProfile": "Chỉnh sửa hồ sơ",
+      "changePassword": "Đổi mật khẩu"
+    },
+    "connectedAccounts": {
+      "title": "Tài khoản liên kết",
+      "email": {
+        "label": "Email",
+        "connected": "Đã kết nối",
+        "notConnected": "Chưa kết nối",
+        "disconnected": "Đã ngắt kết nối"
+      },
+      "telegram": {
+        "label": "Telegram",
+        "hint": "Nhận thông báo qua Telegram",
+        "connectedFallback": "Đã kết nối"
+      }
+    },
+    "billing": {
+      "walletBalance": "Số dư ví",
+      "currentBalance": "Số dư hiện tại: {balance}",
+      "topUp": "Nạp tiền",
+      "availablePlans": "Các gói khả dụng",
+      "availablePlansHint": "Chọn gói phù hợp nhất với nhu cầu của bạn",
+      "planStorage": "{storage} dung lượng",
+      "planDuration": "{duration} thời lượng tối đa",
+      "planUploads": "{count} lượt tải / ngày",
+      "currentPlan": "Gói hiện tại",
+      "processing": "Đang xử lý...",
+      "upgrade": "Nâng cấp",
+      "storage": "Dung lượng",
+      "storageUsedOfLimit": "Đã dùng {used} trên {limit}",
+      "monthlyUploads": "Lượt tải tháng này",
+      "uploadsUsedOfLimit": "{used} trên {limit} lượt tải",
+      "paymentHistory": "Lịch sử thanh toán",
+      "paymentHistorySubtitle": "Các khoản thanh toán và hóa đơn trước đây của bạn",
+      "noPaymentHistory": "Không tìm thấy lịch sử thanh toán.",
+      "download": "Tải xuống",
+      "durationMinutes": "{minutes} phút",
+      "unknownPlan": "Không xác định",
+      "table": {
+        "date": "Ngày",
+        "amount": "Số tiền",
+        "plan": "Gói",
+        "status": "Trạng thái",
+        "invoice": "Hóa đơn"
+      },
+      "status": {
+        "success": "Thành công",
+        "failed": "Thất bại",
+        "pending": "Đang chờ"
+      },
+      "topupDialog": {
+        "title": "Nạp tiền vào ví",
+        "subtitle": "Chọn số tiền hoặc nhập số tiền tùy chỉnh để nạp vào ví.",
+        "customAmount": "Số tiền tùy chỉnh",
+        "enterAmount": "Nhập số tiền",
+        "hint": "Số tiền nạp tối thiểu là $1. Tiền sẽ được cộng vào ví ngay sau khi thanh toán.",
+        "proceed": "Tiếp tục thanh toán"
+      },
+      "toast": {
+        "subscriptionSuccessSummary": "Đăng ký thành công",
+        "subscriptionSuccessDetail": "Đăng ký gói {plan} thành công",
+        "subscriptionFailedSummary": "Đăng ký thất bại",
+        "subscriptionFailedDetail": "Không thể đăng ký gói",
+        "topupSuccessSummary": "Nạp tiền thành công",
+        "topupSuccessDetail": "{amount} đã được cộng vào ví của bạn.",
+        "topupFailedSummary": "Nạp tiền thất bại",
+        "topupFailedDetail": "Không thể xử lý nạp tiền.",
+        "downloadingSummary": "Đang tải",
+        "downloadingDetail": "Đang tải hóa đơn #{invoiceId}...",
+        "downloadedSummary": "Đã tải xong",
+        "downloadedDetail": "Hóa đơn #{invoiceId} đã được tải thành công"
+      }
+    },
+    "securityConnected": {
+      "header": {
+        "title": "Bảo mật & Tài khoản liên kết",
+        "subtitle": "Quản lý cài đặt bảo mật và dịch vụ đã kết nối."
+      },
+      "accountStatus": {
+        "label": "Trạng thái tài khoản",
+        "detail": "Tài khoản của bạn đang hoạt động tốt",
+        "badge": "Đang hoạt động"
+      },
+      "language": {
+        "label": "Ngôn ngữ",
+        "detail": "Chọn ngôn ngữ hiển thị ưu tiên",
+        "save": "Lưu ngôn ngữ",
+        "options": {
+          "en": "English",
+          "vi": "Tiếng Việt"
+        },
+        "toast": {
+          "successSummary": "Đã lưu ngôn ngữ",
+          "successDetail": "Ngôn ngữ đã được cập nhật.",
+          "errorSummary": "Lưu thất bại",
+          "errorDetail": "Không thể lưu ngôn ngữ lên server. Đã áp dụng theo cookie dự phòng."
+        }
+      },
+      "twoFactor": {
+        "label": "Xác thực hai lớp",
+        "enabled": "2FA đã bật",
+        "disabled": "Thêm một lớp bảo mật"
+      },
+      "changePassword": {
+        "label": "Đổi mật khẩu",
+        "detail": "Cập nhật mật khẩu tài khoản",
+        "button": "Đổi mật khẩu",
+        "dialog": {
+          "title": "Đổi mật khẩu",
+          "subtitle": "Nhập mật khẩu hiện tại và chọn mật khẩu mới.",
+          "current": "Mật khẩu hiện tại",
+          "new": "Mật khẩu mới",
+          "confirm": "Xác nhận mật khẩu mới",
+          "currentPlaceholder": "Nhập mật khẩu hiện tại",
+          "newPlaceholder": "Nhập mật khẩu mới",
+          "confirmPlaceholder": "Xác nhận mật khẩu mới",
+          "submit": "Đổi mật khẩu",
+          "cancel": "Hủy",
+          "errors": {
+            "mismatch": "Mật khẩu xác nhận không khớp",
+            "minLength": "Mật khẩu phải có ít nhất 6 ký tự",
+            "default": "Không thể đổi mật khẩu"
+          }
+        },
+        "toast": {
+          "successSummary": "Đổi mật khẩu thành công",
+          "successDetail": "Mật khẩu của bạn đã được cập nhật."
+        }
+      },
+      "logout": {
+        "label": "Đăng xuất",
+        "detail": "Đăng xuất khỏi thiết bị này.",
+        "button": "Đăng xuất",
+        "confirm": {
+          "message": "Bạn có chắc muốn đăng xuất?",
+          "header": "Đăng xuất",
+          "accept": "Đăng xuất",
+          "reject": "Hủy"
+        }
+      },
+      "email": {
+        "label": "Email",
+        "connected": "Đã kết nối",
+        "disconnected": "Chưa kết nối",
+        "badgeConnected": "Đã kết nối",
+        "badgeDisconnected": "Đã ngắt kết nối"
+      },
+      "telegram": {
+        "label": "Telegram",
+        "detailDisconnected": "Nhận thông báo qua Telegram",
+        "connectedFallback": "Đã kết nối",
+        "connect": "Kết nối",
+        "disconnect": "Ngắt kết nối"
+      },
+      "twoFactorDialog": {
+        "title": "Bật xác thực hai lớp",
+        "subtitle": "Quét mã QR bằng ứng dụng xác thực (Google Authenticator, Authy, v.v.)",
+        "secret": "Khóa bí mật:",
+        "codeLabel": "Mã xác thực",
+        "codePlaceholder": "Nhập mã 6 chữ số",
+        "cancel": "Hủy",
+        "verify": "Xác minh & Bật"
+      },
+      "toast": {
+        "twoFactorEnabledSummary": "Đã bật 2FA",
+        "twoFactorEnabledDetail": "Xác thực hai lớp đã được bật thành công.",
+        "twoFactorEnableFailedSummary": "Bật 2FA thất bại",
+        "twoFactorEnableFailedDetail": "Không thể bật xác thực hai lớp.",
+        "twoFactorDisableFailedSummary": "Tắt 2FA thất bại",
+        "twoFactorDisableFailedDetail": "Không thể tắt xác thực hai lớp.",
+        "twoFactorDisabledSummary": "Đã tắt 2FA",
+        "twoFactorDisabledDetail": "Xác thực hai lớp đã bị tắt.",
+        "twoFactorInvalidCodeSummary": "Bật 2FA thất bại",
+        "twoFactorInvalidCodeDetail": "Mã xác thực không hợp lệ. Vui lòng thử lại.",
+        "telegramConnectedSummary": "Đã kết nối Telegram",
+        "telegramConnectedDetail": "Đã kết nối với {username}",
+        "telegramConnectFailedSummary": "Kết nối thất bại",
+        "telegramConnectFailedDetail": "Không thể kết nối tài khoản Telegram.",
+        "telegramDisconnectedSummary": "Đã ngắt Telegram",
+        "telegramDisconnectedDetail": "Tài khoản Telegram đã được ngắt.",
+        "telegramDisconnectFailedSummary": "Ngắt kết nối thất bại",
+        "telegramDisconnectFailedDetail": "Không thể ngắt kết nối Telegram."
+      }
+    }
+  },
+  "pageHeader": {
+    "dashboard": "Bảng điều khiển",
+    "settings": "Cài đặt"
+  },
+  "confirm": {
+    "defaultHeader": "Xác nhận",
+    "defaultAccept": "Đồng ý",
+    "defaultReject": "Hủy"
+  },
+  "toast": {
+    "dismissAria": "Đóng"
+  },
+  "overview": {
+    "welcome": {
+      "title": "Chào mừng trở lại, {name}! 👋",
+      "subtitle": "Đây là tình hình nội dung của bạn hôm nay."
+    },
+    "stats": {
+      "totalVideos": "Tổng số video",
+      "totalViews": "Tổng lượt xem",
+      "storageUsed": "Dung lượng đã dùng",
+      "uploadsThisMonth": "Lượt tải lên tháng này",
+      "trendVsLastMonth": "so với tháng trước"
+    },
+    "quickActions": {
+      "title": "Thao tác nhanh",
+      "uploadVideo": {
+        "title": "Tải video lên",
+        "description": "Tải video mới vào thư viện"
+      },
+      "videoLibrary": {
+        "title": "Thư viện video",
+        "description": "Duyệt tất cả video của bạn"
+      },
+      "analytics": {
+        "title": "Phân tích",
+        "description": "Theo dõi hiệu suất & thông tin chi tiết"
+      },
+      "managePlan": {
+        "title": "Quản lý gói",
+        "description": "Nâng cấp hoặc thay đổi gói"
+      }
+    },
+    "referral": {
+      "title": "Liên kết giới thiệu",
+      "subtitle": "Chia sẻ liên kết giới thiệu và nhận hoa hồng từ người dùng được giới thiệu!"
+    },
+    "recentVideos": {
+      "title": "Video gần đây",
+      "viewAll": "Xem tất cả",
+      "emptyTitle": "Không có video",
+      "emptyDescription": "Bạn chưa tải video nào. Hãy bắt đầu với video đầu tiên!",
+      "emptyAction": "Tải video lên",
+      "table": {
+        "video": "Video",
+        "status": "Trạng thái",
+        "duration": "Thời lượng",
+        "uploadDate": "Ngày tải lên",
+        "actions": "Hành động"
+      },
+      "noDescription": "Không có mô tả",
+      "unknownStatus": "Không xác định",
+      "actionEdit": "Sửa",
+      "actionShare": "Chia sẻ",
+      "actionDelete": "Xóa"
+    },
+    "storage": {
+      "title": "Sử dụng dung lượng",
+      "usedOfLimit": "Đã dùng {used} trên {limit}",
+      "breakdown": {
+        "videos": "Video",
+        "thumbnails": "Thumbnail & tài nguyên",
+        "other": "Tệp khác"
+      },
+      "lowStorage": {
+        "title": "Dung lượng sắp đầy",
+        "message": "Hãy cân nhắc nâng cấp gói để có thêm dung lượng.",
+        "viewPlans": "Xem các gói"
+      }
+    }
+  },
+  "video": {
+    "page": {
+      "title": "Video của tôi",
+      "description": "Quản lý và sắp xếp thư viện video",
+      "uploadAction": "Tải video lên",
+      "uploadDropTitle": "Thả để tải lên",
+      "uploadDropSubtitle": "Tệp sẽ được thêm vào hàng đợi tải lên",
+      "deleteSelectedConfirm": "Xóa {count} video?",
+      "deleteSingleConfirm": "Bạn có chắc muốn xóa video này?",
+      "retry": "Thử lại",
+      "emptyTitle": "Không có video",
+      "emptyDescription": "Bạn chưa tải video nào. Hãy bắt đầu với video đầu tiên!",
+      "emptyAction": "Tải video lên",
+      "duplicateSummary": "Đã bỏ qua tệp trùng lặp",
+      "duplicateDetailOne": "{count} tệp đã có trong hàng đợi.",
+      "duplicateDetailOther": "{count} tệp đã có trong hàng đợi."
+    },
+    "filters": {
+      "searchPlaceholder": "Tìm kiếm video...",
+      "rangeOfTotal": "{first}–{last} / {total}",
+      "previousPageAria": "Trang trước",
+      "nextPageAria": "Trang sau",
+      "allStatus": "Tất cả trạng thái",
+      "ready": "Sẵn sàng",
+      "processing": "Đang xử lý",
+      "failed": "Thất bại"
+    },
+    "table": {
+      "video": "Video",
+      "status": "Trạng thái",
+      "size": "Dung lượng",
+      "created": "Ngày tạo",
+      "actions": "Hành động",
+      "noDescription": "Không có mô tả",
+      "copyLink": "Sao chép liên kết",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    },
+    "bulk": {
+      "selected": "{count} mục đã chọn",
+      "delete": "Xóa"
+    },
+    "copyModal": {
+      "title": "Lấy địa chỉ chia sẻ",
+      "playerAddress": "Địa chỉ phát",
+      "embedPlayer": "Nhúng trình phát (khuyến nghị)",
+      "thumbnail": "URL thumbnail",
+      "hls": "Liên kết HLS (chỉ VIP)",
+      "hlsPlaceholder": "Liên kết HLS cho VIP với domain được whitelist",
+      "hlsHint": "Liên kết này chuyển hướng tới URL HLS đã ký và chỉ hoạt động trên domain đã whitelist.",
+      "warningTitle": "Cảnh báo",
+      "warningDetail": "Hãy đảm bảo tệp chia sẻ tuân thủ pháp luật địa phương và bạn hiểu rõ trách nhiệm khi phân phối nội dung.",
+      "reminderTitle": "Lưu ý",
+      "reminderDetail": "Trình phát nhúng có thể tự chuyển node dự phòng và hoạt động tốt trên di động. Liên kết HLS thô phụ thuộc vào trình phát riêng của bạn và chỉ dùng trên domain đã whitelist.",
+      "toastCopiedSummary": "Đã sao chép",
+      "toastCopiedDetail": "Đã sao chép vào clipboard",
+      "toastErrorSummary": "Lỗi",
+      "toastErrorDetail": "Không thể tải chi tiết video"
+    },
+    "detailModal": {
+      "title": "Chỉnh sửa video",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Nhập tiêu đề video",
+      "descriptionLabel": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả video",
+      "subtitlesTitle": "Phụ đề",
+      "subtitleTracks": "{count} track",
+      "noSubtitles": "Chưa có phụ đề",
+      "uploadSubtitle": "Tải phụ đề",
+      "subtitleFile": "Tệp phụ đề (VTT, SRT, ASS, SSA)",
+      "languageCode": "Mã ngôn ngữ *",
+      "languagePlaceholder": "en, vi, v.v.",
+      "displayName": "Tên hiển thị (Tùy chọn)",
+      "displayNamePlaceholder": "English, Tiếng Việt, v.v.",
+      "uploadSubtitleButton": "Tải phụ đề",
+      "cancel": "Hủy",
+      "saveChanges": "Lưu thay đổi",
+      "errors": {
+        "titleRequired": "Tiêu đề là bắt buộc."
+      },
+      "toast": {
+        "loadErrorSummary": "Lỗi",
+        "loadErrorDetail": "Không thể tải chi tiết video",
+        "saveSuccessSummary": "Thành công",
+        "saveSuccessDetail": "Cập nhật video thành công",
+        "saveErrorSummary": "Lỗi",
+        "saveErrorDetail": "Không thể lưu thay đổi",
+        "subtitleInfoSummary": "Thông tin",
+        "subtitleInfoDetail": "Tải phụ đề chưa được hỗ trợ"
+      }
+    },
+    "detailPage": {
+      "title": "Chi tiết video",
+      "description": "Xem và quản lý thông tin video",
+      "loadingBreadcrumb": "Đang tải...",
+      "detailsTitle": "Thông tin video",
+      "copyValueTitle": "Sao chép giá trị",
+      "videoTagFallback": "Trình duyệt của bạn không hỗ trợ thẻ video.",
+      "saving": "Đang lưu...",
+      "cancelEditTitle": "Hủy chỉnh sửa",
+      "reloadTitle": "Tải lại video",
+      "reloadButton": "Tải lại",
+      "confirmDelete": {
+        "message": "Bạn có chắc muốn xóa video này? Hành động này không thể hoàn tác.",
+        "header": "Xác nhận xóa",
+        "accept": "Xóa",
+        "reject": "Hủy"
+      },
+      "toast": {
+        "reloadSummary": "Thông tin",
+        "reloadDetail": "Đang tải lại video...",
+        "deleteSuccessSummary": "Thành công",
+        "deleteSuccessDetail": "Xóa video thành công",
+        "deleteErrorSummary": "Lỗi",
+        "deleteErrorDetail": "Không thể xóa video",
+        "copySummary": "Đã sao chép",
+        "copyDetail": "Đã sao chép {label} vào clipboard"
+      },
+      "videoInfo": {
+        "videoId": "ID video",
+        "thumbnailUrl": "URL thumbnail",
+        "embedUrl": "URL nhúng",
+        "iframeCode": "Mã iframe",
+        "shareLink": "Liên kết chia sẻ"
+      }
+    },
+    "cardPopover": {
+      "download": "Tải xuống",
+      "copyLink": "Sao chép liên kết",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "toast": {
+        "copySuccessSummary": "Thành công",
+        "copySuccessDetail": "Đã sao chép liên kết video",
+        "copyErrorSummary": "Lỗi",
+        "copyErrorDetail": "Không thể sao chép liên kết",
+        "downloadSuccessSummary": "Thành công",
+        "downloadSuccessDetail": "Đang tải xuống video...",
+        "downloadErrorSummary": "Lỗi",
+        "downloadErrorDetail": "Không tìm thấy tệp video"
+      }
+    }
+  },
+  "notification": {
+    "title": "Thông báo",
+    "subtitle": "Luôn cập nhật các hoạt động và cảnh báo mới nhất của bạn.",
+    "tabs": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc",
+      "videos": "Video",
+      "payments": "Thanh toán"
+    },
+    "stats": {
+      "total": "{count} thông báo",
+      "unread": "{count} chưa đọc"
+    },
+    "actions": {
+      "markAllRead": "Đánh dấu đã đọc tất cả",
+      "clearAll": "Xóa tất cả",
+      "viewAll": "Xem tất cả thông báo",
+      "viewVideo": "Xem video",
+      "viewReceipt": "Xem biên lai",
+      "upgradePlan": "Nâng cấp gói",
+      "tryNow": "Dùng thử ngay"
+    },
+    "item": {
+      "viewDetails": "Xem chi tiết",
+      "markAsRead": "Đánh dấu đã đọc",
+      "delete": "Xóa"
+    },
+    "empty": {
+      "title": "Không có thông báo",
+      "subtitle": "Bạn đã xem hết! Hãy quay lại sau."
+    },
+    "time": {
+      "minutesAgo": "{count} phút trước",
+      "hoursAgo": "{count} giờ trước",
+      "daysAgo": "{count} ngày trước"
+    },
+    "mocks": {
+      "videoProcessed": {
+        "title": "Xử lý video hoàn tất",
+        "message": "Video \"Summer Vacation 2024\" của bạn đã được xử lý thành công và sẵn sàng phát."
+      },
+      "paymentSuccess": {
+        "title": "Thanh toán thành công",
+        "message": "Gói Pro Plan của bạn đã được gia hạn thành công. Kỳ thanh toán tiếp theo: 25/02/2026."
+      },
+      "storageWarning": {
+        "title": "Dung lượng sắp đầy",
+        "message": "Bạn đã sử dụng 85% hạn mức lưu trữ. Hãy cân nhắc nâng cấp gói để có thêm dung lượng."
+      },
+      "uploadSuccess": {
+        "title": "Tải lên thành công",
+        "message": "Video \"Product Demo v2\" của bạn đã được tải lên thành công."
+      },
+      "maintenance": {
+        "title": "Bảo trì định kỳ",
+        "message": "Chúng tôi sẽ bảo trì hệ thống vào ngày 30/01/2026 từ 02:00 đến 04:00 UTC."
+      },
+      "newFeature": {
+        "title": "Tính năng mới",
+        "message": "Chúng tôi vừa ra mắt phân tích video! Theo dõi hiệu suất video với dữ liệu chi tiết."
+      }
+    }
+  },
+  "upload": {
+    "dialog": {
+      "title": "Tải video lên",
+      "subtitle": "Thêm tối đa {maxItems} video mỗi đợt",
+      "mode": {
+        "local": "Tệp cục bộ",
+        "remote": "URL từ xa"
+      },
+      "queueFullTitle": "Hàng đợi đã đầy",
+      "queueFullDescription": "Tối đa {maxItems} video mỗi đợt. Hãy bắt đầu hoặc xóa hàng đợi hiện tại trước.",
+      "slotsRemaining": "Còn {remaining} / {maxItems} vị trí",
+      "formatsHint": "MP4, MOV, MKV · tối đa 10 GB mỗi tệp",
+      "close": "Đóng",
+      "startUpload": "Bắt đầu tải ({count})",
+      "duplicateFilesSummary": "Đã bỏ qua tệp trùng lặp",
+      "duplicateFilesDetailOne": "{count} tệp đã có trong hàng đợi.",
+      "duplicateFilesDetailOther": "{count} tệp đã có trong hàng đợi.",
+      "duplicateUrlsSummary": "Đã bỏ qua URL trùng lặp",
+      "duplicateUrlsDetailOne": "{count} URL đã có trong hàng đợi.",
+      "duplicateUrlsDetailOther": "{count} URL đã có trong hàng đợi."
+    },
+    "dropzone": {
+      "releaseToAdd": "Thả để thêm",
+      "dropHere": "Thả video vào đây",
+      "browse": "hoặc bấm để chọn tệp"
+    },
+    "remote": {
+      "placeholder": "Dán URL video, mỗi dòng một URL\n\nhttps://example.com/video.mp4\nhttps://drive.google.com/...",
+      "providersHint": "Hỗ trợ Google Drive, Dropbox",
+      "addUrls": "Thêm URL"
+    },
+    "queue": {
+      "empty": "Hàng đợi trống!",
+      "totalSize": "Tổng dung lượng:",
+      "zeroSize": "0 MB"
+    },
+    "queueItem": {
+      "remoteFileName": "Tệp từ URL",
+      "unknownSize": "Không xác định",
+      "status": {
+        "pending": "Chờ tải",
+        "uploading": "Đang tải lên...",
+        "uploadingThreads": "Đang tải · {threads} luồng",
+        "processing": "Đang xử lý...",
+        "complete": "Hoàn tất",
+        "error": "Thất bại",
+        "fetching": "Đang lấy dữ liệu..."
+      }
+    },
+    "infoTip": {
+      "title": "Mẹo: Để xử lý nhanh nhất",
+      "description": "Hãy tải video với codec H.264 + codec âm thanh AAC (ví dụ MP4 dùng H.264/AAC). Video theo định dạng này sẽ được xử lý nhanh hơn nhiều (giây thay vì phút) vì không cần encode lại."
+    },
+    "bulkActions": {
+      "title": "Thiết lập nhanh",
+      "applyToPending": "Áp dụng cho {count} tệp đang chờ",
+      "selectCategory": "Chọn danh mục...",
+      "category": {
+        "learning": "Học tập",
+        "entertainment": "Giải trí"
+      },
+      "visibility": {
+        "public": "Công khai",
+        "private": "Riêng tư"
+      }
+    },
+    "indicator": {
+      "allDone": "Hoàn tất",
+      "uploading": "Đang tải lên {count} tệp...",
+      "waiting": "{count} tệp đang chờ",
+      "completeProgress": "Hoàn tất {complete} / {total}",
+      "start": "Bắt đầu",
+      "viewVideos": "Xem video",
+      "addMoreFiles": "Thêm tệp"
+    },
+    "errors": {
+      "chunkUploadFailed": "Không thể tải phần {index}",
+      "mergeFailed": "Gộp tệp thất bại"
+    }
+  },
+  "home": {
+    "nav": {
+      "features": "Tính năng",
+      "pricing": "Bảng giá",
+      "login": "Đăng nhập",
+      "startFree": "Dùng thử miễn phí"
+    },
+    "hero": {
+      "titleLine1": "Hạ tầng video cho",
+      "titleLine2": "internet hiện đại.",
+      "subtitle": "Lưu trữ, mã hóa và phát video mượt mà với API ưu tiên cho developer. Tối ưu tốc độ, sẵn sàng mở rộng.",
+      "getStarted": "Bắt đầu",
+      "uploadVideo": "Tải video"
+    },
+    "features": {
+      "heading": "Mọi thứ bạn cần để triển khai video",
+      "subtitle": "Tập trung xây dựng sản phẩm. Chúng tôi lo phần hạ tầng video phức tạp.",
+      "global": {
+        "title": "Mạng edge toàn cầu",
+        "description": "Nội dung được phân phối từ hơn 200 PoP trên toàn thế giới. Tự động chọn vùng để có độ trễ thấp nhất cho mọi người xem."
+      },
+      "live": {
+        "title": "API livestream",
+        "description": "Mở rộng tới hàng triệu người xem đồng thời với độ trễ cực thấp. Hỗ trợ RTMP ingest và HLS playback sẵn có.",
+        "status": "Trạng thái trực tiếp",
+        "onAir": "Đang phát",
+        "bitrate": "Bitrate:",
+        "fps": "FPS:",
+        "latency": "Độ trễ:",
+        "bitrateValue": "6000 kbps",
+        "fpsValue": "60",
+        "latencyValue": "~2 giây"
+      },
+      "encoding": {
+        "title": "Mã hóa tức thì",
+        "description": "Tải tệp thô và nhận luồng HLS/DASH tối ưu chỉ trong vài giây."
+      },
+      "analytics": {
+        "title": "Phân tích chuyên sâu",
+        "description": "Insight theo phiên, chỉ số chất lượng trải nghiệm (QoE), và nhiều hơn nữa."
+      }
+    },
+    "pricing": {
+      "title": "Bảng giá đơn giản, minh bạch",
+      "subtitle": "Chọn gói phù hợp với nhu cầu. Không phí ẩn.",
+      "perMonth": "/tháng",
+      "hobby": {
+        "name": "Hobby",
+        "features": [
+          "Tải lên không giới hạn",
+          "1 giờ lưu trữ",
+          "Hỗ trợ tiêu chuẩn"
+        ],
+        "button": "Bắt đầu miễn phí"
+      },
+      "pro": {
+        "name": "Pro",
+        "features": [
+          "Trình phát không quảng cáo",
+          "Hỗ trợ M3U8",
+          "Tải lên không giới hạn",
+          "Quảng cáo tùy chỉnh"
+        ],
+        "button": "Bắt đầu ngay",
+        "tag": "PHỔ BIẾN"
+      },
+      "scale": {
+        "name": "Scale",
+        "features": ["5 TB băng thông", "500 giờ lưu trữ", "Hỗ trợ ưu tiên"],
+        "button": "Liên hệ kinh doanh",
+        "tag": "Giá trị cao"
+      }
+    },
+    "footer": {
+      "description": "Xây dựng lớp hạ tầng video cho internet. Thiết kế cho developer.",
+      "product": "Sản phẩm",
+      "productFeatures": "Tính năng",
+      "productPricing": "Bảng giá",
+      "productShowcase": "Trình diễn",
+      "company": "Công ty",
+      "companyAbout": "Giới thiệu",
+      "companyBlog": "Blog",
+      "companyCareers": "Tuyển dụng",
+      "legal": "Pháp lý",
+      "privacy": "Quyền riêng tư",
+      "terms": "Điều khoản",
+      "copyright": "© {year} EcoStream Inc. Bảo lưu mọi quyền."
+    },
+    "head": {
+      "title": "EcoStream - Hạ tầng video cho internet hiện đại",
+      "description": "Lưu trữ, mã hóa và phát video mượt mà với API ưu tiên cho developer. Tối ưu tốc độ, sẵn sàng mở rộng."
+    }
+  },
+  "legal": {
+    "common": {
+      "heading": "Chính sách pháp lý & quyền riêng tư",
+      "subheading": "Pháp lý & quyền riêng tư",
+      "description": "Chính sách pháp lý và quyền riêng tư của chúng tôi."
+    },
+    "terms": {
+      "title": "Điều khoản và điều kiện - Ecostream",
+      "description": "Đọc điều khoản và điều kiện sử dụng dịch vụ lưu trữ và phát video của Ecostream.",
+      "pageHeading": "Chi tiết điều khoản và điều kiện",
+      "pageSubheading": "Điều khoản và điều kiện",
+      "pageDescription": "Điều khoản của chúng tôi nêu rõ các hướng dẫn và quy định quan trọng khi sử dụng dịch vụ Ecostream.",
+      "sections": {
+        "acceptanceTitle": "1. Chấp nhận điều khoản",
+        "acceptanceText": "Bằng việc truy cập và sử dụng Ecostream, bạn đồng ý bị ràng buộc bởi các điều khoản trong thỏa thuận này.",
+        "usageTitle": "2. Sử dụng dịch vụ",
+        "usageText": "Bạn đồng ý chỉ sử dụng dịch vụ cho mục đích hợp pháp. Nghiêm cấm đăng hoặc truyền nội dung bất hợp pháp, đe dọa, phỉ báng, tục tĩu hoặc phản cảm. Chúng tôi có quyền chấm dứt tài khoản vi phạm điều khoản.",
+        "ownershipTitle": "3. Quyền sở hữu nội dung",
+        "ownershipText": "Bạn giữ toàn bộ quyền sở hữu đối với nội dung tải lên Ecostream. Tuy nhiên, khi tải lên, bạn cấp cho chúng tôi quyền lưu trữ, lưu giữ và hiển thị nội dung cần thiết để cung cấp dịch vụ.",
+        "liabilityTitle": "4. Giới hạn trách nhiệm",
+        "liabilityText": "Ecostream không chịu trách nhiệm cho bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, đặc biệt hoặc hệ quả do việc sử dụng hoặc không thể sử dụng dịch vụ.",
+        "changesTitle": "5. Thay đổi điều khoản",
+        "changesText": "Chúng tôi có quyền sửa đổi điều khoản bất kỳ lúc nào. Việc bạn tiếp tục sử dụng dịch vụ sau khi có thay đổi đồng nghĩa với việc chấp nhận điều khoản mới."
+      }
+    },
+    "privacy": {
+      "title": "Chính sách quyền riêng tư - Ecostream",
+      "description": "Tìm hiểu cam kết của Ecostream trong việc bảo vệ quyền riêng tư và dữ liệu của bạn.",
+      "pageHeading": "Chính sách pháp lý & quyền riêng tư",
+      "pageSubheading": "Pháp lý & quyền riêng tư",
+      "pageDescription": "Chính sách pháp lý và quyền riêng tư của chúng tôi.",
+      "sections": {
+        "policyTitle": "1. Chính sách quyền riêng tư",
+        "policyText": "Tại Ecostream, chúng tôi coi trọng quyền riêng tư của bạn. Chính sách này mô tả cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân. Chúng tôi chỉ thu thập thông tin cần thiết để vận hành dịch vụ, bao gồm email tạo tài khoản và thông tin thanh toán xử lý gói dịch vụ.",
+        "dataCollectionTitle": "2. Thu thập dữ liệu",
+        "dataCollectionText": "Chúng tôi thu thập dữ liệu như địa chỉ IP, loại trình duyệt và thời gian truy cập để phân tích xu hướng và cải thiện dịch vụ. Nội dung tải lên được lưu trữ an toàn và chỉ truy cập khi cần cho việc cung cấp dịch vụ lưu trữ.",
+        "cookieTitle": "3. Chính sách cookie",
+        "cookieText": "Chúng tôi sử dụng cookie để duy trì phiên đăng nhập và tùy chọn người dùng. Khi sử dụng website, bạn đồng ý với việc sử dụng cookie theo chính sách này.",
+        "dmcaTitle": "4. DMCA & bản quyền",
+        "dmcaText": "Ecostream tôn trọng quyền sở hữu trí tuệ của người khác. Chúng tôi phản hồi các thông báo vi phạm bản quyền theo Đạo luật DMCA. Vui lòng báo cáo vi phạm bản quyền tới bộ phận hỗ trợ."
+      }
+    }
+  },
+  "notFound": {
+    "headTitle": "404 - Không tìm thấy trang",
+    "title": "404 - Không tìm thấy trang",
+    "description": "Trang bạn đang tìm không tồn tại.",
+    "backHome": "Quay về trang chủ"
+  }
+}

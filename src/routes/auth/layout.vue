@@ -8,9 +8,9 @@
                     {{ content[route.name as keyof typeof content.value]?.title || '' }}
                 </h2>
                 <vue-head :input="{
-                    title: content.value[route.name as keyof typeof content.value]?.headTitle || t('app.name'),
+                    title: content[route.name as keyof typeof content.value]?.headTitle || t('app.name'),
                     meta: [
-                        { name: 'description', content: content.value[route.name as keyof typeof content.value]?.subtitle || '' }
+                        { name: 'description', content: content[route.name as keyof typeof content.value]?.subtitle || '' }
                     ]
                 }" />
             </div>
@@ -23,12 +23,12 @@
     </div>
 </template>
 <script setup lang="ts">
+import { useTranslation } from 'i18next-vue';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const content = computed(() => ({
     login: {
