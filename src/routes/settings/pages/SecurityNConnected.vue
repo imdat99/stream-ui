@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
@@ -8,19 +7,18 @@ import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
 import XCircleIcon from '@/components/icons/XCircleIcon.vue';
-import { supportedLocales, type SupportedLocale } from '@/i18n/constants';
-import { normalizeLocale } from '@/i18n';
 import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
-import { computed, ref, watch } from 'vue';
+import { supportedLocales } from '@/i18n/constants';
+import { useAuthStore } from '@/stores/auth';
 import { useTranslation } from 'i18next-vue';
+import { computed, ref, watch } from 'vue';
 
 const auth = useAuthStore();
 const toast = useAppToast();
 const confirm = useAppConfirm();
 const { t } = useTranslation();
 
-const selectedLanguage = ref<SupportedLocale>(normalizeLocale((auth.user as any)?.language ?? (auth.user as any)?.locale));
 const languageSaving = ref(false);
 
 const languageOptions = computed(() => supportedLocales.map((value) => ({
@@ -29,7 +27,7 @@ const languageOptions = computed(() => supportedLocales.map((value) => ({
 })));
 
 watch(() => auth.user, (nextUser) => {
-    selectedLanguage.value = normalizeLocale((nextUser as any)?.language ?? (nextUser as any)?.locale);
+    // selectedLanguage.value = normalizeLocale((nextUser as any)?.language ?? (nextUser as any)?.locale);
 }, { deep: true });
 
 // 2FA state

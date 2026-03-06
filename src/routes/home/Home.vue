@@ -172,12 +172,12 @@
     </section>
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'i18next-vue';
+import { computed } from 'vue';
 
-const { t } = useTranslation();
-
+const { t, i18next } = useTranslation();
+console.log('Current locale:', i18next);
 const getFeatureList = (key: string): string[] => {
     const localized = t(key, { returnObjects: true });
     return Array.isArray(localized) ? localized.map((item) => String(item)) : [];

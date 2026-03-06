@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { formatBytes, getStatusSeverity } from '@/lib/utils';
-import { computed } from 'vue';
 import { useTranslation } from 'i18next-vue';
-import { getActiveI18n } from '@/i18n';
+import { computed } from 'vue';
+// import { getActiveI18n } from '@/i18n';
 
 const props = defineProps<{
     video: ModelVideo;

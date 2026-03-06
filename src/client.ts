@@ -13,10 +13,6 @@ async function render() {
     pinia.use(PiniaSharedState({ enable: true, initialize: true }));
     hydrateQueryCache(queryCache, appData.$colada || {});
 
-    Object.entries(appData).forEach(([key, value]) => {
-        (window as any)[key] = value;
-    });
-
     await router.isReady();
     app.mount('body', true);
 }

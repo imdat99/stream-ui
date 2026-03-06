@@ -10,6 +10,7 @@
     "tail": "wrangler tail"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.11",
     "@pinia/colada": "^0.21.7",
     "@unhead/vue": "^2.1.10",
     "@vueuse/core": "^14.2.1",

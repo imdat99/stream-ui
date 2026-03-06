@@ -5,13 +5,11 @@ import { createPinia } from 'pinia';
 import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 
-import type { i18n as I18nInstance } from 'i18next';
 import I18NextVue from 'i18next-vue';
 
-import { createI18nInstance, initI18nInstance } from '@/lib/translation';
-import { createI18nForClient } from '@/lib/translation/client';
 
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
+import createI18nInstance from './lib/translation';
 import createAppRouter from './routes';
 
 const bodyClass = ':uno: font-sans text-gray-800 antialiased flex flex-col min-h-screen';
@@ -21,7 +19,7 @@ const getSerializedAppData = () => {
     return JSON.parse(document.getElementById('__APP_DATA__')?.innerText || '{}') as Record<string, any>;
 };
 
-export async function createApp(lng: string = 'en', i18next?: I18nInstance) {
+export async function createApp(lng: string = 'en') {
     const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));
     
@@ -35,13 +33,7 @@ export async function createApp(lng: string = 'en', i18next?: I18nInstance) {
         }
     });
     app.use(pinia);
-    const runtimeI18n = import.meta.env.SSR
-        ? (i18next ?? createI18nInstance(true))
-        : await createI18nForClient(lng);
-    if (import.meta.env.SSR) {
-        await initI18nInstance(runtimeI18n, lng, true);
-    }
-    app.use(I18NextVue, { i18next: runtimeI18n });
+    app.use(I18NextVue, { i18next: createI18nInstance(lng) });
     app.use(PiniaColada, {
         pinia,
         plugins: [
@@ -57,8 +49,6 @@ export async function createApp(lng: string = 'en', i18next?: I18nInstance) {
     });
 
     const queryCache = useQueryCache();
-    const router = createAppRouter();
-    app.use(router);
 
     if (!import.meta.env.SSR) {
         Object.entries(appData).forEach(([key, value]) => {
@@ -68,6 +58,9 @@ export async function createApp(lng: string = 'en', i18next?: I18nInstance) {
             pinia.state.value = (window as any).$p;
         }
     }
+
+    const router = createAppRouter();
+    app.use(router);
 
     return { app, router, head, pinia, bodyClass, queryCache };
 }

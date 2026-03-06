@@ -1,36 +1,16 @@
-import { defineStore } from 'pinia';
-import { useRouter } from 'vue-router';
-import { ref, watch } from 'vue';
 import { client, ResponseResponse, type ModelUser } from '@/api/client';
-import { defaultLocale, localeCookieKey, type SupportedLocale } from '@/i18n/constants';
-import { getActiveI18n, normalizeLocale } from '@/i18n';
 import { TinyMqttClient } from '@/lib/liteMqtt';
+import { useTranslation } from 'i18next-vue';
+import { defineStore } from 'pinia';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 type ProfileUpdatePayload = { username?: string; email?: string; language?: string; locale?: string };
-
-const cookieMaxAge = 60 * 60 * 24 * 365;
-
-const writeLocaleCookie = (locale: SupportedLocale) => {
-    if (typeof document === 'undefined') return;
-    document.cookie = `${localeCookieKey}=${encodeURIComponent(locale)}; path=/; max-age=${cookieMaxAge}; samesite=lax`;
-};
-
-const resolveUserLocale = (target: Partial<ModelUser> | null | undefined): SupportedLocale => {
-    const userLocale = (target as any)?.language ?? (target as any)?.locale;
-    return normalizeLocale(typeof userLocale === 'string' ? userLocale : defaultLocale);
-};
-
-const applyRuntimeLocale = (locale: SupportedLocale) => {
-    const i18n = getActiveI18n();
-    if (!i18n) return;
-    i18n.changeLanguage(locale);
-};
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<ModelUser | null>(null);
     const router = useRouter();
-    const t = (key: string, params?: Record<string, unknown>) =>
-        getActiveI18n()?.t(key, params) ?? key;
+    const { t } = useTranslation();
     const loading = ref(false);
     const error = ref<string | null>(null);
     const initialized = ref(false);
@@ -55,11 +35,13 @@ export const useAuthStore = defineStore('auth', () => {
     }, { deep: true });
 
     watch(user, (newUser) => {
-        if (import.meta.env.SSR) return;
-        const locale = resolveUserLocale(newUser);
-        applyRuntimeLocale(locale);
-        writeLocaleCookie(locale);
-    }, { deep: true, immediate: true });
+        if (import.meta.env.SSR || !initialized.value || !newUser) return;
+        // const locale = getUserPreferredLocale(newUser);
+        // const activeLocale = getActiveI18n()?.resolvedLanguage;
+        // if (!locale || (activeLocale && normalizeLocale(activeLocale) === locale)) return;
+        // applyRuntimeLocale(locale);
+        // writeLocaleCookie(locale);
+    }, { deep: true });
     // Initial check for session could go here if there was a /me endpoint or token check
     async function init() {
         if (initialized.value) return;
@@ -70,8 +52,12 @@ export const useAuthStore = defineStore('auth', () => {
         }).then(r => r.json()).then(r => {
             if (r.data) {
                 user.value = r.data.user as ModelUser;
-                const resolvedLocale = resolveUserLocale(user.value);
-                applyRuntimeLocale(resolvedLocale);
+                // const profileLocale = getUserPreferredLocale(user.value);
+                // const activeLocale = getActiveI18n()?.resolvedLanguage;
+                // if (profileLocale && (!activeLocale || normalizeLocale(activeLocale) !== profileLocale)) {
+                //     applyRuntimeLocale(profileLocale);
+                //     writeLocaleCookie(profileLocale);
+                // }
             }
         }).catch(() => { }).finally(() => {
             initialized.value = true;
@@ -108,9 +94,11 @@ export const useAuthStore = defineStore('auth', () => {
             console.log("body", body);
             if (body && body.data) {
                 user.value = body.data.user;
-                const resolvedLocale = resolveUserLocale(user.value);
-                applyRuntimeLocale(resolvedLocale);
-                writeLocaleCookie(resolvedLocale);
+                // const profileLocale = getUserPreferredLocale(user.value);
+                // if (profileLocale) {
+                //     applyRuntimeLocale(profileLocale);
+                //     writeLocaleCookie(profileLocale);
+                // }
                 router.push('/');
             } else {
                 throw new Error(t('auth.errors.loginNoUserData'));
@@ -188,18 +176,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function setLanguage(locale: string) {
-        const normalizedLocale = normalizeLocale(locale);
-        const previousLocale = resolveUserLocale(user.value);
+        // const normalizedLocale = normalizeLocale(locale);
+        // const previousLocale = resolveUserLocale(user.value);
+        
+        // applyRuntimeLocale(normalizedLocale);
+        // writeLocaleCookie(normalizedLocale);
         const previousUser = user.value ? { ...user.value } : null;
-
-        applyRuntimeLocale(normalizedLocale);
-        writeLocaleCookie(normalizedLocale);
 
         if (user.value) {
             user.value = {
                 ...user.value,
-                language: normalizedLocale,
-                locale: normalizedLocale,
+                // language: normalizedLocale,
+                // locale: normalizedLocale,
             } as ModelUser;
         }
 
@@ -208,14 +196,14 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         try {
-            await updateProfile({ language: normalizedLocale, locale: normalizedLocale });
+            // await updateProfile({ language: normalizedLocale, locale: normalizedLocale });
             return { ok: true as const, fallbackOnly: false as const };
         } catch (e) {
-            applyRuntimeLocale(previousLocale);
+            // applyRuntimeLocale(previousLocale);
             if (previousUser) {
                 user.value = previousUser as ModelUser;
             }
-            writeLocaleCookie(normalizedLocale);
+            // writeLocaleCookie(normalizedLocale);
             return { ok: false as const, fallbackOnly: true as const, error: e };
         }
     }
@@ -257,7 +245,8 @@ export const useAuthStore = defineStore('auth', () => {
         setLanguage,
         logout: async () => {
             loading.value = true;
-            const localeBeforeLogout = resolveUserLocale(user.value);
+            // const activeLocale = getActiveI18n()?.resolvedLanguage;
+            // const localeBeforeLogout = typeof activeLocale === 'string' ? normalizeLocale(activeLocale) : undefined;
             try {
                 await client.auth.logoutCreate();
                 user.value = null;
@@ -267,8 +256,10 @@ export const useAuthStore = defineStore('auth', () => {
                 user.value = null;
                 router.push('/login');
             } finally {
-                writeLocaleCookie(localeBeforeLogout);
-                applyRuntimeLocale(localeBeforeLogout);
+                // if (localeBeforeLogout) {
+                //     writeLocaleCookie(localeBeforeLogout);
+                //     applyRuntimeLocale(localeBeforeLogout);
+                // }
                 loading.value = false;
             }
         },

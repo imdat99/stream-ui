@@ -1,5 +1,4 @@
 import { computed, reactive, readonly } from 'vue';
-import { getActiveI18n } from '@/i18n';
 
 export type AppConfirmOptions = {
   message: string;

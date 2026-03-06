@@ -3,34 +3,18 @@ import { renderSSRHead } from '@unhead/vue/server';
 import { streamText } from 'hono/streaming';
 import { renderToWebStream } from 'vue/server-renderer';
 
-import { localeCookieKey } from '@/i18n';
-import { createI18nInstance, initI18nInstance } from '@/lib/translation';
 import { buildBootstrapScript } from '@/lib/manifest';
 import { createApp } from '@/main';
 import { htmlEscape } from '@/server/utils/htmlEscape';
 import { useAuthStore } from '@/stores/auth';
 import type { Hono } from 'hono';
 
-const parseCookie = (cookieHeader: string | undefined, key: string): string | undefined => {
-  if (!cookieHeader) return undefined;
-  const segments = cookieHeader.split(';');
-  for (const segment of segments) {
-    const [rawKey, ...rest] = segment.trim().split('=');
-    if (rawKey !== key) continue;
-    return decodeURIComponent(rest.join('='));
-  }
-  return undefined;
-};
-
 export function registerSSRRoutes(app: Hono) {
   app.get("*", async (c) => {
     const nonce = crypto.randomUUID();
     const url = new URL(c.req.url);
-    const lang = c.get("language")
-    const localeFromCookie = parseCookie(c.req.header('cookie'), localeCookieKey);
-    const i18next = createI18nInstance(true);
-    await initI18nInstance(i18next, localeFromCookie ?? lang, true);
-    const { app: vueApp, router, head, pinia, bodyClass, queryCache } = await createApp(localeFromCookie ?? lang, i18next);
+    const lang = c.get("language");
+    const { app: vueApp, router, head, pinia, bodyClass, queryCache } = await createApp(lang);
 
     vueApp.provide("honoContext", c);
 
@@ -49,7 +33,7 @@ export function registerSSRRoutes(app: Hono) {
       const appStream = renderToWebStream(vueApp, ctx);
 
       // HTML Head
-      await stream.write(`<!DOCTYPE html><html lang='${i18next.resolvedLanguage ?? lang}'><head>`);
+      await stream.write(`<!DOCTYPE html><html lang='${lang}'><head>`);
       await stream.write("<base href='" + url.origin + "'/>");
 
       // SSR Head tags
@@ -79,7 +63,7 @@ export function registerSSRRoutes(app: Hono) {
       Object.assign(ctx, {
         $p: pinia.state.value,
         $colada: serializeQueryCache(queryCache),
-        $locale: i18next.resolvedLanguage ?? lang,
+        $locale: lang,
       });
 
       // App data script

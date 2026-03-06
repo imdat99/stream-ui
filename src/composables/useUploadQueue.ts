@@ -1,4 +1,3 @@
-import { getActiveI18n } from '@/i18n';
 import { computed, ref } from 'vue';
 
 export interface QueueItem {

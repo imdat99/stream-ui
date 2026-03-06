@@ -1,75 +1,44 @@
-import i18next, { type i18n as I18nInstance } from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import I18NextHttpBackend from 'i18next-http-backend';
+import i18next from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import I18NextHttpBackend, { HttpBackendOptions } from "i18next-http-backend";
+const backendOptions: HttpBackendOptions = {
+    loadPath: 'http://localhost:5173/locales/{{lng}}/{{ns}}.json',
+    request: (_options, url, _payload, callback) => {
+        fetch(url)
+            .then((res) =>
+                res.json().then((r) => {
+                    callback(null, {
+                        data: JSON.stringify(r),
+                        status: 200,
+                    })
+                })
+            )
+            .catch(() => {
+                callback(null, {
+                    status: 500,
+                    data: '',
+                })
+            })
+    },
+}
+export const createI18nInstance = (lng: string) => {
+  console.log('Initializing i18n with language:', lng);
+const i18n = i18next.createInstance();
 
-import { defaultLocale, localeCookieKey, supportedLocales, type SupportedLocale } from '@/i18n/constants';
-
-const runtimeNamespace = 'translation';
-
-const normalizeLanguage = (language?: string): SupportedLocale => {
-  if (!language) return defaultLocale;
-  const normalized = language.toLowerCase().split('-')[0] as SupportedLocale;
-  return supportedLocales.includes(normalized) ? normalized : defaultLocale;
+i18n
+  .use(I18NextHttpBackend)
+  .use(LanguageDetector)
+  .init({
+    lng,
+    supportedLngs: ["en", "vi"],
+    fallbackLng: "en",
+    defaultNS: "translation",
+    ns: ['translation'],
+    interpolation: {
+      escapeValue: false,
+    },
+    backend: backendOptions,
+  });
+  return i18n;
 };
-
-const getLoadPath = () => {
-  const cdnBase = import.meta.env.VITE_I18N_CDN_BASE_URL?.trim().replace(/\/+$/, '');
-  if (cdnBase) {
-    return `${cdnBase}/locales/{{lng}}/{{lng}}.json`;
-  }
-  return '/locales/{{lng}}/{{lng}}.json';
-};
-
-export const createI18nInstance = (forServer: boolean) => {
-  const instance = i18next.createInstance();
-
-  instance.use(I18NextHttpBackend);
-  if (!forServer) {
-    instance.use(LanguageDetector);
-  }
-
-  return instance;
-};
-
-export const initI18nInstance = async (
-  instance: I18nInstance,
-  language?: string,
-  forServer: boolean = import.meta.env.SSR,
-) => {
-  const lng = normalizeLanguage(language);
-
-  if (!instance.isInitialized) {
-    await instance.init({
-      supportedLngs: [...supportedLocales],
-      fallbackLng: defaultLocale,
-      load: 'languageOnly',
-      lng,
-      ns: [runtimeNamespace],
-      defaultNS: runtimeNamespace,
-      fallbackNS: runtimeNamespace,
-      interpolation: {
-        escapeValue: false,
-      },
-      backend: {
-        loadPath: getLoadPath(),
-      },
-      ...(forServer
-        ? {}
-        : {
-            detection: {
-              order: ['cookie', 'navigator', 'htmlTag'],
-              lookupCookie: localeCookieKey,
-              caches: ['cookie'],
-            },
-          }),
-    });
-
-    return instance;
-  }
-
-  if (instance.resolvedLanguage !== lng) {
-    await instance.changeLanguage(lng);
-  }
-
-  return instance;
-};
+export default createI18nInstance;

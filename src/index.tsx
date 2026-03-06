@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 
+import { serveStatic } from "@hono/node-server/serve-static";
 import { apiProxyMiddleware } from './server/middlewares/apiProxy';
 import { setupMiddlewares } from './server/middlewares/setup';
 import { registerDisplayRoutes } from './server/routes/display';
@@ -15,7 +16,7 @@ setupMiddlewares(app);
 
 // API proxy middleware (handles /r/*)
 app.use(apiProxyMiddleware);
-
+app.use(serveStatic({ root: './public' }))
 // Routes
 registerWellKnownRoutes(app);
 registerMergeRoutes(app);

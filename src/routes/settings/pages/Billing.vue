@@ -12,9 +12,8 @@ import UploadIcon from '@/components/icons/UploadIcon.vue';
 import { useAppToast } from '@/composables/useAppToast';
 import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
-import { computed, ref } from 'vue';
 import { useTranslation } from 'i18next-vue';
-import { getActiveI18n } from '@/i18n';
+import { computed, ref } from 'vue';
 
 const toast = useAppToast();
 const auth = useAuthStore();

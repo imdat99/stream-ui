@@ -1,6 +1,5 @@
 import type { ClassValue } from "clsx";
 import { clsx } from "clsx";
-import { getActiveI18n } from '@/i18n';
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -52,10 +51,10 @@ export function getImageAspectRatio(url: string): Promise<AspectInfo> {
 
 
 
-const getRuntimeLocaleTag = () => {
-  const locale = getActiveI18n()?.resolvedLanguage;
-  return locale === 'vi' ? 'vi-VN' : 'en-US';
-};
+// const getRuntimeLocaleTag = () => {
+//   const locale = getActiveI18n()?.resolvedLanguage;
+//   return locale === 'vi' ? 'vi-VN' : 'en-US';
+// };
 
 export const formatBytes = (bytes?: number) => {
   if (!bytes) return '0 B';
@@ -63,7 +62,8 @@ export const formatBytes = (bytes?: number) => {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
-  return `${new Intl.NumberFormat(getRuntimeLocaleTag()).format(value)} ${sizes[i]}`;
+  return `${value} ${sizes[i]}`;
+  // return `${new Intl.NumberFormat(getRuntimeLocaleTag()).format(value)} ${sizes[i]}`;
 };
 
 export const formatDuration = (seconds?: number) => {
@@ -80,7 +80,7 @@ export const formatDuration = (seconds?: number) => {
 
 export const formatDate = (dateString: string = "", dateOnly: boolean = false) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleDateString(getRuntimeLocaleTag(), {
+  return new Date(dateString).toLocaleDateString("en-US", {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
