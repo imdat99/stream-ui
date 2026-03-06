@@ -5,8 +5,11 @@ import { createPinia } from 'pinia';
 import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 
+import type { i18n as I18nInstance } from 'i18next';
 import I18NextVue from 'i18next-vue';
-import { createI18nForRuntime } from '@/lib/translation';
+
+import { createI18nInstance, initI18nInstance } from '@/lib/translation';
+import { createI18nForClient } from '@/lib/translation/client';
 
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import createAppRouter from './routes';
@@ -18,7 +21,7 @@ const getSerializedAppData = () => {
     return JSON.parse(document.getElementById('__APP_DATA__')?.innerText || '{}') as Record<string, any>;
 };
 
-export async function createApp(lng: string = 'en') {
+export async function createApp(lng: string = 'en', i18next?: I18nInstance) {
     const pinia = createPinia();
     const app = createSSRApp(withErrorBoundary(RouterView));
     
@@ -32,8 +35,13 @@ export async function createApp(lng: string = 'en') {
         }
     });
     app.use(pinia);
-    const i18next = await createI18nForRuntime(lng);
-    app.use(I18NextVue, { i18next });
+    const runtimeI18n = import.meta.env.SSR
+        ? (i18next ?? createI18nInstance(true))
+        : await createI18nForClient(lng);
+    if (import.meta.env.SSR) {
+        await initI18nInstance(runtimeI18n, lng, true);
+    }
+    app.use(I18NextVue, { i18next: runtimeI18n });
     app.use(PiniaColada, {
         pinia,
         plugins: [

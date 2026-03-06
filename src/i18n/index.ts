@@ -1,6 +1,6 @@
 import type { i18n as I18nInstance } from 'i18next';
 
-import { getActiveI18nInstance } from '@/lib/translation';
+import { getClientI18nInstance } from '@/lib/translation/client';
 
 import { defaultLocale, supportedLocales, type SupportedLocale } from './constants';
 
@@ -15,5 +15,5 @@ export const normalizeLocale = (locale?: string): SupportedLocale => {
 };
 
 export const getActiveI18n = (): I18nInstance | undefined => {
-  return getActiveI18nInstance();
+  return import.meta.env.SSR ? undefined : getClientI18nInstance();
 };

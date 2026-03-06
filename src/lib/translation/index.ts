@@ -1,13 +1,10 @@
 import i18next, { type i18n as I18nInstance } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import I18NextHttpBackend from 'i18next-http-backend';
-import { tryGetContext } from 'hono/context-storage';
 
 import { defaultLocale, localeCookieKey, supportedLocales, type SupportedLocale } from '@/i18n/constants';
 
 const runtimeNamespace = 'translation';
-
-let clientI18n: I18nInstance | undefined;
 
 const normalizeLanguage = (language?: string): SupportedLocale => {
   if (!language) return defaultLocale;
@@ -23,18 +20,22 @@ const getLoadPath = () => {
   return '/locales/{{lng}}/{{lng}}.json';
 };
 
-const createInstance = () => {
+export const createI18nInstance = (forServer: boolean) => {
   const instance = i18next.createInstance();
 
   instance.use(I18NextHttpBackend);
-  if (!import.meta.env.SSR) {
+  if (!forServer) {
     instance.use(LanguageDetector);
   }
 
   return instance;
 };
 
-const initInstance = async (instance: I18nInstance, language?: string) => {
+export const initI18nInstance = async (
+  instance: I18nInstance,
+  language?: string,
+  forServer: boolean = import.meta.env.SSR,
+) => {
   const lng = normalizeLanguage(language);
 
   if (!instance.isInitialized) {
@@ -52,7 +53,7 @@ const initInstance = async (instance: I18nInstance, language?: string) => {
       backend: {
         loadPath: getLoadPath(),
       },
-      ...(import.meta.env.SSR
+      ...(forServer
         ? {}
         : {
             detection: {
@@ -71,28 +72,4 @@ const initInstance = async (instance: I18nInstance, language?: string) => {
   }
 
   return instance;
-};
-
-export const createI18nForRuntime = async (language?: string) => {
-  if (import.meta.env.SSR) {
-    const serverI18n = await initInstance(createInstance(), language);
-    const context = tryGetContext<any>();
-    context?.set?.('i18n', serverI18n);
-    return serverI18n;
-  }
-
-  if (!clientI18n) {
-    clientI18n = createInstance();
-  }
-
-  return initInstance(clientI18n, language);
-};
-
-export const getActiveI18nInstance = () => {
-  if (!import.meta.env.SSR) {
-    return clientI18n;
-  }
-
-  const context = tryGetContext<any>();
-  return context?.get?.('i18n') as I18nInstance | undefined;
 };

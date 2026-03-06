@@ -3,6 +3,8 @@ import { renderSSRHead } from '@unhead/vue/server';
 import { streamText } from 'hono/streaming';
 import { renderToWebStream } from 'vue/server-renderer';
 
+import { localeCookieKey } from '@/i18n';
+import { createI18nInstance, initI18nInstance } from '@/lib/translation';
 import { buildBootstrapScript } from '@/lib/manifest';
 import { createApp } from '@/main';
 import { htmlEscape } from '@/server/utils/htmlEscape';
@@ -25,7 +27,10 @@ export function registerSSRRoutes(app: Hono) {
     const nonce = crypto.randomUUID();
     const url = new URL(c.req.url);
     const lang = c.get("language")
-    const { app: vueApp, router, head, pinia, bodyClass, queryCache } = await createApp(lang);
+    const localeFromCookie = parseCookie(c.req.header('cookie'), localeCookieKey);
+    const i18next = createI18nInstance(true);
+    await initI18nInstance(i18next, localeFromCookie ?? lang, true);
+    const { app: vueApp, router, head, pinia, bodyClass, queryCache } = await createApp(localeFromCookie ?? lang, i18next);
 
     vueApp.provide("honoContext", c);
 
@@ -44,7 +49,7 @@ export function registerSSRRoutes(app: Hono) {
       const appStream = renderToWebStream(vueApp, ctx);
 
       // HTML Head
-      await stream.write(`<!DOCTYPE html><html lang='${lang}'><head>`);
+      await stream.write(`<!DOCTYPE html><html lang='${i18next.resolvedLanguage ?? lang}'><head>`);
       await stream.write("<base href='" + url.origin + "'/>");
 
       // SSR Head tags
@@ -74,7 +79,7 @@ export function registerSSRRoutes(app: Hono) {
       Object.assign(ctx, {
         $p: pinia.state.value,
         $colada: serializeQueryCache(queryCache),
-        $locale: lang,
+        $locale: i18next.resolvedLanguage ?? lang,
       });
 
       // App data script
