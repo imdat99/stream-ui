@@ -30,10 +30,9 @@ const state = reactive<AppConfirmState>({
 });
 
 const requireConfirm = (options: AppConfirmOptions) => {
-  const i18n = getActiveI18n();
-  const defaultHeader = i18n?.t('confirm.defaultHeader') ?? 'Confirm';
-  const defaultAccept = i18n?.t('confirm.defaultAccept') ?? 'OK';
-  const defaultReject = i18n?.t('confirm.defaultReject') ?? 'Cancel';
+  const defaultHeader = 'Confirm';
+  const defaultAccept = 'OK';
+  const defaultReject = 'Cancel';
 
   state.visible = true;
   state.loading = false;

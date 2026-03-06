@@ -7,7 +7,6 @@ import { RouterView } from 'vue-router';
 
 import I18NextVue from 'i18next-vue';
 
-
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import createI18nInstance from './lib/translation';
 import createAppRouter from './routes';

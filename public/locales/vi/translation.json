@@ -554,7 +554,7 @@
   },
   "overview": {
     "welcome": {
-      "title": "Chào mừng trở lại, {name}! 👋",
+      "title": "Xin chào, {{name}}",
       "subtitle": "Đây là tình hình nội dung của bạn hôm nay."
     },
     "stats": {
@@ -640,7 +640,7 @@
     },
     "filters": {
       "searchPlaceholder": "Tìm kiếm video...",
-      "rangeOfTotal": "{first}–{last} / {total}",
+      "rangeOfTotal": "{{first}}–{{last}} / {{total}}",
       "previousPageAria": "Trang trước",
       "nextPageAria": "Trang sau",
       "allStatus": "Tất cả trạng thái",
@@ -929,7 +929,7 @@
         "description": "Nội dung được phân phối từ hơn 200 PoP trên toàn thế giới. Tự động chọn vùng để có độ trễ thấp nhất cho mọi người xem."
       },
       "live": {
-        "title": "API livestream",
+        "title": "Live Streaming API",
         "description": "Mở rộng tới hàng triệu người xem đồng thời với độ trễ cực thấp. Hỗ trợ RTMP ingest và HLS playback sẵn có.",
         "status": "Trạng thái trực tiếp",
         "onAir": "Đang phát",

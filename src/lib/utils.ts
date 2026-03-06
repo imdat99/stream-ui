@@ -49,13 +49,6 @@ export function getImageAspectRatio(url: string): Promise<AspectInfo> {
   });
 }
 
-
-
-// const getRuntimeLocaleTag = () => {
-//   const locale = getActiveI18n()?.resolvedLanguage;
-//   return locale === 'vi' ? 'vi-VN' : 'en-US';
-// };
-
 export const formatBytes = (bytes?: number) => {
   if (!bytes) return '0 B';
   const k = 1024;
@@ -80,7 +73,10 @@ export const formatDuration = (seconds?: number) => {
 
 export const formatDate = (dateString: string = "", dateOnly: boolean = false) => {
   if (!dateString) return '';
-  return new Date(dateString).toLocaleDateString("en-US", {
+  const locale = typeof document !== 'undefined'
+    ? document.documentElement.lang === 'vi' ? 'vi-VN' : 'en-US'
+    : 'en-US';
+  return new Date(dateString).toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

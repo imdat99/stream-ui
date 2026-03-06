@@ -554,7 +554,7 @@
   },
   "overview": {
     "welcome": {
-      "title": "Welcome back, {name}! 👋",
+      "title": "Hello, {{name}}",
       "subtitle": "Here's what's happening with your content today."
     },
     "stats": {

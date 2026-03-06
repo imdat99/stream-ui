@@ -2,7 +2,6 @@
 import { client, type ModelVideo } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { onMounted, ref } from 'vue';
-import { useTranslation } from 'i18next-vue';
 import NameGradient from './components/NameGradient.vue';
 import QuickActions from './components/QuickActions.vue';
 import RecentVideos from './components/RecentVideos.vue';
@@ -10,7 +9,6 @@ import StatsOverview from './components/StatsOverview.vue';
 
 const loading = ref(true);
 const recentVideos = ref<ModelVideo[]>([]);
-const { t } = useTranslation();
 
 const stats = ref({
     totalVideos: 0,
@@ -55,8 +53,8 @@ onMounted(() => {
 
 <template>
     <div class="dashboard-overview">
-        <PageHeader :title="NameGradient" :description="t('overview.pageHeaderDescription')" :breadcrumbs="[
-            { label: t('pageHeader.dashboard') }
+        <PageHeader :title="NameGradient" :description="$t('overview.welcome.subtitle')" :breadcrumbs="[
+            { label: $t('pageHeader.dashboard') }
         ]" />
 
         <StatsOverview :loading="loading" :stats="stats" />

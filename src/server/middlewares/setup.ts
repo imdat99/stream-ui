@@ -10,17 +10,17 @@ export function setupMiddlewares(app: Hono) {
             fallbackLanguage: 'en',
             lookupCookie: 'i18next',
             lookupFromHeaderKey: 'accept-language',
-            order: ['cookie', 'header'],
+      order: ['cookie', 'header'],
         }) ,contextStorage());
-  
+
   app.use(cors(), async (c, next) => {
     c.set("fetch", app.request.bind(app));
-    
+
     const ua = c.req.header("User-Agent");
     if (!ua) {
       return c.json({ error: "User-Agent header is missing" }, 400);
     }
-    
+
     c.set("isMobile", isMobile({ ua }));
     await next();
   });

@@ -156,7 +156,7 @@ const routes: RouteData[] = [
               {
                 path: "security",
                 name: "settings-security",
-                component: () => import("./settings/pages/SecurityNConnected.vue"),
+                component: () => import("./settings/SecurityNConnected/SecurityNConnected.vue"),
                 meta: {
                   head: {
                     title: "Security & Connected Apps - Holistream",
@@ -166,7 +166,7 @@ const routes: RouteData[] = [
               {
                 path: "billing",
                 name: "settings-billing",
-                component: () => import("./settings/pages/Billing.vue"),
+                component: () => import("./settings/Billing/Billing.vue"),
                 meta: {
                   head: {
                     title: "Billing & Plans - Holistream",
@@ -182,7 +182,7 @@ const routes: RouteData[] = [
               {
                 path: "notifications",
                 name: "settings-notifications",
-                component: () => import("./settings/pages/NotificationSettings.vue"),
+                component: () => import("./settings/NotificationSettings/NotificationSettings.vue"),
                 meta: {
                   head: {
                     title: "Notifications - Holistream",
@@ -192,7 +192,7 @@ const routes: RouteData[] = [
               {
                 path: "player",
                 name: "settings-player",
-                component: () => import("./settings/pages/PlayerSettings.vue"),
+                component: () => import("./settings/PlayerSettings/PlayerSettings.vue"),
                 meta: {
                   head: {
                     title: "Player Settings - Holistream",
@@ -202,7 +202,7 @@ const routes: RouteData[] = [
               {
                 path: "domains",
                 name: "settings-domains",
-                component: () => import("./settings/pages/DomainsDns.vue"),
+                component: () => import("./settings/DomainsDns/DomainsDns.vue"),
                 meta: {
                   head: {
                     title: "Allowed Domains - Holistream",
@@ -212,7 +212,7 @@ const routes: RouteData[] = [
               {
                 path: "ads",
                 name: "settings-ads",
-                component: () => import("./settings/pages/AdsVast.vue"),
+                component: () => import("./settings/AdsVast/AdsVast.vue"),
                 meta: {
                   head: {
                     title: "Ads & VAST - Holistream",
@@ -222,7 +222,7 @@ const routes: RouteData[] = [
               {
                 path: "danger",
                 name: "settings-danger",
-                component: () => import("./settings/pages/DangerZone.vue"),
+                component: () => import("./settings/DangerZone/DangerZone.vue"),
                 meta: {
                   head: {
                     title: "Danger Zone - Holistream",

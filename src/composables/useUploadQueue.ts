@@ -40,8 +40,7 @@ const abortItem = (id: string) => {
 };
 
 export function useUploadQueue() {
-    const t = (key: string, params?: Record<string, unknown>) =>
-        getActiveI18n()?.t(key, params) ?? key;
+    const t = (key: string, params?: Record<string, unknown>) => key;
 
     const remainingSlots = computed(() => Math.max(0, MAX_ITEMS - items.value.length));
 
@@ -330,7 +329,7 @@ export function useUploadQueue() {
         const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
-        return `${new Intl.NumberFormat(getActiveI18n()?.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US').format(value)} ${sizes[i]}`;
+        return `${value} ${sizes[i]}`;
     };
 
     const totalSize = computed(() => {

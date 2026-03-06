@@ -3,7 +3,6 @@ import type { ModelVideo } from '@/api/client';
 import { formatBytes, getStatusSeverity } from '@/lib/utils';
 import { useTranslation } from 'i18next-vue';
 import { computed } from 'vue';
-// import { getActiveI18n } from '@/i18n';
 
 const props = defineProps<{
     video: ModelVideo;
@@ -15,7 +14,7 @@ const emit = defineEmits<{
     delete: [];
 }>();
 
-const { t } = useTranslation();
+const { t, i18next } = useTranslation();
 
 const formatFileSize = (bytes?: number): string => {
     if (!bytes) return '-';
@@ -36,7 +35,7 @@ const formatDuration = (seconds?: number): string => {
 const formatDate = (dateStr?: string): string => {
     if (!dateStr) return '-';
     const date = new Date(dateStr);
-    return date.toLocaleString(getActiveI18n()?.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US', {
+    return date.toLocaleString(i18next.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric',

@@ -6,11 +6,9 @@ import XCircleIcon from '@/components/icons/XCircleIcon.vue';
 import XIcon from '@/components/icons/XIcon.vue';
 import { cn } from '@/lib/utils';
 import { onBeforeUnmount, watchEffect } from 'vue';
-import { useTranslation } from 'i18next-vue';
 import { useAppToast, type AppToastSeverity } from '@/composables/useAppToast';
 
 const { toasts, remove } = useAppToast();
-const { t } = useTranslation();
 
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
@@ -93,7 +91,7 @@ onBeforeUnmount(() => {
           type="button"
           class="p-1 rounded-md text-foreground/50 hover:text-foreground hover:bg-muted/50 transition-all"
           @click="dismiss(t.id)"
-          :aria-label="t('toast.dismissAria')"
+          :aria-label="$t('toast.dismissAria')"
         >
           <XIcon class="w-4 h-4" />
         </button>

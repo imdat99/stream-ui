@@ -31,13 +31,7 @@
                 <p v-if="errors.password" class="text-xs text-red-500 mt-0.5">{{ errors.password }}</p>
             </div>
 
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <input id="remember-me" v-model="form.rememberMe" type="checkbox"
-                        class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                        :disabled="auth.loading" />
-                    <label for="remember-me" class="text-sm text-gray-900">{{ t('auth.login.signIn') }}</label>
-                </div>
+            <div class="flex items-center justify-end">
                 <div class="text-sm">
                     <router-link to="/forgot"
                         class="text-blue-600 hover:text-blue-500 hover:underline">{{ t('auth.login.forgotPassword') }}</router-link>

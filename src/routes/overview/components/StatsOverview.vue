@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useTranslation } from 'i18next-vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import { formatBytes } from '@/lib/utils';
@@ -14,8 +15,9 @@ interface Props {
     };
 }
 
-defineProps<Props>();
-const { t } = useTranslation();
+const props = defineProps<Props>();
+const { t, i18next } = useTranslation();
+const localeTag = computed(() => i18next.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US');
 </script>
 
 <template>
@@ -34,7 +36,7 @@ const { t } = useTranslation();
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard :title="t('overview.stats.totalVideos')" :value="stats.totalVideos" :trend="{ value: 12, isPositive: true }" />
 
-        <StatsCard :title="t('overview.stats.totalViews')" :value="stats.totalViews.toLocaleString()"
+        <StatsCard :title="t('overview.stats.totalViews')" :value="stats.totalViews.toLocaleString(localeTag)"
             :trend="{ value: 8, isPositive: true }" />
 
         <StatsCard :title="t('overview.stats.storageUsed')"
