@@ -31,11 +31,11 @@
 import { client } from '@/api/client';
 import { useAppToast } from '@/composables/useAppToast';
 import { reactive } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { z } from 'zod';
 
 const toast = useAppToast();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const form = reactive({
     email: ''

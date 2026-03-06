@@ -5,8 +5,8 @@
 </template>
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const auth = useAuthStore();
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>

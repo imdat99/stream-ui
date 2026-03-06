@@ -28,11 +28,11 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth';
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const auth = useAuthStore();
 const isCopied = ref(false);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const url = computed(() => `${location.origin}/ref/${auth.user?.username || ''}`);
 

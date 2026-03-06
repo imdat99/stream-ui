@@ -2,7 +2,7 @@
 import { client, type ModelVideo } from '@/api/client';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import NameGradient from './components/NameGradient.vue';
 import QuickActions from './components/QuickActions.vue';
 import RecentVideos from './components/RecentVideos.vue';
@@ -10,7 +10,7 @@ import StatsOverview from './components/StatsOverview.vue';
 
 const loading = ref(true);
 const recentVideos = ref<ModelVideo[]>([]);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const stats = ref({
     totalVideos: 0,

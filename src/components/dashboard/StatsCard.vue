@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { VNode } from 'vue';
 
 interface Trend {
@@ -19,7 +19,7 @@ withDefaults(defineProps<Props>(), {
   color: 'primary'
 });
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 // const gradients = {
 //   primary: 'from-primary/20 to-primary/5',

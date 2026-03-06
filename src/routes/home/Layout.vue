@@ -80,7 +80,7 @@
 </template>
 <script lang="ts" setup>
 import { Head } from '@unhead/vue/components'
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import AppButton from '@/components/app/AppButton.vue';
 import AppInput from '@/components/app/AppInput.vue';
 import AppProgressBar from '@/components/app/AppProgressBar.vue';
@@ -12,7 +12,7 @@ import UserIcon from '@/components/icons/UserIcon.vue';
 import XIcon from '@/components/icons/XIcon.vue';
 
 const auth = useAuthStore();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const props = defineProps<{
     editing: boolean;

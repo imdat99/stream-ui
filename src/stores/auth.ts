@@ -23,14 +23,14 @@ const resolveUserLocale = (target: Partial<ModelUser> | null | undefined): Suppo
 const applyRuntimeLocale = (locale: SupportedLocale) => {
     const i18n = getActiveI18n();
     if (!i18n) return;
-    i18n.global.locale.value = locale;
+    i18n.changeLanguage(locale);
 };
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<ModelUser | null>(null);
     const router = useRouter();
     const t = (key: string, params?: Record<string, unknown>) =>
-        getActiveI18n()?.global.t(key, params) ?? key;
+        getActiveI18n()?.t(key, params) ?? key;
     const loading = ref(false);
     const error = ref<string | null>(null);
     const initialized = ref(false);

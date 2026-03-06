@@ -53,7 +53,7 @@ export function getImageAspectRatio(url: string): Promise<AspectInfo> {
 
 
 const getRuntimeLocaleTag = () => {
-  const locale = getActiveI18n()?.global.locale.value;
+  const locale = getActiveI18n()?.resolvedLanguage;
   return locale === 'vi' ? 'vi-VN' : 'en-US';
 };
 

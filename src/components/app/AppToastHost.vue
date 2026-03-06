@@ -6,11 +6,11 @@ import XCircleIcon from '@/components/icons/XCircleIcon.vue';
 import XIcon from '@/components/icons/XIcon.vue';
 import { cn } from '@/lib/utils';
 import { onBeforeUnmount, watchEffect } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useAppToast, type AppToastSeverity } from '@/composables/useAppToast';
 
 const { toasts, remove } = useAppToast();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 

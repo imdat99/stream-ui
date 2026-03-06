@@ -6,11 +6,11 @@ import SlidersIcon from '@/components/icons/SlidersIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const toast = useAppToast();
 const confirm = useAppConfirm();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const handleDeleteAccount = () => {
     confirm.require({

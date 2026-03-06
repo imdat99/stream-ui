@@ -13,11 +13,12 @@ import { useAppToast } from '@/composables/useAppToast';
 import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
+import { getActiveI18n } from '@/i18n';
 
 const toast = useAppToast();
 const auth = useAuthStore();
-const { t, locale } = useI18n();
+const { t } = useTranslation();
 
 const { data, isLoading } = useQuery({
     key: () => ['payments-and-plans'],
@@ -93,7 +94,7 @@ const getStatusLabel = (status: string) => {
     return map[status] || status;
 };
 
-const currencyFormatter = computed(() => new Intl.NumberFormat(locale.value === 'vi' ? 'vi-VN' : 'en-US', {
+const currencyFormatter = computed(() => new Intl.NumberFormat(getActiveI18n()?.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US', {
     style: 'currency',
     currency: 'USD',
     maximumFractionDigits: 2,
@@ -118,7 +119,7 @@ const subscribe = async (plan: ModelPlan) => {
 
         paymentHistory.value.unshift({
             id: `inv_${Date.now()}`,
-            date: new Date().toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            date: new Date().toLocaleDateString(getActiveI18n()?.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             amount: plan.price || 0,
             plan: plan.name || t('settings.billing.unknownPlan'),
             status: 'success',

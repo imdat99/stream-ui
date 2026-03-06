@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
 import RemoteUrlForm from './components/RemoteUrlForm.vue';
@@ -8,7 +8,7 @@ import UploadDropzone from './components/UploadDropzone.vue';
 
 const uiState = useUIState();
 const mode = ref<'local' | 'remote'>('local');
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const { addFiles, addRemoteUrls, pendingCount, startQueue, remainingSlots, maxItems } = useUploadQueue();
 

@@ -6,7 +6,7 @@ import { createSSRApp } from 'vue';
 import { RouterView } from 'vue-router';
 
 import I18NextVue from 'i18next-vue';
-import i18next from '@/lib/translation';
+import { createI18nForRuntime } from '@/lib/translation';
 
 import { withErrorBoundary } from './lib/hoc/withErrorBoundary';
 import createAppRouter from './routes';
@@ -32,8 +32,8 @@ export async function createApp(lng: string = 'en') {
         }
     });
     app.use(pinia);
-    await i18next.init({lng});
-    app.use(I18NextVue, {i18next});
+    const i18next = await createI18nForRuntime(lng);
+    app.use(I18NextVue, { i18next });
     app.use(PiniaColada, {
         pinia,
         plugins: [

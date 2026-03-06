@@ -80,13 +80,13 @@
 import { useAuthStore } from '@/stores/auth';
 import { useAppToast } from '@/composables/useAppToast';
 import { reactive, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { z } from 'zod';
 
 const toast = useAppToast();
 const auth = useAuthStore();
 const showPassword = ref(false);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const form = reactive({
     email: '',

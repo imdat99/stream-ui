@@ -5,7 +5,7 @@ import { deleteMockVideo, fetchMockVideoById, updateMockVideo } from '@/mocks/vi
 import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useRoute, useRouter } from 'vue-router';
 import VideoEditForm from './components/Detail/VideoEditForm.vue';
 import VideoHeader from './components/Detail/VideoInfoHeader.vue';
@@ -16,7 +16,7 @@ const route = useRoute();
 const router = useRouter();
 const toast = useAppToast();
 const confirm = useAppConfirm();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const videoId = route.params.id as string;
 const video = ref<ModelVideo | null>(null);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import Chart from '@/components/icons/Chart.vue';
 import Credit from '@/components/icons/Credit.vue';
 import Upload from '@/components/icons/Upload.vue';
@@ -17,7 +17,7 @@ defineProps<Props>();
 
 const uiState = useUIState();
 const router = useRouter();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const quickActions = computed(() => [
     {

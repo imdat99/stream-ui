@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import AlertTriangleIcon from '@/components/icons/AlertTriangleIcon.vue';
@@ -32,7 +32,7 @@ const emit = defineEmits<{
     delete: [id: string];
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const iconComponent = computed(() => {
     const icons: Record<string, any> = {

@@ -8,10 +8,10 @@ import SendIcon from '@/components/icons/SendIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const toast = useAppToast();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const notificationSettings = ref({
     email: true,

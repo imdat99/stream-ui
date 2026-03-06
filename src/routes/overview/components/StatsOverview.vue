@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import { formatBytes } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 defineProps<Props>();
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>
 
 <template>

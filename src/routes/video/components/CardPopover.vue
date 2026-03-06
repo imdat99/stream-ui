@@ -45,7 +45,7 @@ import EllipsisVerticalIcon from '@/components/icons/EllipsisVerticalIcon.vue';
 import type { ModelVideo } from '@/api/client';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, nextTick, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import type { RouteLocationRaw } from 'vue-router';
 
 const props = defineProps<{
@@ -61,7 +61,7 @@ const isOpen = ref(false);
 const containerRef = ref<HTMLElement>();
 const menuRef = ref<HTMLElement>();
 const menuStyle = ref<Record<string, string>>({});
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const videoUrl = computed(() => {
     return `${window.location.origin}/videos/${props.video.id}`;

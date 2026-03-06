@@ -2,7 +2,7 @@
 import FileUploadType from '@/components/icons/FileUploadType.vue';
 import type { QueueItem } from '@/composables/useUploadQueue';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     item: QueueItem;
@@ -13,7 +13,7 @@ const emit = defineEmits<{
     cancel: [id: string];
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const statusLabel = computed(() => {
     switch (props.item.status) {

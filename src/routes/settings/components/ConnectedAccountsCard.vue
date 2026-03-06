@@ -6,7 +6,7 @@ import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
 import XIcon from '@/components/icons/XIcon.vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     dialogVisible: boolean;
@@ -31,7 +31,7 @@ const emit = defineEmits<{
     (e: 'disconnect-telegram'): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const handleChangePassword = () => {
     emit('change-password');

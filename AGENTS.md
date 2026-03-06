@@ -1,7 +1,7 @@
 # AGENTS.md
 
 This file provides guidance for AI coding agents working with the Holistream codebase.
-
+hallo
 ## Project Overview
 
 **Holistream** is a Vue 3 streaming application with Server-Side Rendering (SSR) deployed on Cloudflare Workers. It provides video upload, management, and streaming capabilities for content creators.

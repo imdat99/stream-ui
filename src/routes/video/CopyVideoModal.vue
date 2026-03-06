@@ -3,7 +3,7 @@ import type { ModelVideo } from '@/api/client';
 import { fetchMockVideoById } from '@/mocks/videos';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     videoId: string;
@@ -17,7 +17,7 @@ const toast = useAppToast();
 const video = ref<ModelVideo | null>(null);
 const loading = ref(true);
 const copiedField = ref<string | null>(null);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const fetchVideo = async () => {
     loading.value = true;

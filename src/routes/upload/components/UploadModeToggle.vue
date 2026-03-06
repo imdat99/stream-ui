@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     modelValue: 'local' | 'remote';
@@ -11,7 +11,7 @@ const emit = defineEmits<{
     'update:modelValue': [value: 'local' | 'remote'];
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const modeList = computed<{ id: 'local' | 'remote'; label: string; icon: string }[]>(() => [
     {

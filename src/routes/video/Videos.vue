@@ -4,7 +4,7 @@ import EmptyState from '@/components/dashboard/EmptyState.vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { fetchMockVideos } from '@/mocks/videos';
 import { createStaticVNode, computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useRouter } from 'vue-router';
 
 import { useUploadQueue } from '@/composables/useUploadQueue';
@@ -23,7 +23,7 @@ const uiState = useUIState();
 const { addFiles, startQueue } = useUploadQueue();
 const toast = useAppToast();
 const router = useRouter();
-const { t } = useI18n();
+const { t } = useTranslation();
 const videos = ref<ModelVideo[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);

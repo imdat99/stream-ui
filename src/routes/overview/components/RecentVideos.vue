@@ -2,7 +2,7 @@
 import { ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import { formatDate, formatDuration } from '@/lib/utils';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useRouter } from 'vue-router';
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 defineProps<Props>();
 
 const router = useRouter();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const getStatusClass = (status?: string) => {
     switch (status?.toLowerCase()) {

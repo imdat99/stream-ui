@@ -2,7 +2,7 @@
 import XIcon from '@/components/icons/XIcon.vue';
 import { cn } from '@/lib/utils';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 // Ensure client-side only rendering to avoid hydration mismatch
 const isMounted = ref(false);
@@ -26,7 +26,7 @@ const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const close = () => {
   emit('update:visible', false);

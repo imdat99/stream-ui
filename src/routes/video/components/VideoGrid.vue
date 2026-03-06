@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import CardPopover from './CardPopover.vue';
 
 const props = defineProps<{
@@ -15,7 +15,7 @@ const emit = defineEmits<{
     (e: 'delete', videoId: string): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const severityClasses: Record<string, string> = {
     success: 'bg-green-100 text-green-800',

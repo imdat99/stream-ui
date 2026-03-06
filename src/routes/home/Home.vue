@@ -173,13 +173,13 @@
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'i18next-vue';
 
-const { t, tm } = useI18n();
+const { t } = useTranslation();
 
 const getFeatureList = (key: string): string[] => {
-    const localized = tm(key);
+    const localized = t(key, { returnObjects: true });
     return Array.isArray(localized) ? localized.map((item) => String(item)) : [];
 };
 

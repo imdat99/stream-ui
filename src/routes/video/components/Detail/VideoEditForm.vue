@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 defineProps<{
     title: string;
@@ -14,7 +14,7 @@ const emit = defineEmits<{
     toggleEdit: [];
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>
 
 <template>

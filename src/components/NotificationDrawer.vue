@@ -2,7 +2,7 @@
 import NotificationItem from '@/routes/notification/components/NotificationItem.vue';
 import { onClickOutside } from '@vueuse/core';
 import { computed, onMounted, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 // Ensure client-side only rendering to avoid hydration mismatch
 const isMounted = ref(false);
@@ -28,7 +28,7 @@ interface Notification {
 
 const visible = ref(false);
 const drawerRef = ref(null);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 // Mock notifications data
 const notifications = computed<Notification[]>(() => [

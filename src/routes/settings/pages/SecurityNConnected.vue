@@ -13,12 +13,12 @@ import { normalizeLocale } from '@/i18n';
 import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const auth = useAuthStore();
 const toast = useAppToast();
 const confirm = useAppConfirm();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const selectedLanguage = ref<SupportedLocale>(normalizeLocale((auth.user as any)?.language ?? (auth.user as any)?.locale));
 const languageSaving = ref(false);

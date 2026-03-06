@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 interface Props {
     loading?: boolean;
@@ -13,7 +13,7 @@ const emit = defineEmits<{
     clearAll: [];
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>
 
 <template>

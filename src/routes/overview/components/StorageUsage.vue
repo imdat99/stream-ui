@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { formatBytes } from '@/lib/utils';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 interface Props {
     loading: boolean;
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const storagePercentage = computed(() => {
     return Math.round((props.stats.storageUsed / props.stats.storageLimit) * 100);

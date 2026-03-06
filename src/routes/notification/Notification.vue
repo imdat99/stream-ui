@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import NotificationActions from './components/NotificationActions.vue';
 import NotificationList from './components/NotificationList.vue';
@@ -21,7 +21,7 @@ interface Notification {
 
 const loading = ref(false);
 const activeTab = ref('all');
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const notifications = ref<Notification[]>([
     {

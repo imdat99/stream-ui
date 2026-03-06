@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UploadQueueItem from './UploadQueueItem.vue';
 import type { QueueItem } from '@/composables/useUploadQueue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 defineProps<{
     items?: QueueItem[];
@@ -17,7 +17,7 @@ const emit = defineEmits<{
     startQueue: [];
 }>()
 
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>
 
 <template>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import AppButton from '@/components/app/AppButton.vue';
 import AppSwitch from '@/components/app/AppSwitch.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import { useAppToast } from '@/composables/useAppToast';
 
 const toast = useAppToast();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const playerSettings = ref({
     autoplay: true,

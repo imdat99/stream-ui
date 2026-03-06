@@ -51,12 +51,12 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import { reactive, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { z } from 'zod';
 
 const auth = useAuthStore();
 const showPassword = ref(false);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const form = reactive({
     name: '',

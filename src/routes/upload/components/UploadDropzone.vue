@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{ maxFiles?: number }>();
 const emit = defineEmits<{ filesSelected: [files: FileList] }>();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const isDragOver = ref(false);
 let dragCounter = 0;

@@ -3,13 +3,13 @@ import { useUploadQueue } from '@/composables/useUploadQueue';
 import UploadQueueItem from '@/routes/upload/components/UploadQueueItem.vue';
 import { useUIState } from '@/stores/uiState';
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const { items, completeCount, pendingCount, startQueue, removeItem, cancelItem, removeAll } = useUploadQueue();
 const uiState = useUIState();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const isCollapsed = ref(false);
 

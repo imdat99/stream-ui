@@ -5,7 +5,7 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import VideoIcon from '@/components/icons/VideoIcon.vue';
 import { formatBytes, formatDate, getStatusSeverity } from '@/lib/utils';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     videos: ModelVideo[];
@@ -20,7 +20,7 @@ const emit = defineEmits<{
     (e: 'copy', videoId: string): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const severityClasses: Record<string, string> = {
     success: 'bg-green-100 text-green-800',

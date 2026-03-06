@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
@@ -33,7 +33,7 @@ const emit = defineEmits<{
 const twoFactorDialogVisible = ref(false);
 const twoFactorCode = ref('');
 const twoFactorSecret = ref('JBSWY3DPEHPK3PXP');
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const handleToggle2FA = async () => {
     if (!props.twoFactorEnabled) {

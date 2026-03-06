@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     searchQuery: string;
@@ -19,7 +19,7 @@ const emit = defineEmits<{
     (e: 'search'): void;
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 const pageCount = computed(() => Math.ceil(props.total / props.limit) || 1);
 const first = computed(() => Math.min((props.page - 1) * props.limit + 1, props.total));
 const last = computed(() => Math.min(props.page * props.limit, props.total));

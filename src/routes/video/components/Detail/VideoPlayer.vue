@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 defineProps<{
     video: ModelVideo;
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 </script>
 
 <template>

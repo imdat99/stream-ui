@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModelVideo } from '@/api/client';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
     video: ModelVideo;
@@ -11,7 +11,7 @@ const emit = defineEmits<{
     copy: [text: string, label: string];
 }>();
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const handleCopy = (text: string, label: string) => {
     emit('copy', text, label);

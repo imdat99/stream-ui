@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{ maxUrls?: number }>();
 const urls = ref('');
 
 const emit = defineEmits<{ submit: [urls: string[]] }>();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const handleSubmit = () => {
     const limit = props.maxUrls ?? 5;

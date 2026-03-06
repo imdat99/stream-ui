@@ -11,11 +11,11 @@ import TrashIcon from '@/components/icons/TrashIcon.vue';
 import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 
 const toast = useAppToast();
 const confirm = useAppConfirm();
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const domains = ref([
     { id: '1', name: 'example.com', addedAt: '2024-01-15' },

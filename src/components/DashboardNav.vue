@@ -6,14 +6,14 @@ import SettingsIcon from "@/components/icons/SettingsIcon.vue";
 // import Upload from "@/components/icons/Upload.vue";
 import { cn } from "@/lib/utils";
 import { computed, createStaticVNode, ref } from "vue";
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import NotificationDrawer from "./NotificationDrawer.vue";
 
 const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
 const homeHoist = createStaticVNode(`<img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />`, 1);
 const notificationPopover = ref<InstanceType<typeof NotificationDrawer>>();
 const isNotificationOpen = ref(false);
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const handleNotificationClick = (event: Event) => {
     notificationPopover.value?.toggle(event);

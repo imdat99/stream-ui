@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useRoute } from 'vue-router';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import AppConfirmHost from '@/components/app/AppConfirmHost.vue';
@@ -80,7 +80,7 @@ import VideoPlayIcon from '@/components/icons/VideoPlayIcon.vue';
 
 const route = useRoute();
 const auth = useAuthStore();
-const { t } = useI18n();
+const { t } = useTranslation();
 // Map tab values to their paths
 const tabPaths: Record<string, string> = {
     profile: '/settings',

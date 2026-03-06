@@ -21,10 +21,10 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useTranslation } from 'i18next-vue';
 import { useHead } from '@unhead/vue';
 
-const { t } = useI18n();
+const { t } = useTranslation();
 
 const pageContent = computed(() => {
     const title = t('legal.terms.title');
