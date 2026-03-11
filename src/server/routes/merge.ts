@@ -48,6 +48,9 @@ export function registerMergeRoutes(app: Hono) {
         filename: manifest.filename,
         total_parts: manifest.total_parts,
         size: manifest.size,
+        playback_url: `/display/${manifest.id}`,
+        play_url: `/play/index/${manifest.id}`,
+        manifest_url: `/manifest/${manifest.id}`,
       });
     } catch (e: any) {
       return c.json({ error: e?.message ?? String(e) }, 500);

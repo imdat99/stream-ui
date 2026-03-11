@@ -19,10 +19,10 @@ import { computed, ref } from 'vue';
 const auth = useAuthStore();
 const toast = useAppToast();
 const confirm = useAppConfirm();
-const { t } = useTranslation();
+const { t, i18next } = useTranslation();
 
 const languageSaving = ref(false);
-const selectedLanguage = ref('en');
+const selectedLanguage = ref<string>(auth.user?.language || "en");
 const languageOptions = computed(() => supportedLocales.map((value) => ({
     value,
     label: t(`settings.securityConnected.language.options.${value}`)
@@ -282,7 +282,7 @@ const disconnectTelegram = async () => {
             </template>
         </SettingsRow>
 
-        <SettingsRow
+         <SettingsRow
             :title="t('settings.securityConnected.twoFactor.label')"
             :description="twoFactorEnabled ? t('settings.securityConnected.twoFactor.enabled') : t('settings.securityConnected.twoFactor.disabled')"
             iconBoxClass="bg-primary/10"
@@ -310,26 +310,6 @@ const disconnectTelegram = async () => {
             <template #actions>
                 <AppButton size="sm" @click="openChangePassword">
                     {{ t('settings.securityConnected.changePassword.button') }}
-                </AppButton>
-            </template>
-        </SettingsRow>
-
-        <SettingsRow
-            :title="t('settings.securityConnected.logout.label')"
-            :description="t('settings.securityConnected.logout.detail')"
-            iconBoxClass="bg-danger/10"
-            hoverClass="hover:bg-danger/5"
-        >
-            <template #icon>
-                <XCircleIcon class="w-5 h-5 text-danger" />
-            </template>
-
-            <template #actions>
-                <AppButton variant="danger" size="sm" @click="handleLogout">
-                    <template #icon>
-                        <XCircleIcon class="w-4 h-4" />
-                    </template>
-                    {{ t('settings.securityConnected.logout.button') }}
                 </AppButton>
             </template>
         </SettingsRow>
@@ -377,6 +357,26 @@ const disconnectTelegram = async () => {
                     @click="connectTelegram"
                 >
                     {{ t('settings.securityConnected.telegram.connect') }}
+                </AppButton>
+            </template>
+        </SettingsRow>
+
+        <SettingsRow
+            :title="t('settings.securityConnected.logout.label')"
+            :description="t('settings.securityConnected.logout.detail')"
+            iconBoxClass="bg-danger/10"
+            hoverClass="hover:bg-danger/5"
+        >
+            <template #icon>
+                <XCircleIcon class="w-5 h-5 text-danger" />
+            </template>
+
+            <template #actions>
+                <AppButton variant="danger" size="sm" @click="handleLogout">
+                    <template #icon>
+                        <XCircleIcon class="w-4 h-4" />
+                    </template>
+                    {{ t('settings.securityConnected.logout.button') }}
                 </AppButton>
             </template>
         </SettingsRow>

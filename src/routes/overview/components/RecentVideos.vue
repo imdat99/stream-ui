@@ -4,6 +4,7 @@ import EmptyState from '@/components/dashboard/EmptyState.vue';
 import { formatDate, formatDuration } from '@/lib/utils';
 import { useTranslation } from 'i18next-vue';
 import { useRouter } from 'vue-router';
+import { useUIState } from '@/stores/uiState';
 
 interface Props {
     loading: boolean;
@@ -13,6 +14,7 @@ interface Props {
 defineProps<Props>();
 
 const router = useRouter();
+const uiState = useUIState();
 const { t } = useTranslation();
 
 const getStatusClass = (status?: string) => {
@@ -48,7 +50,7 @@ const getStatusClass = (status?: string) => {
         <div v-else>
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold">{{ t('overview.recentVideos.title') }}</h2>
-                <router-link to="/video"
+                <router-link to="/videos"
                     class="text-sm text-primary hover:underline font-medium flex items-center gap-1">
                     {{ t('overview.recentVideos.viewAll') }}
                     <span class="i-heroicons-arrow-right w-4 h-4" />
@@ -58,7 +60,7 @@ const getStatusClass = (status?: string) => {
             <EmptyState v-if="videos.length === 0" :title="t('overview.recentVideos.emptyTitle')"
                 :description="t('overview.recentVideos.emptyDescription')"
                 imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" :actionLabel="t('overview.recentVideos.emptyAction')"
-                :onAction="() => router.push('/upload')" />
+                :onAction="() => uiState.toggleUploadDialog()" />
 
             <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">

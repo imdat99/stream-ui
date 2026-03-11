@@ -1,4 +1,3 @@
-import { cloudflare } from "@cloudflare/vite-plugin";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "node:path";
@@ -7,12 +6,13 @@ import Components from "unplugin-vue-components/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import { defineConfig } from "vite";
 import ssrPlugin from "./ssrPlugin";
+import { vitePluginSsrMiddleware } from "./vite-plugin-ssr-middleware";
 export default defineConfig((env) => {
   // console.log("env:", env, import.meta.env);
   return {
     server: {
-	host: '0.0.0.0'
-	},
+	    host: '0.0.0.0'
+	  },
     plugins: [
       unocss(),
       vue(),
@@ -29,8 +29,30 @@ export default defineConfig((env) => {
         directives: false,
       }),
       ssrPlugin(),
-      cloudflare(),
+      vitePluginSsrMiddleware({
+                entry: "/src/index.tsx",
+                preview: path.resolve("dist/server/index.js"),
+            }),
     ],
+    environments: {
+            client: {
+                build: {
+                    outDir: "dist/client",
+                    rollupOptions: {
+                        input: { index: "/src/client.ts" },
+                    },
+                },
+            },
+            server: {
+                build: {
+                    outDir: "dist/server",
+                    copyPublicDir: false,
+                    rollupOptions: {
+                        input: { index: "/src/index.tsx" },
+                    },
+                },
+            },
+        },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -41,8 +63,8 @@ export default defineConfig((env) => {
       exclude: ["vue"],
     },
 
-    ssr: {
-      noExternal: ["vue"],
-    },
+    // ssr: {
+    //   noExternal: ["vue"],
+    // },
   };
 });

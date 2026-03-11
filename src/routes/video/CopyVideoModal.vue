@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ModelVideo } from '@/api/client';
-import { fetchMockVideoById } from '@/mocks/videos';
+import { client, type ModelVideo } from '@/api/client';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
@@ -22,7 +21,8 @@ const { t } = useTranslation();
 const fetchVideo = async () => {
     loading.value = true;
     try {
-        const videoData = await fetchMockVideoById(props.videoId);
+        const response = await client.videos.videosDetail(props.videoId, { baseUrl: '/r' });
+        const videoData = (response.data as any)?.data?.video || (response.data as any)?.data;
         if (videoData) {
             video.value = videoData;
         }
@@ -44,11 +44,13 @@ const baseUrl = computed(() => typeof window !== 'undefined' ? window.location.o
 const shareLinks = computed(() => {
     if (!video.value) return [];
     const v = video.value;
+    const playbackPath = v.url || `/play/index/${v.id}`;
+    const playbackUrl = playbackPath.startsWith('http') ? playbackPath : `${baseUrl.value}${playbackPath}`;
     return [
         {
             key: 'embed',
             label: t('video.copyModal.embedPlayer'),
-            value: `${baseUrl.value}/play/index/${v.id}`,
+            value: playbackUrl,
         },
         {
             key: 'thumbnail',
@@ -58,7 +60,7 @@ const shareLinks = computed(() => {
         {
             key: 'hls',
             label: t('video.copyModal.hls'),
-            value: v.hls_path ? `${baseUrl.value}/hls/getlink/${v.id}/${v.hls_token}/${v.hls_path}` : '',
+            value: playbackUrl,
             placeholder: t('video.copyModal.hlsPlaceholder'),
             hint: t('video.copyModal.hlsHint'),
         },
@@ -129,7 +131,7 @@ watch(() => props.videoId, (newId) => {
                         <p class="text-sm font-medium text-muted-foreground">{{ link.label }}</p>
                         <div class="flex gap-2">
                             <AppInput :model-value="link.value || ''" :placeholder="link.placeholder" readonly
-                                input-class="!font-mono !text-xs" @click="($event.target as HTMLInputElement)?.select()" />
+                                input-class="!font-mono !text-xs" wrapperClass="w-full" @click="($event.target as HTMLInputElement)?.select()" />
                             <AppButton variant="secondary" :disabled="!link.value || copiedField === link.key"
                                 @click="copyToClipboard(link.value, link.key)" class="shrink-0">
                                 <!-- Copy icon -->

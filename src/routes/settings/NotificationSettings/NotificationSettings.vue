@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { client } from '@/api/client';
 import AppButton from '@/components/app/AppButton.vue';
 import AppSwitch from '@/components/app/AppSwitch.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
@@ -6,22 +7,24 @@ import CheckIcon from '@/components/icons/CheckIcon.vue';
 import MailIcon from '@/components/icons/MailIcon.vue';
 import SendIcon from '@/components/icons/SendIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
+import {
+    createNotificationSettingsDraft,
+    toNotificationPreferencesPayload,
+    useSettingsPreferencesQuery,
+} from '@/composables/useSettingsPreferencesQuery';
 import { useAppToast } from '@/composables/useAppToast';
 import SettingsRow from '@/routes/settings/components/SettingsRow.vue';
+import SettingsRowSkeleton from '@/routes/settings/components/SettingsRowSkeleton.vue';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
 
 const toast = useAppToast();
 const { t } = useTranslation();
 
-const notificationSettings = ref({
-    email: true,
-    push: true,
-    marketing: false,
-    telegram: false,
-});
+const { data: preferencesSnapshot, error, isPending, refetch } = useSettingsPreferencesQuery();
 
+const notificationSettings = ref(createNotificationSettingsDraft());
 const saving = ref(false);
 
 const notificationTypes = computed(() => [
@@ -59,10 +62,40 @@ const notificationTypes = computed(() => [
     },
 ]);
 
+const isInitialLoading = computed(() => isPending.value && !preferencesSnapshot.value);
+const isInteractionDisabled = computed(() => saving.value || isInitialLoading.value || !preferencesSnapshot.value);
+
+const refetchPreferences = () => refetch((fetchError) => {
+    throw fetchError;
+});
+
+watch(preferencesSnapshot, (snapshot) => {
+    if (!snapshot) return;
+    notificationSettings.value = createNotificationSettingsDraft(snapshot);
+}, { immediate: true });
+
+watch(error, (value, previous) => {
+    if (!value || value === previous || saving.value) return;
+
+    toast.add({
+        severity: 'error',
+        summary: t('settings.notificationSettings.toast.failedSummary'),
+        detail: (value as any)?.message || t('settings.notificationSettings.toast.failedDetail'),
+        life: 5000,
+    });
+});
+
 const handleSave = async () => {
+    if (saving.value || !preferencesSnapshot.value) return;
+
     saving.value = true;
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await client.settings.preferencesUpdate(
+            toNotificationPreferencesPayload(notificationSettings.value),
+            { baseUrl: '/r' },
+        );
+        await refetchPreferences();
+
         toast.add({
             severity: 'success',
             summary: t('settings.notificationSettings.toast.savedSummary'),
@@ -88,7 +121,7 @@ const handleSave = async () => {
         :description="t('settings.content.notifications.subtitle')"
     >
         <template #header-actions>
-            <AppButton size="sm" :loading="saving" @click="handleSave">
+            <AppButton size="sm" :loading="saving" :disabled="isInitialLoading || !preferencesSnapshot" @click="handleSave">
                 <template #icon>
                     <CheckIcon class="w-4 h-4" />
                 </template>
@@ -96,20 +129,29 @@ const handleSave = async () => {
             </AppButton>
         </template>
 
-        <SettingsRow
-            v-for="type in notificationTypes"
-            :key="type.key"
-            :title="type.title"
-            :description="type.description"
-            :iconBoxClass="type.bgColor"
-        >
-            <template #icon>
-                <component :is="type.icon" :class="[type.iconColor, 'w-5 h-5']" />
-            </template>
+        <template v-if="isInitialLoading">
+            <SettingsRowSkeleton
+                v-for="type in notificationTypes"
+                :key="type.key"
+            />
+        </template>
 
-            <template #actions>
-                <AppSwitch v-model="notificationSettings[type.key]" />
-            </template>
-        </SettingsRow>
+        <template v-else>
+            <SettingsRow
+                v-for="type in notificationTypes"
+                :key="type.key"
+                :title="type.title"
+                :description="type.description"
+                :iconBoxClass="type.bgColor"
+            >
+                <template #icon>
+                    <component :is="type.icon" :class="[type.iconColor, 'w-5 h-5']" />
+                </template>
+
+                <template #actions>
+                    <AppSwitch v-model="notificationSettings[type.key]" :disabled="isInteractionDisabled" />
+                </template>
+            </SettingsRow>
+        </template>
     </SettingsSectionCard>
 </template>

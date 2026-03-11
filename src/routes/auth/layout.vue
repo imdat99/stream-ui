@@ -45,6 +45,11 @@ const content = computed(() => ({
         title: t('auth.layout.forgot.title'),
         subtitle: t('auth.layout.forgot.subtitle'),
         headTitle: t('auth.layout.forgot.headTitle')
+    },
+    'google-auth-finalize': {
+        title: 'Google sign in',
+        subtitle: 'Completing your Google sign in.',
+        headTitle: 'Google sign in - Holistream'
     }
 }));
 </script>

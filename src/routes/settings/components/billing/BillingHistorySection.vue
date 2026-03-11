@@ -8,12 +8,17 @@ type PaymentHistoryItem = {
     plan: string;
     status: string;
     invoiceId: string;
+    currency: string;
+    kind: string;
+    details?: string[];
 };
 
 defineProps<{
     title: string;
     description: string;
     items: PaymentHistoryItem[];
+    loading?: boolean;
+    downloadingId?: string | null;
     formatMoney: (amount: number) => string;
     getStatusStyles: (status: string) => string;
     getStatusLabel: (status: string) => string;
@@ -52,42 +57,58 @@ const emit = defineEmits<{
                 <div class="col-span-2 text-right">{{ invoiceLabel }}</div>
             </div>
 
-            <div v-if="items.length === 0" class="text-center py-12 text-foreground/60">
+            <div v-if="loading" class="px-4 py-6 space-y-3">
+                <div v-for="index in 3" :key="index" class="grid grid-cols-12 gap-4 items-center animate-pulse">
+                    <div class="col-span-3 h-4 rounded bg-muted/50" />
+                    <div class="col-span-2 h-4 rounded bg-muted/50" />
+                    <div class="col-span-3 h-4 rounded bg-muted/50" />
+                    <div class="col-span-2 h-6 rounded bg-muted/50" />
+                    <div class="col-span-2 h-8 rounded bg-muted/50" />
+                </div>
+            </div>
+
+            <div v-else-if="items.length === 0" class="text-center py-12 text-foreground/60">
                 <div class="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
                     <DownloadIcon class="w-8 h-8 text-foreground/40" />
                 </div>
                 <p>{{ emptyLabel }}</p>
             </div>
 
-            <div
-                v-for="item in items"
-                :key="item.id"
-                class="grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-muted/30 transition-all border-t border-border"
-            >
-                <div class="col-span-3">
-                    <p class="text-sm font-medium text-foreground">{{ item.date }}</p>
+            <template v-else>
+                <div
+                    v-for="item in items"
+                    :key="item.id"
+                    class="grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-muted/30 transition-all border-t border-border"
+                >
+                    <div class="col-span-3">
+                        <p class="text-sm font-medium text-foreground">{{ item.date }}</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-sm text-foreground">{{ formatMoney(item.amount) }}</p>
+                    </div>
+                    <div class="col-span-3">
+                        <p class="text-sm text-foreground">{{ item.plan }}</p>
+                        <p v-if="item.details?.length" class="mt-1 text-xs text-foreground/60">
+                            {{ item.details.join(' · ') }}
+                        </p>
+                    </div>
+                    <div class="col-span-2">
+                        <span :class="`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(item.status)}`">
+                            {{ getStatusLabel(item.status) }}
+                        </span>
+                    </div>
+                    <div class="col-span-2 flex justify-end">
+                        <button
+                            class="flex items-center gap-2 px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground hover:bg-muted/50 rounded-md transition-all disabled:opacity-60 disabled:cursor-wait"
+                            :disabled="downloadingId === item.id"
+                            @click="emit('download', item)"
+                        >
+                            <DownloadIcon class="w-4 h-4" />
+                            <span>{{ downloadingId === item.id ? '...' : downloadLabel }}</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="col-span-2">
-                    <p class="text-sm text-foreground">{{ formatMoney(item.amount) }}</p>
-                </div>
-                <div class="col-span-3">
-                    <p class="text-sm text-foreground">{{ item.plan }}</p>
-                </div>
-                <div class="col-span-2">
-                    <span :class="`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(item.status)}`">
-                        {{ getStatusLabel(item.status) }}
-                    </span>
-                </div>
-                <div class="col-span-2 flex justify-end">
-                    <button
-                        class="flex items-center gap-2 px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground hover:bg-muted/50 rounded-md transition-all"
-                        @click="emit('download', item)"
-                    >
-                        <DownloadIcon class="w-4 h-4" />
-                        <span>{{ downloadLabel }}</span>
-                    </button>
-                </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>

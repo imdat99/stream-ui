@@ -30,7 +30,7 @@ const quickActions = computed(() => [
         title: t('overview.quickActions.videoLibrary.title'),
         description: t('overview.quickActions.videoLibrary.description'),
         icon: Video,
-        onClick: () => router.push('/video')
+        onClick: () => router.push('/videos')
     },
     {
         title: t('overview.quickActions.analytics.title'),
@@ -42,7 +42,7 @@ const quickActions = computed(() => [
         title: t('overview.quickActions.managePlan.title'),
         description: t('overview.quickActions.managePlan.description'),
         icon: Credit,
-        onClick: () => router.push('/payments-and-plans')
+        onClick: () => router.push('/settings/billing')
     },
 ]);
 </script>

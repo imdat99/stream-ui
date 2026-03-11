@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ModelVideo } from '@/api/client';
-import { fetchMockVideoById, updateMockVideo } from '@/mocks/videos';
+import { client, type ManualAdTemplate, type ModelVideo } from '@/api/client';
 import { useAppToast } from '@/composables/useAppToast';
-import { ref, watch } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
@@ -14,17 +14,35 @@ const emit = defineEmits<{
 }>();
 
 const toast = useAppToast();
+const auth = useAuthStore();
 const video = ref<ModelVideo | null>(null);
 const loading = ref(true);
 const saving = ref(false);
 const { t } = useTranslation();
 
+type AdConfigPayload = {
+    ad_template_id: string;
+    template_name?: string;
+    vast_tag_url?: string;
+    ad_format?: string;
+    duration?: number;
+};
+
 const form = ref({
     title: '',
-    description: '',
+    adTemplateId: '' as string,
 });
 
-const errors = ref<{ title?: string; description?: string }>({});
+const currentAdConfig = ref<AdConfigPayload | null>(null);
+const adTemplates = ref<ManualAdTemplate[]>([]);
+const loadingTemplates = ref(false);
+
+const errors = ref<{ title?: string }>({});
+const isFreePlan = computed(() => !auth.user?.plan_id);
+
+const activeTemplates = computed(() =>
+    adTemplates.value.filter(t => t.is_active),
+);
 
 const subtitleForm = ref({
     file: null as File | null,
@@ -32,15 +50,33 @@ const subtitleForm = ref({
     displayName: '',
 });
 
+const fetchAdTemplates = async () => {
+    loadingTemplates.value = true;
+    try {
+        const response = await client.adTemplates.adTemplatesList({ baseUrl: '/r' });
+        const items = ((response.data as any)?.data?.templates || []) as ManualAdTemplate[];
+        adTemplates.value = items;
+    } catch (error) {
+        console.error('Failed to fetch ad templates:', error);
+    } finally {
+        loadingTemplates.value = false;
+    }
+};
+
 const fetchVideo = async () => {
     loading.value = true;
     try {
-        const videoData = await fetchMockVideoById(props.videoId);
+        const response = await client.videos.videosDetail(props.videoId, { baseUrl: '/r' });
+        const data = (response.data as any)?.data;
+        const videoData = data?.video || data;
+        const adConfig = data?.ad_config as AdConfigPayload | undefined;
+
         if (videoData) {
             video.value = videoData;
+            currentAdConfig.value = adConfig || null;
             form.value = {
                 title: videoData.title || '',
-                description: videoData.description || '',
+                adTemplateId: adConfig?.ad_template_id || '',
             };
         }
     } catch (error) {
@@ -68,11 +104,27 @@ const onFormSubmit = async () => {
     if (!validate()) return;
     saving.value = true;
     try {
-        await updateMockVideo(props.videoId, form.value);
+        const payload: Record<string, any> = {
+            title: form.value.title,
+        };
 
-        if (video.value) {
-            video.value.title = form.value.title;
-            video.value.description = form.value.description;
+        if (!isFreePlan.value) {
+            payload.ad_template_id = form.value.adTemplateId || '';
+        }
+
+        const response = await client.videos.videosUpdate(props.videoId, payload as any, { baseUrl: '/r' });
+
+        const data = (response.data as any)?.data;
+        const updatedVideo = data?.video as ModelVideo | undefined;
+        const updatedAdConfig = data?.ad_config as AdConfigPayload | undefined;
+
+        if (updatedVideo) {
+            video.value = updatedVideo;
+            currentAdConfig.value = updatedAdConfig || null;
+            form.value = {
+                title: updatedVideo.title || '',
+                adTemplateId: updatedAdConfig?.ad_template_id || '',
+            };
         }
 
         toast.add({
@@ -118,13 +170,14 @@ watch(() => props.videoId, (newId) => {
     if (newId) {
         errors.value = {};
         fetchVideo();
+        fetchAdTemplates();
     }
 }, { immediate: true });
 </script>
 
 <template>
     <AppDialog :visible="!!videoId" @update:visible="emit('close')" max-width-class="max-w-xl"
-        :title="loading ? '' : t('video.detailModal.title')">
+        :title="loading ? '' : $t('video.detailModal.title')">
 
         <!-- Loading Skeleton -->
         <div v-if="loading" class="flex flex-col gap-4">
@@ -133,10 +186,10 @@ watch(() => props.videoId, (newId) => {
                 <div class="w-12 h-3.5 bg-gray-200 rounded animate-pulse" />
                 <div class="w-full h-10 bg-gray-200 rounded-md animate-pulse" />
             </div>
-            <!-- Description skeleton -->
+            <!-- ad-template selector skeleton -->
             <div class="flex flex-col gap-2">
-                <div class="w-20 h-3.5 bg-gray-200 rounded animate-pulse" />
-                <div class="w-full h-24 bg-gray-200 rounded-md animate-pulse" />
+                <div class="w-24 h-3.5 bg-gray-200 rounded animate-pulse" />
+                <div class="w-full h-10 bg-gray-200 rounded-md animate-pulse" />
             </div>
             <!-- Subtitles section skeleton -->
             <div class="flex flex-col gap-3 border-t border-gray-200 pt-4">
@@ -171,27 +224,47 @@ watch(() => props.videoId, (newId) => {
                 <p v-if="errors.title" class="text-xs text-red-500 mt-0.5">{{ errors.title }}</p>
             </div>
 
-            <!-- Description -->
+            <!-- Ad Template Selector -->
             <div class="flex flex-col gap-1">
-                <label for="edit-description" class="text-sm font-medium">{{ t('video.detailModal.descriptionLabel') }}</label>
-                <textarea id="edit-description" v-model="form.description" :placeholder="t('video.detailModal.descriptionPlaceholder')"
-                    rows="4"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-y" />
-                <p v-if="errors.description" class="text-xs text-red-500 mt-0.5">{{ errors.description }}</p>
+                <label for="edit-ad-template" class="text-sm font-medium">{{ t('video.detailModal.adTemplateLabel') }}</label>
+                <select
+                    id="edit-ad-template"
+                    v-model="form.adTemplateId"
+                    :disabled="isFreePlan || saving"
+                    class="w-full px-3 py-2 border rounded-lg text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    :class="isFreePlan
+                        ? 'border-border bg-muted/50 text-foreground/50 cursor-not-allowed'
+                        : 'border-border bg-background text-foreground cursor-pointer hover:border-primary/50'"
+                >
+                    <option value="">{{ t('video.detailModal.adTemplateNone') }}</option>
+                    <option
+                        v-for="tmpl in activeTemplates"
+                        :key="tmpl.id"
+                        :value="tmpl.id"
+                    >
+                        {{ tmpl.name }}{{ tmpl.is_default ? ` (${t('video.detailModal.adTemplateDefault')})` : '' }}
+                    </option>
+                </select>
+                <p v-if="isFreePlan" class="text-xs text-foreground/50 mt-0.5">
+                    {{ t('video.detailModal.adTemplateUpgradeHint') }}
+                </p>
+                <p v-else-if="!form.adTemplateId" class="text-xs text-foreground/50 mt-0.5">
+                    {{ t('video.detailModal.adTemplateNoAdsHint') }}
+                </p>
             </div>
 
             <!-- Subtitles Section -->
-            <div class="flex flex-col gap-3 border-t-2 border-gray-200 pt-4">
+            <div class="flex flex-col gap-3 border-t-2 border-border pt-4">
                 <div class="flex items-center justify-between">
                     <label class="text-sm font-medium">{{ t('video.detailModal.subtitlesTitle') }}</label>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground/70">
                         {{ t('video.detailModal.subtitleTracks', { count: 0 }) }}
                     </span>
                 </div>
                 <p class="text-sm text-muted-foreground">{{ t('video.detailModal.noSubtitles') }}</p>
 
                 <!-- Upload Subtitle Form -->
-                <div class="flex flex-col gap-3 rounded-lg border border-gray-200 p-3">
+                <div class="flex flex-col gap-3 rounded-lg border border-border p-3">
                     <label class="text-sm font-medium">{{ t('video.detailModal.uploadSubtitle') }}</label>
 
                     <div class="flex flex-col gap-1">
@@ -224,7 +297,7 @@ watch(() => props.videoId, (newId) => {
             </div>
 
             <!-- Footer inside Form so submit works -->
-            <div class="flex justify-end gap-2 border-t border-gray-200 pt-4">
+            <div class="flex justify-end gap-2 border-t border-border pt-4">
                 <AppButton variant="ghost" type="button" @click="emit('close')">{{ t('video.detailModal.cancel') }}</AppButton>
                 <AppButton type="submit" :loading="saving">{{ t('video.detailModal.saveChanges') }}</AppButton>
             </div>

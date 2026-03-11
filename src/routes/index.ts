@@ -1,3 +1,4 @@
+import { useRouteLoading } from "@/composables/useRouteLoading";
 import { useAuthStore } from "@/stores/auth";
 import { headSymbol, type ReactiveHead, type ResolvableValue } from "@unhead/vue";
 import { inject } from "vue";
@@ -68,6 +69,11 @@ const routes: RouteData[] = [
             name: "forgot",
             component: () => import("./auth/forgot.vue"),
           },
+          {
+            path: "auth/google/finalize",
+            name: "google-auth-finalize",
+            component: () => import("./auth/google-finalize.vue"),
+          },
         ],
       },
       {
@@ -85,16 +91,6 @@ const routes: RouteData[] = [
               },
             },
           },
-          // {
-          //   path: "upload",
-          //   name: "upload",
-          //   component: () => import("./upload/Upload.vue"),
-          //   meta: {
-          //     head: {
-          //       title: "Upload - Holistream",
-          //     },
-          //   },
-          // },
           {
             path: "videos",
             children: [
@@ -114,16 +110,6 @@ const routes: RouteData[] = [
                   },
                 },
               },
-              // {
-              //   path: ":id",
-              //   name: "video-detail",
-              //   component: () => import("./video/DetailVideo.vue"),
-              //   meta: {
-              //     head: {
-              //       title: "Edit Video - Holistream",
-              //     },
-              //   },
-              // },
             ],
           },
           {
@@ -255,16 +241,27 @@ const createAppRouter = () => {
     },
   });
 
+      const loading = useRouteLoading()
   router.beforeEach((to, from) => {
     const auth = useAuthStore();
     const head = inject(headSymbol);
-    (head as any).push(to.meta.head || {});
+      (head as any).push(to.meta.head || {});
+      if (to.fullPath !== from.fullPath && !import.meta.env.SSR) {
+          loading.start()
+        }
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (!auth.user) {
         return { name: "login" };
       }
     }
   });
+  router.afterEach(() => {
+    loading.finish()
+  })
+
+  router.onError(() => {
+    loading.fail()
+  })
   return router;
 };
 

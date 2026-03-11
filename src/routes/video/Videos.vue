@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { type ModelVideo } from '@/api/client';
+import { client, type ModelVideo } from '@/api/client';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
-import { fetchMockVideos } from '@/mocks/videos';
 import { createStaticVNode, computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
 import { useRouter } from 'vue-router';
@@ -48,25 +47,18 @@ const fetchVideos = async () => {
   loading.value = true;
   error.value = null;
   try {
-    // Attempt to fetch from API
-    // const response = await client.videos.videosList({ page: page.value, limit: limit.value });
-    // const body = response.data.data
-
-    // Use mock API
-    const response = await fetchMockVideos({
+    const response = await client.videos.videosList({
       page: page.value,
       limit: limit.value,
-      searchQuery: searchQuery.value,
-      status: selectedStatus.value
-    });
+      search: searchQuery.value || undefined,
+      status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
+    } as any, { baseUrl: '/r' });
 
-    videos.value = response.data;
-    total.value = response.total;
-
+    videos.value = ((response.data as any)?.data?.videos ?? []) as ModelVideo[];
+    total.value = (response.data as any)?.data?.total ?? 0;
   } catch (err: any) {
     console.error(err);
-    // Fallback to empty on error
-    console.log('Using mock data due to API error');
+    error.value = err?.response?.data?.message || err?.message || t('video.page.retry');
     videos.value = [];
     total.value = 0;
   } finally {
@@ -84,11 +76,6 @@ const handleFilter = () => {
   fetchVideos();
 };
 
-const handlePageChange = (newPage: number) => {
-  page.value = newPage;
-  fetchVideos();
-};
-
 // Selection Logic
 const selectedVideos = ref<ModelVideo[]>([]);
 
@@ -96,13 +83,22 @@ const deleteSelectedVideos = async () => {
   if (!selectedVideos.value.length || !confirm(t('video.page.deleteSelectedConfirm', { count: selectedVideos.value.length }))) return;
 
   try {
-    // Mock delete
-    const idsToDelete = selectedVideos.value.map(v => v.id);
-    videos.value = videos.value.filter(v => v.id && !idsToDelete.includes(v.id));
+    await Promise.all(
+      selectedVideos.value
+        .map(v => v.id)
+        .filter((id): id is string => Boolean(id))
+        .map(id => client.videos.videosDelete(id, { baseUrl: '/r' }))
+    );
     selectedVideos.value = [];
-    // In real app: await client.videos.bulkDelete(...) or loop
+    await fetchVideos();
   } catch (err) {
     console.error('Failed to delete videos', err);
+    toast.add({
+      severity: 'error',
+      summary: t('video.detailPage.toast.deleteErrorSummary'),
+      detail: t('video.detailPage.toast.deleteErrorDetail'),
+      life: 3000,
+    });
   }
 };
 
@@ -110,11 +106,17 @@ const deleteVideo = async (videoId?: string) => {
   if (!videoId || !confirm(t('video.page.deleteSingleConfirm'))) return;
 
   try {
-    videos.value = videos.value.filter(v => v.id !== videoId);
-    // If deleted video was in selection, remove it
+    await client.videos.videosDelete(videoId, { baseUrl: '/r' });
     selectedVideos.value = selectedVideos.value.filter(v => v.id !== videoId);
+    await fetchVideos();
   } catch (err) {
     console.error('Failed to delete video:', err);
+    toast.add({
+      severity: 'error',
+      summary: t('video.detailPage.toast.deleteErrorSummary'),
+      detail: t('video.detailPage.toast.deleteErrorDetail'),
+      life: 3000,
+    });
   }
 };
 
@@ -130,11 +132,11 @@ watch(() => uiState.uploadDialogVisible, (visible) => {
   }
 });
 
-watch([searchQuery, selectedStatus, limit, page], () => {
+watch([selectedStatus, limit, page], () => {
   fetchVideos();
 });
 const editVideo = (videoId?: string) => {
-  detailVideoId.value = videoId || '';
+  detailVideoId.value = videoId || "";
 };
 
 const copyVideo = (videoId?: string) => {
@@ -257,7 +259,7 @@ onUnmounted(() => {
       <EmptyState v-else-if="videos.length === 0 && !loading" :title="t('video.page.emptyTitle')"
         :description="t('video.page.emptyDescription')"
         imageUrl="https://cdn-icons-png.flaticon.com/512/7486/7486747.png" :actionLabel="t('video.page.emptyAction')"
-        :onAction="() => router.push('/upload')" />
+        :onAction="() => uiState.toggleUploadDialog()" />
       <!-- Grid View -->
       <!-- <VideoGrid :videos="videos" :loading="loading" v-model:selectedVideos="selectedVideos" @delete="deleteVideo" v-else-if="viewMode === 'grid'" /> -->
 

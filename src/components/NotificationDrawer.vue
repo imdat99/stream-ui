@@ -1,130 +1,51 @@
 <script setup lang="ts">
 import NotificationItem from '@/routes/notification/components/NotificationItem.vue';
+import { useNotifications } from '@/composables/useNotifications';
 import { onClickOutside } from '@vueuse/core';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
 
-// Ensure client-side only rendering to avoid hydration mismatch
 const isMounted = ref(false);
 onMounted(() => {
     isMounted.value = true;
+    void notificationStore.fetchNotifications();
 });
 
-// Emit event when visibility changes
 const emit = defineEmits(['change']);
-
-type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'video' | 'payment' | 'system';
-
-interface Notification {
-    id: string;
-    type: NotificationType;
-    title: string;
-    message: string;
-    time: string;
-    read: boolean;
-    actionUrl?: string;
-    actionLabel?: string;
-}
-
 const visible = ref(false);
 const drawerRef = ref(null);
 const { t } = useTranslation();
+const notificationStore = useNotifications();
 
-// Mock notifications data
-const notifications = computed<Notification[]>(() => [
-    {
-        id: '1',
-        type: 'video',
-        title: t('notification.mocks.videoProcessed.title'),
-        message: t('notification.mocks.videoProcessed.message'),
-        time: t('notification.time.minutesAgo', { count: 2 }),
-        read: false,
-        actionUrl: '/video',
-        actionLabel: t('notification.actions.viewVideo')
-    },
-    {
-        id: '2',
-        type: 'payment',
-        title: t('notification.mocks.paymentSuccess.title'),
-        message: t('notification.mocks.paymentSuccess.message'),
-        time: t('notification.time.hoursAgo', { count: 1 }),
-        read: false,
-        actionUrl: '/payments-and-plans',
-        actionLabel: t('notification.actions.viewReceipt')
-    },
-    {
-        id: '3',
-        type: 'warning',
-        title: t('notification.mocks.storageWarning.title'),
-        message: t('notification.mocks.storageWarning.message'),
-        time: t('notification.time.hoursAgo', { count: 3 }),
-        read: false,
-        actionUrl: '/payments-and-plans',
-        actionLabel: t('notification.actions.upgradePlan')
-    },
-    {
-        id: '4',
-        type: 'success',
-        title: t('notification.mocks.uploadSuccess.title'),
-        message: t('notification.mocks.uploadSuccess.message'),
-        time: t('notification.time.daysAgo', { count: 1 }),
-        read: true
-    }
-]);
-
-const mutableNotifications = ref<Notification[]>([]);
-
-watch(notifications, (value) => {
-    mutableNotifications.value = value.map(item => ({ ...item }));
-}, { immediate: true });
-
-const unreadCount = computed(() => mutableNotifications.value.filter(n => !n.read).length);
+const unreadCount = computed(() => notificationStore.unreadCount.value);
+const mutableNotifications = computed(() => notificationStore.notifications.value.slice(0, 8));
 
 const toggle = (event?: Event) => {
     console.log(event);
-    // Prevent event propagation to avoid immediate closure by onClickOutside
-    if (event) {
-        // We don't stop propagation here to let other listeners work, 
-        // but we might need to ignore the trigger element in onClickOutside
-        // However, since the trigger is outside this component, simple toggle logic works 
-        // if we use a small delay or ignore ref. 
-        // Best approach: "toggle" usually comes from a button click.
-    }
     visible.value = !visible.value;
-    console.log(visible.value);
+    if (visible.value && !notificationStore.loaded.value) {
+        void notificationStore.fetchNotifications();
+    }
 };
 
-// Handle click outside
-onClickOutside(drawerRef, (event) => {
-    // We can just set visible to false. 
-    // Note: If the toggle button is clicked, it might toggle it back on immediately 
-    // if the click event propagates. 
-    // The user calls `toggle` from the parent's button click handler. 
-    // If that button is outside `drawerRef` (which it is), this will fire.
-    // To avoid conflict, we usually check if the target is the trigger.
-    // But we don't have access to the trigger ref here.
-    // A common workaround is to use `ignore` option if we had the ref, 
-    // or relying on the fact that if this fires, it sets specific state to false.
-    // If the button click then fires `toggle`, it might set it true again.
-    // Optimization: check if visible is true before closing.
+onClickOutside(drawerRef, () => {
     if (visible.value) {
         visible.value = false;
     }
 }, {
-    ignore: ['[name="Notification"]'] // Assuming the trigger button has this class or we can suggest adding a class to the trigger
+    ignore: ['[name="Notification"]']
 });
 
-const handleMarkRead = (id: string) => {
-    const notification = mutableNotifications.value.find(n => n.id === id);
-    if (notification) notification.read = true;
+const handleMarkRead = async (id: string) => {
+    await notificationStore.markRead(id);
 };
 
-const handleDelete = (id: string) => {
-    mutableNotifications.value = mutableNotifications.value.filter(n => n.id !== id);
+const handleDelete = async (id: string) => {
+    await notificationStore.deleteNotification(id);
 };
 
-const handleMarkAllRead = () => {
-    mutableNotifications.value.forEach(n => n.read = true);
+const handleMarkAllRead = async () => {
+    await notificationStore.markAllRead();
 };
 
 watch(visible, (val) => {
@@ -142,7 +63,6 @@ defineExpose({ toggle });
             leave-to-class="opacity-0 -translate-x-4">
             <div v-if="visible" ref="drawerRef"
                 class="fixed top-0 left-[80px] bottom-0 w-[380px] bg-white rounded-2xl border border-gray-300 p-3 z-50 flex flex-col shadow-lg my-3">
-                <!-- Header -->
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center gap-2">
                         <h3 class="font-semibold text-gray-900">{{ t('notification.title') }}</h3>
@@ -157,9 +77,19 @@ defineExpose({ toggle });
                     </button>
                 </div>
 
-                <!-- Notification List -->
                 <div class="flex flex-col flex-1 overflow-y-auto gap-2">
-                    <template v-if="mutableNotifications.length > 0">
+                    <template v-if="notificationStore.loading.value">
+                        <div v-for="i in 4" :key="i" class="p-4 rounded-xl border border-gray-200 animate-pulse">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-full bg-gray-200"></div>
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else-if="mutableNotifications.length > 0">
                         <div v-for="notification in mutableNotifications" :key="notification.id"
                             class="border-b border-gray-50 last:border-0">
                             <NotificationItem :notification="notification" @mark-read="handleMarkRead"
@@ -167,14 +97,12 @@ defineExpose({ toggle });
                         </div>
                     </template>
 
-                    <!-- Empty state -->
                     <div v-else class="py-12 text-center">
                         <span class="i-lucide-bell-off w-12 h-12 text-gray-300 mx-auto block mb-3"></span>
                         <p class="text-gray-500 text-sm">{{ t('notification.empty.title') }}</p>
                     </div>
                 </div>
 
-                <!-- Footer -->
                 <div v-if="mutableNotifications.length > 0" class="p-3 border-t border-gray-100 bg-gray-50/50">
                     <router-link to="/notification"
                         class="block w-full text-center text-sm text-primary font-medium hover:underline"
@@ -186,16 +114,3 @@ defineExpose({ toggle });
         </Transition>
     </Teleport>
 </template>
-
-<!-- <style>
-.notification-popover {
-    border-radius: 16px !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    overflow: hidden;
-}
-
-.notification-popover .p-popover-content {
-    padding: 0 !important;
-}
-</style> -->

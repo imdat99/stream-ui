@@ -32,10 +32,11 @@ export function clientFirstBuild(): Plugin {
         // Client build first
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (clientEnvironment) {
-          // console.log("Client First Build Plugin: Building client...", clientEnvironment.resolve);
+          // clientEnvironment.config.build.outDir = "dist/client";
+          // console.log("Client First Build Plugin: Building client...", Object.keys());
           await builder.build(clientEnvironment);
         }
-
+        // console.log("Client First Build Plugin: Client build complete.", workerEnvironments);
         // Then worker builds
         for (const workerEnv of workerEnvironments) {
           await builder.build(workerEnv);
@@ -109,23 +110,14 @@ export default function ssrPlugin(): Plugin[] {
       config.define = config.define || {};
     },
     resolveId(id, importer, options) {
-      if (!['@httpClientAdapter', '@liteMqtt'].includes(id)) return
-      switch (id) {
-        case '@httpClientAdapter':
+      if (!id.startsWith('@httpClientAdapter')) return
+      const pwd = process.cwd()
       return path.resolve(
         __dirname,
         options?.ssr
-          ? "./src/api/httpClientAdapter.server.ts"
-          : "./src/api/httpClientAdapter.client.ts"
+          ? pwd+"/src/api/httpClientAdapter.server.ts"
+          : pwd+"/src/api/httpClientAdapter.client.ts"
       );
-        case '@liteMqtt':
-      return path.resolve(
-        __dirname,
-        options?.ssr
-          ? "./src/lib/liteMqtt.server.ts"
-          : "./src/lib/liteMqtt.ts"
-      );
-      }
     },
     async configResolved(config) {
       const viteConfig = config as any;
@@ -143,7 +135,8 @@ export default function ssrPlugin(): Plugin[] {
       const clientBuild = viteConfig.environments.client.build;
       clientBuild.manifest = true;
       clientBuild.rollupOptions = clientBuild.rollupOptions || {};
-      clientBuild.rollupOptions.input = "src/client.ts";
+      // clientBuild.rollupOptions.input = "src/client.ts";
+      // clientBuild.outDir = "dist/client";
       if (!viteConfig.environments.ssr) {
           const manifestPath = path.join(clientBuild.outDir as string, '.vite/manifest.json')
           try {

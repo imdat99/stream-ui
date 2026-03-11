@@ -10,7 +10,7 @@
     "actions": "Hành động",
     "status": "Trạng thái",
     "videos": "Video",
-    "selected": "{count} mục đã chọn",
+    "selected": "{{count}} mục đã chọn",
     "copy": "Sao chép"
   },
   "app": {
@@ -211,6 +211,10 @@
         "chromecast": {
           "title": "Chromecast",
           "description": "Cho phép cast tới thiết bị Chromecast"
+        },
+        "encrytion_m3u8": {
+          "title": "Mã hóa HLS (m3u8)",
+          "description": "Bật mã hóa cho luồng HLS (Chống download trái phép, chỉ dành cho VIP)"
         }
       }
     },
@@ -240,10 +244,12 @@
         "clearDataReject": "Hủy"
       },
       "toast": {
-        "deleteAccountSummary": "Đã gửi yêu cầu xóa tài khoản",
-        "deleteAccountDetail": "Yêu cầu xóa tài khoản của bạn đã được gửi.",
+        "deleteAccountSummary": "Đã xóa tài khoản",
+        "deleteAccountDetail": "Tài khoản và dữ liệu liên quan của bạn đã bị xóa vĩnh viễn.",
         "clearDataSummary": "Đã xóa dữ liệu",
-        "clearDataDetail": "Toàn bộ dữ liệu của bạn đã bị xóa vĩnh viễn."
+        "clearDataDetail": "Toàn bộ dữ liệu của bạn đã bị xóa vĩnh viễn.",
+        "failedSummary": "Thao tác thất bại",
+        "failedDetail": "Không thể hoàn tất thao tác đã yêu cầu."
       }
     },
     "domainsDns": {
@@ -282,13 +288,18 @@
         "removedSummary": "Đã xóa tên miền",
         "removedDetail": "{domain} đã được xóa khỏi whitelist.",
         "copiedSummary": "Đã sao chép",
-        "copiedDetail": "Đã sao chép mã nhúng vào clipboard."
+        "copiedDetail": "Đã sao chép mã nhúng vào clipboard.",
+        "failedSummary": "Thao tác thất bại",
+        "failedDetail": "Không thể tải hoặc cập nhật danh sách tên miền."
       }
     },
     "adsVast": {
       "createTemplate": "Tạo mẫu",
       "infoBanner": "VAST (Video Ad Serving Template) là schema XML dùng để phân phối ad tags cho trình phát video.",
-      "createdOn": "Tạo ngày {date}",
+      "readOnlyTitle": "Cần nâng cấp gói",
+      "readOnlyMessage": "Ads & VAST ở chế độ chỉ đọc với gói free. Hãy nâng cấp gói để tạo, sửa, xóa, bật/tắt hoặc đặt mẫu mặc định.",
+      "defaultBadge": "Mặc định",
+      "createdOn": "Tạo ngày {{date}}",
       "emptyTitle": "Chưa có mẫu VAST",
       "emptySubtitle": "Tạo mẫu để bắt đầu kiếm tiền từ video",
       "formats": {
@@ -299,6 +310,10 @@
       "state": {
         "enabled": "bật",
         "disabled": "tắt"
+      },
+      "actions": {
+        "default": "Mặc định",
+        "setDefault": "Đặt mặc định"
       },
       "table": {
         "template": "Mẫu",
@@ -315,6 +330,10 @@
         "adFormat": "Định dạng quảng cáo",
         "adInterval": "Khoảng cách quảng cáo (giây)",
         "adIntervalPlaceholder": "30",
+        "defaultLabel": "Mẫu mặc định",
+        "defaultCheckbox": "Dùng mẫu này mặc định cho video mới",
+        "defaultHint": "Khi bật, video mới tạo sẽ tự động dùng mẫu đang active này.",
+        "defaultDisabledHint": "Hãy bật mẫu này trước khi đặt làm mặc định.",
         "update": "Cập nhật",
         "create": "Tạo"
       },
@@ -339,11 +358,17 @@
         "createdDetail": "Mẫu VAST đã được tạo.",
         "enabledSummary": "Đã bật mẫu",
         "disabledSummary": "Đã tắt mẫu",
+        "defaultUpdatedSummary": "Đã cập nhật mặc định",
+        "defaultUpdatedDetail": "{name} hiện là mẫu mặc định cho video mới.",
+        "upgradeRequiredSummary": "Cần nâng cấp gói",
+        "upgradeRequiredDetail": "Hãy nâng cấp gói để quản lý Ads & VAST.",
         "toggleDetail": "{name} đã được {state}.",
         "deletedSummary": "Đã xóa mẫu",
         "deletedDetail": "Mẫu VAST đã được gỡ bỏ.",
         "copiedSummary": "Đã sao chép",
-        "copiedDetail": "Đã sao chép URL vào clipboard."
+        "copiedDetail": "Đã sao chép URL vào clipboard.",
+        "failedSummary": "Thao tác thất bại",
+        "failedDetail": "Không thể tải hoặc cập nhật mẫu VAST."
       }
     },
     "profile": {
@@ -353,7 +378,7 @@
       "username": "Tên người dùng",
       "email": "Địa chỉ email",
       "storageUsage": "Dung lượng sử dụng",
-      "storageUsedOfLimit": "Đã dùng {used} trên {limit}",
+      "storageUsedOfLimit": "Đã dùng {{used}} trên {{limit}}",
       "editProfile": "Chỉnh sửa hồ sơ",
       "changePassword": "Đổi mật khẩu"
     },
@@ -373,26 +398,50 @@
     },
     "billing": {
       "walletBalance": "Số dư ví",
-      "currentBalance": "Số dư hiện tại: {balance}",
+      "currentBalance": "Số dư hiện tại: {{balance}}",
       "topUp": "Nạp tiền",
       "availablePlans": "Các gói khả dụng",
       "availablePlansHint": "Chọn gói phù hợp nhất với nhu cầu của bạn",
-      "planStorage": "{storage} dung lượng",
-      "planDuration": "{duration} thời lượng tối đa",
-      "planUploads": "{count} lượt tải / ngày",
+      "planStorage": "{{storage}} dung lượng",
+      "planDuration": "{{duration}} thời lượng tối đa",
+      "planUploads": "{{count}} lượt tải / ngày",
       "currentPlan": "Gói hiện tại",
       "processing": "Đang xử lý...",
       "upgrade": "Nâng cấp",
       "storage": "Dung lượng",
-      "storageUsedOfLimit": "Đã dùng {used} trên {limit}",
-      "monthlyUploads": "Lượt tải tháng này",
-      "uploadsUsedOfLimit": "{used} trên {limit} lượt tải",
+      "storageUsedOfLimit": "Đã dùng {{used}} trên {{limit}}",
+      "totalVideos": "Tổng video",
+      "totalVideosUsedOfLimit": "{{used}} trên {{limit}} video",
       "paymentHistory": "Lịch sử thanh toán",
       "paymentHistorySubtitle": "Các khoản thanh toán và hóa đơn trước đây của bạn",
       "noPaymentHistory": "Không tìm thấy lịch sử thanh toán.",
       "download": "Tải xuống",
-      "durationMinutes": "{minutes} phút",
+      "durationMinutes": "{{minutes}} phút",
       "unknownPlan": "Không xác định",
+      "walletTopup": "Nạp tiền ví",
+      "termOption": "{{months}} tháng",
+      "paymentMethod": {
+        "wallet": "Dùng số dư ví",
+        "topup": "Nạp thêm và thanh toán"
+      },
+      "subscription": {
+        "activeTitle": "Gói đang hoạt động",
+        "activeDescription": " {{plan}} có hiệu lực đến {{date}}",
+        "expiringTitle": "Sắp hết hạn",
+        "expiringDescription": " {{plan}} sẽ hết hạn vào {{date}}",
+        "expiredTitle": "Gói đã hết hạn",
+        "expiredDescription": "Gói gần nhất của bạn đã kết thúc vào {{date}}",
+        "freeTitle": "Gói miễn phí",
+        "freeDescription": "Bạn hiện đang sử dụng gói miễn phí."
+      },
+      "history": {
+        "validUntil": "Hiệu lực đến {{date}}"
+      },
+      "cycle": {
+          "MONTHLY": "Tháng",
+          "QUARTERLY": "Quý",
+          "YEARLY": "Năm"
+      },
       "table": {
         "date": "Ngày",
         "amount": "Số tiền",
@@ -405,6 +454,31 @@
         "failed": "Thất bại",
         "pending": "Đang chờ"
       },
+      "upgradeDialog": {
+        "title": "Nâng cấp hoặc gia hạn gói",
+        "selectedPlan": "Gói đã chọn",
+        "basePrice": "Giá cơ bản mỗi tháng",
+        "perMonthBase": "Được dùng làm giá cơ sở cho kỳ hạn bạn chọn",
+        "termTitle": "Kỳ hạn thanh toán",
+        "termHint": "Chọn thời gian bạn muốn kích hoạt hoặc gia hạn gói này.",
+        "totalLabel": "Tổng tiền",
+        "walletBalanceLabel": "Số dư ví",
+        "shortfallLabel": "Còn thiếu",
+        "paymentMethodTitle": "Bạn muốn thanh toán theo cách nào?",
+        "paymentMethodHint": "Nếu ví chưa đủ, bạn có thể nạp phần thiếu và hoàn tất mua gói trong cùng một flow.",
+        "walletOptionDescription": "Thử dùng số dư ví hiện tại trước.",
+        "topupOptionDescription": "Nạp ít nhất {{shortfall}} để hoàn tất giao dịch.",
+        "walletCoveredHint": "Số dư ví hiện tại đã đủ để thanh toán gói này.",
+        "walletInsufficientHint": "Ví của bạn còn thiếu {{shortfall}}. Hãy chuyển sang phương án nạp thêm để hoàn tất giao dịch.",
+        "topupAmountLabel": "Số tiền nạp thêm",
+        "topupAmountPlaceholder": "Nhập số tiền muốn nạp",
+        "topupAmountHint": "Phần tiền nạp vượt quá {{shortfall}} sẽ được giữ lại trong ví sau khi nâng cấp.",
+        "payWithWallet": "Thanh toán bằng ví",
+        "topupAndUpgrade": "Nạp thêm và nâng cấp",
+        "choosePlan": "Chọn gói này",
+        "selecting": "Đang mở...",
+        "footerHint": "Nếu gói hiện tại vẫn còn hạn, kỳ hạn mới sẽ được cộng tiếp từ ngày hết hạn hiện tại."
+      },
       "topupDialog": {
         "title": "Nạp tiền vào ví",
         "subtitle": "Chọn số tiền hoặc nhập số tiền tùy chỉnh để nạp vào ví.",
@@ -415,17 +489,19 @@
       },
       "toast": {
         "subscriptionSuccessSummary": "Đăng ký thành công",
-        "subscriptionSuccessDetail": "Đăng ký gói {plan} thành công",
+        "subscriptionSuccessDetail": "Đã kích hoạt {{plan}} trong  {{term}}",
         "subscriptionFailedSummary": "Đăng ký thất bại",
         "subscriptionFailedDetail": "Không thể đăng ký gói",
         "topupSuccessSummary": "Nạp tiền thành công",
-        "topupSuccessDetail": "{amount} đã được cộng vào ví của bạn.",
+        "topupSuccessDetail": "{{amount}} đã được cộng vào ví của bạn.",
         "topupFailedSummary": "Nạp tiền thất bại",
         "topupFailedDetail": "Không thể xử lý nạp tiền.",
         "downloadingSummary": "Đang tải",
         "downloadingDetail": "Đang tải hóa đơn #{invoiceId}...",
         "downloadedSummary": "Đã tải xong",
-        "downloadedDetail": "Hóa đơn #{invoiceId} đã được tải thành công"
+        "downloadedDetail": "Hóa đơn #{invoiceId} đã được tải thành công",
+        "downloadFailedSummary": "Tải xuống thất bại",
+        "downloadFailedDetail": "Không thể tải hóa đơn."
       }
     },
     "securityConnected": {
@@ -561,7 +637,6 @@
       "totalVideos": "Tổng số video",
       "totalViews": "Tổng lượt xem",
       "storageUsed": "Dung lượng đã dùng",
-      "uploadsThisMonth": "Lượt tải lên tháng này",
       "trendVsLastMonth": "so với tháng trước"
     },
     "quickActions": {
@@ -608,7 +683,7 @@
     },
     "storage": {
       "title": "Sử dụng dung lượng",
-      "usedOfLimit": "Đã dùng {used} trên {limit}",
+      "usedOfLimit": "Đã dùng {{used}} trên {{limit}}",
       "breakdown": {
         "videos": "Video",
         "thumbnails": "Thumbnail & tài nguyên",
@@ -628,15 +703,15 @@
       "uploadAction": "Tải video lên",
       "uploadDropTitle": "Thả để tải lên",
       "uploadDropSubtitle": "Tệp sẽ được thêm vào hàng đợi tải lên",
-      "deleteSelectedConfirm": "Xóa {count} video?",
+      "deleteSelectedConfirm": "Xóa {{count}} video?",
       "deleteSingleConfirm": "Bạn có chắc muốn xóa video này?",
       "retry": "Thử lại",
       "emptyTitle": "Không có video",
       "emptyDescription": "Bạn chưa tải video nào. Hãy bắt đầu với video đầu tiên!",
       "emptyAction": "Tải video lên",
       "duplicateSummary": "Đã bỏ qua tệp trùng lặp",
-      "duplicateDetailOne": "{count} tệp đã có trong hàng đợi.",
-      "duplicateDetailOther": "{count} tệp đã có trong hàng đợi."
+      "duplicateDetailOne": "{{count}} tệp đã có trong hàng đợi.",
+      "duplicateDetailOther": "{{count}} tệp đã có trong hàng đợi."
     },
     "filters": {
       "searchPlaceholder": "Tìm kiếm video...",
@@ -660,7 +735,7 @@
       "delete": "Xóa"
     },
     "bulk": {
-      "selected": "{count} mục đã chọn",
+      "selected": "{{count}} mục đã chọn",
       "delete": "Xóa"
     },
     "copyModal": {
@@ -684,10 +759,13 @@
       "title": "Chỉnh sửa video",
       "titleLabel": "Tiêu đề",
       "titlePlaceholder": "Nhập tiêu đề video",
-      "descriptionLabel": "Mô tả",
-      "descriptionPlaceholder": "Nhập mô tả video",
+      "adTemplateLabel": "Mẫu quảng cáo",
+      "adTemplateNone": "Không có quảng cáo",
+      "adTemplateDefault": "Mặc định",
+      "adTemplateUpgradeHint": "Nâng cấp gói để tùy chỉnh mẫu quảng cáo cho video này.",
+      "adTemplateNoAdsHint": "Chưa chọn mẫu quảng cáo. Video này sẽ phát không có quảng cáo.",
       "subtitlesTitle": "Phụ đề",
-      "subtitleTracks": "{count} track",
+      "subtitleTracks": "{{count}} track",
       "noSubtitles": "Chưa có phụ đề",
       "uploadSubtitle": "Tải phụ đề",
       "subtitleFile": "Tệp phụ đề (VTT, SRT, ASS, SSA)",
@@ -774,8 +852,8 @@
       "payments": "Thanh toán"
     },
     "stats": {
-      "total": "{count} thông báo",
-      "unread": "{count} chưa đọc"
+      "total": "{{count}} thông báo",
+      "unread": "{{count}} chưa đọc"
     },
     "actions": {
       "markAllRead": "Đánh dấu đã đọc tất cả",
@@ -796,9 +874,9 @@
       "subtitle": "Bạn đã xem hết! Hãy quay lại sau."
     },
     "time": {
-      "minutesAgo": "{count} phút trước",
-      "hoursAgo": "{count} giờ trước",
-      "daysAgo": "{count} ngày trước"
+      "minutesAgo": "{{count}} phút trước",
+      "hoursAgo": "{{count}} giờ trước",
+      "daysAgo": "{{count}} ngày trước"
     },
     "mocks": {
       "videoProcessed": {
@@ -830,23 +908,23 @@
   "upload": {
     "dialog": {
       "title": "Tải video lên",
-      "subtitle": "Thêm tối đa {maxItems} video mỗi đợt",
+      "subtitle": "Thêm tối đa {{maxItems}} video mỗi đợt",
       "mode": {
         "local": "Tệp cục bộ",
         "remote": "URL từ xa"
       },
       "queueFullTitle": "Hàng đợi đã đầy",
-      "queueFullDescription": "Tối đa {maxItems} video mỗi đợt. Hãy bắt đầu hoặc xóa hàng đợi hiện tại trước.",
-      "slotsRemaining": "Còn {remaining} / {maxItems} vị trí",
+      "queueFullDescription": "Tối đa {{maxItems}} video mỗi đợt. Hãy bắt đầu hoặc xóa hàng đợi hiện tại trước.",
+      "slotsRemaining": "Còn {{remaining}} / {{maxItems}} vị trí",
       "formatsHint": "MP4, MOV, MKV · tối đa 10 GB mỗi tệp",
       "close": "Đóng",
-      "startUpload": "Bắt đầu tải ({count})",
+      "startUpload": "Bắt đầu tải ({{count}})",
       "duplicateFilesSummary": "Đã bỏ qua tệp trùng lặp",
-      "duplicateFilesDetailOne": "{count} tệp đã có trong hàng đợi.",
-      "duplicateFilesDetailOther": "{count} tệp đã có trong hàng đợi.",
+      "duplicateFilesDetailOne": "{{count}} tệp đã có trong hàng đợi.",
+      "duplicateFilesDetailOther": "{{count}} tệp đã có trong hàng đợi.",
       "duplicateUrlsSummary": "Đã bỏ qua URL trùng lặp",
-      "duplicateUrlsDetailOne": "{count} URL đã có trong hàng đợi.",
-      "duplicateUrlsDetailOther": "{count} URL đã có trong hàng đợi."
+      "duplicateUrlsDetailOne": "{{count}} URL đã có trong hàng đợi.",
+      "duplicateUrlsDetailOther": "{{count}} URL đã có trong hàng đợi."
     },
     "dropzone": {
       "releaseToAdd": "Thả để thêm",
@@ -869,7 +947,7 @@
       "status": {
         "pending": "Chờ tải",
         "uploading": "Đang tải lên...",
-        "uploadingThreads": "Đang tải · {threads} luồng",
+        "uploadingThreads": "Đang tải · {{threads}} luồng",
         "processing": "Đang xử lý...",
         "complete": "Hoàn tất",
         "error": "Thất bại",
@@ -882,7 +960,7 @@
     },
     "bulkActions": {
       "title": "Thiết lập nhanh",
-      "applyToPending": "Áp dụng cho {count} tệp đang chờ",
+      "applyToPending": "Áp dụng cho {{count}} tệp đang chờ",
       "selectCategory": "Chọn danh mục...",
       "category": {
         "learning": "Học tập",
@@ -895,15 +973,15 @@
     },
     "indicator": {
       "allDone": "Hoàn tất",
-      "uploading": "Đang tải lên {count} tệp...",
-      "waiting": "{count} tệp đang chờ",
-      "completeProgress": "Hoàn tất {complete} / {total}",
+      "uploading": "Đang tải lên {{count}} tệp...",
+      "waiting": "{{count}} tệp đang chờ",
+      "completeProgress": "Hoàn tất {{complete}} / {{total}}",
       "start": "Bắt đầu",
       "viewVideos": "Xem video",
       "addMoreFiles": "Thêm tệp"
     },
     "errors": {
-      "chunkUploadFailed": "Không thể tải phần {index}",
+      "chunkUploadFailed": "Không thể tải phần {{index}}",
       "mergeFailed": "Gộp tệp thất bại"
     }
   },

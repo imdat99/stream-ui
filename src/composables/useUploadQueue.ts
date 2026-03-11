@@ -1,3 +1,4 @@
+import { client, ContentType } from '@/api/client';
 import { computed, ref } from 'vue';
 
 export interface QueueItem {
@@ -12,6 +13,9 @@ export interface QueueItem {
     thumbnail?: string;
     file?: File; // Keep reference to file for local uploads
     url?: string; // Keep reference to url for remote uploads
+    playbackUrl?: string;
+    videoId?: string;
+    mergeId?: string;
     // Upload chunk tracking
     activeChunks?: number;
     uploadedUrls?: string[];
@@ -299,6 +303,25 @@ export function useUploadQueue() {
                 throw new Error(data.error || t('upload.errors.mergeFailed'));
             }
 
+            const playbackUrl = data.playback_url || data.play_url;
+            if (!playbackUrl) {
+                throw new Error('Playback URL missing after merge');
+            }
+
+            const createResponse = await client.videos.videosCreate({
+                title: item.file.name.replace(/\.[^.]+$/, ''),
+                description: '',
+                url: playbackUrl,
+                size: item.file.size,
+                duration: 0,
+                format: item.file.type || 'video/mp4',
+            }, { baseUrl: '/r' });
+
+            const createdVideo = (createResponse.data as any)?.data?.video || (createResponse.data as any)?.data;
+            item.videoId = createdVideo?.id;
+            item.mergeId = data.id;
+            item.playbackUrl = playbackUrl;
+            item.url = playbackUrl;
             item.status = 'complete';
             item.progress = 100;
             item.uploaded = item.total;

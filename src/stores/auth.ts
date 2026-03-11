@@ -1,4 +1,4 @@
-import { client, type ModelUser, type ResponseResponse } from '@/api/client';
+import { client, type AuthUserPayload, type ResponseResponse } from '@/api/client';
 import { TinyMqttClient } from '@/lib/liteMqtt';
 import { useTranslation } from 'i18next-vue';
 import { defineStore } from 'pinia';
@@ -7,18 +7,17 @@ import { useRouter } from 'vue-router';
 
 type ProfileUpdatePayload = {
     username?: string;
-    email?: string;
     language?: string;
     locale?: string;
 };
 
 type AuthResponseBody = ResponseResponse & {
-    data?: ModelUser | { user?: ModelUser };
+    data?: AuthUserPayload | { user?: AuthUserPayload };
 };
 
 const mqttBrokerUrl = 'wss://mqtt-dashboard.com:8884/mqtt';
 
-const extractUser = (body?: AuthResponseBody | null): ModelUser | null => {
+const extractUser = (body?: AuthResponseBody | null): AuthUserPayload | null => {
     const data = body?.data;
 
     if (!data) return null;
@@ -26,7 +25,7 @@ const extractUser = (body?: AuthResponseBody | null): ModelUser | null => {
         return data.user;
     }
 
-    return data as ModelUser;
+    return data as AuthUserPayload;
 };
 
 const getGoogleLoginPath = () => {
@@ -35,9 +34,9 @@ const getGoogleLoginPath = () => {
 };
 
 export const useAuthStore = defineStore('auth', () => {
-    const user = ref<ModelUser | null>(null);
+    const user = ref<AuthUserPayload | null>(null);
     const router = useRouter();
-    const { t } = useTranslation();
+    const { t, i18next } = useTranslation();
     const loading = ref(false);
     const error = ref<string | null>(null);
     const initialized = ref(false);
@@ -61,7 +60,6 @@ export const useAuthStore = defineStore('auth', () => {
 
         clearMqttClient();
         if (!userId) return;
-
         mqttClient = new TinyMqttClient(
             mqttBrokerUrl,
             [['ecos1231231', userId, '#'].join('/')],
@@ -71,21 +69,21 @@ export const useAuthStore = defineStore('auth', () => {
         );
         mqttClient.connect();
     });
+    watch(() => user.value?.language, (lng) => i18next.changeLanguage(lng))
+    async function fetchMe() {
+        const response = await client.me.getMe({ baseUrl: '/r' });
+
+        const nextUser = extractUser(response.data as AuthResponseBody);
+        user.value = nextUser;
+        i18next.changeLanguage(nextUser?.language)
+        return nextUser;
+    }
 
     async function init() {
         if (initialized.value) return;
 
         try {
-            const response = await client.request<AuthResponseBody, ResponseResponse>({
-                path: '/me',
-                method: 'GET',
-                format: 'json',
-            });
-
-            const nextUser = extractUser(response.data as AuthResponseBody);
-            if (nextUser) {
-                user.value = nextUser;
-            }
+            await fetchMe();
         } catch {
             user.value = null;
         } finally {
@@ -149,16 +147,11 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null;
 
         try {
-            const response = await client.request<AuthResponseBody, ResponseResponse>({
-                path: '/me',
-                method: 'PUT',
-                body: data,
-                format: 'json',
-            });
+            const response = await client.me.putMe(data, { baseUrl: '/r' });
             const nextUser = extractUser(response.data as AuthResponseBody);
 
             if (nextUser) {
-                user.value = { ...(user.value ?? {}), ...nextUser } as ModelUser;
+                user.value = { ...(user.value ?? {}), ...nextUser } as AuthUserPayload;
             }
 
             return true;
@@ -189,15 +182,10 @@ export const useAuthStore = defineStore('auth', () => {
         error.value = null;
 
         try {
-            await client.request<ResponseResponse, ResponseResponse>({
-                path: '/auth/change-password',
-                method: 'POST',
-                body: {
-                    current_password: currentPassword,
-                    new_password: newPassword,
-                },
-                format: 'json',
-            });
+            await client.auth.changePasswordCreate({
+                current_password: currentPassword,
+                new_password: newPassword,
+            }, { baseUrl: '/r' });
             return true;
         } catch (e: any) {
             console.error('Change password error', e);
@@ -230,6 +218,7 @@ export const useAuthStore = defineStore('auth', () => {
         error,
         initialized,
         init,
+        fetchMe,
         login,
         loginWithGoogle,
         register,

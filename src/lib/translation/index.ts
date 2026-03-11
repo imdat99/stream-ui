@@ -1,5 +1,4 @@
 import i18next from "i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
 import I18NextHttpBackend, { HttpBackendOptions } from "i18next-http-backend";
 const backendOptions: HttpBackendOptions = {
     loadPath: 'http://localhost:5173/locales/{{lng}}/{{ns}}.json',
@@ -27,7 +26,6 @@ const i18n = i18next.createInstance();
 
 i18n
   .use(I18NextHttpBackend)
-  .use(LanguageDetector)
   .init({
     lng,
     supportedLngs: ["en", "vi"],

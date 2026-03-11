@@ -1,6 +1,6 @@
-export const customFetch = (url: string, options: RequestInit) => {
-	return fetch(url, {
-		...options,
-		credentials: "include",
+export const customFetch: typeof fetch = (input, init) => {
+	return fetch(input, {
+		...init,
+		credentials: 'include',
 	});
-}
+};

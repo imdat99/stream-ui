@@ -33,7 +33,7 @@ export function registerSSRRoutes(app: Hono) {
       const appStream = renderToWebStream(vueApp, ctx);
 
       // HTML Head
-      await stream.write(`<!DOCTYPE html><html lang='${lang}'><head>`);
+      await stream.write(`<!DOCTYPE html><html lang='${auth.user?.language ?? lang}'><head>`);
       await stream.write("<base href='" + url.origin + "'/>");
 
       // SSR Head tags
@@ -63,7 +63,7 @@ export function registerSSRRoutes(app: Hono) {
       Object.assign(ctx, {
         $p: pinia.state.value,
         $colada: serializeQueryCache(queryCache),
-        $locale: lang,
+        $locale: auth.user?.language ?? lang,
       });
 
       // App data script

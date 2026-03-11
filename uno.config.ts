@@ -27,13 +27,13 @@ export default defineConfig({
   theme: {
     colors: {
       primary: {
-        DEFAULT: "#14a74b",
+        DEFAULT: "#4563ca",
         50: "#effcf3",
         100: "#dcf9e2",
         200: "#bbf0c8",
         300: "#86efac",
         400: "#4ade80",
-        500: "#14a74b",
+        500: "#4563ca",
         600: "#16a34a",
         700: "#15803d",
         800: "#166534",
@@ -176,10 +176,6 @@ export default defineConfig({
       },
       surface: {
         DEFAULT: "#fafafa",
-        light: "#f8f9fa",
-      },
-      muted: {
-        DEFAULT: "#f5f4f2",
         light: "#f8f9fa",
       },
       border: {

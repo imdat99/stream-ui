@@ -1,48 +1,42 @@
 <script setup lang="tsx">
 import { client, type ModelVideo } from '@/api/client';
+import { useUsageQuery } from '@/composables/useUsageQuery';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import NameGradient from './components/NameGradient.vue';
 import QuickActions from './components/QuickActions.vue';
 import RecentVideos from './components/RecentVideos.vue';
 import StatsOverview from './components/StatsOverview.vue';
 
-const loading = ref(true);
+const recentVideosLoading = ref(true);
 const recentVideos = ref<ModelVideo[]>([]);
+const { data: usageSnapshot, isPending: isUsagePending } = useUsageQuery();
 
-const stats = ref({
-    totalVideos: 0,
-    totalViews: 0,
-    storageUsed: 0,
+const stats = computed(() => ({
+    totalVideos: usageSnapshot.value?.totalVideos ?? 0,
+    totalViews: recentVideos.value.reduce((sum, v: any) => sum + (v.views || 0), 0),
+    storageUsed: usageSnapshot.value?.totalStorage ?? 0,
     storageLimit: 10737418240,
-    uploadsThisMonth: 0
-});
+}));
+const statsLoading = computed(() => recentVideosLoading.value || (isUsagePending.value && !usageSnapshot.value));
 
 const fetchDashboardData = async () => {
-    loading.value = true;
+    recentVideosLoading.value = true;
     try {
-        const response = await client.videos.videosList({ page: 1, limit: 5 });
+        const response = await client.videos.videosList({ page: 1, limit: 5 }, { baseUrl: '/r' });
         const body = response.data as any;
 
-        if (body.data && Array.isArray(body.data)) {
-            recentVideos.value = body.data;
-            stats.value.totalVideos = body.data.length;
-        } else if (Array.isArray(body)) {
-            recentVideos.value = body;
-            stats.value.totalVideos = body.length;
-        }
+        const videos = Array.isArray(body?.data?.videos)
+            ? body.data.videos
+            : Array.isArray(body?.videos)
+                ? body.videos
+                : [];
 
-        stats.value.totalViews = recentVideos.value.reduce((sum, v: any) => sum + (v.views || 0), 0);
-        stats.value.storageUsed = recentVideos.value.reduce((sum, v) => sum + (v.size || 0), 0);
-        stats.value.uploadsThisMonth = recentVideos.value.filter(v => {
-            const uploadDate = new Date(v.created_at || '');
-            const now = new Date();
-            return uploadDate.getMonth() === now.getMonth() && uploadDate.getFullYear() === now.getFullYear();
-        }).length;
+        recentVideos.value = videos;
     } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
     } finally {
-        loading.value = false;
+        recentVideosLoading.value = false;
     }
 };
 
@@ -57,11 +51,11 @@ onMounted(() => {
             { label: $t('pageHeader.dashboard') }
         ]" />
 
-        <StatsOverview :loading="loading" :stats="stats" />
+        <StatsOverview :loading="statsLoading" :stats="stats" />
 
-        <QuickActions :loading="loading" />
+        <QuickActions :loading="recentVideosLoading" />
 
-        <RecentVideos :loading="loading" :videos="recentVideos" />
+        <RecentVideos :loading="recentVideosLoading" :videos="recentVideos" />
 
         <!-- <StorageUsage :loading="loading" :stats="stats" /> -->
     </div>

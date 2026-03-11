@@ -10,7 +10,7 @@
     "actions": "Actions",
     "status": "Status",
     "videos": "Videos",
-    "selected": "{count} selected",
+    "selected": "{{count}} selected",
     "copy": "Copy"
   },
   "app": {
@@ -211,6 +211,10 @@
         "chromecast": {
           "title": "Chromecast",
           "description": "Allow casting to Chromecast devices"
+        },
+         "encrytion_m3u8": {
+          "title": "HLS Encryption (m3u8)",
+          "description": "Enable encryption for HLS streams (Anti-download, VIP only)"
         }
       }
     },
@@ -240,10 +244,12 @@
         "clearDataReject": "Cancel"
       },
       "toast": {
-        "deleteAccountSummary": "Account deletion requested",
-        "deleteAccountDetail": "Your account deletion request has been submitted.",
+        "deleteAccountSummary": "Account deleted",
+        "deleteAccountDetail": "Your account and associated data have been permanently deleted.",
         "clearDataSummary": "Data cleared",
-        "clearDataDetail": "All your data has been permanently deleted."
+        "clearDataDetail": "All your data has been permanently deleted.",
+        "failedSummary": "Action failed",
+        "failedDetail": "Failed to complete the requested action."
       }
     },
     "domainsDns": {
@@ -282,13 +288,18 @@
         "removedSummary": "Domain Removed",
         "removedDetail": "{domain} has been removed from your whitelist.",
         "copiedSummary": "Copied",
-        "copiedDetail": "Embed code copied to clipboard."
+        "copiedDetail": "Embed code copied to clipboard.",
+        "failedSummary": "Action failed",
+        "failedDetail": "Failed to load or update domains."
       }
     },
     "adsVast": {
       "createTemplate": "Create Template",
       "infoBanner": "VAST (Video Ad Serving Template) is an XML schema for serving ad tags to video players.",
-      "createdOn": "Created {date}",
+      "readOnlyTitle": "Upgrade required",
+      "readOnlyMessage": "Ads & VAST is read-only on the free plan. Upgrade your plan to create, edit, delete, enable, or set default templates.",
+      "defaultBadge": "Default",
+      "createdOn": "Created {{date}}",
       "emptyTitle": "No VAST templates yet",
       "emptySubtitle": "Create a template to start monetizing your videos",
       "formats": {
@@ -299,6 +310,10 @@
       "state": {
         "enabled": "enabled",
         "disabled": "disabled"
+      },
+      "actions": {
+        "default": "Default",
+        "setDefault": "Set default"
       },
       "table": {
         "template": "Template",
@@ -315,6 +330,10 @@
         "adFormat": "Ad Format",
         "adInterval": "Ad Interval (seconds)",
         "adIntervalPlaceholder": "30",
+        "defaultLabel": "Default template",
+        "defaultCheckbox": "Use this template by default for new videos",
+        "defaultHint": "When enabled, newly created videos automatically use this active template.",
+        "defaultDisabledHint": "Enable this template before setting it as default.",
         "update": "Update",
         "create": "Create"
       },
@@ -339,11 +358,17 @@
         "createdDetail": "VAST template has been created.",
         "enabledSummary": "Template Enabled",
         "disabledSummary": "Template Disabled",
+        "defaultUpdatedSummary": "Default Updated",
+        "defaultUpdatedDetail": "{name} is now the default template for new videos.",
+        "upgradeRequiredSummary": "Upgrade required",
+        "upgradeRequiredDetail": "Upgrade your plan to manage Ads & VAST.",
         "toggleDetail": "{name} has been {state}.",
         "deletedSummary": "Template Deleted",
         "deletedDetail": "VAST template has been removed.",
         "copiedSummary": "Copied",
-        "copiedDetail": "URL copied to clipboard."
+        "copiedDetail": "URL copied to clipboard.",
+        "failedSummary": "Action failed",
+        "failedDetail": "Failed to load or update VAST templates."
       }
     },
     "profile": {
@@ -353,7 +378,7 @@
       "username": "Username",
       "email": "Email Address",
       "storageUsage": "Storage Usage",
-      "storageUsedOfLimit": "{used} of {limit} used",
+      "storageUsedOfLimit": "{{used}} of {{limit}} used",
       "editProfile": "Edit Profile",
       "changePassword": "Change Password"
     },
@@ -373,26 +398,51 @@
     },
     "billing": {
       "walletBalance": "Wallet Balance",
-      "currentBalance": "Current balance: {balance}",
+      "currentBalance": "Current balance: {{balance}}",
       "topUp": "Top Up",
       "availablePlans": "Available Plans",
       "availablePlansHint": "Choose the plan that best fits your needs",
-      "planStorage": "{storage} Storage",
-      "planDuration": "{duration} Max Duration",
-      "planUploads": "{count} Uploads / day",
+      "planStorage": "{{storage}} Storage",
+      "planDuration": "{{duration}} Max Duration",
+      "planUploads": "{{count}} Uploads / day",
       "currentPlan": "Current Plan",
       "processing": "Processing...",
       "upgrade": "Upgrade",
       "storage": "Storage",
-      "storageUsedOfLimit": "{used} of {limit} used",
-      "monthlyUploads": "Monthly Uploads",
-      "uploadsUsedOfLimit": "{used} of {limit} uploads",
+      "storageUsedOfLimit": "{{used}} of {{limit}} used",
+      "totalVideos": "Total videos",
+      "totalVideosUsedOfLimit": "{{used}} of {{limit}} videos",
       "paymentHistory": "Payment History",
       "paymentHistorySubtitle": "Your past payments and invoices",
       "noPaymentHistory": "No payment history found.",
       "download": "Download",
-      "durationMinutes": "{minutes} mins",
+      "durationMinutes": "{{minutes}} mins",
       "unknownPlan": "Unknown",
+      "walletTopup": "Wallet Top-up",
+      "termOption": "{{months}} month",
+      "termOption_other": "{{months}} months",
+      "paymentMethod": {
+        "wallet": "Wallet balance",
+        "topup": "Top up and pay"
+      },
+      "subscription": {
+        "activeTitle": "Plan active",
+        "activeDescription": " {{plan}} is active until {{date}}",
+        "expiringTitle": "Expiring soon",
+        "expiringDescription": " {{plan}} expires on {{date}}",
+        "expiredTitle": "Plan expired",
+        "expiredDescription": "Your last subscription ended on {{date}}",
+        "freeTitle": "Free access",
+        "freeDescription": "You are currently using the free plan."
+      },
+      "history": {
+        "validUntil": "Valid until {{date}}"
+      },
+      "cycle": {
+          "MONTHLY": "Monthly",
+          "QUARTERLY": "Quarterly",
+          "YEARLY": "Yearly"
+      },
       "table": {
         "date": "Date",
         "amount": "Amount",
@@ -405,6 +455,31 @@
         "failed": "Failed",
         "pending": "Pending"
       },
+      "upgradeDialog": {
+        "title": "Upgrade or renew plan",
+        "selectedPlan": "Selected plan",
+        "basePrice": "Base monthly price",
+        "perMonthBase": "Used as the monthly base for the selected term",
+        "termTitle": "Billing term",
+        "termHint": "Choose how long you want to activate or extend this plan.",
+        "totalLabel": "Total",
+        "walletBalanceLabel": "Wallet balance",
+        "shortfallLabel": "Shortfall",
+        "paymentMethodTitle": "How do you want to pay?",
+        "paymentMethodHint": "If your wallet is short, you can top up the difference and complete the plan purchase in one flow.",
+        "walletOptionDescription": "Try using your current wallet balance first.",
+        "topupOptionDescription": "Top up at least {{shortfall}} to complete the purchase.",
+        "walletCoveredHint": "Your wallet balance already covers this purchase.",
+        "walletInsufficientHint": "Your wallet is short by {{shortfall}}. Switch to the top-up option to complete the purchase.",
+        "topupAmountLabel": "Top-up amount",
+        "topupAmountPlaceholder": "Enter top-up amount",
+        "topupAmountHint": "Any amount above {{shortfall}} will stay in your wallet after the upgrade.",
+        "payWithWallet": "Pay with wallet",
+        "topupAndUpgrade": "Top up and upgrade",
+        "choosePlan": "Choose plan",
+        "selecting": "Opening...",
+        "footerHint": "The new term will be added from your current expiry if your subscription is still active."
+      },
       "topupDialog": {
         "title": "Top Up Wallet",
         "subtitle": "Select an amount or enter a custom amount to add to your wallet.",
@@ -415,17 +490,19 @@
       },
       "toast": {
         "subscriptionSuccessSummary": "Subscription Successful",
-        "subscriptionSuccessDetail": "Successfully subscribed to {plan}",
+        "subscriptionSuccessDetail": "Successfully activated {{plan}} for  {{term}}",
         "subscriptionFailedSummary": "Subscription Failed",
         "subscriptionFailedDetail": "Failed to subscribe",
         "topupSuccessSummary": "Top-up Successful",
-        "topupSuccessDetail": "{amount} has been added to your wallet.",
+        "topupSuccessDetail": "{{amount}} has been added to your wallet.",
         "topupFailedSummary": "Top-up Failed",
         "topupFailedDetail": "Failed to process top-up.",
         "downloadingSummary": "Downloading",
         "downloadingDetail": "Downloading invoice #{invoiceId}...",
         "downloadedSummary": "Downloaded",
-        "downloadedDetail": "Invoice #{invoiceId} downloaded successfully"
+        "downloadedDetail": "Invoice #{invoiceId} downloaded successfully",
+        "downloadFailedSummary": "Download Failed",
+        "downloadFailedDetail": "Failed to download invoice."
       }
     },
     "securityConnected": {
@@ -561,7 +638,6 @@
       "totalVideos": "Total Videos",
       "totalViews": "Total Views",
       "storageUsed": "Storage Used",
-      "uploadsThisMonth": "Uploads This Month",
       "trendVsLastMonth": "vs last month"
     },
     "quickActions": {
@@ -608,7 +684,7 @@
     },
     "storage": {
       "title": "Storage Usage",
-      "usedOfLimit": "{used} of {limit} used",
+      "usedOfLimit": "{{used}} of {{limit}} used",
       "breakdown": {
         "videos": "Videos",
         "thumbnails": "Thumbnails & Assets",
@@ -628,19 +704,19 @@
       "uploadAction": "Upload Video",
       "uploadDropTitle": "Drop to upload",
       "uploadDropSubtitle": "Files will be added to the upload queue",
-      "deleteSelectedConfirm": "Delete {count} videos?",
+      "deleteSelectedConfirm": "Delete {{count}} videos?",
       "deleteSingleConfirm": "Are you sure you want to delete this video?",
       "retry": "Try Again",
       "emptyTitle": "No videos found",
       "emptyDescription": "You haven't uploaded any videos yet. Start by uploading your first video!",
       "emptyAction": "Upload Video",
       "duplicateSummary": "Duplicate files skipped",
-      "duplicateDetailOne": "{count} file is already in the queue.",
-      "duplicateDetailOther": "{count} files are already in the queue."
+      "duplicateDetailOne": "{{count}} file is already in the queue.",
+      "duplicateDetailOther": "{{count}} files are already in the queue."
     },
     "filters": {
       "searchPlaceholder": "Search videos...",
-      "rangeOfTotal": "{first}–{last} of {total}",
+      "rangeOfTotal": "{first}–{last} of {{total}}",
       "previousPageAria": "Previous page",
       "nextPageAria": "Next page",
       "allStatus": "All Status",
@@ -660,7 +736,7 @@
       "delete": "Delete"
     },
     "bulk": {
-      "selected": "{count} selected",
+      "selected": "{{count}} selected",
       "delete": "Delete"
     },
     "copyModal": {
@@ -684,10 +760,13 @@
       "title": "Edit video",
       "titleLabel": "Title",
       "titlePlaceholder": "Enter video title",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Enter video description",
+      "adTemplateLabel": "Ad Template",
+      "adTemplateNone": "No ads",
+      "adTemplateDefault": "Default",
+      "adTemplateUpgradeHint": "Upgrade your plan to customize ad templates for this video.",
+      "adTemplateNoAdsHint": "No ad template selected. This video will play without ads.",
       "subtitlesTitle": "Subtitles",
-      "subtitleTracks": "{count} tracks",
+      "subtitleTracks": "{{count}} tracks",
       "noSubtitles": "No subtitles uploaded yet",
       "uploadSubtitle": "Upload Subtitle",
       "subtitleFile": "Subtitle File (VTT, SRT, ASS, SSA)",
@@ -774,8 +853,8 @@
       "payments": "Payments"
     },
     "stats": {
-      "total": "{count} notifications",
-      "unread": "{count} unread"
+      "total": "{{count}} notifications",
+      "unread": "{{count}} unread"
     },
     "actions": {
       "markAllRead": "Mark all read",
@@ -796,9 +875,9 @@
       "subtitle": "You're all caught up! Check back later."
     },
     "time": {
-      "minutesAgo": "{count} minutes ago",
-      "hoursAgo": "{count} hours ago",
-      "daysAgo": "{count} days ago"
+      "minutesAgo": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hours ago",
+      "daysAgo": "{{count}} days ago"
     },
     "mocks": {
       "videoProcessed": {
@@ -830,23 +909,23 @@
   "upload": {
     "dialog": {
       "title": "Upload Videos",
-      "subtitle": "Add up to {maxItems} videos per batch",
+      "subtitle": "Add up to {{maxItems}} videos per batch",
       "mode": {
         "local": "Local",
         "remote": "Remote URL"
       },
       "queueFullTitle": "Queue is full",
-      "queueFullDescription": "Maximum {maxItems} videos per batch. Start or clear the current queue first.",
-      "slotsRemaining": "{remaining} / {maxItems} slots remaining",
+      "queueFullDescription": "Maximum {{maxItems}} videos per batch. Start or clear the current queue first.",
+      "slotsRemaining": "{{remaining}} / {{maxItems}} slots remaining",
       "formatsHint": "MP4, MOV, MKV · max 10 GB per file",
       "close": "Close",
-      "startUpload": "Start Upload ({count})",
+      "startUpload": "Start Upload ({{count}})",
       "duplicateFilesSummary": "Duplicate files skipped",
-      "duplicateFilesDetailOne": "{count} file is already in the queue.",
-      "duplicateFilesDetailOther": "{count} files are already in the queue.",
+      "duplicateFilesDetailOne": "{{count}} file is already in the queue.",
+      "duplicateFilesDetailOther": "{{count}} files are already in the queue.",
       "duplicateUrlsSummary": "Duplicate URLs skipped",
-      "duplicateUrlsDetailOne": "{count} URL is already in the queue.",
-      "duplicateUrlsDetailOther": "{count} URLs are already in the queue."
+      "duplicateUrlsDetailOne": "{{count}} URL is already in the queue.",
+      "duplicateUrlsDetailOther": "{{count}} URLs are already in the queue."
     },
     "dropzone": {
       "releaseToAdd": "Release to add",
@@ -869,7 +948,7 @@
       "status": {
         "pending": "Pending",
         "uploading": "Uploading...",
-        "uploadingThreads": "Uploading · {threads} threads",
+        "uploadingThreads": "Uploading · {{threads}} threads",
         "processing": "Processing...",
         "complete": "Done",
         "error": "Failed",
@@ -882,7 +961,7 @@
     },
     "bulkActions": {
       "title": "Quick Settings",
-      "applyToPending": "Apply to {count} pending files",
+      "applyToPending": "Apply to {{count}} pending files",
       "selectCategory": "Select category...",
       "category": {
         "learning": "Learning",
@@ -895,15 +974,15 @@
     },
     "indicator": {
       "allDone": "All done",
-      "uploading": "Uploading {count} files...",
-      "waiting": "{count} files waiting",
-      "completeProgress": "{complete} of {total} complete",
+      "uploading": "Uploading {{count}} files...",
+      "waiting": "{{count}} files waiting",
+      "completeProgress": "{{complete}} of {{total}} complete",
       "start": "Start",
       "viewVideos": "View Videos",
       "addMoreFiles": "Add more files"
     },
     "errors": {
-      "chunkUploadFailed": "Failed to upload chunk {index}",
+      "chunkUploadFailed": "Failed to upload chunk {{index}}",
       "mergeFailed": "Merge failed"
     }
   },

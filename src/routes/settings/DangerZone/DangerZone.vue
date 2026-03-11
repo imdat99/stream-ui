@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { client } from '@/api/client';
 import AppButton from '@/components/app/AppButton.vue';
 import AlertTriangleIcon from '@/components/icons/AlertTriangle.vue';
 import SlidersIcon from '@/components/icons/SlidersIcon.vue';
@@ -8,11 +9,19 @@ import { useAppToast } from '@/composables/useAppToast';
 import SettingsNotice from '@/routes/settings/components/SettingsNotice.vue';
 import SettingsRow from '@/routes/settings/components/SettingsRow.vue';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
+import { useAuthStore } from '@/stores/auth';
 import { useTranslation } from 'i18next-vue';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const auth = useAuthStore();
+const router = useRouter();
 const toast = useAppToast();
 const confirm = useAppConfirm();
 const { t } = useTranslation();
+
+const deletingAccount = ref(false);
+const clearingData = ref(false);
 
 const handleDeleteAccount = () => {
     confirm.require({
@@ -20,13 +29,30 @@ const handleDeleteAccount = () => {
         header: t('settings.dangerZone.confirm.deleteAccountHeader'),
         acceptLabel: t('settings.dangerZone.confirm.deleteAccountAccept'),
         rejectLabel: t('settings.dangerZone.confirm.deleteAccountReject'),
-        accept: () => {
-            toast.add({
-                severity: 'info',
-                summary: t('settings.dangerZone.toast.deleteAccountSummary'),
-                detail: t('settings.dangerZone.toast.deleteAccountDetail'),
-                life: 5000,
-            });
+        accept: async () => {
+            deletingAccount.value = true;
+            try {
+                await client.me.deleteMe({ baseUrl: '/r' });
+
+                auth.$reset();
+                toast.add({
+                    severity: 'success',
+                    summary: t('settings.dangerZone.toast.deleteAccountSummary'),
+                    detail: t('settings.dangerZone.toast.deleteAccountDetail'),
+                    life: 5000,
+                });
+                await router.push('/login');
+            } catch (e: any) {
+                console.error(e);
+                toast.add({
+                    severity: 'error',
+                    summary: t('settings.dangerZone.toast.failedSummary'),
+                    detail: e.message || t('settings.dangerZone.toast.failedDetail'),
+                    life: 5000,
+                });
+            } finally {
+                deletingAccount.value = false;
+            }
         },
     });
 };
@@ -37,13 +63,29 @@ const handleClearData = () => {
         header: t('settings.dangerZone.confirm.clearDataHeader'),
         acceptLabel: t('settings.dangerZone.confirm.clearDataAccept'),
         rejectLabel: t('settings.dangerZone.confirm.clearDataReject'),
-        accept: () => {
-            toast.add({
-                severity: 'info',
-                summary: t('settings.dangerZone.toast.clearDataSummary'),
-                detail: t('settings.dangerZone.toast.clearDataDetail'),
-                life: 5000,
-            });
+        accept: async () => {
+            clearingData.value = true;
+            try {
+                await client.me.clearDataCreate({ baseUrl: '/r' });
+
+                await auth.fetchMe();
+                toast.add({
+                    severity: 'success',
+                    summary: t('settings.dangerZone.toast.clearDataSummary'),
+                    detail: t('settings.dangerZone.toast.clearDataDetail'),
+                    life: 5000,
+                });
+            } catch (e: any) {
+                console.error(e);
+                toast.add({
+                    severity: 'error',
+                    summary: t('settings.dangerZone.toast.failedSummary'),
+                    detail: e.message || t('settings.dangerZone.toast.failedDetail'),
+                    life: 5000,
+                });
+            } finally {
+                clearingData.value = false;
+            }
         },
     });
 };
@@ -66,7 +108,7 @@ const handleClearData = () => {
             </template>
 
             <template #actions>
-                <AppButton variant="danger" size="sm" @click="handleDeleteAccount">
+                <AppButton variant="danger" size="sm" :loading="deletingAccount" :disabled="clearingData" @click="handleDeleteAccount">
                     <template #icon>
                         <TrashIcon class="w-4 h-4" />
                     </template>
@@ -90,7 +132,7 @@ const handleClearData = () => {
             </template>
 
             <template #actions>
-                <AppButton variant="danger" size="sm" @click="handleClearData">
+                <AppButton variant="danger" size="sm" :loading="clearingData" :disabled="deletingAccount" @click="handleClearData">
                     <template #icon>
                         <SlidersIcon class="w-4 h-4" />
                     </template>
