@@ -7,12 +7,12 @@ import { registerManifestRoutes } from './server/routes/manifest';
 import { registerMergeRoutes } from './server/routes/merge';
 import { registerSSRRoutes } from './server/routes/ssr';
 import { registerWellKnownRoutes } from './server/routes/wellKnown';
-
+import { setupServices } from './server/services/grpcClient';
 const app = new Hono();
 
 // Global middlewares
 setupMiddlewares(app);
-
+setupServices(app);
 // API proxy middleware (handles /r/*)
 app.use(apiProxyMiddleware);
 // Routes

@@ -1,17 +1,36 @@
-import { contextStorage } from 'hono/context-storage';
-import { cors } from 'hono/cors';
-import isMobile from 'is-mobile';
-import type { Hono } from 'hono';
-import { languageDetector } from 'hono/language';
+import { RedisClient } from "bun";
+import type { Hono } from "hono";
+import { contextStorage } from "hono/context-storage";
+import { cors } from "hono/cors";
+import { languageDetector } from "hono/language";
+import isMobile from "is-mobile";
+type AppFetch = (
+  input: string | Request | URL,
+  requestInit?: RequestInit
+) => Response | Promise<Response>;
+
+declare module "hono" {
+  interface ContextVariableMap {
+    fetch: AppFetch;
+    isMobile: boolean;
+    redis: RedisClient;
+  }
+}
+
+const client = new RedisClient("redis://:pass123@47.84.62.226:6379/3");
 
 export function setupMiddlewares(app: Hono) {
-  app.use('*', languageDetector({
-            supportedLanguages: ['vi', 'en'],
-            fallbackLanguage: 'en',
-            lookupCookie: 'i18next',
-            lookupFromHeaderKey: 'accept-language',
-      order: ['cookie', 'header'],
-        }) ,contextStorage());
+  app.use(
+    "*",
+    languageDetector({
+      supportedLanguages: ["vi", "en"],
+      fallbackLanguage: "en",
+      lookupCookie: "i18next",
+      lookupFromHeaderKey: "accept-language",
+      order: ["cookie", "header"],
+    }),
+    contextStorage()
+  );
 
   app.use(cors(), async (c, next) => {
     c.set("fetch", app.request.bind(app));
@@ -23,5 +42,16 @@ export function setupMiddlewares(app: Hono) {
 
     c.set("isMobile", isMobile({ ua }));
     await next();
+  });
+  app.use(async (c, next) => {
+    client
+      .connect()
+      .then(() => {
+        c.set("redis", client);
+        return next();
+      })
+      .catch((e) => {
+        console.error("Failed to connect to Redis", e);
+      });
   });
 }

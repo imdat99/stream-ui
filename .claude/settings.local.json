@@ -5,7 +5,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(bun install:*)",
       "Bash(bun preview:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(python -:*)"
     ]
   }
 }
