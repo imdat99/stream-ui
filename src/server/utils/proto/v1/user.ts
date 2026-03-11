@@ -18,9 +18,16 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { Empty } from "../google/protobuf/empty";
 import { Timestamp } from "../google/protobuf/timestamp";
 
 export const protobufPackage = "stream.User.v1";
+
+/** ─── User Messages ─────────────────────────────────────────────────────────── */
+export interface UpdateUserPasswordRequest {
+  id?: string | undefined;
+  newPassword?: string | undefined;
+}
 
 export interface GetUserRequest {
   id?: string | undefined;
@@ -127,6 +134,86 @@ export interface Preferences {
   chromecast?: boolean | undefined;
   encrytionM3u8?: boolean | undefined;
 }
+
+function createBaseUpdateUserPasswordRequest(): UpdateUserPasswordRequest {
+  return { id: "", newPassword: "" };
+}
+
+export const UpdateUserPasswordRequest: MessageFns<UpdateUserPasswordRequest> = {
+  encode(message: UpdateUserPasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.newPassword !== undefined && message.newPassword !== "") {
+      writer.uint32(18).string(message.newPassword);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateUserPasswordRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateUserPasswordRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.newPassword = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateUserPasswordRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      newPassword: isSet(object.newPassword)
+        ? globalThis.String(object.newPassword)
+        : isSet(object.new_password)
+        ? globalThis.String(object.new_password)
+        : "",
+    };
+  },
+
+  toJSON(message: UpdateUserPasswordRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.newPassword !== undefined && message.newPassword !== "") {
+      obj.newPassword = message.newPassword;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateUserPasswordRequest>, I>>(base?: I): UpdateUserPasswordRequest {
+    return UpdateUserPasswordRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateUserPasswordRequest>, I>>(object: I): UpdateUserPasswordRequest {
+    const message = createBaseUpdateUserPasswordRequest();
+    message.id = object.id ?? "";
+    message.newPassword = object.newPassword ?? "";
+    return message;
+  },
+};
 
 function createBaseGetUserRequest(): GetUserRequest {
   return { id: "" };
@@ -1849,6 +1936,16 @@ export const UserServiceService = {
     responseSerialize: (value: DeleteUserResponse): Buffer => Buffer.from(DeleteUserResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): DeleteUserResponse => DeleteUserResponse.decode(value),
   },
+  updateUserPassword: {
+    path: "/stream.User.v1.UserService/UpdateUserPassword",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdateUserPasswordRequest): Buffer =>
+      Buffer.from(UpdateUserPasswordRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdateUserPasswordRequest => UpdateUserPasswordRequest.decode(value),
+    responseSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    responseDeserialize: (value: Buffer): Empty => Empty.decode(value),
+  },
   /** Preferences */
   getPreferences: {
     path: "/stream.User.v1.UserService/GetPreferences",
@@ -1882,6 +1979,7 @@ export interface UserServiceServer extends UntypedServiceImplementation {
   createUser: handleUnaryCall<CreateUserRequest, CreateUserResponse>;
   updateUser: handleUnaryCall<UpdateUserRequest, UpdateUserResponse>;
   deleteUser: handleUnaryCall<DeleteUserRequest, DeleteUserResponse>;
+  updateUserPassword: handleUnaryCall<UpdateUserPasswordRequest, Empty>;
   /** Preferences */
   getPreferences: handleUnaryCall<GetPreferencesRequest, GetPreferencesResponse>;
   upsertPreferences: handleUnaryCall<UpsertPreferencesRequest, UpsertPreferencesResponse>;
@@ -1978,6 +2076,21 @@ export interface UserServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: DeleteUserResponse) => void,
+  ): ClientUnaryCall;
+  updateUserPassword(
+    request: UpdateUserPasswordRequest,
+    callback: (error: ServiceError | null, response: Empty) => void,
+  ): ClientUnaryCall;
+  updateUserPassword(
+    request: UpdateUserPasswordRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: Empty) => void,
+  ): ClientUnaryCall;
+  updateUserPassword(
+    request: UpdateUserPasswordRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: Empty) => void,
   ): ClientUnaryCall;
   /** Preferences */
   getPreferences(

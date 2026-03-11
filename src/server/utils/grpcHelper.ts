@@ -1,43 +1,78 @@
 import { ClientUnaryCall, ServiceError, status } from "@grpc/grpc-js";
-type UnaryCallback<TRes> = (
-  error: ServiceError | null,
-  response: TRes
-) => void;
 
-type UnaryLike<TReq, TRes> = (
-  req: TReq,
-  callback: UnaryCallback<TRes>
-) => ClientUnaryCall;
+// 1. Định nghĩa lại UnaryCallback để bắt được kiểu TRes chính xác hơn
+type UnaryCallback<TRes> = (error: ServiceError | null, response: TRes) => void;
 
-type RequestOf<T> = T extends (
-  req: infer TReq,
-  callback: UnaryCallback<any>
-) => ClientUnaryCall
-  ? TReq
-  : never;
+// 2. Ép TypeScript tìm đúng Overload có Callback
+// Chúng ta sử dụng tham số thứ 2 của hàm (index 1) để lấy TRes
+type ResponseOf<T> = T extends {
+  (req: any, callback: UnaryCallback<infer TRes>): ClientUnaryCall;
+  (req: any, metadata: any, callback: UnaryCallback<infer TRes>): ClientUnaryCall;
+  (req: any, metadata: any, options: any, callback: UnaryCallback<infer TRes>): ClientUnaryCall;
+} ? TRes : any;
 
-type ResponseOf<T> = T extends (
-  req: any,
-  callback: UnaryCallback<infer TRes>
-) => ClientUnaryCall
-  ? TRes
-  : never;
+type RequestOf<T> = T extends {
+  (req: infer TReq, callback: UnaryCallback<any>): ClientUnaryCall;
+  (req: infer TReq, metadata: any, callback: UnaryCallback<any>): ClientUnaryCall;
+} ? TReq : any;
 
-/**
- * Lấy ra overload đúng dạng (req, callback) => ClientUnaryCall
- */
-type ExtractUnaryOverload<T> = Extract<T, UnaryLike<any, any>>;
+// 3. Filter để chỉ lấy các Method thực sự là Unary
+type UnaryKeys<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => ClientUnaryCall ? K : never;
+}[keyof T];
 
 export type PromisifiedClient<TClient> = {
-  [K in keyof TClient as ExtractUnaryOverload<TClient[K]> extends never
-    ? never
-    : K]: (
-    req: RequestOf<ExtractUnaryOverload<TClient[K]>>
-  ) => Promise<ResponseOf<ExtractUnaryOverload<TClient[K]>>>;
+  [K in UnaryKeys<TClient>]: (
+    req: RequestOf<TClient[K]>
+  ) => Promise<ResponseOf<TClient[K]>>;
 };
 
+// ... Các hàm normalizeGrpcError giữ nguyên ...
 
-const grpcCodeToHttpStatus = (code?: number) => {
+export function promisifyClient<TClient extends object>(
+  client: TClient
+): PromisifiedClient<TClient> {
+  const result = {} as any;
+
+  // Thay vì quét Prototype, ta quét các key thực tế hiện có trên instance của client
+  // gRPC dynamic clients thường định nghĩa method trực tiếp hoặc qua proxy
+  const allKeys = new Set([
+    ...Object.getOwnPropertyNames(client),
+    ...Object.getOwnPropertyNames(Object.getPrototypeOf(client))
+  ]);
+
+  allKeys.forEach((key) => {
+    if (key === "constructor") return;
+
+    const originalMethod = (client as any)[key];
+    
+    // Chỉ xử lý nếu nó là function và không phải là các hàm tiện ích của gRPC (bắt đầu bằng $)
+    if (typeof originalMethod === "function" && !key.startsWith('$')) {
+      
+      result[key] = (req: any) =>
+        new Promise((resolve, reject) => {
+          // QUAN TRỌNG: Sử dụng .bind(client) hoặc .call(client, ...) 
+          // để tránh lỗi "No implementation found" do mất context 'this'
+          originalMethod.call(
+            client,
+            req,
+            (error: ServiceError | null, response: any) => {
+              if (error) {
+                reject(normalizeGrpcError(error));
+                return;
+              }
+              resolve(response);
+            }
+          );
+        });
+    }
+  });
+
+  return result;
+}
+
+
+function grpcCodeToHttpStatus (code?: number) {
   switch (code) {
     case status.INVALID_ARGUMENT:
       return 400;
@@ -51,7 +86,7 @@ const grpcCodeToHttpStatus = (code?: number) => {
       return 500;
   }
 };
-const normalizeGrpcError = (error: ServiceError) => {
+function normalizeGrpcError(error: ServiceError) {
   const normalized = new Error(error.details || error.message) as Error & {
     status?: number;
     code?: number;
@@ -77,33 +112,3 @@ const normalizeGrpcError = (error: ServiceError) => {
 
   return normalized;
 };
-export function promisifyClient<TClient extends object>(
-  client: TClient
-): PromisifiedClient<TClient> {
-  const proto = Object.getPrototypeOf(client);
-  const result: Record<string, unknown> = {};
-
-  for (const key of Object.getOwnPropertyNames(proto)) {
-    if (key === "constructor") continue;
-
-    const value = (client as Record<string, unknown>)[key];
-    if (typeof value !== "function") continue;
-
-    result[key] = (req: unknown) =>
-      new Promise((resolve, reject) => {
-        (value as Function).call(
-          client,
-          req,
-          (error: ServiceError | null, response: unknown) => {
-            if (error) {
-              reject(normalizeGrpcError(error));
-              return;
-            }
-            resolve(response);
-          }
-        );
-      });
-  }
-
-  return result as PromisifiedClient<TClient>;
-}

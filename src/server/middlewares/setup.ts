@@ -4,6 +4,7 @@ import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import isMobile from "is-mobile";
+import { JwtProvider } from "../utils/token";
 type AppFetch = (
   input: string | Request | URL,
   requestInit?: RequestInit
@@ -14,6 +15,9 @@ declare module "hono" {
     fetch: AppFetch;
     isMobile: boolean;
     redis: RedisClient;
+    jwtProvider: JwtProvider;
+    userId: string;
+    role: string;
   }
 }
 
@@ -29,7 +33,11 @@ export function setupMiddlewares(app: Hono) {
       lookupFromHeaderKey: "accept-language",
       order: ["cookie", "header"],
     }),
-    contextStorage()
+    contextStorage(),
+    async (c, next) => {
+      c.set("jwtProvider", JwtProvider.newJWTProvider("your-secret-key"));
+      await next();
+    }
   );
 
   app.use(cors(), async (c, next) => {
@@ -44,7 +52,7 @@ export function setupMiddlewares(app: Hono) {
     await next();
   });
   app.use(async (c, next) => {
-    client
+    return await client
       .connect()
       .then(() => {
         c.set("redis", client);

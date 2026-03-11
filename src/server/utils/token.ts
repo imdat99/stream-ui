@@ -9,9 +9,7 @@ export interface Provider {
     role: string
   ): Promise<TokenPair>
 
-  parseToken(token: string): Promise<JWTPayload>
-
-  parseMapToken(token: string): Promise<Record<string, any>>
+  parseToken(token: string): Promise<JwtClaims>
 }
 
 export interface TokenPair {
@@ -30,7 +28,7 @@ export interface Claims {
   tokenID: string
 }
 
-interface JwtClaims {
+export interface JwtClaims extends JWTPayload  {
   user_id: string
   email: string
   role: string
@@ -42,7 +40,7 @@ interface JwtClaims {
 export class JwtProvider implements Provider {
   constructor(private secret: string) {}
 
-  static newJWTProvider(secret: string): Provider {
+  static newJWTProvider(secret: string): JwtProvider {
     return new JwtProvider(secret)
   }
 
@@ -86,26 +84,12 @@ export class JwtProvider implements Provider {
     return td
   }
 
-  async parseToken(token: string): Promise<JWTPayload> {
-    const payload = (await verify(token, this.secret, "HS256"))
+  async parseToken(token: string): Promise<JwtClaims> {
+    const payload = await verify(token, this.secret, "HS256") as JwtClaims
 
     if (!payload) {
       throw new Error("invalid token")
     }
     return payload
   }
-
-  async parseMapToken(token: string): Promise<JWTPayload> {
-    const payload = await verify(token, this.secret, "HS256")
-
-    if (!payload) {
-      throw new Error("invalid token")
-    }
-
-    return payload
-  }
-}
-
-export function JWTProvider(secret: string): Provider {
-  return new JwtProvider(secret)
 }

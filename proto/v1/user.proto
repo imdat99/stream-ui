@@ -3,7 +3,7 @@ syntax = "proto3";
 package stream.User.v1;
 
 option go_package = "stream/proto/gen/go/User/v1;Userv1";
-
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 service UserService {
@@ -14,6 +14,7 @@ service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (google.protobuf.Empty);
 
   // Preferences
   rpc GetPreferences(GetPreferencesRequest) returns (GetPreferencesResponse);
@@ -21,7 +22,10 @@ service UserService {
 }
 
 // ─── User Messages ───────────────────────────────────────────────────────────
-
+message UpdateUserPasswordRequest {
+  string id = 1;
+  string new_password = 2;
+}
 message GetUserRequest {
   string id = 1;
 }

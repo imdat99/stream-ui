@@ -1,5 +1,7 @@
-import { client, type AuthUserPayload, type ResponseResponse } from '@/api/client';
+// import { client, type AuthUserPayload, type ResponseResponse } from '@/api/client';
+import { client } from '@/api/rpcclient';
 import { TinyMqttClient } from '@/lib/liteMqtt';
+import type { User } from '@/server/utils/proto/v1/user';
 import { useTranslation } from 'i18next-vue';
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
@@ -11,22 +13,7 @@ type ProfileUpdatePayload = {
     locale?: string;
 };
 
-type AuthResponseBody = ResponseResponse & {
-    data?: AuthUserPayload | { user?: AuthUserPayload };
-};
-
 const mqttBrokerUrl = 'wss://mqtt-dashboard.com:8884/mqtt';
-
-const extractUser = (body?: AuthResponseBody | null): AuthUserPayload | null => {
-    const data = body?.data;
-
-    if (!data) return null;
-    if (typeof data === 'object' && 'user' in data && data.user) {
-        return data.user;
-    }
-
-    return data as AuthUserPayload;
-};
 
 const getGoogleLoginPath = () => {
     const basePath = client.baseUrl.startsWith('/') ? client.baseUrl : `/${client.baseUrl}`;
@@ -71,12 +58,10 @@ export const useAuthStore = defineStore('auth', () => {
     });
     watch(() => user.value?.language, (lng) => i18next.changeLanguage(lng))
     async function fetchMe() {
-        const response = await client.me.getMe({ baseUrl: '/r' });
-
-        const nextUser = extractUser(response.data as AuthResponseBody);
-        user.value = nextUser;
-        i18next.changeLanguage(nextUser?.language)
-        return nextUser;
+        const response = await client.getMe();
+        user.value = await client.getMe();
+        i18next.changeLanguage(response?.language || 'en');
+        return response;
     }
 
     async function init() {

@@ -8,5 +8,10 @@ declare module '*.vue' {
 }
 
 declare module "@httpClientAdapter" {
-    export const customFetch: typeof fetch;
+    import { TinyRpcClientAdapter } from "@hiogawa/tiny-rpc";
+    export function httpClientAdapter(opts: {
+        url: string;
+        pathsForGET?: string[];
+        headers?: () => Promise<{ Authorization?: undefined; } | { Authorization: string; }>
+    }): TinyRpcClientAdapter;
 }

@@ -55,6 +55,6 @@ export const getUserServiceClient = () => {
 export const setupServices = (app: Hono) => {
     app.use("*", async (c, next) => {
         c.set("userServiceClient", promisifyClient(new UserServiceClient(grpcAddress(), getCredentials())));
-        await next();
+        return await next();
     });
 }

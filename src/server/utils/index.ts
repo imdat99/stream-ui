@@ -1,9 +1,10 @@
 import { RedisClient } from "bun";
+import { Context } from "hono";
 import { tryGetContext } from "hono/context-storage";
 import {
     setCookie
 } from 'hono/cookie';
-import { JWTProvider } from "./token";
+import { User } from "./proto/v1/user";
 export const redisClient = (): RedisClient => {
     const context = tryGetContext<any>();
     const redis = context?.get("redis") as RedisClient | undefined;
@@ -13,26 +14,26 @@ export const redisClient = (): RedisClient => {
     return redis;
 };
 
-export async function generateAndSetTokens(userID: string, email: string, role: string) {
-    const redis = redisClient();
-    const context = tryGetContext<any>();
-    await JWTProvider("your-secret-key").generateTokenPair(userID, email, role).then((td) => {
-        redis.set("refresh_uuid:" + td.refreshUUID, userID, "EX", td.rtExpires - Math.floor(Date.now() / 1000));
-        if (context) {
-            setCookie(context, "access_token", td.accessToken, {
+export async function generateAndSetTokens(c: Context, userData: User) {
+    const redis = c.get("redis");
+    const jwtProvider = c.get("jwtProvider");
+    return await jwtProvider.generateTokenPair(userData.id!, userData.email!, userData.role!).then((td) => {
+        redis.set("refresh_uuid:" + td.refreshUUID, userData.id!, "EX", td.rtExpires - Math.floor(Date.now() / 1000));
+            setCookie(c, "access_token", td.accessToken, {
                 expires: new Date(td.atExpires * 1000),
                 httpOnly: true,
                 secure: false,
                 path: "/",
             });
-            setCookie(context, "refresh_token", td.refreshToken, {
+            setCookie(c, "refresh_token", td.refreshToken, {
                 expires: new Date(td.rtExpires * 1000),
                 httpOnly: true,
                 secure: false,
                 path: "/",
             });
-        }
+        return td;
     }).catch((e) => {
         console.error("Error generating tokens", e);
+        throw e;
     });
 }
