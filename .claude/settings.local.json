@@ -6,7 +6,10 @@
       "Bash(bun install:*)",
       "Bash(bun preview:*)",
       "Bash(curl:*)",
-      "Bash(python -:*)"
+      "Bash(python -:*)",
+      "Bash(bun run:*)",
+      "Bash(bunx:*)",
+      "Bash(bun:*)"
     ]
   }
 }
