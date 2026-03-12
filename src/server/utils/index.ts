@@ -1,7 +1,7 @@
+import type { User } from "@/server/gen/proto/app/v1/common";
 import { Context } from "hono";
 import { tryGetContext } from "hono/context-storage";
 import { setCookie } from "hono/cookie";
-import type { User } from "@/server/gen/proto/app/v1/common";
 
 export const redisClient = () => {
   const context = tryGetContext<any>();
@@ -46,4 +46,16 @@ export async function generateAndSetTokens(c: Context, userData: User) {
       console.error("Error generating tokens", e);
       throw e;
     });
+}
+export const class2Object = <T>(classConvert: T) => {
+    const keys = Object.getOwnPropertyNames(
+        Object.getPrototypeOf(classConvert)
+    ) as Array<keyof T>
+    const object = keys.reduce((classAsObj: Record<string, any>, key) => {
+        classAsObj[key as string] = (classConvert[key] as any).bind(
+            classConvert
+        )
+        return classAsObj
+    }, {})
+    return object as T
 }

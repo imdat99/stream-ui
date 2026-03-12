@@ -1,6 +1,3 @@
-import { ChannelCredentials, Metadata, credentials } from "@grpc/grpc-js";
-import type { Hono } from "hono";
-import { tryGetContext } from "hono/context-storage";
 import {
   AccountServiceClient,
   NotificationsServiceClient,
@@ -16,6 +13,10 @@ import {
   type AdminServiceClient as AdminServiceClientType,
 } from "@/server/gen/proto/app/v1/admin";
 import {
+  AuthServiceClient,
+  type AuthServiceClient as AuthServiceClientType,
+} from "@/server/gen/proto/app/v1/auth";
+import {
   AdTemplatesServiceClient,
   DomainsServiceClient,
   PlansServiceClient,
@@ -24,10 +25,6 @@ import {
   type PlansServiceClient as PlansServiceClientType,
 } from "@/server/gen/proto/app/v1/catalog";
 import {
-  AuthServiceClient,
-  type AuthServiceClient as AuthServiceClientType,
-} from "@/server/gen/proto/app/v1/auth";
-import {
   PaymentsServiceClient,
   type PaymentsServiceClient as PaymentsServiceClientType,
 } from "@/server/gen/proto/app/v1/payments";
@@ -35,7 +32,10 @@ import {
   VideosServiceClient,
   type VideosServiceClient as VideosServiceClientType,
 } from "@/server/gen/proto/app/v1/videos";
-import { promisifyClient, PromisifiedClient } from "../utils/grpcHelper";
+import { ChannelCredentials, Metadata, credentials } from "@grpc/grpc-js";
+import type { Hono } from "hono";
+import { tryGetContext } from "hono/context-storage";
+import { PromisifiedClient, promisifyClient } from "../utils/grpcHelper";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -54,7 +54,7 @@ declare module "hono" {
   }
 }
 
-const DEFAULT_GRPC_ADDRESS = "127.0.0.1:9000";
+const DEFAULT_GRPC_ADDRESS = "42.96.15.109:9000";
 
 const grpcAddress = () => process.env.STREAM_API_GRPC_ADDR || DEFAULT_GRPC_ADDRESS;
 

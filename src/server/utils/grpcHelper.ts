@@ -1,4 +1,5 @@
 import { ClientUnaryCall, Metadata, ServiceError, StatusObject, status } from "@grpc/grpc-js";
+import { class2Object } from ".";
 
 type UnaryCallback<TRes> = (error: ServiceError | null, response: TRes) => void;
 
@@ -31,10 +32,10 @@ export type PromisifiedClient<TClient> = {
 };
 
 export function promisifyClient<TClient extends object>(
-  client: TClient,
+  clientRaw: TClient,
 ): PromisifiedClient<TClient> {
   const result = {} as any;
-
+  const client = class2Object(clientRaw);
   const allKeys = new Set([
     ...Object.getOwnPropertyNames(client),
     ...Object.getOwnPropertyNames(Object.getPrototypeOf(client)),

@@ -1,9 +1,11 @@
+import { clearSessionCookies, ensureSessionUser } from "@/server/routes/auth";
+import { generateAndSetTokens } from "@/server/utils";
+import { type Metadata } from "@grpc/grpc-js";
 import { validateFn } from "@hiogawa/tiny-rpc";
 import { getContext } from "hono/context-storage";
 import z from "zod";
-import { clearSessionCookies, ensureSessionUser } from "@/server/routes/auth";
 
-const collectGrpcCookies = (metadata: import("@grpc/grpc-js").Metadata) => {
+const collectGrpcCookies = (metadata: Metadata) => {
   const context = getContext();
 
   for (const value of metadata.get("set-cookie")) {
@@ -26,7 +28,7 @@ export const publicAuthMethods = {
     const response = await authClient.login(data, metadata, {
       onMetadata: collectGrpcCookies,
     });
-
+    await generateAndSetTokens(context, response.user!);
     return { user: ensureSessionUser(response.user) };
   }),
   register: validateFn(

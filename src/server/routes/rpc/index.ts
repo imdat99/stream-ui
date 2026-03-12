@@ -1,10 +1,10 @@
 import { authenticate } from "@/server/middlewares/authenticate";
+import { getGrpcMetadataFromContext } from "@/server/services/grpcClient";
+import { Metadata } from "@grpc/grpc-js";
 import { exposeTinyRpc, httpServerAdapter } from "@hiogawa/tiny-rpc";
 import { Hono } from "hono";
-import { Metadata } from "@grpc/grpc-js";
-import { meMethods } from "./me";
 import { protectedAuthMethods, publicAuthMethods } from "./auth";
-import { getGrpcMetadataFromContext } from "@/server/services/grpcClient";
+import { meMethods } from "./me";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -23,24 +23,28 @@ const publicRoutes = {
 };
 
 export type RpcRoutes = typeof protectedRoutes & typeof publicRoutes;
-export const endpoint = "/rpc";
-export const publicEndpoint = "/rpc-public";
+export const endpoint = "/rpc/*";
+export const publicEndpoint = "/rpc-public/*";
 export const pathsForGET: (keyof typeof protectedRoutes)[] = ["health"];
 
 export function registerRpcRoutes(app: Hono) {
   const protectedHandler = exposeTinyRpc({
     routes: protectedRoutes,
-    adapter: httpServerAdapter({ endpoint }),
+    adapter: httpServerAdapter({ endpoint: "/rpc" }),
   });
-  const publicHandler = exposeTinyRpc({
-    routes: publicRoutes,
-    adapter: httpServerAdapter({ endpoint: publicEndpoint }),
-  });
+  app.use(publicEndpoint, async (c, next) => {
 
-  app.use(endpoint, authenticate, async (c, next) => {
-    if (c.req.path !== endpoint && !c.req.path.startsWith(endpoint + "/")) {
-      return await next();
+    const publicHandler = exposeTinyRpc({
+    routes: publicRoutes,
+    adapter: httpServerAdapter({ endpoint: "/rpc-public" }),
+  });
+    const res = await publicHandler({ request: c.req.raw });
+    if (res) {
+      return res;
     }
+    return await next();
+  });
+  app.use(endpoint, authenticate, async (c, next) => {
 
     c.set("grpcMetadata", getGrpcMetadataFromContext());
 
@@ -51,15 +55,5 @@ export function registerRpcRoutes(app: Hono) {
     return await next();
   });
 
-  app.use(publicEndpoint, async (c, next) => {
-    if (c.req.path !== publicEndpoint && !c.req.path.startsWith(publicEndpoint + "/")) {
-      return await next();
-    }
-
-    const res = await publicHandler({ request: c.req.raw });
-    if (res) {
-      return res;
-    }
-    return await next();
-  });
+  
 }
