@@ -20,11 +20,9 @@ const status = computed(() => String(route.query.status ?? 'error'));
 const reason = computed(() => String(route.query.reason ?? 'google_login_failed'));
 
 const reasonMessages: Record<string, string> = {
-  missing_state: 'Google login session is invalid. Please try again.',
-  invalid_state: 'Google login session has expired. Please try again.',
   missing_code: 'Google did not return an authorization code.',
   access_denied: 'Google login was cancelled.',
-  exchange_failed: 'Failed to sign in with Google.',
+  exchange_failed: 'Failed to verify your Google sign-in. Please try again.',
   userinfo_failed: 'Failed to load your Google account information.',
   userinfo_parse_failed: 'Failed to read your Google account information.',
   missing_email: 'Your Google account did not provide an email address.',

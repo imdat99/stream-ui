@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import { useAppToast } from '@/composables/useAppToast';
 import { reactive } from 'vue';
 import { useTranslation } from 'i18next-vue';
@@ -59,7 +59,7 @@ const onFormSubmit = () => {
         return;
     }
 
-    client.auth.forgotPasswordCreate({ email: form.email })
+    rpcClient.forgotPassword({ email: form.email })
         .then(() => {
             toast.add({
                 severity: 'success',

@@ -42,7 +42,7 @@ import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import EllipsisVerticalIcon from '@/components/icons/EllipsisVerticalIcon.vue';
-import type { ModelVideo } from '@/api/client';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, nextTick, ref } from 'vue';
 import { useTranslation } from 'i18next-vue';
@@ -107,7 +107,7 @@ const handleCopyLink = async () => {
 const handleDownload = () => {
     if (props.video.id) {
         const link = document.createElement('a');
-        link.href = props.video.hls_path || videoUrl.value;
+        link.href = props.video.url?.startsWith('http') ? props.video.url : videoUrl.value;
         link.download = props.video.title || 'video';
         document.body.appendChild(link);
         link.click();

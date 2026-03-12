@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import AppButton from '@/components/app/AppButton.vue';
 import AppSwitch from '@/components/app/AppSwitch.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
@@ -90,9 +90,8 @@ const handleSave = async () => {
 
     saving.value = true;
     try {
-        await client.settings.preferencesUpdate(
+        await rpcClient.updatePreferences(
             toNotificationPreferencesPayload(notificationSettings.value),
-            { baseUrl: '/r' },
         );
         await refetchPreferences();
 

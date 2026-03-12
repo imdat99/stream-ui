@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { client, type ModelVideo } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { createStaticVNode, computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -47,15 +48,15 @@ const fetchVideos = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const response = await client.videos.videosList({
+    const response = await rpcClient.listVideos({
       page: page.value,
       limit: limit.value,
       search: searchQuery.value || undefined,
       status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
-    } as any, { baseUrl: '/r' });
+    });
 
-    videos.value = ((response.data as any)?.data?.videos ?? []) as ModelVideo[];
-    total.value = (response.data as any)?.data?.total ?? 0;
+    videos.value = response.videos ?? [];
+    total.value = response.total ?? 0;
   } catch (err: any) {
     console.error(err);
     error.value = err?.response?.data?.message || err?.message || t('video.page.retry');
@@ -87,7 +88,7 @@ const deleteSelectedVideos = async () => {
       selectedVideos.value
         .map(v => v.id)
         .filter((id): id is string => Boolean(id))
-        .map(id => client.videos.videosDelete(id, { baseUrl: '/r' }))
+        .map(id => rpcClient.deleteVideo({ id }))
     );
     selectedVideos.value = [];
     await fetchVideos();
@@ -106,7 +107,7 @@ const deleteVideo = async (videoId?: string) => {
   if (!videoId || !confirm(t('video.page.deleteSingleConfirm'))) return;
 
   try {
-    await client.videos.videosDelete(videoId, { baseUrl: '/r' });
+    await rpcClient.deleteVideo({ id: videoId });
     selectedVideos.value = selectedVideos.value.filter(v => v.id !== videoId);
     await fetchVideos();
   } catch (err) {

@@ -10,7 +10,7 @@ import {
 } from "vue-router";
 
 type RouteData = RouteRecordRaw & {
-  meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean };
+  meta?: ResolvableValue<ReactiveHead> & { requiresAuth?: boolean; requiresAdmin?: boolean };
   children?: RouteData[];
 };
 const routes: RouteData[] = [
@@ -217,6 +217,23 @@ const routes: RouteData[] = [
               },
             ],
           },
+          {
+            path: "admin",
+            component: () => import("./admin/Layout.vue"),
+            meta: { requiresAdmin: true },
+            redirect: { name: "admin-overview" },
+            children: [
+              { path: "overview", name: "admin-overview", component: () => import("./admin/Overview.vue") },
+              { path: "users", name: "admin-users", component: () => import("./admin/Users.vue") },
+              { path: "videos", name: "admin-videos", component: () => import("./admin/Videos.vue") },
+              { path: "payments", name: "admin-payments", component: () => import("./admin/Payments.vue") },
+              { path: "plans", name: "admin-plans", component: () => import("./admin/Plans.vue") },
+              { path: "ad-templates", name: "admin-ad-templates", component: () => import("./admin/AdTemplates.vue") },
+              { path: "jobs", name: "admin-jobs", component: () => import("./admin/Jobs.vue") },
+              { path: "agents", name: "admin-agents", component: () => import("./admin/Agents.vue") },
+              { path: "logs", name: "admin-logs", component: () => import("./admin/Logs.vue") },
+            ],
+          },
         ],
       },
       {
@@ -252,6 +269,17 @@ const createAppRouter = () => {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       if (!auth.user) {
         return { name: "login" };
+      }
+    }
+
+    if (to.matched.some((record) => record.meta.requiresAdmin)) {
+      if (!auth.user) {
+        return { name: "login" };
+      }
+
+      const role = String(auth.user.role || "").toLowerCase();
+      if (role !== "admin") {
+        return { name: "overview" };
       }
     }
   });

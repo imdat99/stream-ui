@@ -1,16 +1,63 @@
-import { ChannelCredentials, credentials } from "@grpc/grpc-js";
+import { ChannelCredentials, Metadata, credentials } from "@grpc/grpc-js";
+import type { Hono } from "hono";
 import { tryGetContext } from "hono/context-storage";
-import { Hono } from "node_modules/hono/dist/types/hono";
-import { PromisifiedClient, promisifyClient } from "../utils/grpcHelper";
-import { UserServiceClient } from "../utils/proto/v1/user";
+import {
+  AccountServiceClient,
+  NotificationsServiceClient,
+  PreferencesServiceClient,
+  UsageServiceClient,
+  type AccountServiceClient as AccountServiceClientType,
+  type NotificationsServiceClient as NotificationsServiceClientType,
+  type PreferencesServiceClient as PreferencesServiceClientType,
+  type UsageServiceClient as UsageServiceClientType,
+} from "@/server/gen/proto/app/v1/account";
+import {
+  AdminServiceClient,
+  type AdminServiceClient as AdminServiceClientType,
+} from "@/server/gen/proto/app/v1/admin";
+import {
+  AdTemplatesServiceClient,
+  DomainsServiceClient,
+  PlansServiceClient,
+  type AdTemplatesServiceClient as AdTemplatesServiceClientType,
+  type DomainsServiceClient as DomainsServiceClientType,
+  type PlansServiceClient as PlansServiceClientType,
+} from "@/server/gen/proto/app/v1/catalog";
+import {
+  AuthServiceClient,
+  type AuthServiceClient as AuthServiceClientType,
+} from "@/server/gen/proto/app/v1/auth";
+import {
+  PaymentsServiceClient,
+  type PaymentsServiceClient as PaymentsServiceClientType,
+} from "@/server/gen/proto/app/v1/payments";
+import {
+  VideosServiceClient,
+  type VideosServiceClient as VideosServiceClientType,
+} from "@/server/gen/proto/app/v1/videos";
+import { promisifyClient, PromisifiedClient } from "../utils/grpcHelper";
+
 declare module "hono" {
   interface ContextVariableMap {
-    userServiceClient: PromisifiedClient<UserServiceClient>;
+    accountServiceClient: PromisifiedClient<AccountServiceClientType>;
+    authServiceClient: PromisifiedClient<AuthServiceClientType>;
+    adminServiceClient: PromisifiedClient<AdminServiceClientType>;
+    adTemplatesServiceClient: PromisifiedClient<AdTemplatesServiceClientType>;
+    videosServiceClient: PromisifiedClient<VideosServiceClientType>;
+    domainsServiceClient: PromisifiedClient<DomainsServiceClientType>;
+    plansServiceClient: PromisifiedClient<PlansServiceClientType>;
+    paymentsServiceClient: PromisifiedClient<PaymentsServiceClientType>;
+    preferencesServiceClient: PromisifiedClient<PreferencesServiceClientType>;
+    notificationsServiceClient: PromisifiedClient<NotificationsServiceClientType>;
+    usageServiceClient: PromisifiedClient<UsageServiceClientType>;
+    internalGrpcMetadata: Metadata;
   }
 }
-const DEFAULT_GRPC_ADDRESS = '127.0.0.1:9000';
+
+const DEFAULT_GRPC_ADDRESS = "127.0.0.1:9000";
 
 const grpcAddress = () => process.env.STREAM_API_GRPC_ADDR || DEFAULT_GRPC_ADDRESS;
+
 let sharedCredentials: ChannelCredentials | undefined;
 const getCredentials = () => {
   if (!sharedCredentials) {
@@ -18,43 +65,178 @@ const getCredentials = () => {
   }
   return sharedCredentials;
 };
-export const getUserServiceClient = () => {
-    const context = tryGetContext();
-    if (context) {
-        return context.get("userServiceClient");
+
+const buildForwardMetadataFromHeaders = (headers: Headers): Metadata => {
+  const metadata = new Metadata();
+
+  for (const name of ["user-agent", "x-forwarded-for", "x-real-ip", "x-request-id"]) {
+    const value = headers.get(name);
+    if (value) {
+      metadata.set(name, value);
     }
-    throw new Error("No context available to get UserServiceClient");
+  }
+
+  return metadata;
 };
-// (method) UserServiceClient.getUserByEmail(request: GetUserByEmailRequest, callback: (error: ServiceError | null, response: GetUserResponse) => void): ClientUnaryCall (+2 overloads)
 
-// const unaryCall = <TResponse>(
-//   executor: (
-//     metadata: Metadata,
-//     options: Partial<CallOptions>,
-//     callback: (error: ServiceError | null, response: TResponse) => void,
-//   ) => { metadata?: Metadata; trailer?: Metadata },
-// ): Promise<TResponse> => {
-//   // const { metadata } = createMetadataFromContext();
+const buildInternalMetadata = () => {
+  const context = tryGetContext();
+  const metadata = context ? buildForwardMetadataFromHeaders(context.req.raw.headers) : new Metadata();
+  const marker = process.env.STREAM_INTERNAL_AUTH_MARKER;
 
-//   return new Promise<TResponse>((resolve, reject) => {
-//     executor({
-//       deadline: Date.now() + 10_000,
-//     }, (error, response) => {
-//       if (error) {
-//         reject(normalizeGrpcError(error));
-//         return;
-//       }
+  if (!marker) {
+    throw new Error("STREAM_INTERNAL_AUTH_MARKER is not configured");
+  }
 
-//       // appendSetCookiesToResponse(call.metadata?.get('set-cookie') ?? []);
-//       resolve(response);
-//     });
-//   });
-// };
+  metadata.set("x-stream-internal-auth", marker);
+  return metadata;
+};
 
+const buildActorMetadata = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to build actor metadata");
+  }
+
+  const metadata = buildInternalMetadata();
+  const userId = context.get("userId");
+  const role = context.get("role");
+  const email = context.get("email");
+
+  if (!userId || !role) {
+    throw new Error("Authenticated actor context is missing");
+  }
+
+  metadata.set("x-stream-actor-id", userId);
+  metadata.set("x-stream-actor-role", role);
+  if (email) {
+    metadata.set("x-stream-actor-email", email);
+  }
+
+  return metadata;
+};
+
+export const getAccountServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get AccountServiceClient");
+  }
+  return context.get("accountServiceClient");
+};
+
+export const getAuthServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get AuthServiceClient");
+  }
+  return context.get("authServiceClient");
+};
+
+export const getAdminServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get AdminServiceClient");
+  }
+  return context.get("adminServiceClient");
+};
+
+export const getAdTemplatesServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get AdTemplatesServiceClient");
+  }
+  return context.get("adTemplatesServiceClient");
+};
+
+export const getVideosServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get VideosServiceClient");
+  }
+  return context.get("videosServiceClient");
+};
+
+export const getDomainsServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get DomainsServiceClient");
+  }
+  return context.get("domainsServiceClient");
+};
+
+export const getPlansServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get PlansServiceClient");
+  }
+  return context.get("plansServiceClient");
+};
+
+export const getPaymentsServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get PaymentsServiceClient");
+  }
+  return context.get("paymentsServiceClient");
+};
+
+export const getPreferencesServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get PreferencesServiceClient");
+  }
+  return context.get("preferencesServiceClient");
+};
+
+export const getNotificationsServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get NotificationsServiceClient");
+  }
+  return context.get("notificationsServiceClient");
+};
+
+export const getUsageServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get UsageServiceClient");
+  }
+  return context.get("usageServiceClient");
+};
+
+export const getGrpcMetadataFromContext = () => buildActorMetadata();
+
+export const getInternalGrpcMetadata = () => buildInternalMetadata();
 
 export const setupServices = (app: Hono) => {
-    app.use("*", async (c, next) => {
-        c.set("userServiceClient", promisifyClient(new UserServiceClient(grpcAddress(), getCredentials())));
-        return await next();
-    });
-}
+  app.use("*", async (c, next) => {
+    const creds = getCredentials();
+
+    const accountClient = new AccountServiceClient(grpcAddress(), creds);
+    const authClient = new AuthServiceClient(grpcAddress(), creds);
+    const adminClient = new AdminServiceClient(grpcAddress(), creds);
+    const adTemplatesClient = new AdTemplatesServiceClient(grpcAddress(), creds);
+    const videosClient = new VideosServiceClient(grpcAddress(), creds);
+    const domainsClient = new DomainsServiceClient(grpcAddress(), creds);
+    const plansClient = new PlansServiceClient(grpcAddress(), creds);
+    const paymentsClient = new PaymentsServiceClient(grpcAddress(), creds);
+    const preferencesClient = new PreferencesServiceClient(grpcAddress(), creds);
+    const notificationsClient = new NotificationsServiceClient(grpcAddress(), creds);
+    const usageClient = new UsageServiceClient(grpcAddress(), creds);
+
+    c.set("accountServiceClient", promisifyClient(accountClient));
+    c.set("authServiceClient", promisifyClient(authClient));
+    c.set("adminServiceClient", promisifyClient(adminClient));
+    c.set("adTemplatesServiceClient", promisifyClient(adTemplatesClient));
+    c.set("videosServiceClient", promisifyClient(videosClient));
+    c.set("domainsServiceClient", promisifyClient(domainsClient));
+    c.set("plansServiceClient", promisifyClient(plansClient));
+    c.set("paymentsServiceClient", promisifyClient(paymentsClient));
+    c.set("preferencesServiceClient", promisifyClient(preferencesClient));
+    c.set("notificationsServiceClient", promisifyClient(notificationsClient));
+    c.set("usageServiceClient", promisifyClient(usageClient));
+    c.set("internalGrpcMetadata", getInternalGrpcMetadata());
+
+    await next();
+  });
+};

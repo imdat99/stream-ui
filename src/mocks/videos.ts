@@ -1,4 +1,4 @@
-import type { ModelVideo } from "@/api/client";
+import type { Video as ModelVideo } from "@/server/gen/proto/app/v1/common";
 
 export const mockVideos: ModelVideo[] = [
     {
@@ -9,7 +9,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 345, // 5m 45s
         status: 'ready',
         size: 1024 * 1024 * 45, // 45MB
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
         views: 12500,
         url: '#'
     },
@@ -20,9 +20,8 @@ export const mockVideos: ModelVideo[] = [
         thumbnail: 'https://picsum.photos/seed/video2/640/360',
         duration: 890, // 14m 50s
         status: 'processing',
-        processing_status: '75%',
         size: 1024 * 1024 * 128, // 128MB
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
         views: 0,
         url: '#'
     },
@@ -34,7 +33,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 120, // 2m 00s
         status: 'ready',
         size: 1024 * 1024 * 25, // 25MB
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week ago
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week ago
         views: 340,
         url: '#'
     },
@@ -46,7 +45,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 1800, // 30m 00s
         status: 'ready',
         size: 1024 * 1024 * 350, // 350MB
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14).toISOString(), // 2 weeks ago
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14).toISOString(), // 2 weeks ago
         views: 12,
         url: '#'
     },
@@ -58,7 +57,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 600, // 10m 00s
         status: 'failed',
         size: 1024 * 1024 * 80, // 80MB
-        created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
+        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
         views: 0,
         url: '#'
     },
@@ -70,7 +69,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 5400, // 1h 30m
         status: 'ready',
         size: 1024 * 1024 * 1024 * 2.5, // 2.5GB
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 1 month ago
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 1 month ago
         views: 45000,
         url: '#'
     },
@@ -82,7 +81,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 1540, 
         status: 'ready',
         size: 1024 * 1024 * 200, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
         views: 8900,
         url: '#'
     },
@@ -94,7 +93,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -106,7 +105,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -118,7 +117,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -130,7 +129,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -142,7 +141,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -154,7 +153,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -166,7 +165,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -178,7 +177,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -190,7 +189,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -202,7 +201,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -214,7 +213,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -226,7 +225,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -238,7 +237,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -250,7 +249,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -262,7 +261,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -274,7 +273,7 @@ export const mockVideos: ModelVideo[] = [
         duration: 3200, 
         status: 'ready',
         size: 1024 * 1024 * 800, 
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
         views: 1500,
         url: '#'
     },
@@ -340,7 +339,7 @@ export const updateMockVideo = async (id: string, updates: { title: string; desc
         ...mockVideos[videoIndex],
         title: updates.title,
         description: updates.description,
-        updated_at: new Date().toISOString()
+        updatedAt: new Date().toISOString()
     };
     return mockVideos[videoIndex];
 };

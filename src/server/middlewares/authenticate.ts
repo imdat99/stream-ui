@@ -1,7 +1,7 @@
 import { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
-import { getUserServiceClient } from "../services/grpcClient";
+import { getAccountServiceClient } from "../services/grpcClient";
 import { generateAndSetTokens } from "../utils";
 export const authenticate: MiddlewareHandler = async (ctx, next) => {
     let payload
@@ -35,14 +35,17 @@ export const authenticate: MiddlewareHandler = async (ctx, next) => {
         if (!userId) {
             throw new HTTPException(401)
         }
-        const userData = await getUserServiceClient().getUser({ id: userId });
-        // userData.user
+        const userData = await getAccountServiceClient().getMe({});
+        const user = userData.user;
         redis.del("refresh_uuid:" + refreshUuid);
         const tokenPair = await generateAndSetTokens(ctx, userData.user!);
+        if (!user?.id || !user?.role || user.id !== userId) {
+            throw new HTTPException(401)
+        }
         payload = {
-            user_id: userId,
-            email: userData.user!.email,
-            role: userData.user!.role,
+            user_id: user.id,
+            email: user.email,
+            role: user.role,
             token_id: tokenPair.accessUUID,
         }
     }

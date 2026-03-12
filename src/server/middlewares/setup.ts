@@ -16,12 +16,14 @@ declare module "hono" {
     isMobile: boolean;
     redis: RedisClient;
     jwtProvider: JwtProvider;
+    jwtPayload: Record<string, unknown>;
     userId: string;
     role: string;
+    email: string;
   }
 }
 
-const client = new RedisClient("redis://:pass123@47.84.62.226:6379/3");
+const redisClient = new RedisClient("redis://:pass123@47.84.62.226:6379/3");
 
 export function setupMiddlewares(app: Hono) {
   app.use(
@@ -52,14 +54,11 @@ export function setupMiddlewares(app: Hono) {
     await next();
   });
   app.use(async (c, next) => {
-    return await client
-      .connect()
-      .then(() => {
-        c.set("redis", client);
-        return next();
-      })
-      .catch((e) => {
-        console.error("Failed to connect to Redis", e);
-      });
+    try {
+      return await redisClient.connect().then(() => c.set("redis", redisClient)).then(next)
+    } catch (e) {
+      console.error("Failed to connect to Redis", e);
+      return c.json({ error: "Redis unavailable" }, 500);
+    }
   });
 }

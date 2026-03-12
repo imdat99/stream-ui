@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
@@ -38,12 +38,12 @@ interface VastTemplate {
 type AdTemplateApiItem = {
     id?: string;
     name?: string;
-    vast_tag_url?: string;
-    ad_format?: 'pre-roll' | 'mid-roll' | 'post-roll';
+    vastTagUrl?: string;
+    adFormat?: 'pre-roll' | 'mid-roll' | 'post-roll';
     duration?: number | null;
-    is_active?: boolean;
-    is_default?: boolean;
-    created_at?: string;
+    isActive?: boolean;
+    isDefault?: boolean;
+    createdAt?: string;
 };
 
 const adFormatOptions = ['pre-roll', 'mid-roll', 'post-roll'] as const;
@@ -68,21 +68,21 @@ const isMutating = computed(() => saving.value || deletingId.value !== null || t
 const canMarkAsDefaultInDialog = computed(() => !isFreePlan.value && (!editingTemplate.value || editingTemplate.value.enabled));
 
 const mapTemplate = (item: AdTemplateApiItem): VastTemplate => ({
-    id: item.id || `${item.name || 'template'}:${item.vast_tag_url || item.created_at || ''}`,
+    id: item.id || `${item.name || 'template'}:${item.vastTagUrl || item.createdAt || ''}`,
     name: item.name || '',
-    vastUrl: item.vast_tag_url || '',
-    adFormat: item.ad_format || 'pre-roll',
+    vastUrl: item.vastTagUrl || '',
+    adFormat: item.adFormat || 'pre-roll',
     duration: typeof item.duration === 'number' ? item.duration : undefined,
-    enabled: Boolean(item.is_active),
-    isDefault: Boolean(item.is_default),
-    createdAt: item.created_at || '',
+    enabled: Boolean(item.isActive),
+    isDefault: Boolean(item.isDefault),
+    createdAt: item.createdAt || '',
 });
 
 const { data: templatesSnapshot, error, isPending, refetch } = useQuery({
     key: () => ['settings', 'ad-templates'],
     query: async () => {
-        const response = await client.adTemplates.adTemplatesList({ baseUrl: '/r' });
-        return ((((response.data as any)?.data?.templates) || []) as AdTemplateApiItem[]).map(mapTemplate);
+        const response = await rpcClient.listAdTemplates();
+        return (response.templates || []).map(mapTemplate);
     },
 });
 
@@ -161,11 +161,12 @@ const openEditDialog = (template: VastTemplate) => {
 
 const buildRequestBody = (enabled = true) => ({
     name: formData.value.name.trim(),
-    vast_tag_url: formData.value.vastUrl.trim(),
-    ad_format: formData.value.adFormat,
+    description: '',
+    vastTagUrl: formData.value.vastUrl.trim(),
+    adFormat: formData.value.adFormat,
     duration: formData.value.adFormat === 'mid-roll' ? formData.value.duration : undefined,
-    is_active: enabled,
-    is_default: enabled ? formData.value.isDefault : false,
+    isActive: enabled,
+    isDefault: enabled ? formData.value.isDefault : false,
 });
 
 const handleSave = async () => {
@@ -213,11 +214,10 @@ const handleSave = async () => {
     saving.value = true;
     try {
         if (editingTemplate.value) {
-            await client.adTemplates.adTemplatesUpdate(
-                editingTemplate.value.id,
-                buildRequestBody(editingTemplate.value.enabled),
-                { baseUrl: '/r' },
-            );
+            await rpcClient.updateAdTemplate({
+                id: editingTemplate.value.id,
+                ...buildRequestBody(editingTemplate.value.enabled),
+            });
             toast.add({
                 severity: 'success',
                 summary: t('settings.adsVast.toast.updatedSummary'),
@@ -225,7 +225,7 @@ const handleSave = async () => {
                 life: 3000,
             });
         } else {
-            await client.adTemplates.adTemplatesCreate(buildRequestBody(true), { baseUrl: '/r' });
+            await rpcClient.createAdTemplate(buildRequestBody(true));
             toast.add({
                 severity: 'success',
                 summary: t('settings.adsVast.toast.createdSummary'),
@@ -249,14 +249,16 @@ const handleToggle = async (template: VastTemplate, nextValue: boolean) => {
 
     togglingId.value = template.id;
     try {
-        await client.adTemplates.adTemplatesUpdate(template.id, {
+        await rpcClient.updateAdTemplate({
+            id: template.id,
             name: template.name,
-            vast_tag_url: template.vastUrl,
-            ad_format: template.adFormat,
+            description: '',
+            vastTagUrl: template.vastUrl,
+            adFormat: template.adFormat,
             duration: template.adFormat === 'mid-roll' ? template.duration : undefined,
-            is_active: nextValue,
-            is_default: nextValue ? template.isDefault : false,
-        }, { baseUrl: '/r' });
+            isActive: nextValue,
+            isDefault: nextValue ? template.isDefault : false,
+        });
 
         await refetchTemplates();
         toast.add({
@@ -285,14 +287,16 @@ const handleSetDefault = async (template: VastTemplate) => {
 
     defaultingId.value = template.id;
     try {
-        await client.adTemplates.adTemplatesUpdate(template.id, {
+        await rpcClient.updateAdTemplate({
+            id: template.id,
             name: template.name,
-            vast_tag_url: template.vastUrl,
-            ad_format: template.adFormat,
+            description: '',
+            vastTagUrl: template.vastUrl,
+            adFormat: template.adFormat,
             duration: template.adFormat === 'mid-roll' ? template.duration : undefined,
-            is_active: template.enabled,
-            is_default: true,
-        }, { baseUrl: '/r' });
+            isActive: template.enabled,
+            isDefault: true,
+        });
 
         await refetchTemplates();
         toast.add({
@@ -320,7 +324,7 @@ const handleDelete = (template: VastTemplate) => {
         accept: async () => {
             deletingId.value = template.id;
             try {
-                await client.adTemplates.adTemplatesDelete(template.id, { baseUrl: '/r' });
+                await rpcClient.deleteAdTemplate({ id: template.id });
                 await refetchTemplates();
                 toast.add({
                     severity: 'info',

@@ -2,55 +2,677 @@ import { validateFn } from "@hiogawa/tiny-rpc";
 import { getContext } from "hono/context-storage";
 import z from "zod";
 
+const optionalTrimmed = () => z.string().trim().min(1).optional();
+
 export const meMethods = {
-    getMe: async () => {
-        const context = getContext();
-        const userServiceClient = context.get("userServiceClient");
-        const user = await userServiceClient.getUser({ id: context.get("userId") });
-        const userPreferences = await userServiceClient.getPreferences({ userId: context.get("userId") });
-        delete user.user?.password
-        return {
-            ...user.user,
-            ...userPreferences.preferences
-        };
-    },
-    updateMe: validateFn(z.object({
-        username: z.string().min(3).optional(),
-        avatar: z.url().optional(),
-        role: z.string().optional(),
-        planId: z.string().optional(),
-    }))(
-        async (data) => {
-            const context = getContext();
-            const user = await context.get("userServiceClient").updateUser({
-                id: context.get("userId"),
-                username: data.username,
-                avatar: data.avatar,
-                role: data.role,
-                planId: data.planId,
-            });
-            delete user.user?.password
-            return user.user;
-        }
-    ),
-    ChangePassword: validateFn(z.object({
-        oldPassword: z.string().min(6),
-        newPassword: z.string().min(6),
-    }))(
-        async (data) => {
-            const context = getContext();
-            const user = await context.get("userServiceClient").getUser({ id: context.get("userId") });
-            if (!user.user) {
-                throw new Error("User not found");
-            }
-            const isMatch = Bun.password.verifySync(data.oldPassword, user.user!.password!, "bcrypt");
-            if (!isMatch) {
-                throw new Error("Invalid password");
-            }
-            await context.get("userServiceClient").updateUserPassword({
-                id: context.get("userId"),
-                newPassword: Bun.password.hashSync(data.newPassword, { algorithm: "bcrypt", cost: 12 }),
-            });
-        }
-    )
+  getMe: async () => {
+    const context = getContext();
+    const accountClient = context.get("accountServiceClient");
+    const metadata = context.get("grpcMetadata");
+    const response = await accountClient.getMe({}, metadata);
+    return response.user ?? null;
+  },
+  updateMe: validateFn(
+    z.object({
+      username: z.string().min(3).optional(),
+      email: z.string().email().optional(),
+      language: z.string().optional(),
+      locale: z.string().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const accountClient = context.get("accountServiceClient");
+    const metadata = context.get("grpcMetadata");
+    const response = await accountClient.updateMe(data, metadata);
+    return response.user ?? null;
+  }),
+  deleteMe: async () => {
+    const context = getContext();
+    const accountClient = context.get("accountServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await accountClient.deleteMe({}, metadata);
+  },
+  clearMyData: async () => {
+    const context = getContext();
+    const accountClient = context.get("accountServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await accountClient.clearMyData({}, metadata);
+  },
+  listVideos: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      search: optionalTrimmed(),
+      status: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const videosClient = context.get("videosServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await videosClient.listVideos(data, metadata);
+  }),
+  getVideo: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const videosClient = context.get("videosServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await videosClient.getVideo(data, metadata);
+  }),
+  updateVideo: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      title: z.string().trim().min(1),
+      description: z.string().optional(),
+      url: optionalTrimmed(),
+      size: z.number().min(0).optional(),
+      duration: z.number().min(0).optional(),
+      format: optionalTrimmed(),
+      status: optionalTrimmed(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const videosClient = context.get("videosServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await videosClient.updateVideo(data, metadata);
+  }),
+  deleteVideo: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const videosClient = context.get("videosServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await videosClient.deleteVideo(data, metadata);
+  }),
+  listAdTemplates: async () => {
+    const context = getContext();
+    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adTemplatesClient.listAdTemplates({}, metadata);
+  },
+  createAdTemplate: validateFn(
+    z.object({
+      name: z.string().trim().min(1),
+      description: z.string().optional(),
+      vastTagUrl: z.string().trim().url(),
+      adFormat: optionalTrimmed(),
+      duration: z.number().int().min(0).optional(),
+      isActive: z.boolean().optional(),
+      isDefault: z.boolean().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adTemplatesClient.createAdTemplate(data, metadata);
+  }),
+  updateAdTemplate: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: z.string().optional(),
+      vastTagUrl: z.string().trim().url(),
+      adFormat: optionalTrimmed(),
+      duration: z.number().int().min(0).optional(),
+      isActive: z.boolean().optional(),
+      isDefault: z.boolean().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adTemplatesClient.updateAdTemplate(data, metadata);
+  }),
+  deleteAdTemplate: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adTemplatesClient.deleteAdTemplate(data, metadata);
+  }),
+  getPreferences: async () => {
+    const context = getContext();
+    const preferencesClient = context.get("preferencesServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await preferencesClient.getPreferences({}, metadata);
+  },
+  updatePreferences: validateFn(
+    z.object({
+      emailNotifications: z.boolean().optional(),
+      pushNotifications: z.boolean().optional(),
+      marketingNotifications: z.boolean().optional(),
+      telegramNotifications: z.boolean().optional(),
+      autoplay: z.boolean().optional(),
+      loop: z.boolean().optional(),
+      muted: z.boolean().optional(),
+      showControls: z.boolean().optional(),
+      pip: z.boolean().optional(),
+      airplay: z.boolean().optional(),
+      chromecast: z.boolean().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const preferencesClient = context.get("preferencesServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await preferencesClient.updatePreferences(data, metadata);
+  }),
+  listNotifications: async () => {
+    const context = getContext();
+    const notificationsClient = context.get("notificationsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await notificationsClient.listNotifications({}, metadata);
+  },
+  markNotificationRead: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const notificationsClient = context.get("notificationsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await notificationsClient.markNotificationRead(data, metadata);
+  }),
+  markAllNotificationsRead: async () => {
+    const context = getContext();
+    const notificationsClient = context.get("notificationsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await notificationsClient.markAllNotificationsRead({}, metadata);
+  },
+  deleteNotification: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const notificationsClient = context.get("notificationsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await notificationsClient.deleteNotification(data, metadata);
+  }),
+  clearNotifications: async () => {
+    const context = getContext();
+    const notificationsClient = context.get("notificationsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await notificationsClient.clearNotifications({}, metadata);
+  },
+  getUploadUrl: validateFn(
+    z.object({
+      filename: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const videosClient = context.get("videosServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await videosClient.getUploadUrl(data, metadata);
+  }),
+  createVideo: validateFn(
+    z.object({
+      title: z.string().trim().min(1),
+      description: z.string().optional(),
+      url: z.string().trim().min(1),
+      size: z.number().min(0).optional(),
+      duration: z.number().min(0).optional(),
+      format: optionalTrimmed(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const videosClient = context.get("videosServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await videosClient.createVideo(data, metadata);
+  }),
+  getUsage: async () => {
+    const context = getContext();
+    const usageClient = context.get("usageServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await usageClient.getUsage({}, metadata);
+  },
+  listDomains: async () => {
+    const context = getContext();
+    const domainsClient = context.get("domainsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await domainsClient.listDomains({}, metadata);
+  },
+  createDomain: validateFn(
+    z.object({
+      name: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const domainsClient = context.get("domainsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await domainsClient.createDomain(data, metadata);
+  }),
+  deleteDomain: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const domainsClient = context.get("domainsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await domainsClient.deleteDomain(data, metadata);
+  }),
+  listPlans: async () => {
+    const context = getContext();
+    const plansClient = context.get("plansServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await plansClient.listPlans({}, metadata);
+  },
+  listPaymentHistory: async () => {
+    const context = getContext();
+    const paymentsClient = context.get("paymentsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await paymentsClient.listPaymentHistory({}, metadata);
+  },
+  createPayment: validateFn(
+    z.object({
+      planId: z.string().trim().min(1),
+      termMonths: z.number().int().min(1),
+      paymentMethod: z.string().trim().min(1),
+      topupAmount: z.number().min(0).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const paymentsClient = context.get("paymentsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await paymentsClient.createPayment(data, metadata);
+  }),
+  topupWallet: validateFn(
+    z.object({
+      amount: z.number().min(0.01),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const paymentsClient = context.get("paymentsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await paymentsClient.topupWallet(data, metadata);
+  }),
+  downloadInvoice: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const paymentsClient = context.get("paymentsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await paymentsClient.downloadInvoice(data, metadata);
+  }),
+  getAdminDashboard: async () => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    const response = await adminClient.getAdminDashboard({}, metadata);
+    return response.dashboard ?? null;
+  },
+  listAdminUsers: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      search: optionalTrimmed(),
+      role: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminUsers(data, metadata);
+  }),
+  createAdminUser: validateFn(
+    z.object({
+      email: z.string().trim().email(),
+      username: optionalTrimmed(),
+      password: z.string().min(6),
+      role: z.string().trim().min(1),
+      planId: optionalTrimmed(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminUser(data, metadata);
+  }),
+  updateAdminUser: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      email: z.string().trim().email().optional(),
+      username: optionalTrimmed(),
+      password: z.string().min(6).optional(),
+      role: z.string().trim().min(1).optional(),
+      planId: optionalTrimmed(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminUser(data, metadata);
+  }),
+  updateAdminUserRole: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      role: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminUserRole(data, metadata);
+  }),
+  deleteAdminUser: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.deleteAdminUser(data, metadata);
+  }),
+  listAdminVideos: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      search: optionalTrimmed(),
+      userId: optionalTrimmed(),
+      status: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminVideos(data, metadata);
+  }),
+  createAdminVideo: validateFn(
+    z.object({
+      userId: z.string().trim().min(1),
+      title: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      url: z.string().trim().url(),
+      size: z.number().min(0).optional(),
+      duration: z.number().min(0).optional(),
+      format: optionalTrimmed(),
+      status: z.string().trim().min(1),
+      adTemplateId: optionalTrimmed(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminVideo(data, metadata);
+  }),
+  updateAdminVideo: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      userId: z.string().trim().min(1),
+      title: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      url: z.string().trim().url(),
+      size: z.number().min(0).optional(),
+      duration: z.number().min(0).optional(),
+      format: optionalTrimmed(),
+      status: z.string().trim().min(1),
+      adTemplateId: optionalTrimmed(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminVideo(data, metadata);
+  }),
+  deleteAdminVideo: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.deleteAdminVideo(data, metadata);
+  }),
+  listAdminPayments: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      userId: optionalTrimmed(),
+      status: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminPayments(data, metadata);
+  }),
+  createAdminPayment: validateFn(
+    z.object({
+      userId: z.string().trim().min(1),
+      planId: z.string().trim().min(1),
+      termMonths: z.number().int().min(1),
+      paymentMethod: z.string().trim().min(1),
+      topupAmount: z.number().min(0).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminPayment(data, metadata);
+  }),
+  updateAdminPayment: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      status: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminPayment(data, metadata);
+  }),
+  listAdminPlans: async () => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminPlans({}, metadata);
+  },
+  createAdminPlan: validateFn(
+    z.object({
+      name: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      features: z.array(z.string().trim().min(1)).optional(),
+      price: z.number().min(0),
+      cycle: z.string().trim().min(1),
+      storageLimit: z.number().int().min(1),
+      uploadLimit: z.number().int().min(1),
+      isActive: z.boolean(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminPlan(data, metadata);
+  }),
+  updateAdminPlan: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      features: z.array(z.string().trim().min(1)).optional(),
+      price: z.number().min(0),
+      cycle: z.string().trim().min(1),
+      storageLimit: z.number().int().min(1),
+      uploadLimit: z.number().int().min(1),
+      isActive: z.boolean(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminPlan(data, metadata);
+  }),
+  deleteAdminPlan: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.deleteAdminPlan(data, metadata);
+  }),
+  listAdminAdTemplates: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      userId: optionalTrimmed(),
+      search: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminAdTemplates(data, metadata);
+  }),
+  createAdminAdTemplate: validateFn(
+    z.object({
+      userId: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      vastTagUrl: z.string().trim().url(),
+      adFormat: z.string().trim().min(1).optional(),
+      duration: z.number().int().min(0).optional(),
+      isActive: z.boolean(),
+      isDefault: z.boolean(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminAdTemplate(data, metadata);
+  }),
+  updateAdminAdTemplate: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      userId: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      vastTagUrl: z.string().trim().url(),
+      adFormat: z.string().trim().min(1).optional(),
+      duration: z.number().int().min(0).optional(),
+      isActive: z.boolean(),
+      isDefault: z.boolean(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminAdTemplate(data, metadata);
+  }),
+  deleteAdminAdTemplate: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.deleteAdminAdTemplate(data, metadata);
+  }),
+  listAdminJobs: validateFn(
+    z.object({
+      offset: z.number().int().min(0).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      agentId: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminJobs(data, metadata);
+  }),
+  getAdminJob: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.getAdminJob(data, metadata);
+  }),
+  getAdminJobLogs: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.getAdminJobLogs(data, metadata);
+  }),
+  createAdminJob: validateFn(
+    z.object({
+      command: z.string().trim().min(1),
+      image: optionalTrimmed(),
+      env: z.record(z.string(), z.string()).optional(),
+      priority: z.number().int().optional(),
+      userId: optionalTrimmed(),
+      name: optionalTrimmed(),
+      timeLimit: z.number().int().min(0).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminJob(data, metadata);
+  }),
+  cancelAdminJob: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.cancelAdminJob(data, metadata);
+  }),
+  retryAdminJob: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.retryAdminJob(data, metadata);
+  }),
+  listAdminAgents: async () => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminAgents({}, metadata);
+  },
+  restartAdminAgent: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.restartAdminAgent(data, metadata);
+  }),
+  updateAdminAgent: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminAgent(data, metadata);
+  }),
 };

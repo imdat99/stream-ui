@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ModelVideo } from '@/api/client';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import { formatDate, formatDuration } from '@/lib/utils';
 import { useTranslation } from 'i18next-vue';
@@ -112,7 +112,7 @@ const getStatusClass = (status?: string) => {
                                     {{ formatDuration(video.duration) }}
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">
-                                    {{ formatDate(video.created_at) }}
+                                    {{ formatDate(video.createdAt) }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">

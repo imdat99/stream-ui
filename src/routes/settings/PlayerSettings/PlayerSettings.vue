@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import AppButton from '@/components/app/AppButton.vue';
 import AppSwitch from '@/components/app/AppSwitch.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
@@ -100,9 +100,8 @@ const handleSave = async () => {
 
     saving.value = true;
     try {
-        await client.settings.preferencesUpdate(
+        await rpcClient.updatePreferences(
             toPlayerPreferencesPayload(playerSettings.value),
-            { baseUrl: '/r' },
         );
         await refetch();
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { client, type ModelPlan } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
+import type { PaymentHistoryItem as PaymentHistoryApiItem, Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
@@ -19,30 +20,10 @@ import { computed, ref, watch } from 'vue';
 const TERM_OPTIONS = [1, 3, 6, 12] as const;
 type UpgradePaymentMethod = 'wallet' | 'topup';
 
-type PlansEnvelope = {
-    data?: {
-        plans?: ModelPlan[];
-    } | ModelPlan[];
-};
-
-type PaymentHistoryApiItem = {
-    id?: string;
-    amount?: number;
-    currency?: string;
-    status?: string;
-    plan_name?: string;
-    invoice_id?: string;
-    kind?: string;
-    term_months?: number;
-    payment_method?: string;
-    expires_at?: string;
-    created_at?: string;
-};
-
-type PaymentHistoryEnvelope = {
-    data?: {
-        payments?: PaymentHistoryApiItem[];
-    };
+type InvoiceDownloadResponse = {
+    filename?: string;
+    contentType?: string;
+    content?: string;
 };
 
 type PaymentHistoryItem = {
@@ -69,7 +50,7 @@ const { t, i18next } = useTranslation();
 
 const { data: plansResponse, isLoading } = useQuery({
     key: () => ['billing-plans'],
-    query: () => client.plans.plansList({ baseUrl: '/r' }),
+    query: () => rpcClient.listPlans(),
 });
 const { data: usageSnapshot, refetch: refetchUsage } = useUsageQuery();
 
@@ -89,17 +70,7 @@ const purchaseTopupAmount = ref<number | null>(null);
 const purchaseLoading = ref(false);
 const purchaseError = ref<string | null>(null);
 
-const plans = computed(() => {
-    const body = plansResponse.value?.data as PlansEnvelope | undefined;
-    const payload = body?.data;
-
-    if (Array.isArray(payload)) return payload;
-    if (payload && typeof payload === 'object' && Array.isArray(payload.plans)) {
-        return payload.plans;
-    }
-
-    return [] as ModelPlan[];
-});
+const plans = computed(() => plansResponse.value?.plans || [] as ModelPlan[]);
 
 const currentPlanId = computed(() => auth.user?.plan_id || undefined);
 const currentPlan = computed(() => plans.value.find(plan => plan.id === currentPlanId.value));
@@ -109,11 +80,11 @@ const storageUsed = computed(() => usageSnapshot.value?.totalStorage ?? 0);
 const uploadsUsed = computed(() => usageSnapshot.value?.totalVideos ?? 0);
 const storageLimit = computed(() => {
     const activePlan = plans.value.find(plan => plan.id === currentPlanId.value);
-    return activePlan?.storage_limit || 10737418240;
+    return activePlan?.storageLimit || 10737418240;
 });
 const uploadsLimit = computed(() => {
     const activePlan = plans.value.find(plan => plan.id === currentPlanId.value);
-    return activePlan?.upload_limit || 50;
+    return activePlan?.uploadLimit || 50;
 });
 const storagePercentage = computed(() =>
     Math.min(Math.round((storageUsed.value / storageLimit.value) * 100), 100),
@@ -189,9 +160,9 @@ const formatPaymentMethodLabel = (value?: string) => {
     }
 };
 
-const getPlanStorageText = (plan: ModelPlan) => t('settings.billing.planStorage', { storage: formatBytes(plan.storage_limit || 0) });
-const getPlanDurationText = (plan: ModelPlan) => t('settings.billing.planDuration', { duration: formatDuration(plan.duration_limit) });
-const getPlanUploadsText = (plan: ModelPlan) => t('settings.billing.planUploads', { count: plan.upload_limit || 0 });
+const getPlanStorageText = (plan: ModelPlan) => t('settings.billing.planStorage', { storage: formatBytes(plan.storageLimit || 0) });
+const getPlanDurationText = (plan: ModelPlan) => t('settings.billing.planDuration', { duration: formatDuration(plan.durationLimit) });
+const getPlanUploadsText = (plan: ModelPlan) => t('settings.billing.planUploads', { count: plan.uploadLimit || 0 });
 
 const getStatusStyles = (status: string) => {
     switch (status) {
@@ -254,25 +225,25 @@ const getApiErrorData = (error: unknown) => getApiErrorPayload(error)?.data || n
 const mapHistoryItem = (item: PaymentHistoryApiItem): PaymentHistoryItem => {
     const details: string[] = [];
 
-    if (item.kind !== 'wallet_topup' && item.term_months) {
-        details.push(formatTermLabel(item.term_months));
+    if (item.kind !== 'wallet_topup' && item.termMonths) {
+        details.push(formatTermLabel(item.termMonths));
     }
-    if (item.kind !== 'wallet_topup' && item.payment_method) {
-        details.push(formatPaymentMethodLabel(item.payment_method));
+    if (item.kind !== 'wallet_topup' && item.paymentMethod) {
+        details.push(formatPaymentMethodLabel(item.paymentMethod));
     }
-    if (item.kind !== 'wallet_topup' && item.expires_at) {
-        details.push(t('settings.billing.history.validUntil', { date: formatHistoryDate(item.expires_at) }));
+    if (item.kind !== 'wallet_topup' && item.expiresAt) {
+        details.push(t('settings.billing.history.validUntil', { date: formatHistoryDate(item.expiresAt) }));
     }
 
     return {
         id: item.id || '',
-        date: formatHistoryDate(item.created_at),
+        date: formatHistoryDate(item.createdAt),
         amount: item.amount || 0,
         plan: item.kind === 'wallet_topup'
             ? t('settings.billing.walletTopup')
-            : (item.plan_name || t('settings.billing.unknownPlan')),
+            : (item.planName || t('settings.billing.unknownPlan')),
         status: normalizeHistoryStatus(item.status),
-        invoiceId: item.invoice_id || '-',
+        invoiceId: item.invoiceId || '-',
         currency: item.currency || 'USD',
         kind: item.kind || 'subscription',
         details,
@@ -282,9 +253,8 @@ const mapHistoryItem = (item: PaymentHistoryApiItem): PaymentHistoryItem => {
 const loadPaymentHistory = async () => {
     historyLoading.value = true;
     try {
-        const response = await client.payments.historyList({ baseUrl: '/r' });
-        const body = response.data as PaymentHistoryEnvelope | undefined;
-        paymentHistory.value = (body?.data?.payments || []).map(mapHistoryItem);
+        const response = await rpcClient.listPaymentHistory();
+        paymentHistory.value = (response.payments || []).map(mapHistoryItem);
     } catch (error) {
         console.error(error);
         paymentHistory.value = [];
@@ -308,7 +278,7 @@ const refreshBillingState = async () => {
 void loadPaymentHistory();
 
 const subscriptionSummary = computed(() => {
-    const expiresAt = auth.user?.plan_expires_at;
+    const expiresAt = auth.user?.planExpiresAt || auth.user?.plan_expires_at;
     const formattedDate = formatHistoryDate(expiresAt);
 
     if (auth.user?.plan_id) {
@@ -434,16 +404,16 @@ const submitUpgrade = async () => {
     try {
         const paymentMethod: UpgradePaymentMethod = selectedNeedsTopup.value ? selectedPaymentMethod.value : 'wallet';
         const payload: Record<string, any> = {
-            plan_id: selectedPlan.value.id,
-            term_months: selectedTermMonths.value,
-            payment_method: paymentMethod,
+            planId: selectedPlan.value.id,
+            termMonths: selectedTermMonths.value,
+            paymentMethod: paymentMethod,
         };
 
         if (paymentMethod === 'topup') {
-            payload.topup_amount = purchaseTopupAmount.value || selectedShortfall.value;
+            payload.topupAmount = purchaseTopupAmount.value || selectedShortfall.value;
         }
 
-        await client.payments.paymentsCreate(payload, { baseUrl: '/r' });
+        await rpcClient.createPayment(payload);
         await refreshBillingState();
 
         toast.add({
@@ -481,7 +451,7 @@ const submitUpgrade = async () => {
 const handleTopup = async (amount: number) => {
     topupLoading.value = true;
     try {
-        await client.wallet.topupsCreate({ amount }, { baseUrl: '/r' });
+        await rpcClient.topupWallet({ amount });
         await refreshBillingState();
 
         toast.add({
@@ -517,13 +487,15 @@ const handleDownloadInvoice = async (item: PaymentHistoryItem) => {
     });
 
     try {
-        const response = await client.payments.invoiceList(item.id, { baseUrl: '/r', format: 'text' });
-        const content = typeof response.data === 'string' ? response.data : '';
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const response = await rpcClient.downloadInvoice({ id: item.id }) as InvoiceDownloadResponse;
+        const content = response.content || '';
+        const contentType = response.contentType || 'text/plain;charset=utf-8';
+        const filename = response.filename || `${item.invoiceId}.txt`;
+        const blob = new Blob([content], { type: contentType });
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = url;
-        anchor.download = `${item.invoiceId}.txt`;
+        anchor.download = filename;
         document.body.appendChild(anchor);
         anchor.click();
         document.body.removeChild(anchor);

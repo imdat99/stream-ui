@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
@@ -64,8 +64,8 @@ const mapDomainItem = (item: DomainApiItem): DomainItem => ({
 const { data: domainsSnapshot, error, isPending, refetch } = useQuery({
     key: () => ['settings', 'domains'],
     query: async () => {
-        const response = await client.domains.domainsList({ baseUrl: '/r' });
-        return ((((response.data as any)?.data?.domains) || []) as DomainApiItem[]).map(mapDomainItem);
+        const response = await rpcClient.listDomains();
+        return (response.domains || []).map(mapDomainItem);
     },
 });
 
@@ -126,9 +126,9 @@ const handleAddDomain = async () => {
 
     adding.value = true;
     try {
-        await client.domains.domainsCreate({
+        await rpcClient.createDomain({
             name: domainName,
-        }, { baseUrl: '/r' });
+        });
 
         await refetchDomains();
         closeAddDialog();
@@ -178,7 +178,7 @@ const handleRemoveDomain = (domain: DomainItem) => {
         accept: async () => {
             removingId.value = domain.id;
             try {
-                await client.domains.domainsDelete(domain.id, { baseUrl: '/r' });
+                await rpcClient.deleteDomain({ id: domain.id });
                 await refetchDomains();
                 toast.add({
                     severity: 'info',

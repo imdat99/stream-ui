@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import Bell from "@/components/icons/Bell.vue";
 import Home from "@/components/icons/Home.vue";
-import Video from "@/components/icons/Video.vue";
+import LayoutDashboard from "@/components/icons/LayoutDashboard.vue";
 import SettingsIcon from "@/components/icons/SettingsIcon.vue";
-// import Upload from "@/components/icons/Upload.vue";
+import Video from "@/components/icons/Video.vue";
 import { cn } from "@/lib/utils";
-import { computed, createStaticVNode, ref } from "vue";
-import { useTranslation } from 'i18next-vue';
+import { useAuthStore } from "@/stores/auth";
+import { useTranslation } from "i18next-vue";
+import { computed, createStaticVNode, ref, VNode } from "vue";
 import NotificationDrawer from "./NotificationDrawer.vue";
 
 const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
@@ -14,40 +15,69 @@ const homeHoist = createStaticVNode(`<img class="h-8 w-8" src="/apple-touch-icon
 const notificationPopover = ref<InstanceType<typeof NotificationDrawer>>();
 const isNotificationOpen = ref(false);
 const { t } = useTranslation();
+const auth = useAuthStore();
+
+const isAdmin = computed(() => String(auth.user?.role || "").toLowerCase() === "admin");
 
 const handleNotificationClick = (event: Event) => {
-    notificationPopover.value?.toggle(event);
+  notificationPopover.value?.toggle(event);
 };
 
-const links = computed(() => [
-    { href: "/#home", label: "app", icon: homeHoist, type: "btn", className },
-    { href: "/", label: t('nav.overview'), icon: Home, type: "a", className },
-    // { href: "/upload", label: t('common.upload'), icon: Upload, type: "a", className },
-    { href: "/videos", label: t('nav.videos'), icon: Video, type: "a", className },
-    { href: "/notification", label: t('nav.notification'), icon: Bell, type: "btn", className, action: handleNotificationClick, isActive: isNotificationOpen },
-    { href: "/settings", label: t('nav.settings'), icon: SettingsIcon, type: "a", className },
-]);
+const links = computed<Record<string, any>>(() => {
+  const baseLinks = [
+    { href: "/#home", label: "app", icon: homeHoist, action: () => {}, className },
+    { href: "/", label: t("nav.overview"), icon: Home, action: null, className },
+    { href: "/videos", label: t("nav.videos"), icon: Video, action: null, className },
+    {
+      href: "/notification",
+      label: t("nav.notification"),
+      icon: Bell,
+      className,
+      action: handleNotificationClick,
+      isActive: isNotificationOpen,
+    },
+    { href: "/settings", label: t("nav.settings"), icon: SettingsIcon, action: null, className },
+  ] as const;
 
+  if (isAdmin.value) {
+    return [
+      ...baseLinks,
+      {
+        href: "/admin/overview",
+        label: "Admin",
+        icon: LayoutDashboard,
+        action: null,
+        className,
+      } as const,
+    ];
+  }
 
-//v-tooltip="i.label"
+  return baseLinks;
+});
 </script>
 
 <template>
-    <header
-        class=":uno: fixed left-0 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen bg-muted transition-all duration-300 ease-in-out w-18 items-center">
-
-        <template v-for="i in links" :key="i.href">
-            <component :name="i.label" :is="i.type === 'a' ? 'router-link' : 'div'"
-                v-bind="i.type === 'a' ? { to: i.href } : {}"
-                @click="i.action && i.action($event)"
-                :class="cn(
-                    i.className,
-                    ($route.path === i.href || $route.path.startsWith(i.href+'/') || i.isActive?.value) && 'bg-primary/15'
-                )">
-                <component :is="i.icon" class="w-6 h-6 shrink-0"
-                    :filled="$route.path === i.href || $route.path.startsWith(i.href+'/') || i.isActive?.value" />
-            </component>
-        </template>
-    </header>
-    <NotificationDrawer ref="notificationPopover" @change="(val) => isNotificationOpen = val" />
+  <header
+    class=":uno: fixed left-0 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen bg-muted transition-all duration-300 ease-in-out w-18 items-center"
+  >
+    <template v-for="i in links" :key="i.href">
+      <component
+        :name="i.label"
+        :is="i.action ? 'div' : 'router-link'"
+        v-bind="i.action ? {} : { to: i.href }"
+        @click="i.action && i.action($event)"
+        :class="cn(
+          i.className,
+          ($route.path === i.href || $route.path.startsWith(i.href + '/') || i.isActive?.value) && 'bg-primary/15',
+        )"
+      >
+        <component
+          :is="i.icon"
+          class="w-6 h-6 shrink-0"
+          :filled="$route.path === i.href || $route.path.startsWith(i.href + '/') || i.isActive?.value"
+        />
+      </component>
+    </template>
+  </header>
+  <NotificationDrawer ref="notificationPopover" @change="(val) => (isNotificationOpen = val)" />
 </template>

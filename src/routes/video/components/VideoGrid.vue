@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModelVideo } from '@/api/client';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { formatDate, formatDuration, getStatusSeverity } from '@/lib/utils';
 import { useTranslation } from 'i18next-vue';
 import CardPopover from './CardPopover.vue';
@@ -96,7 +96,7 @@ const toggleSelection = (video: ModelVideo) => {
                 <p class="text-xs text-gray-500 mb-3 line-clamp-1 h-4">{{ video.description || t('video.table.noDescription') }}
                 </p>
                 <div class="text-xs text-gray-400 mt-auto">
-                    {{ formatDate(video.created_at) }}
+                    {{ formatDate(video.createdAt) }}
                 </div>
             </div>
 

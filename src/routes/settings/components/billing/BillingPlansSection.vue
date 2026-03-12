@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModelPlan } from '@/api/client';
+import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
 
@@ -44,7 +44,7 @@ const emit = defineEmits<{
 
         <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
-                v-for="plan in plans.sort((a,b) => a.price - b.price)"
+                v-for="plan in plans.sort((a,b) => (a.price || 0) - (b.price || 0))"
                 :key="plan.id"
                 :class="[
                     'border rounded-lg p-4 hover:bg-muted/30 transition-all flex flex-col',

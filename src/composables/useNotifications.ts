@@ -1,4 +1,4 @@
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import { computed, ref } from 'vue';
 import { useTranslation } from 'i18next-vue';
 
@@ -24,9 +24,7 @@ type NotificationApiItem = {
     read?: boolean;
     actionUrl?: string;
     actionLabel?: string;
-    action_url?: string;
-    action_label?: string;
-    created_at?: string;
+    createdAt?: string;
 };
 
 const notifications = ref<AppNotification[]>([]);
@@ -69,18 +67,18 @@ export function useNotifications() {
         type: normalizeType(item.type),
         title: item.title || '',
         message: item.message || '',
-        time: formatRelativeTime(item.created_at),
+        time: formatRelativeTime(item.createdAt),
         read: Boolean(item.read),
-        actionUrl: item.actionUrl || item.action_url || undefined,
-        actionLabel: item.actionLabel || item.action_label || undefined,
-        createdAt: item.created_at,
+        actionUrl: item.actionUrl || undefined,
+        actionLabel: item.actionLabel || undefined,
+        createdAt: item.createdAt,
     });
 
     const fetchNotifications = async () => {
         loading.value = true;
         try {
-            const response = await client.notifications.notificationsList({ baseUrl: '/r' });
-            notifications.value = (((response.data as any)?.data?.notifications || []) as NotificationApiItem[]).map(mapNotification);
+            const response = await rpcClient.listNotifications();
+            notifications.value = (response.notifications || []).map(mapNotification);
             loaded.value = true;
             return notifications.value;
         } finally {
@@ -90,24 +88,24 @@ export function useNotifications() {
 
     const markRead = async (id: string) => {
         if (!id) return;
-        await client.notifications.readCreate(id, { baseUrl: '/r' });
+        await rpcClient.markNotificationRead({ id });
         const item = notifications.value.find(notification => notification.id === id);
         if (item) item.read = true;
     };
 
     const deleteNotification = async (id: string) => {
         if (!id) return;
-        await client.notifications.notificationsDelete2(id, { baseUrl: '/r' });
+        await rpcClient.deleteNotification({ id });
         notifications.value = notifications.value.filter(notification => notification.id !== id);
     };
 
     const markAllRead = async () => {
-        await client.notifications.readAllCreate({ baseUrl: '/r' });
+        await rpcClient.markAllNotificationsRead();
         notifications.value = notifications.value.map(item => ({ ...item, read: true }));
     };
 
     const clearAll = async () => {
-        await client.notifications.notificationsDelete({ baseUrl: '/r' });
+        await rpcClient.clearNotifications();
         notifications.value = [];
     };
 

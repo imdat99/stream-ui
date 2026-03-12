@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { client, type ManualAdTemplate, type ModelVideo } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
+import type { AdTemplate as ManualAdTemplate, Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useAppToast } from '@/composables/useAppToast';
 import { useAuthStore } from '@/stores/auth';
 import { computed, ref, watch } from 'vue';
@@ -53,9 +54,8 @@ const subtitleForm = ref({
 const fetchAdTemplates = async () => {
     loadingTemplates.value = true;
     try {
-        const response = await client.adTemplates.adTemplatesList({ baseUrl: '/r' });
-        const items = ((response.data as any)?.data?.templates || []) as ManualAdTemplate[];
-        adTemplates.value = items;
+        const response = await rpcClient.listAdTemplates();
+        adTemplates.value = response.templates ?? [];
     } catch (error) {
         console.error('Failed to fetch ad templates:', error);
     } finally {
@@ -66,17 +66,15 @@ const fetchAdTemplates = async () => {
 const fetchVideo = async () => {
     loading.value = true;
     try {
-        const response = await client.videos.videosDetail(props.videoId, { baseUrl: '/r' });
-        const data = (response.data as any)?.data;
-        const videoData = data?.video || data;
-        const adConfig = data?.ad_config as AdConfigPayload | undefined;
+        const response = await rpcClient.getVideo({ id: props.videoId });
+        const videoData = response.video;
 
         if (videoData) {
             video.value = videoData;
-            currentAdConfig.value = adConfig || null;
+            currentAdConfig.value = null;
             form.value = {
                 title: videoData.title || '',
-                adTemplateId: adConfig?.ad_template_id || '',
+                adTemplateId: '',
             };
         }
     } catch (error) {
@@ -104,26 +102,25 @@ const onFormSubmit = async () => {
     if (!validate()) return;
     saving.value = true;
     try {
-        const payload: Record<string, any> = {
+        const response = await rpcClient.updateVideo({
+            id: props.videoId,
             title: form.value.title,
-        };
+            description: video.value?.description || '',
+            url: video.value?.url,
+            size: video.value?.size,
+            duration: video.value?.duration,
+            format: video.value?.format,
+            status: video.value?.status,
+        });
 
-        if (!isFreePlan.value) {
-            payload.ad_template_id = form.value.adTemplateId || '';
-        }
-
-        const response = await client.videos.videosUpdate(props.videoId, payload as any, { baseUrl: '/r' });
-
-        const data = (response.data as any)?.data;
-        const updatedVideo = data?.video as ModelVideo | undefined;
-        const updatedAdConfig = data?.ad_config as AdConfigPayload | undefined;
+        const updatedVideo = response.video as ModelVideo | undefined;
 
         if (updatedVideo) {
             video.value = updatedVideo;
-            currentAdConfig.value = updatedAdConfig || null;
+            currentAdConfig.value = null;
             form.value = {
                 title: updatedVideo.title || '',
-                adTemplateId: updatedAdConfig?.ad_template_id || '',
+                adTemplateId: '',
             };
         }
 

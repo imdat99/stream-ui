@@ -1,19 +1,20 @@
-import {
-	proxyTinyRpc,
-	TinyRpcClientAdapter,
-	TinyRpcError,
-} from "@hiogawa/tiny-rpc";
-import { Result } from "@hiogawa/utils";
+import { proxyTinyRpc } from "@hiogawa/tiny-rpc";
 import { httpClientAdapter } from "@httpClientAdapter";
-// console.log("httpClientAdapter module:", httpClientAdapter.toString());
-declare let __host__: string;
+import type { RpcRoutes } from "@/server/routes/rpc";
+
 const endpoint = "/rpc";
+const publicEndpoint = "/rpc-public";
 const url = import.meta.env.SSR ? "http://localhost" : "";
-import { type RpcRoutes } from "@/server/routes/rpc";
+const publicMethods = ["login", "register", "forgotPassword", "resetPassword", "getGoogleLoginUrl"];
 
 export const client = proxyTinyRpc<RpcRoutes>({
-	adapter: httpClientAdapter({
-		url: url + endpoint,
-		pathsForGET: [],
-	}),
+  adapter: {
+    send: async (data) => {
+      const targetEndpoint = publicMethods.includes(data.path) ? publicEndpoint : endpoint;
+      return await httpClientAdapter({
+        url: `${url}${targetEndpoint}`,
+        pathsForGET: ["health"],
+      }).send(data);
+    },
+  },
 });

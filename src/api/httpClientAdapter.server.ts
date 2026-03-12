@@ -3,6 +3,7 @@ import { Result } from "@hiogawa/utils";
 import { tryGetContext } from "hono/context-storage";
 
 const GET_PAYLOAD_PARAM = "payload";
+export const baseAPIURL = "https://api.pipic.fun";
 
 export function httpClientAdapter(opts: {
 	url: string;

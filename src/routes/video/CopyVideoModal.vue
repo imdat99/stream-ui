@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { client, type ModelVideo } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
@@ -21,10 +22,9 @@ const { t } = useTranslation();
 const fetchVideo = async () => {
     loading.value = true;
     try {
-        const response = await client.videos.videosDetail(props.videoId, { baseUrl: '/r' });
-        const videoData = (response.data as any)?.data?.video || (response.data as any)?.data;
-        if (videoData) {
-            video.value = videoData;
+        const response = await rpcClient.getVideo({ id: props.videoId });
+        if (response.video) {
+            video.value = response.video;
         }
     } catch (error) {
         console.error('Failed to fetch video:', error);
@@ -44,8 +44,8 @@ const baseUrl = computed(() => typeof window !== 'undefined' ? window.location.o
 const shareLinks = computed(() => {
     if (!video.value) return [];
     const v = video.value;
-    const playbackPath = v.url || `/play/index/${v.id}`;
-    const playbackUrl = playbackPath.startsWith('http') ? playbackPath : `${baseUrl.value}${playbackPath}`;
+    const playbackPath = v.url || '';
+    const playbackUrl = playbackPath.startsWith('http') ? playbackPath : `${baseUrl.value}/${playbackPath.replace(/^\/+/, '')}`;
     return [
         {
             key: 'embed',

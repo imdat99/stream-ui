@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { client } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
 import AppButton from '@/components/app/AppButton.vue';
 import AlertTriangleIcon from '@/components/icons/AlertTriangle.vue';
 import SlidersIcon from '@/components/icons/SlidersIcon.vue';
@@ -32,7 +32,7 @@ const handleDeleteAccount = () => {
         accept: async () => {
             deletingAccount.value = true;
             try {
-                await client.me.deleteMe({ baseUrl: '/r' });
+                await rpcClient.deleteMe();
 
                 auth.$reset();
                 toast.add({
@@ -66,7 +66,7 @@ const handleClearData = () => {
         accept: async () => {
             clearingData.value = true;
             try {
-                await client.me.clearDataCreate({ baseUrl: '/r' });
+                await rpcClient.clearMyData();
 
                 await auth.fetchMe();
                 toast.add({

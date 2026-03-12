@@ -1,5 +1,6 @@
 <script setup lang="tsx">
-import { client, type ModelVideo } from '@/api/client';
+import { client as rpcClient } from '@/api/rpcclient';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useUsageQuery } from '@/composables/useUsageQuery';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { computed, onMounted, ref } from 'vue';
@@ -23,16 +24,8 @@ const statsLoading = computed(() => recentVideosLoading.value || (isUsagePending
 const fetchDashboardData = async () => {
     recentVideosLoading.value = true;
     try {
-        const response = await client.videos.videosList({ page: 1, limit: 5 }, { baseUrl: '/r' });
-        const body = response.data as any;
-
-        const videos = Array.isArray(body?.data?.videos)
-            ? body.data.videos
-            : Array.isArray(body?.videos)
-                ? body.videos
-                : [];
-
-        recentVideos.value = videos;
+        const response = await rpcClient.listVideos({ page: 1, limit: 5 });
+        recentVideos.value = response.videos ?? [];
     } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
     } finally {

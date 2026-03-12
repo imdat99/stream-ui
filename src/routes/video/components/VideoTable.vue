@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModelVideo } from '@/api/client';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
@@ -120,7 +120,7 @@ const isSelected = (video: ModelVideo) =>
                         <span class="text-sm text-gray-500">{{ formatBytes(data.size) }}</span>
                     </td>
                     <td class="px-4 py-3">
-                        <span class="text-sm text-gray-500">{{ formatDate(data.created_at, true) }}</span>
+                        <span class="text-sm text-gray-500">{{ formatDate(data.createdAt, true) }}</span>
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-0.5">

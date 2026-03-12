@@ -8,7 +8,7 @@
     "lib": [
       "ESNext", "DOM"
     ],
-    "types": ["vite/client"],
+    "types": ["vite/client", "bun"],
     "jsx": "preserve",
     "jsxImportSource": "vue",
     "baseUrl": ".",
