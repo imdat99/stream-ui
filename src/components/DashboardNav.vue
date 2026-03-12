@@ -44,7 +44,7 @@ const links = computed<Record<string, any>>(() => {
       ...baseLinks,
       {
         href: "/admin/overview",
-        label: "Admin",
+        label: "Admin Console",
         icon: LayoutDashboard,
         action: null,
         className,

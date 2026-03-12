@@ -3,10 +3,11 @@ import { client as rpcClient } from "@/api/rpcclient";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
 
-type AdminAgentRow = any;
+type ListAgentsResponse = Awaited<ReturnType<typeof rpcClient.listAdminAgents>>;
+type AdminAgentRow = NonNullable<ListAgentsResponse["agents"]>[number];
 
 const loading = ref(true);
 const submitting = ref(false);
@@ -16,6 +17,27 @@ const rows = ref<AdminAgentRow[]>([]);
 const selectedRow = ref<AdminAgentRow | null>(null);
 const restartOpen = ref(false);
 const updateOpen = ref(false);
+let reloadAgentsTimer: ReturnType<typeof setTimeout> | null = null;
+
+const summary = computed(() => [
+  { label: "Agents", value: rows.value.length },
+  { label: "Online", value: rows.value.filter((row) => matchesStatus(row.status, ["online", "active"])).length },
+  { label: "Busy", value: rows.value.reduce((sum, row) => sum + Number(row.activeJobCount ?? 0), 0) },
+  { label: "Total capacity", value: rows.value.reduce((sum, row) => sum + Number(row.capacity ?? 0), 0) },
+]);
+const selectedMeta = computed(() => {
+  if (!selectedRow.value) return [];
+  return [
+    { label: "Status", value: selectedRow.value.status || "—" },
+    { label: "Platform", value: selectedRow.value.platform || "—" },
+    { label: "Version", value: selectedRow.value.version || "—" },
+    { label: "Capacity", value: String(selectedRow.value.capacity ?? 0) },
+    { label: "Active jobs", value: String(selectedRow.value.activeJobCount ?? 0) },
+    { label: "Heartbeat", value: formatDate(selectedRow.value.lastHeartbeat) },
+  ];
+});
+
+const matchesStatus = (value: string | undefined, candidates: string[]) => candidates.includes(String(value || "").toLowerCase());
 
 const loadAgents = async () => {
   loading.value = true;
@@ -23,6 +45,10 @@ const loadAgents = async () => {
   try {
     const response = await rpcClient.listAdminAgents();
     rows.value = response.agents ?? [];
+    if (selectedRow.value?.id) {
+      const fresh = rows.value.find((row) => row.id === selectedRow.value?.id);
+      if (fresh) selectedRow.value = fresh;
+    }
   } catch (err: any) {
     error.value = err?.message || "Failed to load admin agents";
   } finally {
@@ -33,8 +59,16 @@ const loadAgents = async () => {
 const closeDialogs = () => {
   restartOpen.value = false;
   updateOpen.value = false;
-  selectedRow.value = null;
   actionError.value = null;
+};
+
+const scheduleAgentsReload = () => {
+  if (loading.value) return;
+  if (reloadAgentsTimer) clearTimeout(reloadAgentsTimer);
+  reloadAgentsTimer = setTimeout(() => {
+    reloadAgentsTimer = null;
+    loadAgents();
+  }, 300);
 };
 
 const openRestartDialog = (row: AdminAgentRow) => {
@@ -56,7 +90,6 @@ const submitRestart = async () => {
   try {
     await rpcClient.restartAdminAgent({ id: selectedRow.value.id });
     restartOpen.value = false;
-    selectedRow.value = null;
     await loadAgents();
   } catch (err: any) {
     actionError.value = err?.message || "Failed to restart agent";
@@ -72,7 +105,6 @@ const submitUpdate = async () => {
   try {
     await rpcClient.updateAdminAgent({ id: selectedRow.value.id });
     updateOpen.value = false;
-    selectedRow.value = null;
     await loadAgents();
   } catch (err: any) {
     actionError.value = err?.message || "Failed to update agent";
@@ -81,21 +113,57 @@ const submitUpdate = async () => {
   }
 };
 
+const formatDate = (value?: string) => {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+};
+
+const formatCpu = (value?: number) => `${Number(value ?? 0).toFixed(1)}%`;
+const formatRam = (value?: number) => `${Number(value ?? 0).toFixed(1)} MB`;
+
+const statusBadgeClass = (status?: string) => {
+  const normalized = String(status || "").toLowerCase();
+  if (["online", "active"].includes(normalized)) return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (["busy", "updating"].includes(normalized)) return "border-amber-200 bg-amber-50 text-amber-700";
+  if (["offline", "error", "failed"].includes(normalized)) return "border-rose-200 bg-rose-50 text-rose-700";
+  return "border-slate-200 bg-slate-100 text-slate-700";
+};
+
 useAdminRuntimeMqtt(({ topic, payload }) => {
-  if (topic !== "picpic/events" || payload?.type !== "agent_update") return;
-  const update = payload.payload;
-  if (!update?.id) return;
-  const row = rows.value.find((item) => item.id === update.id);
-  if (row) {
-    Object.assign(row, {
-      ...row,
-      ...update,
-      lastHeartbeat: update.last_heartbeat || row.lastHeartbeat,
-      createdAt: update.created_at || row.createdAt,
-      updatedAt: update.updated_at || row.updatedAt,
-    });
-  } else {
-    loadAgents();
+  if (topic !== "picpic/events") return;
+
+  if (payload?.type === "agent_update") {
+    const update = payload.payload;
+    if (!update?.id) return;
+    const row = rows.value.find((item) => item.id === update.id);
+    if (row) {
+      Object.assign(row, {
+        ...row,
+        ...update,
+        lastHeartbeat: update.last_heartbeat || row.lastHeartbeat,
+        createdAt: update.created_at || row.createdAt,
+        updatedAt: update.updated_at || row.updatedAt,
+      });
+    } else {
+      loadAgents();
+    }
+  }
+
+  if (payload?.type === "resource_update") {
+    const update = payload.payload;
+    if (!update?.agent_id) return;
+    const row = rows.value.find((item) => item.id === update.agent_id);
+    if (row) {
+      row.cpu = update.cpu ?? row.cpu;
+      row.ram = update.ram ?? row.ram;
+      row.lastHeartbeat = new Date().toISOString();
+      row.status = row.status || "online";
+    }
+  }
+
+  if (payload?.type === "job_update") {
+    scheduleAgentsReload();
   }
 });
 
@@ -105,57 +173,110 @@ onMounted(loadAgents);
 <template>
   <AdminSectionShell
     title="Admin Agents"
-    description="Connected render workers and command controls over admin gRPC service."
+    description="Watch worker health, capacity and maintenance actions while staying on the current admin runtime transport."
+    eyebrow="Workers"
+    :badge="`${rows.length} agents connected`"
   >
-    <div class="mb-4 flex justify-end">
-      <AppButton size="sm" variant="secondary" @click="loadAgents">Refresh agents</AppButton>
-    </div>
+    <template #toolbar>
+      <AppButton size="sm" variant="secondary" :loading="loading" @click="loadAgents">Refresh agents</AppButton>
+    </template>
 
-    <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-      {{ error }}
-    </div>
+    <template #stats>
+      <div v-for="item in summary" :key="item.label" class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{{ item.label }}</div>
+        <div class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{{ item.value }}</div>
+      </div>
+    </template>
 
-    <div v-else class="overflow-x-auto">
-      <table class="min-w-full text-left text-sm">
-        <thead>
-          <tr class="border-b border-gray-200 text-gray-500">
-            <th class="py-3 pr-4 font-medium">Agent</th>
-            <th class="py-3 pr-4 font-medium">Status</th>
-            <th class="py-3 pr-4 font-medium">Platform</th>
-            <th class="py-3 pr-4 font-medium">Version</th>
-            <th class="py-3 pr-4 font-medium">CPU</th>
-            <th class="py-3 pr-4 font-medium">RAM</th>
-            <th class="py-3 pr-4 font-medium">Heartbeat</th>
-            <th class="py-3 pr-4 text-right font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="loading" class="border-b border-gray-100">
-            <td colspan="8" class="py-6 text-center text-gray-500">Loading agents...</td>
-          </tr>
-          <tr v-else-if="rows.length === 0" class="border-b border-gray-100">
-            <td colspan="8" class="py-6 text-center text-gray-500">No agents connected.</td>
-          </tr>
-          <tr v-for="row in rows" :key="row.id" class="border-b border-gray-100 align-top">
-            <td class="py-3 pr-4 text-gray-700">
-              <div class="font-medium">{{ row.name || row.id }}</div>
-              <div class="text-xs text-gray-500">{{ row.id }}</div>
-            </td>
-            <td class="py-3 pr-4 text-gray-700">{{ row.status }}</td>
-            <td class="py-3 pr-4 text-gray-700">{{ row.platform || '—' }}</td>
-            <td class="py-3 pr-4 text-gray-700">{{ row.version || '—' }}</td>
-            <td class="py-3 pr-4 text-gray-700">{{ row.cpu ?? 0 }}</td>
-            <td class="py-3 pr-4 text-gray-700">{{ row.ram ?? 0 }}</td>
-            <td class="py-3 pr-4 text-gray-700">{{ row.lastHeartbeat ? new Date(row.lastHeartbeat).toLocaleString() : '—' }}</td>
-            <td class="py-3 text-right">
-              <div class="flex justify-end gap-2">
-                <AppButton size="sm" variant="secondary" @click="openUpdateDialog(row)">Update</AppButton>
-                <AppButton size="sm" variant="danger" @click="openRestartDialog(row)">Restart</AppButton>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <template #aside>
+      <div class="space-y-5">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Selected agent</div>
+        <div v-if="selectedRow" class="space-y-4">
+          <div>
+            <div class="text-lg font-semibold text-white">{{ selectedRow.name || 'Unnamed agent' }}</div>
+            <div class="mt-1 text-sm text-slate-400">{{ selectedRow.id }}</div>
+          </div>
+          <div class="grid gap-3">
+            <div v-for="item in selectedMeta" :key="item.label" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ item.label }}</div>
+              <div class="mt-1 text-sm font-medium text-white">{{ item.value }}</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">CPU</div>
+              <div class="mt-1 text-sm font-medium text-white">{{ formatCpu(selectedRow.cpu) }}</div>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">RAM</div>
+              <div class="mt-1 text-sm font-medium text-white">{{ formatRam(selectedRow.ram) }}</div>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <AppButton size="sm" @click="openUpdateDialog(selectedRow)">Update agent</AppButton>
+            <AppButton size="sm" variant="danger" @click="openRestartDialog(selectedRow)">Restart agent</AppButton>
+          </div>
+        </div>
+        <div v-else class="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-sm leading-6 text-slate-400">
+          Select an agent to inspect heartbeat, capacity and dispatch maintenance commands.
+        </div>
+      </div>
+    </template>
+
+    <div class="space-y-4">
+      <div v-if="error" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
+
+      <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-slate-50/90 text-slate-500">
+              <tr>
+                <th class="px-4 py-3 font-semibold">Agent</th>
+                <th class="px-4 py-3 font-semibold">Status</th>
+                <th class="px-4 py-3 font-semibold text-right">Capacity</th>
+                <th class="px-4 py-3 font-semibold text-right">Active jobs</th>
+                <th class="px-4 py-3 font-semibold text-right">CPU</th>
+                <th class="px-4 py-3 font-semibold text-right">RAM</th>
+                <th class="px-4 py-3 font-semibold">Heartbeat</th>
+                <th class="px-4 py-3 text-right font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading" class="border-t border-slate-200">
+                <td colspan="8" class="px-4 py-10 text-center text-slate-500">Loading agents...</td>
+              </tr>
+              <tr v-else-if="rows.length === 0" class="border-t border-slate-200">
+                <td colspan="8" class="px-4 py-10 text-center text-slate-500">No agents connected.</td>
+              </tr>
+              <tr v-for="row in rows" :key="row.id" class="border-t border-slate-200 transition-colors hover:bg-slate-50/70" :class="selectedRow?.id === row.id ? 'bg-sky-50/60' : ''">
+                <td class="px-4 py-3">
+                  <button class="text-left" @click="selectedRow = row">
+                    <div class="font-medium text-slate-900">{{ row.name || 'Unnamed agent' }}</div>
+                    <div class="mt-1 text-xs text-slate-500">{{ row.id }}</div>
+                    <div class="mt-1 text-xs text-slate-500">{{ row.platform || '—' }} · {{ row.backend || '—' }} · {{ row.version || '—' }}</div>
+                  </button>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" :class="statusBadgeClass(row.status)">
+                    {{ row.status || 'UNKNOWN' }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-right text-slate-700">{{ row.capacity ?? 0 }}</td>
+                <td class="px-4 py-3 text-right text-slate-700">{{ row.activeJobCount ?? 0 }}</td>
+                <td class="px-4 py-3 text-right text-slate-700">{{ formatCpu(row.cpu) }}</td>
+                <td class="px-4 py-3 text-right text-slate-700">{{ formatRam(row.ram) }}</td>
+                <td class="px-4 py-3 text-slate-500">{{ formatDate(row.lastHeartbeat) }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex justify-end gap-2">
+                    <AppButton size="sm" variant="secondary" @click="openUpdateDialog(row)">Update</AppButton>
+                    <AppButton size="sm" variant="danger" @click="openRestartDialog(row)">Restart</AppButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </AdminSectionShell>
 

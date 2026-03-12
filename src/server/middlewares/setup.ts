@@ -1,4 +1,3 @@
-import { RedisClient } from "bun";
 import type { Hono } from "hono";
 import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
@@ -10,11 +9,18 @@ type AppFetch = (
   requestInit?: RequestInit
 ) => Response | Promise<Response>;
 
+type RedisClientLike = {
+  connect(): Promise<unknown>;
+  get(key: string): Promise<string | null>;
+  set(...args: unknown[]): Promise<unknown> | unknown;
+  del(key: string): Promise<unknown> | unknown;
+};
+
 declare module "hono" {
   interface ContextVariableMap {
     fetch: AppFetch;
     isMobile: boolean;
-    redis: RedisClient;
+    redis: RedisClientLike;
     jwtProvider: JwtProvider;
     jwtPayload: Record<string, unknown>;
     userId: string;
@@ -23,7 +29,37 @@ declare module "hono" {
   }
 }
 
-const redisClient = new RedisClient("redis://:pass123@47.84.62.226:6379/3");
+let redisClientPromise: Promise<RedisClientLike> | null = null;
+
+const getJwtSecret = () => {
+  const secret = (process.env.JWT_SECRET || process.env.STREAM_UI_JWT_SECRET || "").trim() || "secret_is_not_configured"
+  if (!secret) {
+    throw new Error("JWT secret is not configured");
+  }
+  return secret;
+};
+
+const getRedisUrl = () => {
+  const redisUrl = (process.env.REDIS_URL || process.env.STREAM_UI_REDIS_URL || "").trim() || "redis://:pass123@47.84.62.226:6379/3";
+  if (!redisUrl) {
+    throw new Error("Redis URL is not configured");
+  }
+  return redisUrl;
+};
+
+const getRedisClient = async (): Promise<RedisClientLike> => {
+  console.log("bun", typeof Bun)
+
+  if (!redisClientPromise) {
+    // redisClientPromise = import("Bun").then(async ({ RedisClient }) => {
+    //   const client = new RedisClient(getRedisUrl()) as RedisClientLike;
+    //   await client.connect();
+    //   return client;
+    // });
+  }
+  // return await redisClientPromise;
+  return Promise.resolve() as any
+};
 
 export function setupMiddlewares(app: Hono) {
   app.use(
@@ -37,7 +73,7 @@ export function setupMiddlewares(app: Hono) {
     }),
     contextStorage(),
     async (c, next) => {
-      c.set("jwtProvider", JwtProvider.newJWTProvider("your-secret-key"));
+      c.set("jwtProvider", JwtProvider.newJWTProvider(getJwtSecret()));
       await next();
     }
   );
@@ -55,7 +91,9 @@ export function setupMiddlewares(app: Hono) {
   });
   app.use(async (c, next) => {
     try {
-      return await redisClient.connect().then(() => c.set("redis", redisClient)).then(next)
+      const redisClient = await getRedisClient();
+      c.set("redis", redisClient);
+      await next();
     } catch (e) {
       console.error("Failed to connect to Redis", e);
       return c.json({ error: "Redis unavailable" }, 500);
