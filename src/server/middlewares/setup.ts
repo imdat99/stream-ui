@@ -4,23 +4,17 @@ import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import isMobile from "is-mobile";
 import { JwtProvider } from "../utils/token";
+import { RedisClient } from "bun";
 type AppFetch = (
   input: string | Request | URL,
   requestInit?: RequestInit
 ) => Response | Promise<Response>;
 
-type RedisClientLike = {
-  connect(): Promise<unknown>;
-  get(key: string): Promise<string | null>;
-  set(...args: unknown[]): Promise<unknown> | unknown;
-  del(key: string): Promise<unknown> | unknown;
-};
-
 declare module "hono" {
   interface ContextVariableMap {
     fetch: AppFetch;
     isMobile: boolean;
-    redis: RedisClientLike;
+    redis: RedisClient;
     jwtProvider: JwtProvider;
     jwtPayload: Record<string, unknown>;
     userId: string;
@@ -29,7 +23,7 @@ declare module "hono" {
   }
 }
 
-let redisClientPromise: Promise<RedisClientLike> | null = null;
+let redisClientPromise: Promise<RedisClient> | null = null;
 
 const getJwtSecret = () => {
   const secret = (process.env.JWT_SECRET || process.env.STREAM_UI_JWT_SECRET || "").trim() || "secret_is_not_configured"
@@ -47,10 +41,13 @@ const getRedisUrl = () => {
   return redisUrl;
 };
 
-const getRedisClient = async (): Promise<RedisClientLike> => {
+const getRedisClient = async (): Promise<RedisClient> => {
   console.log("bun", typeof Bun)
 
   if (!redisClientPromise) {
+    const client = new RedisClient(getRedisUrl())
+    await client.connect();
+    return client;
     // redisClientPromise = import("Bun").then(async ({ RedisClient }) => {
     //   const client = new RedisClient(getRedisUrl()) as RedisClientLike;
     //   await client.connect();
