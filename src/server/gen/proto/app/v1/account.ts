@@ -18,6 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { StringValue } from "../../google/protobuf/wrappers";
 import { MessageResponse, Notification, Preferences, User } from "./common";
 
 export const protobufPackage = "stream.app.v1";
@@ -1402,6 +1403,16 @@ export const AccountServiceService = {
     responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
+  getUserById: {
+    path: "/stream.app.v1.AccountService/GetUserById",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: string | undefined): Buffer =>
+      Buffer.from(StringValue.encode({ value: value ?? "" }).finish()),
+    requestDeserialize: (value: Buffer): string | undefined => StringValue.decode(value).value,
+    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
+    responseDeserialize: (value: Buffer): User => User.decode(value),
+  },
 } as const;
 
 export interface AccountServiceServer extends UntypedServiceImplementation {
@@ -1409,6 +1420,7 @@ export interface AccountServiceServer extends UntypedServiceImplementation {
   updateMe: handleUnaryCall<UpdateMeRequest, UpdateMeResponse>;
   deleteMe: handleUnaryCall<DeleteMeRequest, MessageResponse>;
   clearMyData: handleUnaryCall<ClearMyDataRequest, MessageResponse>;
+  getUserById: handleUnaryCall<string | undefined, User>;
 }
 
 export interface AccountServiceClient extends Client {
@@ -1471,6 +1483,21 @@ export interface AccountServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  getUserById(
+    request: string | undefined,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  getUserById(
+    request: string | undefined,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  getUserById(
+    request: string | undefined,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: User) => void,
   ): ClientUnaryCall;
 }
 

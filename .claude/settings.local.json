@@ -9,7 +9,10 @@
       "Bash(python -:*)",
       "Bash(bun run:*)",
       "Bash(bunx:*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git status:*)"
     ]
   }
 }
