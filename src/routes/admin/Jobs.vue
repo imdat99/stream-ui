@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { client as rpcClient } from "@/api/rpcclient";
-import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import AppInput from "@/components/app/AppInput.vue";
+import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
 import { computed, onMounted, reactive, ref } from "vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
 
@@ -415,7 +415,7 @@ onMounted(loadJobs);
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Command</label>
-          <textarea v-model="createForm.command" rows="4" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="ffmpeg -i ..." />
+          <textarea v-model="createForm.command" rows="4" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="ffmpeg -i ..." />
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Image</label>
@@ -439,7 +439,7 @@ onMounted(loadJobs);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Environment</label>
-          <textarea v-model="createForm.envText" rows="5" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="KEY=value per line" />
+          <textarea v-model="createForm.envText" rows="5" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="KEY=value per line" />
         </div>
       </div>
     </div>

@@ -15,8 +15,8 @@ const props = withDefaults(defineProps<{
     rowClass?: string;
 }>(), {
     description: '',
-    iconBoxClass: '',
-    hoverClass: 'hover:bg-muted/30',
+    iconBoxClass: 'bg-muted text-foreground/70',
+    hoverClass: 'hover:bg-header',
     titleClass: 'text-sm font-medium text-foreground',
     descriptionClass: 'text-xs text-foreground/60 mt-0.5',
     actionsClass: '',
@@ -43,7 +43,7 @@ const actionsWrapperClass = computed(() => cn('shrink-0', props.actionsClass));
     <div v-bind="attrs" :class="rootClass">
         <div class="flex min-w-0 items-center gap-4">
             <div :class="iconClass">
-                <slot name="icon" />
+                <slot name="icon" class="h-6 w-6" />
             </div>
 
             <div class="min-w-0">

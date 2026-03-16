@@ -61,7 +61,7 @@ const onKeyup = (e: KeyboardEvent) => {
   if (e.key === 'Enter') emit('enter');
 };
 
-const baseInputClass = 'w-full px-3 py-2 rounded-md border border-border bg-surface text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 disabled:opacity-60 disabled:cursor-not-allowed';
+const baseInputClass = 'w-full px-3 py-2 rounded-md border border-border bg-header text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 disabled:opacity-60 disabled:cursor-not-allowed';
 </script>
 
 <template>

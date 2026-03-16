@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<{
 const attrs = useAttrs();
 
 const rootClass = computed(() => cn(
-    'bg-surface border border-border rounded-lg',
+    'bg-white border border-border rounded-lg',
 ));
 </script>
 
@@ -32,7 +32,7 @@ const rootClass = computed(() => cn(
         <div
             v-if="title || description || $slots['header-actions']"
             :class="cn(
-                'px-6 py-4 border-b border-border',
+                'px-6 py-4 border-b border-border bg-header rounded-tl-lg rounded-tr-lg',
                 $slots['header-actions'] ? 'flex items-center justify-between gap-4' : '',
                 headerClass,
             )"

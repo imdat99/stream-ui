@@ -306,11 +306,11 @@ onMounted(loadPlans);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Description</label>
-          <textarea v-model="createForm.description" rows="3" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
+          <textarea v-model="createForm.description" rows="3" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Features</label>
-          <textarea v-model="createForm.featuresText" rows="4" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="One feature per line" />
+          <textarea v-model="createForm.featuresText" rows="4" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="One feature per line" />
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Price</label>
@@ -318,7 +318,7 @@ onMounted(loadPlans);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Cycle</label>
-          <select v-model="createForm.cycle" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="createForm.cycle" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="cycle in cycleOptions" :key="cycle" :value="cycle">{{ cycle }}</option>
           </select>
         </div>
@@ -354,11 +354,11 @@ onMounted(loadPlans);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Description</label>
-          <textarea v-model="editForm.description" rows="3" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          <textarea v-model="editForm.description" rows="3" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Features</label>
-          <textarea v-model="editForm.featuresText" rows="4" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          <textarea v-model="editForm.featuresText" rows="4" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Price</label>
@@ -366,7 +366,7 @@ onMounted(loadPlans);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Cycle</label>
-          <select v-model="editForm.cycle" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="editForm.cycle" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="cycle in cycleOptions" :key="cycle" :value="cycle">{{ cycle }}</option>
           </select>
         </div>

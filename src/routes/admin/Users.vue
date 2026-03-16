@@ -329,7 +329,7 @@ onMounted(loadUsers);
           </div>
           <div class="space-y-2">
             <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Role filter</label>
-            <select v-model="roleFilter" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <select v-model="roleFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
               <option v-for="role in roleFilterOptions" :key="role || 'all'" :value="role">{{ role || 'ALL' }}</option>
             </select>
           </div>
@@ -423,7 +423,7 @@ onMounted(loadUsers);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Role</label>
-          <select v-model="createForm.role" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="createForm.role" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="role in roleOptions" :key="role" :value="role">{{ role }}</option>
           </select>
         </div>
@@ -459,7 +459,7 @@ onMounted(loadUsers);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Role</label>
-          <select v-model="editForm.role" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="editForm.role" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="role in roleOptions" :key="role" :value="role">{{ role }}</option>
           </select>
         </div>
@@ -486,7 +486,7 @@ onMounted(loadUsers);
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
       <div class="space-y-2">
         <label class="text-sm font-medium text-gray-700">Role</label>
-        <select v-model="roleForm.role" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+        <select v-model="roleForm.role" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
           <option v-for="role in roleOptions" :key="role" :value="role">{{ role }}</option>
         </select>
       </div>

@@ -13,8 +13,8 @@ import SettingsNotice from '@/routes/settings/components/SettingsNotice.vue';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
 import { useQuery } from '@pinia/colada';
-import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
+import { computed, ref, watch } from 'vue';
 
 const toast = useAppToast();
 const confirm = useAppConfirm();
@@ -304,7 +304,7 @@ const copyIframeCode = async () => {
             <p class="text-xs text-foreground/60 mb-2">
                 {{ t('settings.domainsDns.embedCodeHint') }}
             </p>
-            <pre class="bg-surface border border-border rounded-md p-3 text-xs text-foreground/70 overflow-x-auto"><code>{{ iframeCode }}</code></pre>
+            <pre class="bg-header border border-border rounded-md p-3 text-xs text-foreground/70 overflow-x-auto"><code>{{ iframeCode }}</code></pre>
         </div>
 
         <AppDialog

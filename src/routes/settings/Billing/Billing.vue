@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import type { PaymentHistoryItem as PaymentHistoryApiItem, Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
@@ -12,6 +11,7 @@ import BillingPlansSection from '@/routes/settings/components/billing/BillingPla
 import BillingTopupDialog from '@/routes/settings/components/billing/BillingTopupDialog.vue';
 import BillingUsageSection from '@/routes/settings/components/billing/BillingUsageSection.vue';
 import BillingWalletRow from '@/routes/settings/components/billing/BillingWalletRow.vue';
+import type { Plan as ModelPlan, PaymentHistoryItem as PaymentHistoryApiItem } from '@/server/gen/proto/app/v1/common';
 import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
 import { useTranslation } from 'i18next-vue';
@@ -634,7 +634,7 @@ const selectPreset = (amount: number) => {
                             'rounded-lg border px-4 py-3 text-left transition-all',
                             selectedTermMonths === months
                                 ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border bg-surface text-foreground hover:border-primary/30 hover:bg-muted/30',
+                                : 'border-border bg-header text-foreground hover:border-primary/30 hover:bg-muted/30',
                         ]"
                         @click="selectedTermMonths = months"
                     >
@@ -645,11 +645,11 @@ const selectPreset = (amount: number) => {
             </div>
 
             <div class="grid gap-3 md:grid-cols-3">
-                <div class="rounded-lg border border-border bg-surface p-4">
+                <div class="rounded-lg border border-border bg-header p-4">
                     <p class="text-xs uppercase tracking-wide text-foreground/50">{{ t('settings.billing.upgradeDialog.totalLabel') }}</p>
                     <p class="mt-2 text-xl font-semibold text-foreground">{{ formatMoney(selectedTotalAmount) }}</p>
                 </div>
-                <div class="rounded-lg border border-border bg-surface p-4">
+                <div class="rounded-lg border border-border bg-header p-4">
                     <p class="text-xs uppercase tracking-wide text-foreground/50">{{ t('settings.billing.upgradeDialog.walletBalanceLabel') }}</p>
                     <p class="mt-2 text-xl font-semibold text-foreground">{{ formatMoney(walletBalance) }}</p>
                 </div>
@@ -679,7 +679,7 @@ const selectPreset = (amount: number) => {
                             'rounded-lg border p-4 text-left transition-all',
                             selectedPaymentMethod === 'wallet'
                                 ? 'border-primary bg-primary/5'
-                                : 'border-border bg-surface hover:border-primary/30 hover:bg-muted/30',
+                                : 'border-border bg-header hover:border-primary/30 hover:bg-muted/30',
                         ]"
                         @click="selectUpgradePaymentMethod('wallet')"
                     >
@@ -695,7 +695,7 @@ const selectPreset = (amount: number) => {
                             'rounded-lg border p-4 text-left transition-all',
                             selectedPaymentMethod === 'topup'
                                 ? 'border-primary bg-primary/5'
-                                : 'border-border bg-surface hover:border-primary/30 hover:bg-muted/30',
+                                : 'border-border bg-header hover:border-primary/30 hover:bg-muted/30',
                         ]"
                         @click="selectUpgradePaymentMethod('topup')"
                     >

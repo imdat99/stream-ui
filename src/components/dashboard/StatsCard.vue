@@ -40,7 +40,7 @@ const iconColors = {
 
 <template>
   <div :class="[
-    'transform translate-y-0 relative overflow-hidden rounded-2xl p-6 bg-surface',
+    'transform translate-y-0 relative overflow-hidden rounded-2xl p-6 bg-header',
     // gradients[color],
     'border border-gray-300 transition-all duration-300',
     // 'group cursor-pointer'

@@ -179,9 +179,10 @@ export default defineConfig({
         light: "#f8f9fa",
       },
       border: {
-        DEFAULT: "#e6e7e2",
+        DEFAULT: "#d0d7de",
         light: "#f8f9fa",
       },
+      header: '#f6f8fa',
       // bg: {
       //   page:    "#faf8f8", // nền toàn trang
       //   surface: "#ffffff", // card, modal, table

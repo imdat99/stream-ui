@@ -364,7 +364,7 @@ onMounted(loadTemplates);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Description</label>
-          <textarea v-model="createForm.description" rows="3" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
+          <textarea v-model="createForm.description" rows="3" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">VAST URL</label>
@@ -372,7 +372,7 @@ onMounted(loadTemplates);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Ad format</label>
-          <select v-model="createForm.adFormat" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="createForm.adFormat" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="format in formatOptions" :key="format" :value="format">{{ format }}</option>
           </select>
         </div>
@@ -412,7 +412,7 @@ onMounted(loadTemplates);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Description</label>
-          <textarea v-model="editForm.description" rows="3" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
+          <textarea v-model="editForm.description" rows="3" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">VAST URL</label>
@@ -420,7 +420,7 @@ onMounted(loadTemplates);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Ad format</label>
-          <select v-model="editForm.adFormat" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="editForm.adFormat" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="format in formatOptions" :key="format" :value="format">{{ format }}</option>
           </select>
         </div>

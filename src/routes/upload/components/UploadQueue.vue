@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import UploadQueueItem from './UploadQueueItem.vue';
 import type { QueueItem } from '@/composables/useUploadQueue';
 import { useTranslation } from 'i18next-vue';
 
@@ -24,7 +23,7 @@ const { t } = useTranslation();
     <aside
         class=":uno: w-full flex flex-col h-[calc(100svh-64px)] sticky top-16 before:(content-[''] absolute pointer-events-none inset-[-1px] rounded-[calc(var(--radius-2xl)+1px)] bg-[linear-gradient(-45deg,var(--capra-ramp-5)_0,var(--capra-ramp-4)_8%,var(--capra-ramp-3)_17%,var(--capra-ramp-2)_25%,var(--capra-ramp-1)_33%,#292929_34%,#292929_40%,#e1dfdf_45%,#e1dfdf_100%)] bg-[length:400%_200%] bg-[position:0_0] transition-[background-position] duration-[1000ms] ease-in-out delay-[500ms] z-0)"
         :class="{ 'before:bg-[position:100%_100%]': pendingCount && pendingCount > 0 }">
-        <div class="bg-surface z-1 relative flex flex-col h-full rounded-2xl overflow-hidden">
+        <div class="bg-header z-1 relative flex flex-col h-full rounded-2xl overflow-hidden">
 
             <div class="flex-1 overflow-y-auto scrollbar-thin p-6 space-y-5 relative" id="queue-list">
                 <div v-if="!items?.length" id="empty-queue"

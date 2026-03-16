@@ -79,7 +79,7 @@ const buildForwardMetadataFromHeaders = (headers: Headers): Metadata => {
   return metadata;
 };
 
-const buildInternalMetadata = () => {
+export const buildInternalMetadata = () => {
   const context = tryGetContext();
   const metadata = context ? buildForwardMetadataFromHeaders(context.req.raw.headers) : new Metadata();
   const marker = process.env.STREAM_INTERNAL_AUTH_MARKER;

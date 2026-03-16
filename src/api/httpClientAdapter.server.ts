@@ -47,6 +47,7 @@ export function httpClientAdapter(opts: {
 			} else {
 				res = await fetch(req);
 			}
+
 			if (!res.ok) {
 				// throw new Error(`HTTP error: ${res.status}`);
 				throw new Error(
@@ -59,6 +60,9 @@ export function httpClientAdapter(opts: {
 				);
 				// throw TinyRpcError.deserialize(res.status);
 			}
+			// if (res.headers.get("set-cookie")) {
+			// 	console.log("Response has set-cookie header:", res.headers.get("set-cookie"));
+			// }
 			const result: Result<unknown, unknown> = JSON.parse(
 				await res.text()
 			);

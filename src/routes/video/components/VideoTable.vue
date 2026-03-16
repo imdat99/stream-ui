@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import VideoIcon from '@/components/icons/VideoIcon.vue';
 import { formatBytes, formatDate, getStatusSeverity } from '@/lib/utils';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useTranslation } from 'i18next-vue';
 
 const props = defineProps<{
@@ -75,7 +75,7 @@ const isSelected = (video: ModelVideo) =>
         </div>
         <table v-else class="w-full min-w-[50rem]">
             <thead>
-                <tr class="border-b border-gray-200 bg-gray-50">
+                <tr class="border-b border-gray-200 bg-header">
                     <th class="w-12 px-4 py-3">
                         <input type="checkbox" :checked="isAllSelected" @change="toggleAll"
                             class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" />

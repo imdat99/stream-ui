@@ -1,66 +1,49 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
 import { computed } from 'vue';
+type UiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type UiButtonSize = 'sm' | 'md' | 'lg';
+const props = withDefaults(
+  defineProps<{
+    variant?: UiButtonVariant;
+    size?: UiButtonSize;
+    block?: boolean;
+    disabled?: boolean;
+    type?: 'button' | 'submit' | 'reset';
+  }>(),
+  {
+    variant: 'secondary',
+    size: 'md',
+    block: false,
+    disabled: false,
+    type: 'button',
+  },
+);
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
-type Size = 'sm' | 'md';
+const classes = computed(() => {
+  const variants: Record<UiButtonVariant, string> = {
+    primary: 'border-transparent bg-primary text-white hover:bg-primaryHover focus-visible:ring-primary/25',
+    secondary: 'border-border bg-white text-text hover:bg-header focus-visible:ring-#0969da/20',
+    ghost: 'border-transparent bg-transparent text-text hover:bg-header focus-visible:ring-#0969da/20 shadow-none',
+    danger: 'border-transparent bg-danger text-white hover:opacity-92 focus-visible:ring-danger/20',
+  };
 
-const props = withDefaults(defineProps<{
-  variant?: Variant;
-  size?: Size;
-  loading?: boolean;
-  disabled?: boolean;
-  type?: 'button' | 'submit' | 'reset';
-}>(), {
-  variant: 'primary',
-  size: 'md',
-  loading: false,
-  disabled: false,
-  type: 'button',
+  const sizes: Record<UiButtonSize, string> = {
+    sm: 'min-h-[28px] px-3 text-[12px] leading-[20px]',
+    md: 'min-h-[32px] px-3 text-[14px] leading-[20px]',
+    lg: 'min-h-[36px] px-4 text-[14px] leading-[20px]',
+  };
+
+  return [
+    'inline-flex items-center justify-center gap-2 rounded-md border font-medium whitespace-nowrap shadow-primer outline-none transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out active:translate-y-[0.5px] hover:shadow-[0_2px_0_rgba(27,31,36,0.06)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:ring-4',
+    variants[props.variant],
+    sizes[props.size],
+    props.block ? 'w-full' : '',
+  ].join(' ');
 });
-
-const baseClass = 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all press-animated select-none';
-
-const sizeClass = computed(() => {
-  switch (props.size) {
-    case 'sm':
-      return 'px-3 py-1.5 text-sm';
-    case 'md':
-    default:
-      return 'px-4 py-2 text-sm';
-  }
-});
-
-const variantClass = computed(() => {
-  switch (props.variant) {
-    case 'secondary':
-      return 'bg-muted/50 text-foreground hover:bg-muted border border-border';
-    case 'danger':
-      return 'bg-danger text-white hover:bg-danger/90';
-    case 'ghost':
-      return 'bg-transparent text-foreground/70 hover:text-foreground hover:bg-muted/50';
-    case 'primary':
-    default:
-      return 'bg-primary text-white hover:bg-primary/90';
-  }
-});
-
-const disabledClass = computed(() => (props.disabled || props.loading) ? 'opacity-60 cursor-not-allowed' : '');
 </script>
 
 <template>
-  <button
-    :type="type"
-    :disabled="disabled || loading"
-    :class="cn(baseClass, sizeClass, variantClass, disabledClass)"
-  >
-    <span v-if="loading" class="inline-flex items-center" aria-hidden="true">
-      <svg class="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
-      </svg>
-    </span>
-    <slot name="icon" />
+  <button :type="type" :disabled="disabled" :class="classes">
     <slot />
   </button>
 </template>

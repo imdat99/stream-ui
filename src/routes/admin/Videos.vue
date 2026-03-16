@@ -345,7 +345,7 @@ onMounted(loadVideos);
         </div>
         <div class="space-y-2">
           <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status</label>
-          <select v-model="statusFilter" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="statusFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="status in statusFilterOptions" :key="status || 'all'" :value="status">{{ status || 'ALL' }}</option>
           </select>
         </div>
@@ -428,7 +428,7 @@ onMounted(loadVideos);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Status</label>
-          <select v-model="createForm.status" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="createForm.status" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="status in statusOptions" :key="status" :value="status">{{ status }}</option>
           </select>
         </div>
@@ -442,7 +442,7 @@ onMounted(loadVideos);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Description</label>
-          <textarea v-model="createForm.description" rows="3" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
+          <textarea v-model="createForm.description" rows="3" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Format</label>
@@ -480,7 +480,7 @@ onMounted(loadVideos);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Status</label>
-          <select v-model="editForm.status" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="editForm.status" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="status in statusOptions" :key="status" :value="status">{{ status }}</option>
           </select>
         </div>
@@ -494,7 +494,7 @@ onMounted(loadVideos);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">Description</label>
-          <textarea v-model="editForm.description" rows="3" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
+          <textarea v-model="editForm.description" rows="3" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional" />
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Format</label>

@@ -1,14 +1,14 @@
 <script lang="ts" setup>
+import Upload from "@/routes/upload/Upload.vue";
 import DashboardNav from "./DashboardNav.vue";
 import GlobalUploadIndicator from "./GlobalUploadIndicator.vue";
-import Upload from "@/routes/upload/Upload.vue";
 
 </script>
 
 <template>
     <DashboardNav />
-    <main class="flex flex-1 flex-col transition-all duration-300 ease-in-out bg-page md:ps-18">
-        <div class=":uno: flex-1 overflow-auto p-4 bg-page rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">
+    <main class="flex flex-1 flex-col transition-all duration-300 ease-in-out bg-white md:ps-18">
+        <div class=":uno: flex-1 overflow-auto p-4 bg-white rounded-lg md:(mr-2 mb-2) min-h-[calc(100vh-8rem)]">
             <router-view v-slot="{ Component }">
                 <Transition enter-active-class="transition-all duration-300 ease-in-out"
                     enter-from-class="opacity-0 transform translate-y-4"

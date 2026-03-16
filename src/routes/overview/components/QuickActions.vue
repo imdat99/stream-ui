@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useTranslation } from 'i18next-vue';
 import Chart from '@/components/icons/Chart.vue';
 import Credit from '@/components/icons/Credit.vue';
 import Upload from '@/components/icons/Upload.vue';
 import Video from '@/components/icons/Video.vue';
 import { useUIState } from '@/stores/uiState';
+import { useTranslation } from 'i18next-vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Referral from './Referral.vue';
 
@@ -71,12 +71,12 @@ const quickActions = computed(() => [
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <button v-for="action in quickActions" :key="action.title" @click="action.onClick" :class="[
-                    'p-6 rounded-xl text-left transition-all duration-200 flex flex-col bg-surface',
+                    'p-6 rounded-xl text-left transition-all duration-200 flex flex-col bg-header',
                     'border border-gray-300 hover:border-primary hover:shadow-lg',
                     'group press-animated',
                 ]">
                     <div
-                        class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-muted group-hover:bg-primary/10">
+                        class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-muted-dark group-hover:bg-primary/10">
                         <component filled :is="action.icon" class="w-6 h-6" />
                     </div>
                     <h3 class="font-semibold mb-1 group-hover:text-primary transition-colors">{{ action.title }}</h3>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import XIcon from '@/components/icons/XIcon.vue';
 import { cn } from '@/lib/utils';
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 // Ensure client-side only rendering to avoid hydration mismatch
 const isMounted = ref(false);
@@ -75,7 +75,7 @@ onBeforeUnmount(() => {
 
         <!-- Panel -->
         <div class="absolute inset-0 flex items-center justify-center p-4">
-          <div :class="cn('w-full bg-surface border border-border rounded-lg shadow-lg overflow-hidden', maxWidthClass)">
+          <div :class="cn('w-full bg-header border border-border rounded-lg shadow-lg overflow-hidden', maxWidthClass)">
             <!-- Header slot -->
             <div v-if="$slots.header" class="px-5 py-4 border-b border-border">
               <slot name="header" :close="close" />

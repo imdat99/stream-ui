@@ -2,7 +2,6 @@
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
-import AppSwitch from '@/components/app/AppSwitch.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
@@ -122,41 +121,6 @@ const saveLanguage = async () => {
     }
 };
 
-const handleToggle2FA = async () => {
-    if (!twoFactorEnabled.value) {
-        try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            twoFactorDialogVisible.value = true;
-        } catch (e) {
-            toast.add({
-                severity: 'error',
-                summary: t('settings.securityConnected.toast.twoFactorEnableFailedSummary'),
-                detail: t('settings.securityConnected.toast.twoFactorEnableFailedDetail'),
-                life: 5000
-            });
-            twoFactorEnabled.value = false;
-        }
-    } else {
-        try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            toast.add({
-                severity: 'success',
-                summary: t('settings.securityConnected.toast.twoFactorDisabledSummary'),
-                detail: t('settings.securityConnected.toast.twoFactorDisabledDetail'),
-                life: 3000
-            });
-        } catch (e) {
-            toast.add({
-                severity: 'error',
-                summary: t('settings.securityConnected.toast.twoFactorDisableFailedSummary'),
-                detail: t('settings.securityConnected.toast.twoFactorDisableFailedDetail'),
-                life: 5000
-            });
-            twoFactorEnabled.value = true;
-        }
-    }
-};
-
 const confirmTwoFactor = async () => {
     try {
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -228,10 +192,9 @@ const disconnectTelegram = async () => {
         <SettingsRow
             :title="t('settings.securityConnected.accountStatus.label')"
             :description="t('settings.securityConnected.accountStatus.detail')"
-            iconBoxClass="bg-success/10"
         >
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                     <polyline points="22 4 12 14.01 9 11.01"/>
                 </svg>
@@ -245,11 +208,10 @@ const disconnectTelegram = async () => {
         <SettingsRow
             :title="t('settings.securityConnected.language.label')"
             :description="t('settings.securityConnected.language.detail')"
-            iconBoxClass="bg-info/10"
             actionsClass="flex items-center gap-2"
         >
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M2 12h20" />
                     <path d="M12 2a15 15 0 0 1 0 20" />
@@ -261,7 +223,7 @@ const disconnectTelegram = async () => {
                 <select
                     v-model="selectedLanguage"
                     :disabled="languageSaving"
-                    class="rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground disabled:opacity-60"
+                    class="rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground disabled:opacity-60"
                 >
                     <option
                         v-for="option in languageOptions"
@@ -273,6 +235,7 @@ const disconnectTelegram = async () => {
                 </select>
                 <AppButton
                     size="sm"
+                    variant="secondary"
                     :loading="languageSaving"
                     :disabled="languageSaving"
                     @click="saveLanguage"
@@ -282,33 +245,18 @@ const disconnectTelegram = async () => {
             </template>
         </SettingsRow>
 
-         <SettingsRow
-            :title="t('settings.securityConnected.twoFactor.label')"
-            :description="twoFactorEnabled ? t('settings.securityConnected.twoFactor.enabled') : t('settings.securityConnected.twoFactor.disabled')"
-            iconBoxClass="bg-primary/10"
-        >
-            <template #icon>
-                <LockIcon class="w-5 h-5 text-primary" />
-            </template>
-
-            <template #actions>
-                <AppSwitch v-model="twoFactorEnabled" @change="handleToggle2FA" />
-            </template>
-        </SettingsRow>
-
         <SettingsRow
             :title="t('settings.securityConnected.changePassword.label')"
             :description="t('settings.securityConnected.changePassword.detail')"
-            iconBoxClass="bg-primary/10"
         >
             <template #icon>
-                <svg aria-hidden="true" class="fill-primary" height="24" viewBox="0 0 24 24" version="1.1" width="24" data-view-component="true">
+                <svg aria-hidden="true" class="fill-primary w-6 h-6" height="24" viewBox="0 0 24 24" version="1.1" width="24" data-view-component="true">
                     <path d="M22 9.75v5.5A1.75 1.75 0 0 1 20.25 17H3.75A1.75 1.75 0 0 1 2 15.25v-5.5C2 8.784 2.784 8 3.75 8h16.5c.966 0 1.75.784 1.75 1.75Zm-8.75 2.75a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0Zm-6.5 1.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Zm10.5 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"></path>
                 </svg>
             </template>
 
             <template #actions>
-                <AppButton size="sm" @click="openChangePassword">
+                <AppButton variant="secondary" size="sm" @click="openChangePassword">
                     {{ t('settings.securityConnected.changePassword.button') }}
                 </AppButton>
             </template>
@@ -317,10 +265,9 @@ const disconnectTelegram = async () => {
         <SettingsRow
             :title="t('settings.securityConnected.email.label')"
             :description="emailConnected ? t('settings.securityConnected.email.connected') : t('settings.securityConnected.email.disconnected')"
-            iconBoxClass="bg-info/10"
         >
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="text-info w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect width="20" height="16" x="2" y="4" rx="2"/>
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
@@ -336,10 +283,9 @@ const disconnectTelegram = async () => {
         <SettingsRow
             :title="t('settings.securityConnected.telegram.label')"
             :description="telegramConnected ? (telegramUsername || t('settings.securityConnected.telegram.connectedFallback')) : t('settings.securityConnected.telegram.detailDisconnected')"
-            iconBoxClass="bg-[#0088cc]/10"
         >
             <template #icon>
-                <TelegramIcon class="w-5 h-5 text-[#0088cc]" />
+                <TelegramIcon class="w-6 h-6 text-[#0088cc]" />
             </template>
 
             <template #actions>
@@ -354,6 +300,7 @@ const disconnectTelegram = async () => {
                 <AppButton
                     v-else
                     size="sm"
+                    variant="secondary"
                     @click="connectTelegram"
                 >
                     {{ t('settings.securityConnected.telegram.connect') }}
@@ -364,11 +311,10 @@ const disconnectTelegram = async () => {
         <SettingsRow
             :title="t('settings.securityConnected.logout.label')"
             :description="t('settings.securityConnected.logout.detail')"
-            iconBoxClass="bg-danger/10"
             hoverClass="hover:bg-danger/5"
         >
             <template #icon>
-                <XCircleIcon class="w-5 h-5 text-danger" />
+                <XCircleIcon class="w-6 h-6 text-danger" />
             </template>
 
             <template #actions>

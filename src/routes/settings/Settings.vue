@@ -34,7 +34,7 @@
                                             ? 'bg-primary/10 text-primary font-semibold'
                                             : item.danger
                                                 ? 'text-danger hover:bg-danger/10'
-                                                : 'text-foreground/70 hover:bg-muted hover:text-foreground'
+                                                : 'text-foreground/70 hover:bg-header hover:text-foreground'
                                     ]"
                                 >
                                     <component :is="item.icon" class="w-5 h-5 shrink-0" :filled="currentTab === item.value" />
@@ -62,21 +62,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useTranslation } from 'i18next-vue';
-import { useRoute } from 'vue-router';
-import PageHeader from '@/components/dashboard/PageHeader.vue';
 import AppConfirmHost from '@/components/app/AppConfirmHost.vue';
 import AppToastHost from '@/components/app/AppToastHost.vue';
 import ClientOnly from '@/components/ClientOnly';
-import UserIcon from '@/components/icons/UserIcon.vue';
-import GlobeIcon from '@/components/icons/Globe.vue';
-import AlertTriangle from '@/components/icons/AlertTriangle.vue';
-import { useAuthStore } from '@/stores/auth';
-import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
-import Bell from '@/components/icons/Bell.vue';
+import PageHeader from '@/components/dashboard/PageHeader.vue';
 import AdvertisementIcon from '@/components/icons/AdvertisementIcon.vue';
+import AlertTriangle from '@/components/icons/AlertTriangle.vue';
+import Bell from '@/components/icons/Bell.vue';
+import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
+import GlobeIcon from '@/components/icons/Globe.vue';
+import UserIcon from '@/components/icons/UserIcon.vue';
 import VideoPlayIcon from '@/components/icons/VideoPlayIcon.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useTranslation } from 'i18next-vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const auth = useAuthStore();
@@ -94,7 +94,7 @@ const tabPaths: Record<string, string> = {
 };
 
 // Menu items grouped by category (GitHub-style)
-const menuSections = computed(() => [
+const menuSections = computed<{ title: string; items: { value: string; label: string; icon: any, danger?: boolean }[] }[]>(() => [
     {
         title: t('settings.menu.securityGroup'),
         items: [

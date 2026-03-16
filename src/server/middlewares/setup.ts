@@ -1,10 +1,10 @@
+import { RedisClient } from "bun";
 import type { Hono } from "hono";
 import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { languageDetector } from "hono/language";
 import isMobile from "is-mobile";
 import { JwtProvider } from "../utils/token";
-import { RedisClient } from "bun";
 type AppFetch = (
   input: string | Request | URL,
   requestInit?: RequestInit
@@ -42,8 +42,6 @@ const getRedisUrl = () => {
 };
 
 const getRedisClient = async (): Promise<RedisClient> => {
-  console.log("bun", typeof Bun)
-
   if (!redisClientPromise) {
     const client = new RedisClient(getRedisUrl())
     await client.connect();

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useTranslation } from 'i18next-vue';
 import StatsCard from '@/components/dashboard/StatsCard.vue';
 import { formatBytes } from '@/lib/utils';
+import { useTranslation } from 'i18next-vue';
+import { computed } from 'vue';
 
 interface Props {
     loading: boolean;
@@ -21,7 +21,7 @@ const localeTag = computed(() => i18next.resolvedLanguage === 'vi' ? 'vi-VN' : '
 
 <template>
     <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div v-for="i in 3" :key="i" class="bg-surface rounded-xl border border-gray-200 p-6">
+        <div v-for="i in 3" :key="i" class="bg-header rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <div class="space-y-2">
                     <div class="w-20 h-4 bg-gray-200 rounded animate-pulse mb-2" />

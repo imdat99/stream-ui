@@ -7,7 +7,7 @@ import Video from "@/components/icons/Video.vue";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useTranslation } from "i18next-vue";
-import { computed, createStaticVNode, ref, VNode } from "vue";
+import { computed, createStaticVNode, ref } from "vue";
 import NotificationDrawer from "./NotificationDrawer.vue";
 
 const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
@@ -58,7 +58,7 @@ const links = computed<Record<string, any>>(() => {
 
 <template>
   <header
-    class=":uno: fixed left-0 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen bg-muted transition-all duration-300 ease-in-out w-18 items-center"
+    class=":uno: fixed left-0 flex flex-col items-center pt-4 gap-6 z-41 max-h-screen h-screen bg-header transition-all duration-300 ease-in-out w-18 items-center border-r border-border text-foreground/60"
   >
     <template v-for="i in links" :key="i.href">
       <component

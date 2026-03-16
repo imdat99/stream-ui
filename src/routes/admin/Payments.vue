@@ -246,7 +246,7 @@ onMounted(loadPayments);
         </div>
         <div class="space-y-2">
           <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status</label>
-          <select v-model="statusFilter" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="statusFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="status in statusFilterOptions" :key="status || 'all'" :value="status">{{ status || 'ALL' }}</option>
           </select>
         </div>
@@ -336,7 +336,7 @@ onMounted(loadPayments);
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Payment method</label>
-          <select v-model="createForm.paymentMethod" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+          <select v-model="createForm.paymentMethod" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option v-for="method in paymentMethodOptions" :key="method" :value="method">{{ method }}</option>
           </select>
         </div>
@@ -359,7 +359,7 @@ onMounted(loadPayments);
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
       <div class="space-y-2">
         <label class="text-sm font-medium text-gray-700">Status</label>
-        <select v-model="statusForm.status" class="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+        <select v-model="statusForm.status" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
           <option v-for="status in statusOptions" :key="status" :value="status">{{ status }}</option>
         </select>
       </div>

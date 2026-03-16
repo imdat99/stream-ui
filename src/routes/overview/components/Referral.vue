@@ -1,5 +1,5 @@
 <template>
-    <div class="rounded-xl border border-gray-300 hover:border-primary hover:shadow-lg text-card-foreground bg-surface">
+    <div class="rounded-xl border border-gray-300 hover:border-primary hover:shadow-lg text-card-foreground bg-header">
         <div class="flex flex-col space-y-1.5 p-6">
             <h3 class="text-lg font-semibold leading-none tracking-tight">{{ t('overview.referral.title') }}</h3>
         </div>
@@ -27,8 +27,8 @@
 </template>
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth';
-import { computed, ref } from 'vue';
 import { useTranslation } from 'i18next-vue';
+import { computed, ref } from 'vue';
 
 const auth = useAuthStore();
 const isCopied = ref(false);
