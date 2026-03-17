@@ -3,8 +3,15 @@ import { client as rpcClient } from "@/api/rpcclient";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import AppInput from "@/components/app/AppInput.vue";
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import BaseTable from "@/components/ui/table/BaseTable.vue";
+import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
+import BillingPlansSection from "@/routes/settings/components/billing/BillingPlansSection.vue";
+import type { Plan as ModelPlan } from "@/server/gen/proto/app/v1/common";
+import { type ColumnDef } from "@tanstack/vue-table";
+import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import AdminPlaceholderTable from "./components/AdminPlaceholderTable.vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
+import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 type ListPaymentsResponse = Awaited<ReturnType<typeof rpcClient.listAdminPayments>>;
 type AdminPaymentRow = NonNullable<ListPaymentsResponse["payments"]>[number];
@@ -14,10 +21,12 @@ const statusOptions = ["PENDING", "SUCCESS", "FAILED", "CANCELLED"] as const;
 const statusFilterOptions = ["", ...statusOptions] as const;
 
 const loading = ref(true);
+const plansLoading = ref(false);
 const submitting = ref(false);
 const error = ref<string | null>(null);
 const actionError = ref<string | null>(null);
 const rows = ref<AdminPaymentRow[]>([]);
+const plans = ref<ModelPlan[]>([]);
 const total = ref(0);
 const limit = ref(12);
 const page = ref(1);
@@ -26,6 +35,7 @@ const userFilter = ref("");
 const appliedUserFilter = ref("");
 const statusFilter = ref<(typeof statusFilterOptions)[number]>("");
 const createOpen = ref(false);
+const detailOpen = ref(false);
 const statusOpen = ref(false);
 
 const createForm = reactive({
@@ -44,6 +54,7 @@ const statusForm = reactive({
 const canCreate = computed(() => createForm.userId.trim() && createForm.planId.trim() && createForm.termMonths >= 1 && createForm.paymentMethod.trim());
 const canUpdateStatus = computed(() => statusForm.id.trim() && statusForm.status.trim());
 const totalPages = computed(() => Math.max(1, Math.ceil((total.value || 0) / limit.value)));
+const selectedPlanId = computed(() => createForm.planId || undefined);
 const summary = computed(() => [
   { label: "Visible payments", value: rows.value.length },
   { label: "Successful", value: rows.value.filter((row) => row.status === "SUCCESS").length },
@@ -62,6 +73,16 @@ const selectedMeta = computed(() => {
   ];
 });
 
+const loadPlans = async () => {
+  plansLoading.value = true;
+  try {
+    const response = await rpcClient.listPlans();
+    plans.value = response.plans ?? [];
+  } finally {
+    plansLoading.value = false;
+  }
+};
+
 const loadPayments = async () => {
   loading.value = true;
   error.value = null;
@@ -76,7 +97,7 @@ const loadPayments = async () => {
     total.value = response.total ?? rows.value.length;
     limit.value = response.limit ?? limit.value;
     page.value = response.page ?? page.value;
-    if (selectedRow.value?.id) {
+    if (selectedRow.value?.id && (detailOpen.value || statusOpen.value)) {
       const fresh = rows.value.find((row) => row.id === selectedRow.value?.id);
       if (fresh) selectedRow.value = fresh;
     }
@@ -97,6 +118,7 @@ const resetCreateForm = () => {
 
 const closeDialogs = () => {
   createOpen.value = false;
+  detailOpen.value = false;
   statusOpen.value = false;
   actionError.value = null;
 };
@@ -107,12 +129,22 @@ const applyFilters = async () => {
   await loadPayments();
 };
 
+const openDetailDialog = (row: AdminPaymentRow) => {
+  selectedRow.value = row;
+  actionError.value = null;
+  detailOpen.value = true;
+};
+
 const openStatusDialog = (row: AdminPaymentRow) => {
   selectedRow.value = row;
   actionError.value = null;
   statusForm.id = row.id || "";
   statusForm.status = row.status || "PENDING";
   statusOpen.value = true;
+};
+
+const selectPlan = (plan: ModelPlan) => {
+  createForm.planId = plan.id || "";
 };
 
 const submitCreate = async () => {
@@ -175,6 +207,26 @@ const formatDate = (value?: string) => {
 
 const formatMoney = (amount?: number, currency?: string) => `${amount ?? 0} ${currency || "USD"}`;
 
+const formatBytes = (bytes?: number) => {
+  const value = Number(bytes || 0);
+  if (!value) return "0 B";
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const index = Math.min(Math.floor(Math.log(value) / Math.log(1024)), sizes.length - 1);
+  const normalized = value / 1024 ** index;
+  return `${normalized.toFixed(index === 0 ? 0 : 1)} ${sizes[index]}`;
+};
+
+const formatDuration = (seconds?: number) => {
+  const value = Number(seconds || 0);
+  if (!value) return "0 min";
+  if (value < 0) return "∞";
+  return `${Math.floor(value / 60)} min`;
+};
+
+const getPlanStorageText = (plan: ModelPlan) => `Storage ${formatBytes(plan.storageLimit || 0)}`;
+const getPlanDurationText = (plan: ModelPlan) => `Duration ${formatDuration(plan.durationLimit)}`;
+const getPlanUploadsText = (plan: ModelPlan) => `Uploads ${plan.uploadLimit || 0}`;
+
 const statusBadgeClass = (status?: string) => {
   switch (status) {
     case "SUCCESS":
@@ -185,150 +237,216 @@ const statusBadgeClass = (status?: string) => {
     case "CANCELLED":
       return "border-rose-200 bg-rose-50 text-rose-700";
     default:
-      return "border-slate-200 bg-slate-100 text-slate-700";
+      return "border-border bg-muted/40 text-foreground/70";
   }
 };
+
+useAdminPageHeader(() => ({
+  eyebrow: "Finance",
+  badge: `${total.value} total payments`,
+  actions: [
+    {
+      label: "Refresh",
+      variant: "secondary",
+      onClick: loadPayments,
+    },
+    {
+      label: "Create payment",
+      onClick: () => {
+        actionError.value = null;
+        createOpen.value = true;
+      },
+    },
+  ],
+}));
+
+const columns = computed<ColumnDef<AdminPaymentRow>[]>(() => [
+  {
+    id: "payment",
+    header: "Payment",
+    accessorFn: row => row.invoiceId || row.id || "",
+    cell: ({ row }) => h("button", { class: "text-left", onClick: () => { openDetailDialog(row.original); } }, [
+      h("div", { class: "font-medium text-foreground" }, formatMoney(row.original.amount, row.original.currency)),
+      h("div", { class: "mt-1 text-xs text-foreground/60" }, row.original.planName || row.original.planId || "No plan"),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "user",
+    header: "User",
+    accessorFn: row => row.userEmail || row.userId || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.userEmail || row.original.userId || "—"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "plan",
+    header: "Plan",
+    accessorFn: row => row.planName || row.planId || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.planName || row.original.planId || "—"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "method",
+    header: "Method",
+    accessorFn: row => row.paymentMethod || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.paymentMethod || "—"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "status",
+    header: "Status",
+    accessorFn: row => row.status || "",
+    cell: ({ row }) => h("span", {
+      class: ["inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]", statusBadgeClass(row.original.status)],
+    }, row.original.status || "UNKNOWN"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "created",
+    header: "Created",
+    accessorFn: row => row.createdAt || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/60" }, formatDate(row.original.createdAt)),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => h("div", { class: "flex justify-end gap-2" }, [
+      h(AppButton, { size: "sm", variant: "secondary", onClick: () => openStatusDialog(row.original) }, { default: () => "Update status" }),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+]);
 
 watch(statusFilter, async () => {
   page.value = 1;
   await loadPayments();
 });
 
-onMounted(loadPayments);
+onMounted(() => {
+  void loadPlans();
+  void loadPayments();
+});
 </script>
 
 <template>
-  <AdminSectionShell
-    title="Admin Payments"
-    description="Track invoices, manual plan activations and state changes with a finance-focused operator view."
-    eyebrow="Finance"
-    :badge="`${total} total payments`"
-  >
-    <template #toolbar>
-      <AppButton size="sm" variant="secondary" @click="loadPayments">Refresh</AppButton>
-      <AppButton size="sm" @click="actionError = null; createOpen = true">Create payment</AppButton>
-    </template>
+  <AdminSectionShell>
 
     <template #stats>
-      <div v-for="item in summary" :key="item.label" class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{{ item.label }}</div>
-        <div class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{{ item.value }}</div>
-      </div>
-    </template>
-
-    <template #aside>
-      <div class="space-y-5">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Selected payment</div>
-        <div v-if="selectedRow" class="space-y-4">
-          <div>
-            <div class="text-lg font-semibold text-white">{{ formatMoney(selectedRow.amount, selectedRow.currency) }}</div>
-            <div class="mt-1 text-sm text-slate-400">{{ selectedRow.id }}</div>
-          </div>
-          <div class="grid gap-3">
-            <div v-for="item in selectedMeta" :key="item.label" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ item.label }}</div>
-              <div class="mt-1 text-sm font-medium text-white">{{ item.value }}</div>
-            </div>
-          </div>
-          <AppButton size="sm" @click="openStatusDialog(selectedRow)">Update status</AppButton>
-        </div>
-        <div v-else class="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-sm leading-6 text-slate-400">
-          Select a payment to review invoice metadata and push a status change.
-        </div>
+      <div v-for="item in summary" :key="item.label" class="rounded-lg border border-border bg-muted/20 p-4">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/50">{{ item.label }}</div>
+        <div class="mt-2 text-2xl font-semibold tracking-tight text-foreground">{{ item.value }}</div>
       </div>
     </template>
 
     <div class="space-y-4">
-      <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 xl:grid-cols-[220px_220px_auto] xl:items-end">
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">User filter</label>
-          <AppInput v-model="userFilter" placeholder="Optional user id" @enter="applyFilters" />
+      <SettingsSectionCard title="Filters" description="Filter payments by user reference and status." bodyClass="p-5">
+        <div class="grid gap-3 xl:grid-cols-[220px_220px_auto] xl:items-end">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">User reference</label>
+            <AppInput v-model="userFilter" placeholder="Optional user reference" @enter="applyFilters" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Status</label>
+            <select v-model="statusFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option v-for="status in statusFilterOptions" :key="status || 'all'" :value="status">{{ status || 'ALL' }}</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2 xl:justify-end">
+            <AppButton size="sm" variant="ghost" @click="userFilter = ''; appliedUserFilter = ''; statusFilter = ''; loadPayments()">Reset</AppButton>
+            <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
+          </div>
         </div>
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status</label>
-          <select v-model="statusFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option v-for="status in statusFilterOptions" :key="status || 'all'" :value="status">{{ status || 'ALL' }}</option>
-          </select>
-        </div>
-        <div class="flex items-center gap-2 xl:justify-end">
-          <AppButton size="sm" variant="ghost" @click="userFilter = ''; appliedUserFilter = ''; statusFilter = ''; loadPayments()">Reset</AppButton>
-          <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
-        </div>
-      </div>
+      </SettingsSectionCard>
 
-      <div v-if="error" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
         {{ error }}
       </div>
 
-      <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left text-sm">
-            <thead class="bg-slate-50/90 text-slate-500">
-              <tr>
-                <th class="px-4 py-3 font-semibold">Payment</th>
-                <th class="px-4 py-3 font-semibold">User</th>
-                <th class="px-4 py-3 font-semibold">Plan</th>
-                <th class="px-4 py-3 font-semibold">Method</th>
-                <th class="px-4 py-3 font-semibold">Status</th>
-                <th class="px-4 py-3 font-semibold">Created</th>
-                <th class="px-4 py-3 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loading" class="border-t border-slate-200">
-                <td colspan="7" class="px-4 py-10 text-center text-slate-500">Loading payments...</td>
-              </tr>
-              <tr v-else-if="rows.length === 0" class="border-t border-slate-200">
-                <td colspan="7" class="px-4 py-10 text-center text-slate-500">No payments matched the current filters.</td>
-              </tr>
-              <tr v-for="row in rows" :key="row.id" class="border-t border-slate-200 transition-colors hover:bg-slate-50/70" :class="selectedRow?.id === row.id ? 'bg-sky-50/60' : ''">
-                <td class="px-4 py-3">
-                  <button class="text-left" @click="selectedRow = row">
-                    <div class="font-medium text-slate-900">{{ formatMoney(row.amount, row.currency) }}</div>
-                    <div class="mt-1 text-xs text-slate-500">{{ row.id }}</div>
-                  </button>
-                </td>
-                <td class="px-4 py-3 text-slate-700">{{ row.userEmail || row.userId }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ row.planName || row.planId || '—' }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ row.paymentMethod || '—' }}</td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" :class="statusBadgeClass(row.status)">
-                    {{ row.status }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-slate-500">{{ formatDate(row.createdAt) }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
-                    <AppButton size="sm" variant="secondary" @click="openStatusDialog(row)">Update status</AppButton>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <SettingsSectionCard v-else title="Payments" description="Payment records and status operations." bodyClass="">
+        <AdminPlaceholderTable v-if="loading" :columns="7" :rows="4" />
 
-        <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-3 md:flex-row md:items-center md:justify-between">
-          <div class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Page {{ page }} of {{ totalPages }} · {{ total }} records</div>
+        <BaseTable
+          v-else
+          :data="rows"
+          :columns="columns"
+          :get-row-id="(row) => row.id || row.invoiceId || ''"
+          wrapperClass="border-x-0 border-t-0 rounded-none bg-transparent"
+          tableClass="w-full"
+          headerRowClass="bg-muted/30"
+          bodyRowClass="border-b border-border hover:bg-muted/30"
+        >
+          <template #empty>
+            <div class="px-6 py-12 text-center">
+              <p class="mb-1 text-sm text-foreground/60">No payments matched the current filters.</p>
+              <p class="text-xs text-foreground/40">Try a broader user reference or clear the status filter.</p>
+            </div>
+          </template>
+        </BaseTable>
+
+        <div class="flex flex-col gap-3 border-t border-border bg-muted/20 px-6 py-4 md:flex-row md:items-center md:justify-between">
+          <div class="text-xs font-medium uppercase tracking-[0.16em] text-foreground/50">Page {{ page }} of {{ totalPages }} · {{ total }} records</div>
           <div class="flex items-center gap-2">
             <AppButton size="sm" variant="secondary" :disabled="page <= 1 || loading" @click="previousPage">Previous</AppButton>
             <AppButton size="sm" variant="secondary" :disabled="page >= totalPages || loading" @click="nextPage">Next</AppButton>
           </div>
         </div>
-      </div>
+      </SettingsSectionCard>
     </div>
   </AdminSectionShell>
 
-  <AppDialog v-model:visible="createOpen" title="Create admin payment" maxWidthClass="max-w-lg" @close="actionError = null">
+  <AppDialog v-model:visible="detailOpen" title="Payment details" maxWidthClass="max-w-lg" @close="actionError = null">
+    <div v-if="selectedRow" class="space-y-4">
+      <div>
+        <div class="text-lg font-semibold text-foreground">{{ formatMoney(selectedRow.amount, selectedRow.currency) }}</div>
+        <div class="mt-1 text-sm text-foreground/60">{{ selectedRow.planName || selectedRow.planId || 'No plan linked' }}</div>
+      </div>
+
+      <div class="grid gap-3">
+        <div v-for="item in selectedMeta" :key="item.label" class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+          <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">{{ item.label }}</div>
+          <div class="mt-1 text-sm font-medium text-foreground">{{ item.value }}</div>
+        </div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <AppButton variant="secondary" size="sm" @click="detailOpen = false">Close</AppButton>
+        <AppButton size="sm" @click="detailOpen = false; selectedRow && openStatusDialog(selectedRow)">Update status</AppButton>
+      </div>
+    </template>
+  </AppDialog>
+
+  <AppDialog v-model:visible="createOpen" title="Create admin payment" maxWidthClass="max-w-4xl" @close="actionError = null">
     <div class="space-y-4">
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
+
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-gray-700">User ID</label>
           <AppInput v-model="createForm.userId" placeholder="user-id" />
-        </div>
-        <div class="space-y-2 md:col-span-2">
-          <label class="text-sm font-medium text-gray-700">Plan ID</label>
-          <AppInput v-model="createForm.planId" placeholder="plan-id" />
         </div>
         <div class="space-y-2">
           <label class="text-sm font-medium text-gray-700">Term months</label>
@@ -344,6 +462,25 @@ onMounted(loadPayments);
           <label class="text-sm font-medium text-gray-700">Topup amount</label>
           <AppInput v-model="createForm.topupAmount" type="number" min="0" placeholder="Optional" />
         </div>
+      </div>
+
+      <div class="overflow-hidden rounded-lg border border-border">
+        <BillingPlansSection
+          title="Available plans"
+          description="Reuse the same plan cards from the billing screen when creating an admin payment."
+          :is-loading="plansLoading"
+          :plans="plans"
+          :current-plan-id="selectedPlanId"
+          :selecting-plan-id="selectedPlanId"
+          :format-money="(amount) => formatMoney(amount, 'USD')"
+          :get-plan-storage-text="getPlanStorageText"
+          :get-plan-duration-text="getPlanDurationText"
+          :get-plan-uploads-text="getPlanUploadsText"
+          current-plan-label="Selected"
+          selecting-label="Selected"
+          choose-label="Select plan"
+          @select="selectPlan"
+        />
       </div>
     </div>
     <template #footer>

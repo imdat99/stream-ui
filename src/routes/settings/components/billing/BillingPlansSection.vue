@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
+import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 
 defineProps<{
     title: string;
@@ -69,18 +69,6 @@ const emit = defineEmits<{
                     <span class="text-foreground/60 text-sm"> / {{ $t('settings.billing.cycle.'+plan.cycle) }}</span>
                 </div>
                 <ul class="space-y-2 mb-4 text-sm">
-                    <!-- <li class="flex items-center gap-2 text-foreground/70">
-                        <CheckIcon class="w-4 h-4 text-success shrink-0" />
-                        {{ getPlanStorageText(plan) }}
-                    </li>
-                    <li class="flex items-center gap-2 text-foreground/70">
-                        <CheckIcon class="w-4 h-4 text-success shrink-0" />
-                        {{ getPlanDurationText(plan) }}
-                    </li>
-                    <li class="flex items-center gap-2 text-foreground/70">
-                        <CheckIcon class="w-4 h-4 text-success shrink-0" />
-                        {{ getPlanUploadsText(plan) }}
-                    </li> -->
                     <li
                         v-for="feature in plan.features || []"
                         :key="feature"

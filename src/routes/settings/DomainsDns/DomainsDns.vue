@@ -3,6 +3,7 @@ import { client as rpcClient } from '@/api/rpcclient';
 import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
+import BaseTable from '@/components/ui/table/BaseTable.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PlusIcon from '@/components/icons/PlusIcon.vue';
@@ -13,6 +14,7 @@ import SettingsNotice from '@/routes/settings/components/SettingsNotice.vue';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
 import { useQuery } from '@pinia/colada';
+import type { ColumnDef } from '@tanstack/vue-table';
 import { useTranslation } from 'i18next-vue';
 import { computed, ref, watch } from 'vue';
 
@@ -220,6 +222,49 @@ const copyIframeCode = async () => {
         life: 2000,
     });
 };
+
+const columns = computed<ColumnDef<DomainItem>[]>(() => [
+    {
+        id: 'domain',
+        header: t('settings.domainsDns.table.domain'),
+        accessorFn: row => row.name,
+        cell: ({ row }) => h('div', { class: 'flex items-center gap-2' }, [
+            h(LinkIcon, { class: 'h-4 w-4 text-foreground/40' }),
+            h('span', { class: 'text-sm font-medium text-foreground' }, row.original.name),
+        ]),
+        meta: {
+            headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3',
+        },
+    },
+    {
+        id: 'addedAt',
+        header: t('settings.domainsDns.table.addedDate'),
+        accessorFn: row => row.addedAt,
+        cell: ({ row }) => h('span', { class: 'text-sm text-foreground/60' }, row.original.addedAt),
+        meta: {
+            headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3',
+        },
+    },
+    {
+        id: 'actions',
+        header: t('common.actions'),
+        enableSorting: false,
+        cell: ({ row }) => h(AppButton, {
+            variant: 'ghost',
+            size: 'sm',
+            disabled: adding.value || removingId.value !== null,
+            onClick: () => handleRemoveDomain(row.original),
+        }, {
+            icon: () => h(TrashIcon, { class: 'h-4 w-4 text-danger' }),
+        }),
+        meta: {
+            headerClass: 'px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3 text-right',
+        },
+    },
+]);
 </script>
 
 <template>
@@ -243,53 +288,24 @@ const copyIframeCode = async () => {
 
         <SettingsTableSkeleton v-if="isInitialLoading" :columns="3" :rows="4" />
 
-        <div v-else class="border-b border-border mt-4">
-            <table class="w-full">
-                <thead class="bg-muted/30">
-                    <tr>
-                        <th class="text-left text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('settings.domainsDns.table.domain') }}</th>
-                        <th class="text-left text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('settings.domainsDns.table.addedDate') }}</th>
-                        <th class="text-right text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('common.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
-                    <template v-if="domains.length > 0">
-                        <tr
-                            v-for="domain in domains"
-                            :key="domain.id"
-                            class="hover:bg-muted/30 transition-all"
-                        >
-                            <td class="px-6 py-3">
-                                <div class="flex items-center gap-2">
-                                    <LinkIcon class="w-4 h-4 text-foreground/40" />
-                                    <span class="text-sm font-medium text-foreground">{{ domain.name }}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3 text-sm text-foreground/60">{{ domain.addedAt }}</td>
-                            <td class="px-6 py-3 text-right">
-                                <AppButton
-                                    variant="ghost"
-                                    size="sm"
-                                    :disabled="adding || removingId !== null"
-                                    @click="handleRemoveDomain(domain)"
-                                >
-                                    <template #icon>
-                                        <TrashIcon class="w-4 h-4 text-danger" />
-                                    </template>
-                                </AppButton>
-                            </td>
-                        </tr>
-                    </template>
-                    <tr v-else>
-                        <td colspan="3" class="px-6 py-12 text-center">
-                            <LinkIcon class="w-10 h-10 text-foreground/30 mb-3 block mx-auto" />
-                            <p class="text-sm text-foreground/60 mb-1">{{ t('settings.domainsDns.emptyTitle') }}</p>
-                            <p class="text-xs text-foreground/40">{{ t('settings.domainsDns.emptySubtitle') }}</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <BaseTable
+            v-else
+            :data="domains"
+            :columns="columns"
+            :get-row-id="(row) => row.id"
+            wrapperClass="mt-4 border-b border-border rounded-none border-x-0 border-t-0 bg-transparent"
+            tableClass="w-full"
+            headerRowClass="bg-muted/30"
+            bodyRowClass="border-b border-border hover:bg-muted/30"
+        >
+            <template #empty>
+                <div class="px-6 py-12 text-center">
+                    <LinkIcon class="mx-auto mb-3 block h-10 w-10 text-foreground/30" />
+                    <p class="mb-1 text-sm text-foreground/60">{{ t('settings.domainsDns.emptyTitle') }}</p>
+                    <p class="text-xs text-foreground/40">{{ t('settings.domainsDns.emptySubtitle') }}</p>
+                </div>
+            </template>
+        </BaseTable>
 
         <div class="px-6 py-4 bg-muted/30">
             <div class="flex items-center justify-between mb-3">

@@ -3,9 +3,14 @@ import { client as rpcClient } from "@/api/rpcclient";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import AppInput from "@/components/app/AppInput.vue";
+import BaseTable from "@/components/ui/table/BaseTable.vue";
 import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
-import { computed, onMounted, reactive, ref } from "vue";
+import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
+import { type ColumnDef } from "@tanstack/vue-table";
+import { computed, h, onMounted, reactive, ref } from "vue";
+import AdminPlaceholderTable from "./components/AdminPlaceholderTable.vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
+import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 type ListJobsResponse = Awaited<ReturnType<typeof rpcClient.listAdminJobs>>;
 type AdminJobRow = NonNullable<ListJobsResponse["jobs"]>[number];
@@ -21,6 +26,7 @@ const activeAgentFilter = ref("");
 const appliedAgentFilter = ref("");
 const search = ref("");
 const createOpen = ref(false);
+const detailOpen = ref(false);
 const logsOpen = ref(false);
 const cancelOpen = ref(false);
 const retryOpen = ref(false);
@@ -55,7 +61,7 @@ const filteredRows = computed(() => {
   const keyword = search.value.trim().toLowerCase();
   if (!keyword) return rows.value;
   return rows.value.filter((row) => {
-    return [row.id, row.name, row.userId, row.agentId, row.status]
+    return [row.name, row.status]
       .map((value) => String(value || "").toLowerCase())
       .some((value) => value.includes(keyword));
   });
@@ -73,7 +79,7 @@ const selectedMeta = computed(() => {
     { label: "Agent", value: selectedRow.value.agentId || "Unassigned" },
     { label: "Priority", value: String(selectedRow.value.priority ?? 0) },
     { label: "Progress", value: formatProgress(selectedRow.value.progress) },
-    { label: "User", value: selectedRow.value.userId || "—" },
+    { label: "Owner", value: selectedRow.value.userId || "—" },
     { label: "Updated", value: formatDate(selectedRow.value.updatedAt) },
   ];
 });
@@ -98,6 +104,7 @@ const resetCreateForm = () => {
 
 const closeDialogs = () => {
   createOpen.value = false;
+  detailOpen.value = false;
   logsOpen.value = false;
   cancelOpen.value = false;
   retryOpen.value = false;
@@ -107,7 +114,7 @@ const closeDialogs = () => {
 const syncSelectedRow = () => {
   if (!selectedRow.value?.id) return;
   const fresh = rows.value.find((row) => row.id === selectedRow.value?.id);
-  if (fresh) selectedRow.value = fresh;
+  if (fresh && (detailOpen.value || logsOpen.value || cancelOpen.value || retryOpen.value)) selectedRow.value = fresh;
 };
 
 const loadJobs = async () => {
@@ -138,9 +145,11 @@ const loadSelectedLogs = async (jobId: string) => {
   selectedLogs.value = response.logs || "No logs available.";
 };
 
-const selectRow = async (row: AdminJobRow) => {
+const openDetailDialog = async (row: AdminJobRow) => {
   selectedRow.value = row;
+  actionError.value = null;
   selectedLogs.value = "Loading logs...";
+  detailOpen.value = true;
   try {
     await loadSelectedLogs(row.id);
   } catch {
@@ -241,8 +250,94 @@ const statusBadgeClass = (status?: string) => {
   if (["running", "processing"].includes(normalized)) return "border-sky-200 bg-sky-50 text-sky-700";
   if (["pending", "queued"].includes(normalized)) return "border-amber-200 bg-amber-50 text-amber-700";
   if (["failure", "failed", "cancelled"].includes(normalized)) return "border-rose-200 bg-rose-50 text-rose-700";
-  return "border-slate-200 bg-slate-100 text-slate-700";
+  return "border-border bg-muted/40 text-foreground/70";
 };
+
+const columns = computed<ColumnDef<AdminJobRow>[]>(() => [
+  {
+    id: "job",
+    header: "Job",
+    accessorFn: row => row.name || row.id || "",
+    cell: ({ row }) => h("button", { class: "text-left", onClick: () => { openDetailDialog(row.original); } }, [
+      h("div", { class: "font-medium text-foreground" }, row.original.name || "Untitled job"),
+      h("div", { class: "mt-1 text-xs text-foreground/60" }, row.original.status || "Unknown status"),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "status",
+    header: "Status",
+    accessorFn: row => row.status || "",
+    cell: ({ row }) => h("span", {
+      class: ["inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]", statusBadgeClass(row.original.status)],
+    }, row.original.status || "UNKNOWN"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "agent",
+    header: "Agent",
+    accessorFn: row => row.agentId || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.agentId || "Unassigned"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "priority",
+    header: "Priority",
+    accessorFn: row => Number(row.priority ?? 0),
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, String(row.original.priority ?? 0)),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+  {
+    id: "progress",
+    header: "Progress",
+    accessorFn: row => Number(row.progress ?? 0),
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, formatProgress(row.original.progress)),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+  {
+    id: "updated",
+    header: "Updated",
+    accessorFn: row => row.updatedAt || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/60" }, formatDate(row.original.updatedAt)),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => h("div", { class: "flex justify-end gap-2" }, [
+      h(AppButton, { size: "sm", variant: "secondary", onClick: () => openLogsDialog(row.original) }, { default: () => "Logs" }),
+      ...(isRetryable(row.original)
+        ? [h(AppButton, { size: "sm", onClick: () => openRetryDialog(row.original) }, { default: () => "Retry" })]
+        : []),
+      ...(isCancelable(row.original)
+        ? [h(AppButton, { size: "sm", variant: "danger", onClick: () => openCancelDialog(row.original) }, { default: () => "Cancel" })]
+        : []),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+]);
 
 useAdminRuntimeMqtt(({ topic, payload }) => {
   if (topic.startsWith("picpic/job/") && payload?.type === "job_update") {
@@ -284,130 +379,112 @@ useAdminRuntimeMqtt(({ topic, payload }) => {
   }
 });
 
+useAdminPageHeader(() => ({
+  eyebrow: "Runtime",
+  badge: `${rows.value.length} jobs loaded`,
+  actions: [
+    {
+      label: "Refresh",
+      variant: "secondary",
+      onClick: loadJobs,
+    },
+    {
+      label: "Create job",
+      onClick: () => {
+        actionError.value = null;
+        createOpen.value = true;
+      },
+    },
+  ],
+}));
+
 onMounted(loadJobs);
 </script>
 
 <template>
-  <AdminSectionShell
-    title="Admin Jobs"
-    description="Queue visibility, live progress and operator interventions backed by the existing admin runtime contract."
-    eyebrow="Runtime"
-    :badge="`${rows.length} jobs loaded`"
-  >
-    <template #toolbar>
-      <AppButton size="sm" variant="secondary" :loading="loading" @click="loadJobs">Refresh</AppButton>
-      <AppButton size="sm" @click="actionError = null; createOpen = true">Create job</AppButton>
-    </template>
+  <AdminSectionShell>
 
     <template #stats>
-      <div v-for="item in summary" :key="item.label" class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{{ item.label }}</div>
-        <div class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{{ item.value }}</div>
-      </div>
-    </template>
-
-    <template #aside>
-      <div class="space-y-5">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Selected job</div>
-        <div v-if="selectedRow" class="space-y-4">
-          <div>
-            <div class="text-lg font-semibold text-white">{{ selectedRow.name || 'Untitled job' }}</div>
-            <div class="mt-1 text-sm text-slate-400">{{ selectedRow.id }}</div>
-          </div>
-          <div class="grid gap-3">
-            <div v-for="item in selectedMeta" :key="item.label" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ item.label }}</div>
-              <div class="mt-1 text-sm font-medium text-white">{{ item.value }}</div>
-            </div>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3">
-            <div class="flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              <span>Live logs</span>
-              <button type="button" class="text-slate-300 transition hover:text-white" @click="openLogsDialog(selectedRow)">Expand</button>
-            </div>
-            <pre class="mt-3 max-h-72 overflow-auto whitespace-pre-wrap break-words text-xs leading-5 text-emerald-300">{{ selectedLogs || 'No logs available.' }}</pre>
-          </div>
-          <div class="grid gap-2">
-            <AppButton size="sm" variant="secondary" @click="openLogsDialog(selectedRow)">Open full logs</AppButton>
-            <AppButton v-if="isRetryable(selectedRow)" size="sm" @click="openRetryDialog(selectedRow)">Retry job</AppButton>
-            <AppButton v-if="isCancelable(selectedRow)" size="sm" variant="danger" @click="openCancelDialog(selectedRow)">Cancel job</AppButton>
-          </div>
-        </div>
-        <div v-else class="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-sm leading-6 text-slate-400">
-          Select a job to inspect runtime state and tail logs from the existing MQTT stream.
-        </div>
+      <div v-for="item in summary" :key="item.label" class="rounded-lg border border-border bg-muted/20 p-4">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/50">{{ item.label }}</div>
+        <div class="mt-2 text-2xl font-semibold tracking-tight text-foreground">{{ item.value }}</div>
       </div>
     </template>
 
     <div class="space-y-4">
-      <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 xl:grid-cols-[220px_minmax(0,1fr)_auto] xl:items-end">
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Agent filter</label>
-          <AppInput v-model="activeAgentFilter" placeholder="Optional agent id" @enter="applyFilters" />
+      <SettingsSectionCard title="Filters" description="Find jobs by name or status, then narrow the list by assigned agent if needed." bodyClass="p-5">
+        <div class="grid gap-3 xl:grid-cols-[220px_minmax(0,1fr)_auto] xl:items-end">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Assigned agent</label>
+            <AppInput v-model="activeAgentFilter" placeholder="Optional agent reference" @enter="applyFilters" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Search</label>
+            <AppInput v-model="search" placeholder="Search by job name or status" />
+          </div>
+          <div class="flex items-center gap-2 xl:justify-end">
+            <AppButton size="sm" variant="ghost" @click="activeAgentFilter = ''; appliedAgentFilter = ''; search = ''; loadJobs()">Reset</AppButton>
+            <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
+          </div>
         </div>
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
-          <AppInput v-model="search" placeholder="Search job id, name, user, agent" />
-        </div>
-        <div class="flex items-center gap-2 xl:justify-end">
-          <AppButton size="sm" variant="ghost" @click="activeAgentFilter = ''; appliedAgentFilter = ''; search = ''; loadJobs()">Reset</AppButton>
-          <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
-        </div>
-      </div>
+      </SettingsSectionCard>
 
-      <div v-if="error" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
+      <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
 
-      <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left text-sm">
-            <thead class="bg-slate-50/90 text-slate-500">
-              <tr>
-                <th class="px-4 py-3 font-semibold">Job</th>
-                <th class="px-4 py-3 font-semibold">Status</th>
-                <th class="px-4 py-3 font-semibold">Agent</th>
-                <th class="px-4 py-3 font-semibold">Priority</th>
-                <th class="px-4 py-3 font-semibold">Progress</th>
-                <th class="px-4 py-3 font-semibold">Updated</th>
-                <th class="px-4 py-3 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loading" class="border-t border-slate-200">
-                <td colspan="7" class="px-4 py-10 text-center text-slate-500">Loading jobs...</td>
-              </tr>
-              <tr v-else-if="filteredRows.length === 0" class="border-t border-slate-200">
-                <td colspan="7" class="px-4 py-10 text-center text-slate-500">No jobs matched the current filters.</td>
-              </tr>
-              <tr v-for="row in filteredRows" :key="row.id" class="border-t border-slate-200 transition-colors hover:bg-slate-50/70" :class="selectedRow?.id === row.id ? 'bg-sky-50/60' : ''">
-                <td class="px-4 py-3">
-                  <button class="text-left" @click="selectRow(row)">
-                    <div class="font-medium text-slate-900">{{ row.name || 'Untitled job' }}</div>
-                    <div class="mt-1 text-xs text-slate-500">{{ row.id }}</div>
-                  </button>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" :class="statusBadgeClass(row.status)">
-                    {{ row.status || 'UNKNOWN' }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-slate-700">{{ row.agentId || 'Unassigned' }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ row.priority ?? 0 }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ formatProgress(row.progress) }}</td>
-                <td class="px-4 py-3 text-slate-500">{{ formatDate(row.updatedAt) }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
-                    <AppButton size="sm" variant="secondary" @click="openLogsDialog(row)">Logs</AppButton>
-                    <AppButton v-if="isRetryable(row)" size="sm" @click="openRetryDialog(row)">Retry</AppButton>
-                    <AppButton v-if="isCancelable(row)" size="sm" variant="danger" @click="openCancelDialog(row)">Cancel</AppButton>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <SettingsSectionCard v-else title="Jobs" description="Current queue state and operator actions." bodyClass="">
+        <AdminPlaceholderTable v-if="loading" :columns="7" :rows="4" />
+
+        <BaseTable
+          v-else
+          :data="filteredRows"
+          :columns="columns"
+          :get-row-id="(row) => row.id || row.name || ''"
+          wrapperClass="border-x-0 border-t-0 rounded-none bg-transparent"
+          tableClass="w-full"
+          headerRowClass="bg-muted/30"
+          bodyRowClass="border-b border-border hover:bg-muted/30"
+        >
+          <template #empty>
+            <div class="px-6 py-12 text-center">
+              <p class="mb-1 text-sm text-foreground/60">No jobs matched the current filters.</p>
+              <p class="text-xs text-foreground/40">Try a broader job name or clear the agent filter.</p>
+            </div>
+          </template>
+        </BaseTable>
+      </SettingsSectionCard>
     </div>
   </AdminSectionShell>
+
+  <AppDialog v-model:visible="detailOpen" title="Job details" maxWidthClass="max-w-3xl" @close="actionError = null">
+    <div v-if="selectedRow" class="space-y-4">
+      <div>
+        <div class="text-lg font-semibold text-foreground">{{ selectedRow.name || 'Untitled job' }}</div>
+        <div class="mt-1 text-sm text-foreground/60">{{ selectedRow.status || 'Unknown status' }}</div>
+      </div>
+
+      <div class="grid gap-3 md:grid-cols-2">
+        <div v-for="item in selectedMeta" :key="item.label" class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+          <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">{{ item.label }}</div>
+          <div class="mt-1 text-sm font-medium text-foreground">{{ item.value }}</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-slate-200 bg-slate-950 px-4 py-3">
+        <div class="flex items-center justify-between gap-2 text-[11px] uppercase tracking-[0.16em] text-slate-400">
+          <span>Live logs</span>
+          <button type="button" class="text-slate-300 transition hover:text-white" @click="selectedRow && openLogsDialog(selectedRow)">Open full logs</button>
+        </div>
+        <pre class="mt-3 max-h-72 overflow-auto whitespace-pre-wrap break-words text-xs leading-5 text-emerald-300">{{ selectedLogs || 'No logs available.' }}</pre>
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <AppButton variant="secondary" size="sm" @click="detailOpen = false">Close</AppButton>
+        <AppButton v-if="selectedRow && isRetryable(selectedRow)" size="sm" @click="detailOpen = false; openRetryDialog(selectedRow)">Retry</AppButton>
+        <AppButton v-if="selectedRow && isCancelable(selectedRow)" variant="danger" size="sm" @click="detailOpen = false; openCancelDialog(selectedRow)">Cancel</AppButton>
+      </div>
+    </template>
+  </AppDialog>
 
   <AppDialog v-model:visible="createOpen" title="Create job" maxWidthClass="max-w-2xl" @close="actionError = null">
     <div class="space-y-4">
@@ -469,7 +546,7 @@ onMounted(loadJobs);
     <div class="space-y-4">
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
       <p class="text-sm text-gray-700">
-        Cancel job <span class="font-medium">{{ selectedRow?.name || selectedRow?.id }}</span>.
+        Cancel <span class="font-medium">{{ selectedRow?.name || 'this job' }}</span>.
       </p>
     </div>
     <template #footer>
@@ -484,7 +561,7 @@ onMounted(loadJobs);
     <div class="space-y-4">
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
       <p class="text-sm text-gray-700">
-        Retry job <span class="font-medium">{{ selectedRow?.name || selectedRow?.id }}</span>.
+        Retry <span class="font-medium">{{ selectedRow?.name || 'this job' }}</span>.
       </p>
     </div>
     <template #footer>

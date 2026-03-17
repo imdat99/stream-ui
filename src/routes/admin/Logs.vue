@@ -3,8 +3,10 @@ import { client as rpcClient } from "@/api/rpcclient";
 import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
 import AppButton from "@/components/app/AppButton.vue";
 import AppInput from "@/components/app/AppInput.vue";
+import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
 import { computed, ref } from "vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
+import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -19,6 +21,8 @@ const summary = computed(() => [
   { label: "Tracking job", value: activeJobId.value || "—" },
   { label: "Live lines", value: liveLineCount.value },
 ]);
+
+const activeChannel = computed(() => activeJobId.value ? `picpic/logs/${activeJobId.value}` : "No active stream");
 
 const loadLogs = async () => {
   if (!jobId.value.trim()) return;
@@ -55,63 +59,61 @@ useAdminRuntimeMqtt(({ topic, payload }) => {
     liveLineCount.value += countLogLines(nextLine);
   }
 });
+
+useAdminPageHeader(() => ({
+  eyebrow: "Observability",
+  badge: activeJobId.value ? "Live tail attached" : "Awaiting job selection",
+  actions: [{
+    label: "Load logs",
+    variant: "secondary",
+    onClick: loadLogs,
+  }],
+}));
 </script>
 
 <template>
-  <AdminSectionShell
-    title="Admin Logs"
-    description="Fetch persisted output and continue tailing the selected job over the existing MQTT log stream."
-    eyebrow="Observability"
-    :badge="activeJobId ? 'Live tail attached' : 'Awaiting job selection'"
-  >
-    <template #toolbar>
-      <AppButton size="sm" variant="secondary" :loading="loading" @click="loadLogs">Load logs</AppButton>
-    </template>
+  <AdminSectionShell>
 
     <template #stats>
-      <div v-for="item in summary" :key="item.label" class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{{ item.label }}</div>
-        <div class="mt-2 truncate text-2xl font-semibold tracking-tight text-slate-950">{{ item.value }}</div>
-      </div>
-    </template>
-
-    <template #aside>
-      <div class="space-y-5">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Tail status</div>
-        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-          <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Current channel</div>
-          <div class="mt-1 break-all text-sm font-medium text-white">{{ activeJobId ? `picpic/logs/${activeJobId}` : 'No active stream' }}</div>
-        </div>
-        <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-slate-300">
-          Persisted logs are loaded once from gRPC, then appended live from MQTT frames for the same job.
-        </div>
-        <AppButton size="sm" variant="secondary" @click="clearLogs">Clear session</AppButton>
+      <div v-for="item in summary" :key="item.label" class="rounded-lg border border-border bg-muted/20 p-4">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/50">{{ item.label }}</div>
+        <div class="mt-2 truncate text-2xl font-semibold tracking-tight text-foreground">{{ item.value }}</div>
       </div>
     </template>
 
     <div class="space-y-4">
-      <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 lg:flex-row lg:items-end">
-        <div class="w-full max-w-xl space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Job ID</label>
-          <AppInput v-model="jobId" placeholder="job-..." @enter="loadLogs" />
+      <SettingsSectionCard title="Log session" description="Load persisted logs once, then keep appending live lines for the same job." bodyClass="p-5">
+        <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Job ID</label>
+            <AppInput v-model="jobId" placeholder="job-..." @enter="loadLogs" />
+          </div>
+          <div class="flex items-center gap-2">
+            <AppButton size="sm" variant="ghost" @click="clearLogs">Reset</AppButton>
+            <AppButton size="sm" variant="secondary" :loading="loading" @click="loadLogs">Fetch</AppButton>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <AppButton size="sm" variant="ghost" @click="clearLogs">Reset</AppButton>
-          <AppButton size="sm" variant="secondary" :loading="loading" @click="loadLogs">Fetch</AppButton>
-        </div>
-      </div>
 
-      <div v-if="error" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <div class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+            <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">Current channel</div>
+            <div class="mt-1 break-all text-sm font-medium text-foreground">{{ activeChannel }}</div>
+          </div>
+          <div class="rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm leading-6 text-foreground/70">
+            Persisted logs are loaded once from gRPC, then appended live from MQTT frames for the same job.
+          </div>
+        </div>
+      </SettingsSectionCard>
+
+      <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
         {{ error }}
       </div>
 
-      <div class="rounded-[24px] border border-slate-200 bg-slate-950 p-4 shadow-[0_12px_40px_-32px_rgba(15,23,42,0.6)]">
-        <div class="mb-3 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-          <span>Runtime output</span>
-          <span>{{ activeJobId || 'idle' }}</span>
+      <SettingsSectionCard title="Runtime output" :description="activeJobId || 'idle'" bodyClass="p-5">
+        <div class="rounded-lg border border-slate-200 bg-slate-950 p-4">
+          <pre class="min-h-96 overflow-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 text-emerald-300">{{ loading ? 'Loading logs...' : logs }}</pre>
         </div>
-        <pre class="min-h-96 overflow-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 text-emerald-300">{{ loading ? 'Loading logs...' : logs }}</pre>
-      </div>
+      </SettingsSectionCard>
     </div>
   </AdminSectionShell>
 </template>

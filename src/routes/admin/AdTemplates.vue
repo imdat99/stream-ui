@@ -3,8 +3,13 @@ import { client as rpcClient } from "@/api/rpcclient";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import AppInput from "@/components/app/AppInput.vue";
-import { computed, onMounted, reactive, ref } from "vue";
+import BaseTable from "@/components/ui/table/BaseTable.vue";
+import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
+import { type ColumnDef } from "@tanstack/vue-table";
+import { computed, h, onMounted, reactive, ref } from "vue";
+import AdminPlaceholderTable from "./components/AdminPlaceholderTable.vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
+import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 type ListTemplatesResponse = Awaited<ReturnType<typeof rpcClient.listAdminAdTemplates>>;
 type AdminAdTemplateRow = NonNullable<ListTemplatesResponse["templates"]>[number];
@@ -25,6 +30,7 @@ const appliedSearch = ref("");
 const ownerFilter = ref("");
 const appliedOwnerFilter = ref("");
 const createOpen = ref(false);
+const detailOpen = ref(false);
 const editOpen = ref(false);
 const deleteOpen = ref(false);
 
@@ -86,7 +92,7 @@ const loadTemplates = async () => {
     total.value = response.total ?? rows.value.length;
     limit.value = response.limit ?? limit.value;
     page.value = response.page ?? page.value;
-    if (selectedRow.value?.id) {
+    if (selectedRow.value?.id && (detailOpen.value || editOpen.value || deleteOpen.value)) {
       const fresh = rows.value.find((row) => row.id === selectedRow.value?.id);
       if (fresh) selectedRow.value = fresh;
     }
@@ -110,6 +116,7 @@ const resetCreateForm = () => {
 
 const closeDialogs = () => {
   createOpen.value = false;
+  detailOpen.value = false;
   editOpen.value = false;
   deleteOpen.value = false;
   actionError.value = null;
@@ -120,6 +127,12 @@ const applyFilters = async () => {
   appliedSearch.value = search.value;
   appliedOwnerFilter.value = ownerFilter.value;
   await loadTemplates();
+};
+
+const openDetailDialog = (row: AdminAdTemplateRow) => {
+  selectedRow.value = row;
+  actionError.value = null;
+  detailOpen.value = true;
 };
 
 const openEditDialog = (row: AdminAdTemplateRow) => {
@@ -228,127 +241,184 @@ const formatDate = (value?: string) => {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 };
 
+const columns = computed<ColumnDef<AdminAdTemplateRow>[]>(() => [
+  {
+    id: "template",
+    header: "Template",
+    accessorFn: row => row.name || "",
+    cell: ({ row }) => h("button", { class: "text-left", onClick: () => { openDetailDialog(row.original); } }, [
+      h("div", { class: "font-medium text-foreground" }, row.original.name),
+      h("div", { class: "mt-1 text-xs text-foreground/60" }, row.original.ownerEmail || row.original.userId || "No owner"),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "owner",
+    header: "Owner",
+    accessorFn: row => row.ownerEmail || row.userId || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.ownerEmail || row.original.userId || "—"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "format",
+    header: "Format",
+    accessorFn: row => row.adFormat || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.adFormat || "pre-roll"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "status",
+    header: "Status",
+    accessorFn: row => row.isActive ? "ACTIVE" : "INACTIVE",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.isActive ? "ACTIVE" : "INACTIVE"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "default",
+    header: "Default",
+    accessorFn: row => row.isDefault ? "YES" : "NO",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.isDefault ? "YES" : "NO"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => h("div", { class: "flex justify-end gap-2" }, [
+      h(AppButton, { size: "sm", variant: "secondary", onClick: () => openEditDialog(row.original) }, { default: () => "Edit" }),
+      h(AppButton, { size: "sm", variant: "danger", onClick: () => openDeleteDialog(row.original) }, { default: () => "Delete" }),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+]);
+
+useAdminPageHeader(() => ({
+  eyebrow: "Advertising",
+  badge: `${total.value} total templates`,
+  actions: [
+    {
+      label: "Refresh",
+      variant: "secondary",
+      onClick: loadTemplates,
+    },
+    {
+      label: "Create template",
+      onClick: () => {
+        actionError.value = null;
+        createOpen.value = true;
+      },
+    },
+  ],
+}));
+
 onMounted(loadTemplates);
 </script>
 
 <template>
-  <AdminSectionShell
-    title="Admin Ad Templates"
-    description="Operate VAST templates as reusable assets with quick filtering, defaults and owner context."
-    eyebrow="Advertising"
-    :badge="`${total} total templates`"
-  >
-    <template #toolbar>
-      <AppButton size="sm" variant="secondary" @click="loadTemplates">Refresh</AppButton>
-      <AppButton size="sm" @click="actionError = null; createOpen = true">Create template</AppButton>
-    </template>
+  <AdminSectionShell>
 
     <template #stats>
-      <div v-for="item in summary" :key="item.label" class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{{ item.label }}</div>
-        <div class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{{ item.value }}</div>
-      </div>
-    </template>
-
-    <template #aside>
-      <div class="space-y-5">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Selected template</div>
-        <div v-if="selectedRow" class="space-y-4">
-          <div>
-            <div class="text-lg font-semibold text-white">{{ selectedRow.name }}</div>
-            <div class="mt-1 text-sm text-slate-400">{{ selectedRow.id }}</div>
-          </div>
-          <div class="grid gap-3">
-            <div v-for="item in selectedMeta" :key="item.label" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ item.label }}</div>
-              <div class="mt-1 text-sm font-medium text-white">{{ item.value }}</div>
-            </div>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">VAST URL</div>
-            <div class="mt-2 break-all text-sm text-slate-200">{{ selectedRow.vastTagUrl }}</div>
-          </div>
-          <div class="grid gap-2">
-            <AppButton size="sm" @click="openEditDialog(selectedRow)">Edit template</AppButton>
-            <AppButton size="sm" variant="danger" @click="openDeleteDialog(selectedRow)">Delete template</AppButton>
-          </div>
-        </div>
-        <div v-else class="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-sm leading-6 text-slate-400">
-          Select a template to inspect status, default flag and VAST source.
-        </div>
+      <div v-for="item in summary" :key="item.label" class="rounded-lg border border-border bg-muted/20 p-4">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/50">{{ item.label }}</div>
+        <div class="mt-2 text-2xl font-semibold tracking-tight text-foreground">{{ item.value }}</div>
       </div>
     </template>
 
     <div class="space-y-4">
-      <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 xl:grid-cols-[minmax(0,1fr)_220px_auto] xl:items-end">
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
-          <AppInput v-model="search" placeholder="Search template name" @enter="applyFilters" />
+      <SettingsSectionCard title="Filters" description="Search templates by name and narrow by owner reference if needed." bodyClass="p-5">
+        <div class="grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px_auto] xl:items-end">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Search</label>
+            <AppInput v-model="search" placeholder="Search template name" @enter="applyFilters" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Owner reference</label>
+            <AppInput v-model="ownerFilter" placeholder="Optional owner reference" @enter="applyFilters" />
+          </div>
+          <div class="flex items-center gap-2 xl:justify-end">
+            <AppButton size="sm" variant="ghost" @click="search = ''; ownerFilter = ''; appliedSearch = ''; appliedOwnerFilter = ''; loadTemplates()">Reset</AppButton>
+            <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
+          </div>
         </div>
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Owner user ID</label>
-          <AppInput v-model="ownerFilter" placeholder="Optional owner id" @enter="applyFilters" />
-        </div>
-        <div class="flex items-center gap-2 xl:justify-end">
-          <AppButton size="sm" variant="ghost" @click="search = ''; ownerFilter = ''; appliedSearch = ''; appliedOwnerFilter = ''; loadTemplates()">Reset</AppButton>
-          <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
-        </div>
-      </div>
+      </SettingsSectionCard>
 
-      <div v-if="error" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
+      <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
 
-      <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left text-sm">
-            <thead class="bg-slate-50/90 text-slate-500">
-              <tr>
-                <th class="px-4 py-3 font-semibold">Template</th>
-                <th class="px-4 py-3 font-semibold">Owner</th>
-                <th class="px-4 py-3 font-semibold">Format</th>
-                <th class="px-4 py-3 font-semibold">Status</th>
-                <th class="px-4 py-3 font-semibold">Default</th>
-                <th class="px-4 py-3 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loading" class="border-t border-slate-200">
-                <td colspan="6" class="px-4 py-10 text-center text-slate-500">Loading ad templates...</td>
-              </tr>
-              <tr v-else-if="rows.length === 0" class="border-t border-slate-200">
-                <td colspan="6" class="px-4 py-10 text-center text-slate-500">No templates matched the current filters.</td>
-              </tr>
-              <tr v-for="row in rows" :key="row.id" class="border-t border-slate-200 transition-colors hover:bg-slate-50/70" :class="selectedRow?.id === row.id ? 'bg-sky-50/60' : ''">
-                <td class="px-4 py-3">
-                  <button class="text-left" @click="selectedRow = row">
-                    <div class="font-medium text-slate-900">{{ row.name }}</div>
-                    <div class="mt-1 text-xs text-slate-500">{{ row.id }}</div>
-                  </button>
-                </td>
-                <td class="px-4 py-3 text-slate-700">{{ row.ownerEmail || row.userId }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ row.adFormat || 'pre-roll' }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ row.isActive ? 'ACTIVE' : 'INACTIVE' }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ row.isDefault ? 'YES' : 'NO' }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
-                    <AppButton size="sm" variant="secondary" @click="openEditDialog(row)">Edit</AppButton>
-                    <AppButton size="sm" variant="danger" @click="openDeleteDialog(row)">Delete</AppButton>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <SettingsSectionCard v-else title="Templates" description="Reusable ad templates and ownership metadata." bodyClass="">
+        <AdminPlaceholderTable v-if="loading" :columns="6" :rows="4" />
 
-        <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-3 md:flex-row md:items-center md:justify-between">
-          <div class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Page {{ page }} of {{ totalPages }} · {{ total }} records</div>
+        <BaseTable
+          v-else
+          :data="rows"
+          :columns="columns"
+          :get-row-id="(row) => row.id || row.name || ''"
+          wrapperClass="border-x-0 border-t-0 rounded-none bg-transparent"
+          tableClass="w-full"
+          headerRowClass="bg-muted/30"
+          bodyRowClass="border-b border-border hover:bg-muted/30"
+        >
+          <template #empty>
+            <div class="px-6 py-12 text-center">
+              <p class="mb-1 text-sm text-foreground/60">No templates matched the current filters.</p>
+              <p class="text-xs text-foreground/40">Try a broader template name or clear the owner filter.</p>
+            </div>
+          </template>
+        </BaseTable>
+
+        <div class="flex flex-col gap-3 border-t border-border bg-muted/20 px-6 py-4 md:flex-row md:items-center md:justify-between">
+          <div class="text-xs font-medium uppercase tracking-[0.16em] text-foreground/50">Page {{ page }} of {{ totalPages }} · {{ total }} records</div>
           <div class="flex items-center gap-2">
             <AppButton size="sm" variant="secondary" :disabled="page <= 1 || loading" @click="previousPage">Previous</AppButton>
             <AppButton size="sm" variant="secondary" :disabled="page >= totalPages || loading" @click="nextPage">Next</AppButton>
           </div>
         </div>
-      </div>
+      </SettingsSectionCard>
     </div>
   </AdminSectionShell>
+
+  <AppDialog v-model:visible="detailOpen" title="Template details" maxWidthClass="max-w-lg" @close="actionError = null">
+    <div v-if="selectedRow" class="space-y-4">
+      <div>
+        <div class="text-lg font-semibold text-foreground">{{ selectedRow.name }}</div>
+        <div class="mt-1 text-sm text-foreground/60">{{ selectedRow.ownerEmail || selectedRow.userId || 'No owner' }}</div>
+      </div>
+      <div class="grid gap-3">
+        <div v-for="item in selectedMeta" :key="item.label" class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+          <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">{{ item.label }}</div>
+          <div class="mt-1 text-sm font-medium text-foreground">{{ item.value }}</div>
+        </div>
+      </div>
+      <div class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">VAST URL</div>
+        <div class="mt-2 break-all text-sm text-foreground/70">{{ selectedRow.vastTagUrl }}</div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <AppButton variant="secondary" size="sm" @click="detailOpen = false">Close</AppButton>
+        <AppButton size="sm" @click="detailOpen = false; selectedRow && openEditDialog(selectedRow)">Edit</AppButton>
+        <AppButton variant="danger" size="sm" @click="detailOpen = false; selectedRow && openDeleteDialog(selectedRow)">Delete</AppButton>
+      </div>
+    </template>
+  </AppDialog>
 
   <AppDialog v-model:visible="createOpen" title="Create ad template" maxWidthClass="max-w-2xl" @close="actionError = null">
     <div class="space-y-4">
@@ -450,7 +520,7 @@ onMounted(loadTemplates);
     <div class="space-y-4">
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
       <p class="text-sm text-gray-700">
-        Delete ad template <span class="font-medium">{{ selectedRow?.name || selectedRow?.id }}</span>.
+        Delete ad template <span class="font-medium">{{ selectedRow?.name || 'this template' }}</span>.
       </p>
     </div>
     <template #footer>

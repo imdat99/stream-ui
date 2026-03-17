@@ -3,8 +3,13 @@ import { client as rpcClient } from "@/api/rpcclient";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import AppInput from "@/components/app/AppInput.vue";
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import BaseTable from "@/components/ui/table/BaseTable.vue";
+import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
+import { type ColumnDef } from "@tanstack/vue-table";
+import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import AdminPlaceholderTable from "./components/AdminPlaceholderTable.vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
+import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 type ListVideosResponse = Awaited<ReturnType<typeof rpcClient.listAdminVideos>>;
 type AdminVideoRow = NonNullable<ListVideosResponse["videos"]>[number];
@@ -27,6 +32,7 @@ const ownerFilter = ref("");
 const appliedOwnerFilter = ref("");
 const statusFilter = ref<(typeof statusFilterOptions)[number]>("");
 const createOpen = ref(false);
+const detailOpen = ref(false);
 const editOpen = ref(false);
 const deleteOpen = ref(false);
 
@@ -97,6 +103,7 @@ const resetCreateForm = () => {
 
 const closeDialogs = () => {
   createOpen.value = false;
+  detailOpen.value = false;
   editOpen.value = false;
   deleteOpen.value = false;
   actionError.value = null;
@@ -105,7 +112,7 @@ const closeDialogs = () => {
 const syncSelectedRow = () => {
   if (!selectedRow.value?.id) return;
   const fresh = rows.value.find((row) => row.id === selectedRow.value?.id);
-  if (fresh) selectedRow.value = fresh;
+  if (fresh && (detailOpen.value || editOpen.value || deleteOpen.value)) selectedRow.value = fresh;
 };
 
 const loadVideos = async () => {
@@ -136,6 +143,12 @@ const applyFilters = async () => {
   appliedSearch.value = search.value;
   appliedOwnerFilter.value = ownerFilter.value;
   await loadVideos();
+};
+
+const openDetailDialog = (row: AdminVideoRow) => {
+  selectedRow.value = row;
+  actionError.value = null;
+  detailOpen.value = true;
 };
 
 const openEditDialog = (row: AdminVideoRow) => {
@@ -273,9 +286,109 @@ const statusBadgeClass = (status?: string) => {
     case "FAILED":
       return "border-rose-200 bg-rose-50 text-rose-700";
     default:
-      return "border-slate-200 bg-slate-100 text-slate-700";
+      return "border-border bg-muted/40 text-foreground/70";
   }
 };
+
+const columns = computed<ColumnDef<AdminVideoRow>[]>(() => [
+  {
+    id: "video",
+    header: "Video",
+    accessorFn: row => row.title || "",
+    cell: ({ row }) => h("button", { class: "text-left", onClick: () => { openDetailDialog(row.original); } }, [
+      h("div", { class: "font-medium text-foreground" }, row.original.title),
+      h("div", { class: "mt-1 text-xs text-foreground/60" }, row.original.ownerEmail || row.original.userId || "No owner"),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "owner",
+    header: "Owner",
+    accessorFn: row => row.ownerEmail || row.userId || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.ownerEmail || row.original.userId || "—"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "status",
+    header: "Status",
+    accessorFn: row => row.status || "",
+    cell: ({ row }) => h("span", {
+      class: ["inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]", statusBadgeClass(row.original.status)],
+    }, row.original.status || "UNKNOWN"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "format",
+    header: "Format",
+    accessorFn: row => row.format || "",
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, row.original.format || "—"),
+    meta: {
+      headerClass: "px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3",
+    },
+  },
+  {
+    id: "size",
+    header: "Size",
+    accessorFn: row => Number(row.size ?? 0),
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, formatBytes(row.original.size)),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+  {
+    id: "duration",
+    header: "Duration",
+    accessorFn: row => Number(row.duration ?? 0),
+    cell: ({ row }) => h("span", { class: "text-foreground/70" }, formatDuration(row.original.duration)),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({ row }) => h("div", { class: "flex justify-end gap-2" }, [
+      h(AppButton, { size: "sm", variant: "secondary", onClick: () => openEditDialog(row.original) }, { default: () => "Edit" }),
+      h(AppButton, { size: "sm", variant: "danger", onClick: () => openDeleteDialog(row.original) }, { default: () => "Delete" }),
+    ]),
+    meta: {
+      headerClass: "px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50",
+      cellClass: "px-4 py-3 text-right",
+    },
+  },
+]);
+
+useAdminPageHeader(() => ({
+  eyebrow: "Media",
+  badge: `${total.value} total videos`,
+  actions: [
+    {
+      label: "Refresh",
+      variant: "secondary",
+      onClick: loadVideos,
+    },
+    {
+      label: "Create video",
+      onClick: () => {
+        actionError.value = null;
+        createOpen.value = true;
+      },
+    },
+  ],
+}));
 
 watch(statusFilter, async () => {
   page.value = 1;
@@ -286,137 +399,100 @@ onMounted(loadVideos);
 </script>
 
 <template>
-  <AdminSectionShell
-    title="Admin Videos"
-    description="Cross-user video inventory with direct edit, moderation and storage context."
-    eyebrow="Media"
-    :badge="`${total} total videos`"
-  >
-    <template #toolbar>
-      <AppButton size="sm" variant="secondary" @click="loadVideos">Refresh</AppButton>
-      <AppButton size="sm" @click="actionError = null; createOpen = true">Create video</AppButton>
-    </template>
+  <AdminSectionShell>
 
     <template #stats>
-      <div v-for="item in summary" :key="item.label" class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{{ item.label }}</div>
-        <div class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{{ item.value }}</div>
-      </div>
-    </template>
-
-    <template #aside>
-      <div class="space-y-5">
-        <div class="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Selected video</div>
-        <div v-if="selectedRow" class="space-y-4">
-          <div>
-            <div class="text-lg font-semibold text-white">{{ selectedRow.title }}</div>
-            <div class="mt-1 text-sm text-slate-400">{{ selectedRow.id }}</div>
-          </div>
-          <div class="grid gap-3">
-            <div v-for="item in selectedMeta" :key="item.label" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">{{ item.label }}</div>
-              <div class="mt-1 text-sm font-medium text-white">{{ item.value }}</div>
-            </div>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Source URL</div>
-            <div class="mt-2 break-all text-sm text-slate-200">{{ selectedRow.url }}</div>
-          </div>
-          <div class="grid gap-2">
-            <AppButton size="sm" @click="openEditDialog(selectedRow)">Edit video</AppButton>
-            <AppButton size="sm" variant="danger" @click="openDeleteDialog(selectedRow)">Delete video</AppButton>
-          </div>
-        </div>
-        <div v-else class="rounded-2xl border border-dashed border-white/15 px-4 py-5 text-sm leading-6 text-slate-400">
-          Select a video to review metadata, storage footprint and upstream source URL.
-        </div>
+      <div v-for="item in summary" :key="item.label" class="rounded-lg border border-border bg-muted/20 p-4">
+        <div class="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/50">{{ item.label }}</div>
+        <div class="mt-2 text-2xl font-semibold tracking-tight text-foreground">{{ item.value }}</div>
       </div>
     </template>
 
     <div class="space-y-4">
-      <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 xl:grid-cols-[minmax(0,1fr)_220px_180px_auto] xl:items-end">
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Search</label>
-          <AppInput v-model="search" placeholder="Search by title" @enter="applyFilters" />
+      <SettingsSectionCard title="Filters" description="Search videos by title and narrow by owner reference or status." bodyClass="p-5">
+        <div class="grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px_180px_auto] xl:items-end">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Search</label>
+            <AppInput v-model="search" placeholder="Search by title" @enter="applyFilters" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Owner reference</label>
+            <AppInput v-model="ownerFilter" placeholder="Optional owner reference" @enter="applyFilters" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/50">Status</label>
+            <select v-model="statusFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option v-for="status in statusFilterOptions" :key="status || 'all'" :value="status">{{ status || 'ALL' }}</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2 xl:justify-end">
+            <AppButton size="sm" variant="ghost" @click="search = ''; ownerFilter = ''; appliedSearch = ''; appliedOwnerFilter = ''; statusFilter = ''; loadVideos()">Reset</AppButton>
+            <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
+          </div>
         </div>
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Owner user ID</label>
-          <AppInput v-model="ownerFilter" placeholder="Optional owner id" @enter="applyFilters" />
-        </div>
-        <div class="space-y-2">
-          <label class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Status</label>
-          <select v-model="statusFilter" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option v-for="status in statusFilterOptions" :key="status || 'all'" :value="status">{{ status || 'ALL' }}</option>
-          </select>
-        </div>
-        <div class="flex items-center gap-2 xl:justify-end">
-          <AppButton size="sm" variant="ghost" @click="search = ''; ownerFilter = ''; appliedSearch = ''; appliedOwnerFilter = ''; statusFilter = ''; loadVideos()">Reset</AppButton>
-          <AppButton size="sm" variant="secondary" @click="applyFilters">Apply</AppButton>
-        </div>
-      </div>
+      </SettingsSectionCard>
 
-      <div v-if="error" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
         {{ error }}
       </div>
 
-      <div v-else class="overflow-hidden rounded-2xl border border-slate-200">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-left text-sm">
-            <thead class="bg-slate-50/90 text-slate-500">
-              <tr>
-                <th class="px-4 py-3 font-semibold">Video</th>
-                <th class="px-4 py-3 font-semibold">Owner</th>
-                <th class="px-4 py-3 font-semibold">Status</th>
-                <th class="px-4 py-3 font-semibold">Format</th>
-                <th class="px-4 py-3 font-semibold">Size</th>
-                <th class="px-4 py-3 font-semibold">Duration</th>
-                <th class="px-4 py-3 text-right font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="loading" class="border-t border-slate-200">
-                <td colspan="7" class="px-4 py-10 text-center text-slate-500">Loading videos...</td>
-              </tr>
-              <tr v-else-if="rows.length === 0" class="border-t border-slate-200">
-                <td colspan="7" class="px-4 py-10 text-center text-slate-500">No videos matched the current filters.</td>
-              </tr>
-              <tr v-for="row in rows" :key="row.id" class="border-t border-slate-200 transition-colors hover:bg-slate-50/70" :class="selectedRow?.id === row.id ? 'bg-sky-50/60' : ''">
-                <td class="px-4 py-3">
-                  <button class="text-left" @click="selectedRow = row">
-                    <div class="font-medium text-slate-900">{{ row.title }}</div>
-                    <div class="mt-1 text-xs text-slate-500">{{ row.id }}</div>
-                  </button>
-                </td>
-                <td class="px-4 py-3 text-slate-700">{{ row.ownerEmail || row.userId }}</td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]" :class="statusBadgeClass(row.status)">
-                    {{ row.status }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-slate-700">{{ row.format || '—' }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ formatBytes(row.size) }}</td>
-                <td class="px-4 py-3 text-slate-700">{{ formatDuration(row.duration) }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex justify-end gap-2">
-                    <AppButton size="sm" variant="secondary" @click="openEditDialog(row)">Edit</AppButton>
-                    <AppButton size="sm" variant="danger" @click="openDeleteDialog(row)">Delete</AppButton>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <SettingsSectionCard v-else title="Videos" description="Video inventory and moderation actions." bodyClass="">
+        <AdminPlaceholderTable v-if="loading" :columns="7" :rows="4" />
 
-        <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50/70 px-4 py-3 md:flex-row md:items-center md:justify-between">
-          <div class="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Page {{ page }} of {{ totalPages }} · {{ total }} records</div>
+        <BaseTable
+          v-else
+          :data="rows"
+          :columns="columns"
+          :get-row-id="(row) => row.id || row.title || ''"
+          wrapperClass="border-x-0 border-t-0 rounded-none bg-transparent"
+          tableClass="w-full"
+          headerRowClass="bg-muted/30"
+          bodyRowClass="border-b border-border hover:bg-muted/30"
+        >
+          <template #empty>
+            <div class="px-6 py-12 text-center">
+              <p class="mb-1 text-sm text-foreground/60">No videos matched the current filters.</p>
+              <p class="text-xs text-foreground/40">Try a broader title or clear the owner and status filters.</p>
+            </div>
+          </template>
+        </BaseTable>
+
+        <div class="flex flex-col gap-3 border-t border-border bg-muted/20 px-6 py-4 md:flex-row md:items-center md:justify-between">
+          <div class="text-xs font-medium uppercase tracking-[0.16em] text-foreground/50">Page {{ page }} of {{ totalPages }} · {{ total }} records</div>
           <div class="flex items-center gap-2">
             <AppButton size="sm" variant="secondary" :disabled="page <= 1 || loading" @click="previousPage">Previous</AppButton>
             <AppButton size="sm" variant="secondary" :disabled="page >= totalPages || loading" @click="nextPage">Next</AppButton>
           </div>
         </div>
-      </div>
+      </SettingsSectionCard>
     </div>
   </AdminSectionShell>
+
+  <AppDialog v-model:visible="detailOpen" title="Video details" maxWidthClass="max-w-lg" @close="actionError = null">
+    <div v-if="selectedRow" class="space-y-4">
+      <div>
+        <div class="text-lg font-semibold text-foreground">{{ selectedRow.title }}</div>
+        <div class="mt-1 text-sm text-foreground/60">{{ selectedRow.ownerEmail || selectedRow.userId || 'No owner' }}</div>
+      </div>
+      <div class="grid gap-3">
+        <div v-for="item in selectedMeta" :key="item.label" class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+          <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">{{ item.label }}</div>
+          <div class="mt-1 text-sm font-medium text-foreground">{{ item.value }}</div>
+        </div>
+      </div>
+      <div class="rounded-lg border border-border bg-muted/20 px-4 py-3">
+        <div class="text-[11px] uppercase tracking-[0.16em] text-foreground/50">Source URL</div>
+        <div class="mt-2 break-all text-sm text-foreground/70">{{ selectedRow.url }}</div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <AppButton variant="secondary" size="sm" @click="detailOpen = false">Close</AppButton>
+        <AppButton size="sm" @click="detailOpen = false; selectedRow && openEditDialog(selectedRow)">Edit</AppButton>
+        <AppButton variant="danger" size="sm" @click="detailOpen = false; selectedRow && openDeleteDialog(selectedRow)">Delete</AppButton>
+      </div>
+    </template>
+  </AppDialog>
 
   <AppDialog v-model:visible="createOpen" title="Create admin video" maxWidthClass="max-w-2xl" @close="actionError = null">
     <div class="space-y-4">
@@ -526,7 +602,7 @@ onMounted(loadVideos);
     <div class="space-y-4">
       <div v-if="actionError" class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{{ actionError }}</div>
       <p class="text-sm text-gray-700">
-        Delete video <span class="font-medium">{{ selectedRow?.title || selectedRow?.id }}</span>.
+        Delete video <span class="font-medium">{{ selectedRow?.title || 'this video' }}</span>.
       </p>
     </div>
     <template #footer>

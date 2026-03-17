@@ -12,6 +12,12 @@ declare module "@httpClientAdapter" {
     export function httpClientAdapter(opts: {
         url: string;
         pathsForGET?: string[];
+        JSON?: Partial<JsonTransformer>;
         headers?: () => Promise<{ Authorization?: undefined; } | { Authorization: string; }>
     }): TinyRpcClientAdapter;
+}
+
+interface JsonTransformer {
+  parse: (v: string) => any; // TODO: eliminate proto pollution at least on server by default cf. https://github.com/fastify/secure-json-parse
+  stringify: (v: any) => string;
 }

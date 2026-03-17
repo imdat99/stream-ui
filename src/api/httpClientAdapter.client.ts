@@ -6,12 +6,19 @@ const GET_PAYLOAD_PARAM = "payload";
 export function httpClientAdapter(opts: {
 	url: string;
 	pathsForGET?: string[];
+	JSON?: Partial<JsonTransformer>;
 	headers?: () => Promise<Record<string, string>> | Record<string, string>;
 }): TinyRpcClientAdapter {
+	const JSON: JsonTransformer = {
+    parse: globalThis.JSON.parse,
+    stringify: globalThis.JSON.stringify,
+    ...opts.JSON,
+  };
 	return {
 		send: async (data) => {
 			const url = [opts.url, data.path].join("/");
 			const payload = JSON.stringify(data.args);
+			console.log("RPC Request:", payload);
 			const method = opts.pathsForGET?.includes(data.path)
 				? "GET"
 				: "POST";

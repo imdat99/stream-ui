@@ -4,6 +4,7 @@ import AppButton from '@/components/app/AppButton.vue';
 import AppDialog from '@/components/app/AppDialog.vue';
 import AppInput from '@/components/app/AppInput.vue';
 import AppSwitch from '@/components/app/AppSwitch.vue';
+import BaseTable from '@/components/ui/table/BaseTable.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
@@ -16,6 +17,7 @@ import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCar
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
+import type { ColumnDef } from '@tanstack/vue-table';
 import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
 
@@ -378,6 +380,121 @@ const getAdFormatColor = (format: string) => {
     };
     return colors[format] || 'bg-gray-500/10 text-gray-500';
 };
+
+const columns = computed<ColumnDef<VastTemplate>[]>(() => [
+    {
+        id: 'template',
+        header: t('settings.adsVast.table.template'),
+        accessorFn: row => row.name,
+        cell: ({ row }) => h('div', [
+            h('div', { class: 'flex flex-wrap items-center gap-2' }, [
+                h('span', { class: 'text-sm font-medium text-foreground' }, row.original.name),
+                row.original.isDefault
+                    ? h('span', {
+                        class: 'inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary',
+                    }, t('settings.adsVast.defaultBadge'))
+                    : null,
+            ]),
+            h('p', { class: 'mt-0.5 text-xs text-foreground/50' }, t('settings.adsVast.createdOn', { date: row.original.createdAt || '-' })),
+        ]),
+        meta: {
+            headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3',
+        },
+    },
+    {
+        id: 'format',
+        header: t('settings.adsVast.table.format'),
+        accessorFn: row => row.adFormat,
+        cell: ({ row }) => h('div', [
+            h('span', {
+                class: ['rounded-full px-2 py-1 text-xs font-medium', getAdFormatColor(row.original.adFormat)],
+            }, getAdFormatLabel(row.original.adFormat)),
+            row.original.adFormat === 'mid-roll' && row.original.duration
+                ? h('span', { class: 'ml-2 text-xs text-foreground/50' }, `(${row.original.duration}s)`)
+                : null,
+        ]),
+        meta: {
+            headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3',
+        },
+    },
+    {
+        id: 'vastUrl',
+        header: t('settings.adsVast.table.vastUrl'),
+        accessorFn: row => row.vastUrl,
+        cell: ({ row }) => h('div', { class: 'flex max-w-[240px] items-center gap-2' }, [
+            h('code', { class: 'truncate text-xs text-foreground/60' }, row.original.vastUrl),
+            h(AppButton, {
+                variant: 'ghost',
+                size: 'sm',
+                disabled: isMutating.value,
+                onClick: () => copyToClipboard(row.original.vastUrl),
+            }, {
+                icon: () => h(CheckIcon, { class: 'h-4 w-4' }),
+            }),
+        ]),
+        enableSorting: false,
+        meta: {
+            headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3',
+        },
+    },
+    {
+        id: 'status',
+        header: t('common.status'),
+        accessorFn: row => Number(row.enabled),
+        cell: ({ row }) => h('div', { class: 'text-center' }, [
+            h(AppSwitch, {
+                modelValue: row.original.enabled,
+                disabled: isFreePlan.value || saving.value || deletingId.value !== null || defaultingId.value !== null || togglingId.value === row.original.id,
+                'onUpdate:modelValue': (value: boolean) => handleToggle(row.original, value),
+            }),
+        ]),
+        meta: {
+            headerClass: 'px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3 text-center',
+        },
+    },
+    {
+        id: 'actions',
+        header: t('common.actions'),
+        enableSorting: false,
+        cell: ({ row }) => h('div', { class: 'flex flex-wrap items-center justify-end gap-2' }, [
+            row.original.isDefault
+                ? h('span', {
+                    class: 'inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary',
+                }, t('settings.adsVast.actions.default'))
+                : h(AppButton, {
+                    variant: 'ghost',
+                    size: 'sm',
+                    loading: defaultingId.value === row.original.id,
+                    disabled: isFreePlan.value || saving.value || deletingId.value !== null || togglingId.value !== null || defaultingId.value !== null || !row.original.enabled,
+                    onClick: () => handleSetDefault(row.original),
+                }, () => t('settings.adsVast.actions.setDefault')),
+            h(AppButton, {
+                variant: 'ghost',
+                size: 'sm',
+                disabled: isFreePlan.value || isMutating.value,
+                onClick: () => openEditDialog(row.original),
+            }, {
+                icon: () => h(PencilIcon, { class: 'h-4 w-4' }),
+            }),
+            h(AppButton, {
+                variant: 'ghost',
+                size: 'sm',
+                disabled: isFreePlan.value || isMutating.value,
+                onClick: () => handleDelete(row.original),
+            }, {
+                icon: () => h(TrashIcon, { class: 'h-4 w-4 text-danger' }),
+            }),
+        ]),
+        meta: {
+            headerClass: 'px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50',
+            cellClass: 'px-6 py-3 text-right',
+        },
+    },
+]);
 </script>
 
 <template>
@@ -411,105 +528,24 @@ const getAdFormatColor = (format: string) => {
 
         <SettingsTableSkeleton v-if="isInitialLoading" :columns="5" :rows="4" />
 
-        <div v-else class="border-b border-border mt-4">
-            <table class="w-full">
-                <thead class="bg-muted/30">
-                    <tr>
-                        <th class="text-left text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('settings.adsVast.table.template') }}</th>
-                        <th class="text-left text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('settings.adsVast.table.format') }}</th>
-                        <th class="text-left text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('settings.adsVast.table.vastUrl') }}</th>
-                        <th class="text-center text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('common.status') }}</th>
-                        <th class="text-right text-xs font-medium text-foreground/50 uppercase tracking-wider px-6 py-3">{{ t('common.actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-border">
-                    <template v-if="templates.length > 0">
-                        <tr
-                            v-for="template in templates"
-                            :key="template.id"
-                            class="hover:bg-muted/30 transition-all"
-                        >
-                            <td class="px-6 py-3">
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="text-sm font-medium text-foreground">{{ template.name }}</span>
-                                        <span
-                                            v-if="template.isDefault"
-                                            class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                                        >
-                                            {{ t('settings.adsVast.defaultBadge') }}
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-foreground/50 mt-0.5">{{ t('settings.adsVast.createdOn', { date: template.createdAt || '-' }) }}</p>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3">
-                                <span :class="['text-xs px-2 py-1 rounded-full font-medium', getAdFormatColor(template.adFormat)]">
-                                    {{ getAdFormatLabel(template.adFormat) }}
-                                </span>
-                                <span v-if="template.adFormat === 'mid-roll' && template.duration" class="text-xs text-foreground/50 ml-2">
-                                    ({{ template.duration }}s)
-                                </span>
-                            </td>
-                            <td class="px-6 py-3">
-                                <div class="flex items-center gap-2 max-w-[240px]">
-                                    <code class="text-xs text-foreground/60 truncate">{{ template.vastUrl }}</code>
-                                    <AppButton variant="ghost" size="sm" :disabled="isMutating" @click="copyToClipboard(template.vastUrl)">
-                                        <template #icon>
-                                            <CheckIcon class="w-4 h-4" />
-                                        </template>
-                                    </AppButton>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3 text-center">
-                                <AppSwitch
-                                    :model-value="template.enabled"
-                                    :disabled="isFreePlan || saving || deletingId !== null || defaultingId !== null || togglingId === template.id"
-                                    @update:model-value="handleToggle(template, $event)"
-                                />
-                            </td>
-                            <td class="px-6 py-3 text-right">
-                                <div class="flex items-center justify-end gap-2 flex-wrap">
-                                    <span
-                                        v-if="template.isDefault"
-                                        class="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
-                                    >
-                                        {{ t('settings.adsVast.actions.default') }}
-                                    </span>
-                                    <AppButton
-                                        v-else
-                                        variant="ghost"
-                                        size="sm"
-                                        :loading="defaultingId === template.id"
-                                        :disabled="isFreePlan || saving || deletingId !== null || togglingId !== null || defaultingId !== null || !template.enabled"
-                                        @click="handleSetDefault(template)"
-                                    >
-                                        {{ t('settings.adsVast.actions.setDefault') }}
-                                    </AppButton>
-                                    <AppButton variant="ghost" size="sm" :disabled="isFreePlan || isMutating" @click="openEditDialog(template)">
-                                        <template #icon>
-                                            <PencilIcon class="w-4 h-4" />
-                                        </template>
-                                    </AppButton>
-                                    <AppButton variant="ghost" size="sm" :disabled="isFreePlan || isMutating" @click="handleDelete(template)">
-                                        <template #icon>
-                                            <TrashIcon class="w-4 h-4 text-danger" />
-                                        </template>
-                                    </AppButton>
-                                </div>
-                            </td>
-                        </tr>
-                    </template>
-                    <tr v-else>
-                        <td colspan="5" class="px-6 py-12 text-center">
-                            <LinkIcon class="w-10 h-10 text-foreground/30 mb-3 block mx-auto" />
-                            <p class="text-sm text-foreground/60 mb-1">{{ t('settings.adsVast.emptyTitle') }}</p>
-                            <p class="text-xs text-foreground/40">{{ t('settings.adsVast.emptySubtitle') }}</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <BaseTable
+            v-else
+            :data="templates"
+            :columns="columns"
+            :get-row-id="(row) => row.id"
+            wrapperClass="mt-4 border-b border-border rounded-none border-x-0 border-t-0 bg-transparent"
+            tableClass="w-full"
+            headerRowClass="bg-muted/30"
+            bodyRowClass="border-b border-border hover:bg-muted/30"
+        >
+            <template #empty>
+                <div class="px-6 py-12 text-center">
+                    <LinkIcon class="mx-auto mb-3 block h-10 w-10 text-foreground/30" />
+                    <p class="mb-1 text-sm text-foreground/60">{{ t('settings.adsVast.emptyTitle') }}</p>
+                    <p class="text-xs text-foreground/40">{{ t('settings.adsVast.emptySubtitle') }}</p>
+                </div>
+            </template>
+        </BaseTable>
 
         <AppDialog
             :visible="showAddDialog"

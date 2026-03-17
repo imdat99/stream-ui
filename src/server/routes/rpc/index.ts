@@ -1,5 +1,6 @@
 import { authenticate } from "@/server/middlewares/authenticate";
 import { getGrpcMetadataFromContext } from "@/server/services/grpcClient";
+import { clientJSON } from "@/shared/secure-json-transformer";
 import { Metadata } from "@grpc/grpc-js";
 import { exposeTinyRpc, httpServerAdapter } from "@hiogawa/tiny-rpc";
 import { Hono } from "hono";
@@ -30,13 +31,13 @@ export const pathsForGET: (keyof typeof protectedRoutes)[] = ["health"];
 export function registerRpcRoutes(app: Hono) {
   const protectedHandler = exposeTinyRpc({
     routes: protectedRoutes,
-    adapter: httpServerAdapter({ endpoint: "/rpc" }),
+    adapter: httpServerAdapter({ endpoint: "/rpc",JSON:clientJSON }),
   });
   app.use(publicEndpoint, async (c, next) => {
 
     const publicHandler = exposeTinyRpc({
     routes: publicRoutes,
-    adapter: httpServerAdapter({ endpoint: "/rpc-public" }),
+    adapter: httpServerAdapter({ endpoint: "/rpc-public", JSON:clientJSON }),
   });
     const res = await publicHandler({ request: c.req.raw });
     if (res) {
