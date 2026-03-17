@@ -13,14 +13,18 @@ export function httpClientAdapter(opts: {
 }): TinyRpcClientAdapter {
 	const JSON: JsonTransformer = {
     parse: globalThis.JSON.parse,
-    stringify: globalThis.JSON.stringify,
+    stringify: globalThis.JSON.stringify as JsonTransformer["stringify"],
     ...opts.JSON,
   };
 	return {
 		send: async (data) => {
 			const url = [opts.url, data.path].join("/");
-			const payload = JSON.stringify(data.args);
-			console.log("RPC Request:", payload);
+			const extraHeaders = opts.headers ? await opts.headers() : {};
+			const payload = JSON.stringify(data.args, (headerObj) => {
+				if (headerObj) {
+					Object.assign(extraHeaders, headerObj);
+				}
+			});
 			const method = opts.pathsForGET?.includes(data.path)
 				? "GET"
 				: "POST";
@@ -29,7 +33,10 @@ export function httpClientAdapter(opts: {
 				req = new Request(
 					url +
 					"?" +
-					new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload })
+					new URLSearchParams({ [GET_PAYLOAD_PARAM]: payload }),
+					{
+						headers: extraHeaders
+					}
 				);
 			} else {
 				req = new Request(url, {
@@ -37,6 +44,7 @@ export function httpClientAdapter(opts: {
 					body: payload,
 					headers: {
 						"content-type": "application/json; charset=utf-8",
+						...extraHeaders,
 					},
 					credentials: "include",
 				});
@@ -67,11 +75,9 @@ export function httpClientAdapter(opts: {
 				);
 				// throw TinyRpcError.deserialize(res.status);
 			}
-			// if (res.headers.get("set-cookie")) {
-			// 	console.log("Response has set-cookie header:", res.headers.get("set-cookie"));
-			// }
 			const result: Result<unknown, unknown> = JSON.parse(
-				await res.text()
+				await res.text(),
+				() => Object.fromEntries((res.headers as any).entries() ?? [])
 			);
 			if (!result.ok) {
 				throw TinyRpcError.deserialize(result.value);

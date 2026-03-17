@@ -20,6 +20,7 @@ declare module "hono" {
     userId: string;
     role: string;
     email: string;
+    nonce: Uint8Array<ArrayBufferLike>;
   }
 }
 

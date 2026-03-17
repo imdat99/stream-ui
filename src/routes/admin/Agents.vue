@@ -9,7 +9,6 @@ import SettingsTableSkeleton from "@/routes/settings/components/SettingsTableSke
 import type { ColumnDef } from "@tanstack/vue-table";
 import { computed, h, onMounted, ref } from "vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
-import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 type ListAgentsResponse = Awaited<ReturnType<typeof rpcClient.listAdminAgents>>;
 type AdminAgentRow = NonNullable<ListAgentsResponse["agents"]>[number];
@@ -144,25 +143,6 @@ const statusBadgeClass = (status?: string) => {
   return "border-border bg-muted/40 text-foreground/70";
 };
 
-useAdminPageHeader(() => ({
-  eyebrow: "Workers",
-  badge: `${rows.value.length} agents connected`,
-  actions: [{
-    label: "Refresh agents",
-    variant: "secondary",
-    onClick: loadAgents,
-  }],
-}));
-
-useAdminPageHeader(() => ({
-  eyebrow: "Workers",
-  badge: `${rows.value.length} agents connected`,
-  actions: [{
-    label: "Refresh agents",
-    variant: "secondary",
-    onClick: loadAgents,
-  }],
-}));
 
 const columns = computed<ColumnDef<AdminAgentRow>[]>(() => [
   {
@@ -294,7 +274,10 @@ onMounted(loadAgents);
     <div class="space-y-4">
       <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
 
-      <SettingsSectionCard v-else title="Agents" description="Connected workers and runtime health." bodyClass="">
+      <SettingsSectionCard v-else title="Agents" :description="`${rows.length} agents connected`" bodyClass="">
+        <template #header-actions>
+          <AppButton size="sm" variant="ghost" @click="loadAgents">Refresh</AppButton>
+        </template>
         <SettingsTableSkeleton v-if="loading" :columns="8" :rows="4" />
 
         <BaseTable

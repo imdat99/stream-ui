@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { client as rpcClient } from "@/api/rpcclient";
+import { client, client as rpcClient } from "@/api/rpcclient";
 import AppButton from "@/components/app/AppButton.vue";
 import AppDialog from "@/components/app/AppDialog.vue";
 import AppInput from "@/components/app/AppInput.vue";
@@ -10,6 +10,7 @@ import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import AdminPlaceholderTable from "./components/AdminPlaceholderTable.vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
 import { useAdminPageHeader } from "./components/useAdminPageHeader";
+import AsyncSelect from "@/components/ui/AsyncSelect.vue";
 
 type ListUsersResponse = Awaited<ReturnType<typeof rpcClient.listAdminUsers>>;
 type AdminUserRow = NonNullable<ListUsersResponse["users"]>[number];
@@ -408,6 +409,10 @@ onMounted(loadUsers);
       </div>
 
       <SettingsSectionCard v-else title="Users" :description="`${total} records across ${totalPages} pages.`" bodyClass="">
+        <template #header-actions>
+          <AppButton size="sm" variant="ghost" @click="loadUsers">Refresh</AppButton>
+          <AppButton size="sm" @click="createOpen = true; actionError = null">Create user</AppButton>
+        </template>
         <AdminPlaceholderTable v-if="loading" :columns="['User', 'Role', 'Plan', 'Videos', 'Created', 'Actions']" :rows="limit" />
 
         <template v-else>
@@ -465,8 +470,8 @@ onMounted(loadUsers);
           <AppInput v-model="createForm.password" type="password" placeholder="Minimum 6 characters" />
         </div>
         <div class="space-y-2">
-          <label class="text-sm font-medium text-gray-700">Plan ID</label>
-          <AppInput v-model="createForm.planId" placeholder="Optional" />
+          <label class="text-sm font-medium text-gray-700">Plan</label>
+          <AsyncSelect v-model="editForm.planId" :loadOptions="() => client.listPlans().then(plans => (plans?.plans || []).map(p => ({ label: p.name!, value: p.id! })))" />
         </div>
       </div>
     </div>
@@ -523,8 +528,12 @@ onMounted(loadUsers);
           <AppInput v-model="editForm.password" type="password" placeholder="Leave blank to keep current" />
         </div>
         <div class="space-y-2">
-          <label class="text-sm font-medium text-gray-700">Plan ID</label>
-          <AppInput v-model="editForm.planId" placeholder="Optional" />
+          <label class="text-sm font-medium text-gray-700">Plan</label>
+          <AsyncSelect v-model="editForm.planId" :loadOptions="() => client.listPlans().then(plans => (plans?.plans || []).map(p => ({ label: p.name!, value: p.id! })))" />
+          <!-- <select v-model="editForm.planId" class="w-full rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <option v-for="plan in selectedRow?.availablePlans || []" :key="plan.id" :value="plan.id">{{ plan.name }}</option>
+          </select> -->
+          <!-- <AppInput v-model="editForm.planId" placeholder="Optional" /> -->
         </div>
       </div>
     </div>

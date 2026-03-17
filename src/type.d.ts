@@ -13,11 +13,11 @@ declare module "@httpClientAdapter" {
         url: string;
         pathsForGET?: string[];
         JSON?: Partial<JsonTransformer>;
-        headers?: () => Promise<{ Authorization?: undefined; } | { Authorization: string; }>
+        headers?: () => Promise<Record<string, string>>;
     }): TinyRpcClientAdapter;
 }
 
 interface JsonTransformer {
-  parse: (v: string) => any; // TODO: eliminate proto pollution at least on server by default cf. https://github.com/fastify/secure-json-parse
-  stringify: (v: any) => string;
+  parse: (v: string, getHeader?: () => Record<string, string>) => any; // TODO: eliminate proto pollution at least on server by default cf. https://github.com/fastify/secure-json-parse
+  stringify: (v: any, setHeader?: (headers: Record<string, string>) => void) => string;
 }

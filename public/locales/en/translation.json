@@ -716,7 +716,7 @@
     },
     "filters": {
       "searchPlaceholder": "Search videos...",
-      "rangeOfTotal": "{first}–{last} of {{total}}",
+      "rangeOfTotal": "{{first}}–{{last}} of {{total}}",
       "previousPageAria": "Previous page",
       "nextPageAria": "Next page",
       "allStatus": "All Status",

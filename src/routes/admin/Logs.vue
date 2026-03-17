@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { client as rpcClient } from "@/api/rpcclient";
-import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
 import AppButton from "@/components/app/AppButton.vue";
 import AppInput from "@/components/app/AppInput.vue";
+import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
 import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
 import { computed, ref } from "vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";
-import { useAdminPageHeader } from "./components/useAdminPageHeader";
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -60,15 +59,6 @@ useAdminRuntimeMqtt(({ topic, payload }) => {
   }
 });
 
-useAdminPageHeader(() => ({
-  eyebrow: "Observability",
-  badge: activeJobId.value ? "Live tail attached" : "Awaiting job selection",
-  actions: [{
-    label: "Load logs",
-    variant: "secondary",
-    onClick: loadLogs,
-  }],
-}));
 </script>
 
 <template>

@@ -11,19 +11,22 @@ export function httpClientAdapter(opts: {
 }): TinyRpcClientAdapter {
 	const JSON: JsonTransformer = {
     parse: globalThis.JSON.parse,
-    stringify: globalThis.JSON.stringify,
+    stringify: globalThis.JSON.stringify as JsonTransformer["stringify"],
     ...opts.JSON,
   };
 	return {
 		send: async (data) => {
 			const url = [opts.url, data.path].join("/");
-			const payload = JSON.stringify(data.args);
-			console.log("RPC Request:", payload);
+			const extraHeaders = opts.headers ? await opts.headers() : {};
+			const payload = JSON.stringify(data.args, (headerObj) => {
+				if (headerObj) {
+					Object.assign(extraHeaders, headerObj);
+				}
+			});
+			
 			const method = opts.pathsForGET?.includes(data.path)
 				? "GET"
 				: "POST";
-
-			const extraHeaders = opts.headers ? await opts.headers() : {};
 
 			let req: Request;
 			if (method === "GET") {
@@ -47,6 +50,7 @@ export function httpClientAdapter(opts: {
 				});
 			}
 			let res: Response;
+			
 			res = await fetch(req);
 			if (!res.ok) {
 				// throw new Error(`HTTP error: ${res.status}`);
@@ -60,8 +64,10 @@ export function httpClientAdapter(opts: {
 				);
 				// throw TinyRpcError.deserialize(res.status);
 			}
+
 			const result: Result<unknown, unknown> = JSON.parse(
-				await res.text()
+				await res.text(),
+				() => Object.fromEntries((res.headers as any).entries() ?? [])
 			);
 			if (!result.ok) {
 				throw TinyRpcError.deserialize(result.value);

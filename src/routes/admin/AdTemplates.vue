@@ -310,24 +310,24 @@ const columns = computed<ColumnDef<AdminAdTemplateRow>[]>(() => [
   },
 ]);
 
-useAdminPageHeader(() => ({
-  eyebrow: "Advertising",
-  badge: `${total.value} total templates`,
-  actions: [
-    {
-      label: "Refresh",
-      variant: "secondary",
-      onClick: loadTemplates,
-    },
-    {
-      label: "Create template",
-      onClick: () => {
-        actionError.value = null;
-        createOpen.value = true;
-      },
-    },
-  ],
-}));
+// useAdminPageHeader(() => ({
+//   eyebrow: "Advertising",
+//   badge: `${total.value} total templates`,
+//   actions: [
+//     {
+//       label: "Refresh",
+//       variant: "secondary",
+//       onClick: loadTemplates,
+//     },
+//     {
+//       label: "Create template",
+//       onClick: () => {
+//         actionError.value = null;
+//         createOpen.value = true;
+//       },
+//     },
+//   ],
+// }));
 
 onMounted(loadTemplates);
 </script>
@@ -363,6 +363,10 @@ onMounted(loadTemplates);
       <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div>
 
       <SettingsSectionCard v-else title="Templates" description="Reusable ad templates and ownership metadata." bodyClass="">
+        <template #header-actions>
+          <AppButton size="sm" variant="ghost" @click="loadTemplates">Refresh</AppButton>
+          <AppButton size="sm" @click="createOpen = true; actionError = null">Create template</AppButton>
+        </template>
         <AdminPlaceholderTable v-if="loading" :columns="6" :rows="4" />
 
         <BaseTable

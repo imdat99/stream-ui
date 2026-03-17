@@ -8,10 +8,13 @@ import { createApp } from '@/main';
 import { htmlEscape } from '@/server/utils/htmlEscape';
 import { useAuthStore } from '@/stores/auth';
 import type { Hono } from 'hono';
+import nacl from 'tweetnacl';
+import { toBase64 } from '@/shared/secure-json-transformer';
 
 export function registerSSRRoutes(app: Hono) {
   app.get("*", async (c) => {
-    const nonce = crypto.randomUUID();
+    const nonce = nacl.randomBytes(nacl.box.nonceLength);
+    c.set("nonce", nonce);
     const url = new URL(c.req.url);
     const lang = c.get("language");
     const { app: vueApp, router, head, pinia, bodyClass, queryCache } = await createApp(lang);
@@ -28,7 +31,7 @@ export function registerSSRRoutes(app: Hono) {
     return streamText(c, async (stream) => {
       c.header("Content-Type", "text/html; charset=utf-8");
       c.header("Content-Encoding", "Identity");
-
+      c.header("nonce", toBase64(nonce));
       const ctx: Record<string, any> = {};
       const appStream = renderToWebStream(vueApp, ctx);
 
@@ -67,7 +70,7 @@ export function registerSSRRoutes(app: Hono) {
       });
 
       // App data script
-      const appDataScript = `<script type="application/json" data-ssr="true" id="__APP_DATA__" nonce="${nonce}">${htmlEscape(JSON.stringify(ctx))}</script>`;
+      const appDataScript = `<script type="application/json" data-ssr="true" id="__APP_DATA__" nonce="${toBase64(nonce)}">${htmlEscape(JSON.stringify(ctx))}</script>`;
       await stream.write(appDataScript);
 
       // Close HTML

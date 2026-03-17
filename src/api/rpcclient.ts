@@ -27,6 +27,7 @@ export const client = proxyTinyRpc<RpcRoutes>({
         url: `${url}${targetEndpoint}`,
         pathsForGET: ["health"],
         JSON: clientJSON,
+        headers: () => Promise.resolve({})
       }).send(data);
     },
   },

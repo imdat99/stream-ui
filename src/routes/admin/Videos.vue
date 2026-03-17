@@ -371,24 +371,24 @@ const columns = computed<ColumnDef<AdminVideoRow>[]>(() => [
   },
 ]);
 
-useAdminPageHeader(() => ({
-  eyebrow: "Media",
-  badge: `${total.value} total videos`,
-  actions: [
-    {
-      label: "Refresh",
-      variant: "secondary",
-      onClick: loadVideos,
-    },
-    {
-      label: "Create video",
-      onClick: () => {
-        actionError.value = null;
-        createOpen.value = true;
-      },
-    },
-  ],
-}));
+// useAdminPageHeader(() => ({
+//   eyebrow: "Media",
+//   badge: `${total.value} total videos`,
+//   actions: [
+//     {
+//       label: "Refresh",
+//       variant: "secondary",
+//       onClick: loadVideos,
+//     },
+//     {
+//       label: "Create video",
+//       onClick: () => {
+//         actionError.value = null;
+//         createOpen.value = true;
+//       },
+//     },
+//   ],
+// }));
 
 watch(statusFilter, async () => {
   page.value = 1;
@@ -437,6 +437,10 @@ onMounted(loadVideos);
       </div>
 
       <SettingsSectionCard v-else title="Videos" description="Video inventory and moderation actions." bodyClass="">
+        <template #header-actions>
+          <AppButton size="sm" variant="ghost" @click="loadVideos">Refresh</AppButton>
+          <AppButton size="sm" @click="createOpen = true; actionError = null">Create video</AppButton>
+        </template>
         <AdminPlaceholderTable v-if="loading" :columns="7" :rows="4" />
 
         <BaseTable

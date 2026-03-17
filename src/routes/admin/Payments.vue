@@ -241,24 +241,24 @@ const statusBadgeClass = (status?: string) => {
   }
 };
 
-useAdminPageHeader(() => ({
-  eyebrow: "Finance",
-  badge: `${total.value} total payments`,
-  actions: [
-    {
-      label: "Refresh",
-      variant: "secondary",
-      onClick: loadPayments,
-    },
-    {
-      label: "Create payment",
-      onClick: () => {
-        actionError.value = null;
-        createOpen.value = true;
-      },
-    },
-  ],
-}));
+// useAdminPageHeader(() => ({
+//   eyebrow: "Finance",
+//   badge: `${total.value} total payments`,
+//   actions: [
+//     {
+//       label: "Refresh",
+//       variant: "secondary",
+//       onClick: loadPayments,
+//     },
+//     {
+//       label: "Create payment",
+//       onClick: () => {
+//         actionError.value = null;
+//         createOpen.value = true;
+//       },
+//     },
+//   ],
+// }));
 
 const columns = computed<ColumnDef<AdminPaymentRow>[]>(() => [
   {
@@ -386,6 +386,10 @@ onMounted(() => {
       </div>
 
       <SettingsSectionCard v-else title="Payments" description="Payment records and status operations." bodyClass="">
+        <template #header-actions>
+          <AppButton size="sm" variant="ghost" @click="loadPayments">Refresh</AppButton>
+          <AppButton size="sm" @click="createOpen = true">Create payment</AppButton>
+        </template>
         <AdminPlaceholderTable v-if="loading" :columns="7" :rows="4" />
 
         <BaseTable

@@ -2,7 +2,10 @@
 import superjson from "superjson";
 import nacl from "tweetnacl";
 
-const secureConfig = { kid: 'xUJh4/ADCkL/mZTsxSofIVTgLrTLw2C8h/X8/StUc0E=', publicKeyBase64: 'hvtS8b4RWXkau3B2UXbWhCV1NxS/97DGLfcftf/0TG8=' };
+const kp = nacl.box.keyPair();
+
+const uToBase64 = (u8: Uint8Array) => btoa(String.fromCharCode(...u8));
+const secureConfig = { kid: uToBase64(kp.secretKey), publicKeyBase64: uToBase64(kp.publicKey) };
 export type SecureEnvelopeV1 = {
   kid: string;
   nonce: string;   // base64
@@ -15,7 +18,7 @@ export type ServerPublicKeyConfig = {
   publicKeyBase64: string;
 };
 
-function toBase64(bytes: Uint8Array): string {
+export function toBase64(bytes: Uint8Array): string {
   if (typeof Buffer !== "undefined") {
     return Buffer.from(bytes).toString("base64");
   }
@@ -24,7 +27,7 @@ function toBase64(bytes: Uint8Array): string {
   return btoa(s);
 }
 
-function fromBase64(base64: string): Uint8Array {
+export function fromBase64(base64: string): Uint8Array {
   if (typeof Buffer !== "undefined") {
     return new Uint8Array(Buffer.from(base64, "base64"));
   }
@@ -95,7 +98,7 @@ export function createEncryptedInputTransformer(opts: {
     },
   };
 }
-export function stringify(object: any) {
+export function stringify(object: any, setHeader?: (headers: Record<string, string>) => void): string {
       const clientKeypair = createClientKeypair();
       const payload = superjson.serialize(object);
       const plaintext = utf8Encode(JSON.stringify(payload));
@@ -108,35 +111,40 @@ export function stringify(object: any) {
         // serverPublicKey,
         clientKeypair.secretKey,
       );
-
-      return JSON.stringify({
+      setHeader?.({
         kid: secureConfig.kid,
         nonce: toBase64(nonce),
         pk: toBase64(clientKeypair.publicKey),
-        data: toBase64(cipher),
       });
+      // return JSON.stringify({
+      //   kid: secureConfig.kid,
+      //   nonce: toBase64(nonce),
+      //   pk: toBase64(clientKeypair.publicKey),
+      //   data: toBase64(cipher),
+      // });
+      return toBase64(cipher);
     }
-export function parse(d: unknown): unknown {
-      const object = typeof d === "string" ? JSON.parse(d) : d;
-      if (!isSecureEnvelope(object)) {
-        // console.log("parse RPC payload:", object);
-        return object;
-      }
-
+export function parse(d: string, getHeader?: () => Record<string, string>): any {
+      // const object = typeof d === "string" ? JSON.parse(d) : d;
+      // if (!isSecureEnvelope(object)) {
+      //   // console.log("parse RPC payload:", object);
+      //   return object;
+      // }
+      const headers = getHeader ? getHeader() : {};
       // const serverSecretKey = opts.getSecretKeyByKid(object.kid);
       // if (!serverSecretKey) {
       //   throw new Error(`Unknown secure transformer kid: ${object.kid}`);
       // }
-      const nonce = fromBase64(object.nonce);
-      const clientPublicKey = fromBase64(object.pk);
-      const ciphertext = fromBase64(object.data);
+      const nonce = fromBase64(headers.nonce);
+      const clientPublicKey = fromBase64(headers.pk);
+      const ciphertext = fromBase64(d);
 
       const opened = nacl.box.open(
         ciphertext,
         nonce,
         clientPublicKey,
         // serverSecretKey
-        fromBase64(secureConfig.kid), // for testing, should be replaced with real secret key retrieval
+        fromBase64(headers.kid), // for testing, should be replaced with real secret key retrieval
       );
       if (!opened) {
         throw new Error("Failed to decrypt tRPC input payload");
