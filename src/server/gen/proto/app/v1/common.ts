@@ -168,6 +168,7 @@ export interface Video {
   storageType?: string | undefined;
   createdAt?: string | undefined;
   updatedAt?: string | undefined;
+  jobId?: string | undefined;
 }
 
 export interface AdminDashboard {
@@ -217,6 +218,8 @@ export interface AdminVideo {
   adTemplateName?: string | undefined;
   createdAt?: string | undefined;
   updatedAt?: string | undefined;
+  processingStatus?: string | undefined;
+  jobId?: string | undefined;
 }
 
 export interface AdminPayment {
@@ -292,6 +295,7 @@ export interface AdminJob {
   maxRetries?: number | undefined;
   createdAt?: string | undefined;
   updatedAt?: string | undefined;
+  videoId?: string | undefined;
 }
 
 export interface AdminAgent {
@@ -2932,6 +2936,7 @@ function createBaseVideo(): Video {
     storageType: undefined,
     createdAt: undefined,
     updatedAt: undefined,
+    jobId: undefined,
   };
 }
 
@@ -2978,6 +2983,9 @@ export const Video: MessageFns<Video> = {
     }
     if (message.updatedAt !== undefined) {
       Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(114).fork()).join();
+    }
+    if (message.jobId !== undefined) {
+      writer.uint32(122).string(message.jobId);
     }
     return writer;
   },
@@ -3101,6 +3109,14 @@ export const Video: MessageFns<Video> = {
           message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
+        case 15: {
+          if (tag !== 122) {
+            break;
+          }
+
+          message.jobId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3145,6 +3161,11 @@ export const Video: MessageFns<Video> = {
         ? globalThis.String(object.updatedAt)
         : isSet(object.updated_at)
         ? globalThis.String(object.updated_at)
+        : undefined,
+      jobId: isSet(object.jobId)
+        ? globalThis.String(object.jobId)
+        : isSet(object.job_id)
+        ? globalThis.String(object.job_id)
         : undefined,
     };
   },
@@ -3193,6 +3214,9 @@ export const Video: MessageFns<Video> = {
     if (message.updatedAt !== undefined) {
       obj.updatedAt = message.updatedAt;
     }
+    if (message.jobId !== undefined) {
+      obj.jobId = message.jobId;
+    }
     return obj;
   },
 
@@ -3215,6 +3239,7 @@ export const Video: MessageFns<Video> = {
     message.storageType = object.storageType ?? undefined;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
+    message.jobId = object.jobId ?? undefined;
     return message;
   },
 };
@@ -3824,6 +3849,8 @@ function createBaseAdminVideo(): AdminVideo {
     adTemplateName: undefined,
     createdAt: undefined,
     updatedAt: undefined,
+    processingStatus: undefined,
+    jobId: undefined,
   };
 }
 
@@ -3870,6 +3897,12 @@ export const AdminVideo: MessageFns<AdminVideo> = {
     }
     if (message.updatedAt !== undefined) {
       Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(114).fork()).join();
+    }
+    if (message.processingStatus !== undefined) {
+      writer.uint32(122).string(message.processingStatus);
+    }
+    if (message.jobId !== undefined) {
+      writer.uint32(130).string(message.jobId);
     }
     return writer;
   },
@@ -3993,6 +4026,22 @@ export const AdminVideo: MessageFns<AdminVideo> = {
           message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
+        case 15: {
+          if (tag !== 122) {
+            break;
+          }
+
+          message.processingStatus = reader.string();
+          continue;
+        }
+        case 16: {
+          if (tag !== 130) {
+            break;
+          }
+
+          message.jobId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4042,6 +4091,16 @@ export const AdminVideo: MessageFns<AdminVideo> = {
         : isSet(object.updated_at)
         ? globalThis.String(object.updated_at)
         : undefined,
+      processingStatus: isSet(object.processingStatus)
+        ? globalThis.String(object.processingStatus)
+        : isSet(object.processing_status)
+        ? globalThis.String(object.processing_status)
+        : undefined,
+      jobId: isSet(object.jobId)
+        ? globalThis.String(object.jobId)
+        : isSet(object.job_id)
+        ? globalThis.String(object.job_id)
+        : undefined,
     };
   },
 
@@ -4089,6 +4148,12 @@ export const AdminVideo: MessageFns<AdminVideo> = {
     if (message.updatedAt !== undefined) {
       obj.updatedAt = message.updatedAt;
     }
+    if (message.processingStatus !== undefined) {
+      obj.processingStatus = message.processingStatus;
+    }
+    if (message.jobId !== undefined) {
+      obj.jobId = message.jobId;
+    }
     return obj;
   },
 
@@ -4111,6 +4176,8 @@ export const AdminVideo: MessageFns<AdminVideo> = {
     message.adTemplateName = object.adTemplateName ?? undefined;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
+    message.processingStatus = object.processingStatus ?? undefined;
+    message.jobId = object.jobId ?? undefined;
     return message;
   },
 };
@@ -5140,6 +5207,7 @@ function createBaseAdminJob(): AdminJob {
     maxRetries: 0,
     createdAt: undefined,
     updatedAt: undefined,
+    videoId: undefined,
   };
 }
 
@@ -5201,6 +5269,9 @@ export const AdminJob: MessageFns<AdminJob> = {
     }
     if (message.updatedAt !== undefined) {
       Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(154).fork()).join();
+    }
+    if (message.videoId !== undefined) {
+      writer.uint32(162).string(message.videoId);
     }
     return writer;
   },
@@ -5364,6 +5435,14 @@ export const AdminJob: MessageFns<AdminJob> = {
           message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
+        case 20: {
+          if (tag !== 162) {
+            break;
+          }
+
+          message.videoId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5438,6 +5517,11 @@ export const AdminJob: MessageFns<AdminJob> = {
         : isSet(object.updated_at)
         ? globalThis.String(object.updated_at)
         : undefined,
+      videoId: isSet(object.videoId)
+        ? globalThis.String(object.videoId)
+        : isSet(object.video_id)
+        ? globalThis.String(object.video_id)
+        : undefined,
     };
   },
 
@@ -5500,6 +5584,9 @@ export const AdminJob: MessageFns<AdminJob> = {
     if (message.updatedAt !== undefined) {
       obj.updatedAt = message.updatedAt;
     }
+    if (message.videoId !== undefined) {
+      obj.videoId = message.videoId;
+    }
     return obj;
   },
 
@@ -5527,6 +5614,7 @@ export const AdminJob: MessageFns<AdminJob> = {
     message.maxRetries = object.maxRetries ?? 0;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
+    message.videoId = object.videoId ?? undefined;
     return message;
   },
 };

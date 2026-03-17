@@ -350,6 +350,7 @@ export interface CreateAdminJobRequest {
   userId?: string | undefined;
   name?: string | undefined;
   timeLimit?: number | undefined;
+  videoId?: string | undefined;
 }
 
 export interface CreateAdminJobRequest_EnvEntry {
@@ -5327,7 +5328,16 @@ export const GetAdminJobLogsResponse: MessageFns<GetAdminJobLogsResponse> = {
 };
 
 function createBaseCreateAdminJobRequest(): CreateAdminJobRequest {
-  return { command: "", image: undefined, env: {}, priority: 0, userId: undefined, name: undefined, timeLimit: 0 };
+  return {
+    command: "",
+    image: undefined,
+    env: {},
+    priority: 0,
+    userId: undefined,
+    name: undefined,
+    timeLimit: 0,
+    videoId: undefined,
+  };
 }
 
 export const CreateAdminJobRequest: MessageFns<CreateAdminJobRequest> = {
@@ -5352,6 +5362,9 @@ export const CreateAdminJobRequest: MessageFns<CreateAdminJobRequest> = {
     }
     if (message.timeLimit !== undefined && message.timeLimit !== 0) {
       writer.uint32(56).int64(message.timeLimit);
+    }
+    if (message.videoId !== undefined) {
+      writer.uint32(66).string(message.videoId);
     }
     return writer;
   },
@@ -5422,6 +5435,14 @@ export const CreateAdminJobRequest: MessageFns<CreateAdminJobRequest> = {
           message.timeLimit = longToNumber(reader.int64());
           continue;
         }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.videoId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5456,6 +5477,11 @@ export const CreateAdminJobRequest: MessageFns<CreateAdminJobRequest> = {
         : isSet(object.time_limit)
         ? globalThis.Number(object.time_limit)
         : 0,
+      videoId: isSet(object.videoId)
+        ? globalThis.String(object.videoId)
+        : isSet(object.video_id)
+        ? globalThis.String(object.video_id)
+        : undefined,
     };
   },
 
@@ -5488,6 +5514,9 @@ export const CreateAdminJobRequest: MessageFns<CreateAdminJobRequest> = {
     if (message.timeLimit !== undefined && message.timeLimit !== 0) {
       obj.timeLimit = Math.round(message.timeLimit);
     }
+    if (message.videoId !== undefined) {
+      obj.videoId = message.videoId;
+    }
     return obj;
   },
 
@@ -5511,6 +5540,7 @@ export const CreateAdminJobRequest: MessageFns<CreateAdminJobRequest> = {
     message.userId = object.userId ?? undefined;
     message.name = object.name ?? undefined;
     message.timeLimit = object.timeLimit ?? 0;
+    message.videoId = object.videoId ?? undefined;
     return message;
   },
 };
