@@ -1,4 +1,6 @@
 import type { User } from "@/server/gen/proto/app/v1/common";
+import { TinyRpcError } from "@hiogawa/tiny-rpc";
+import { tinyassert } from "@hiogawa/utils";
 import { Context } from "hono";
 import { tryGetContext } from "hono/context-storage";
 import { setCookie } from "hono/cookie";
@@ -58,4 +60,65 @@ export const class2Object = <T>(classConvert: T) => {
         return classAsObj
     }, {})
     return object as T
+}
+// validator agnostic function guard
+// now supports multiple schemas / multiple args
+// (it only supports zod for starter)
+
+export function validateFn<Schemas extends readonly unknown[]>(
+  ...schemas: Schemas
+) {
+  return function decorate<Out>(
+    fn: (...inputs: InferOutputs<Schemas>) => Out
+  ): (...inputRaws: InferInputs<Schemas>) => Out {
+    return function wrapper(...inputRaws) {
+      if (inputRaws.length !== schemas.length) {
+        throw new TinyRpcError(
+          `invalid argument count: expected ${schemas.length}, got ${inputRaws.length}`
+        ).setStatus(400);
+      }
+
+      const inputs = schemas.map((schema, index) => {
+        const parser = getParser(schema);
+        try {
+          return parser(inputRaws[index]);
+        } catch (e) {
+          throw TinyRpcError.fromUnknown(`Error validating argument at index ${index}: ${e instanceof Error ? e.message : 'Unknown error'}`).setStatus(400);
+        }
+      }) as InferOutputs<Schemas>;
+
+      return fn(...inputs);
+    };
+  };
+}
+
+// infer input/output from a single parser
+type InferIO<Parser> = Parser extends { _input: infer I; _output: infer O }
+  ? {
+      i: I;
+      o: O;
+    }
+  : {
+      i: never;
+      o: never;
+    };
+
+// infer tuple of raw inputs from tuple of schemas
+type InferInputs<Schemas extends readonly unknown[]> = {
+  [K in keyof Schemas]: InferIO<Schemas[K]>["i"];
+};
+
+// infer tuple of parsed outputs from tuple of schemas
+type InferOutputs<Schemas extends readonly unknown[]> = {
+  [K in keyof Schemas]: InferIO<Schemas[K]>["o"];
+};
+
+function getParser(schema: unknown): (input: unknown) => unknown {
+  tinyassert(schema && typeof schema === "object");
+
+  if ("parse" in schema && typeof schema.parse === "function") {
+    return schema.parse.bind(schema);
+  }
+
+  throw new TinyRpcError("unsupported schema", { cause: schema });
 }

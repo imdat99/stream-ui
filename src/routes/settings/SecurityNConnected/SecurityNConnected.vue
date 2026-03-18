@@ -142,24 +142,26 @@ const confirmTwoFactor = async () => {
 };
 
 const connectTelegram = async () => {
-    try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        telegramConnected.value = true;
-        telegramUsername.value = '@telegram_user';
-        toast.add({
-            severity: 'success',
-            summary: t('settings.securityConnected.toast.telegramConnectedSummary'),
-            detail: t('settings.securityConnected.toast.telegramConnectedDetail', { username: telegramUsername.value }),
-            life: 3000
-        });
-    } catch (e) {
-        toast.add({
-            severity: 'error',
-            summary: t('settings.securityConnected.toast.telegramConnectFailedSummary'),
-            detail: t('settings.securityConnected.toast.telegramConnectFailedDetail'),
-            life: 5000
-        });
-    }
+    // https://t.me/<username_bot>?start=abc123
+    window.open(`https://t.me/hlstiktok_bot?start=${auth.user?.username}`, "_blank");
+    // try {
+    //     await new Promise(resolve => setTimeout(resolve, 1000));
+    //     telegramConnected.value = true;
+    //     telegramUsername.value = '@telegram_user';
+    //     toast.add({
+    //         severity: 'success',
+    //         summary: t('settings.securityConnected.toast.telegramConnectedSummary'),
+    //         detail: t('settings.securityConnected.toast.telegramConnectedDetail', { username: telegramUsername.value }),
+    //         life: 3000
+    //     });
+    // } catch (e) {
+    //     toast.add({
+    //         severity: 'error',
+    //         summary: t('settings.securityConnected.toast.telegramConnectFailedSummary'),
+    //         detail: t('settings.securityConnected.toast.telegramConnectFailedDetail'),
+    //         life: 5000
+    //     });
+    // }
 };
 
 const disconnectTelegram = async () => {

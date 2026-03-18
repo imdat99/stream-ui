@@ -1,12 +1,13 @@
 import { authenticate } from "@/server/middlewares/authenticate";
 import { getGrpcMetadataFromContext } from "@/server/services/grpcClient";
-import { clientJSON, parse, stringify } from "@/shared/secure-json-transformer";
+import { parse, stringify } from "@/shared/secure-json-transformer";
 import { Metadata } from "@grpc/grpc-js";
 import { exposeTinyRpc, httpServerAdapter } from "@hiogawa/tiny-rpc";
 import { Hono } from "hono";
 import { protectedAuthMethods, publicAuthMethods } from "./auth";
 import { meMethods } from "./me";
 import { getContext } from "hono/context-storage";
+import { adminMethods } from "./admin";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -18,6 +19,7 @@ const protectedRoutes = {
   health: () => ({ ok: true }),
   ...protectedAuthMethods,
   ...meMethods,
+  ...adminMethods
 };
 
 const publicRoutes = {
@@ -45,14 +47,16 @@ export function registerRpcRoutes(app: Hono) {
   };
   const protectedHandler = exposeTinyRpc({
     routes: protectedRoutes,
-    adapter: httpServerAdapter({ endpoint: "/rpc", JSON: JSONProcessor }),
+    adapter: httpServerAdapter({ endpoint: "/rpc", 
+      // JSON: JSONProcessor
+     }),
   });
   app.use(publicEndpoint, async (c, next) => {
     const publicHandler = exposeTinyRpc({
       routes: publicRoutes,
       adapter: httpServerAdapter({
         endpoint: "/rpc-public",
-        JSON: JSONProcessor,
+        // JSON: JSONProcessor,
       }),
     });
     const res = await publicHandler({ request: c.req.raw });

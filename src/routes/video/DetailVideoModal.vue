@@ -42,7 +42,7 @@ const errors = ref<{ title?: string }>({});
 const isFreePlan = computed(() => !auth.user?.plan_id);
 
 const activeTemplates = computed(() =>
-    adTemplates.value.filter(t => t.is_active),
+    adTemplates.value.filter(t => t.isActive),
 );
 
 const subtitleForm = ref({
@@ -239,7 +239,7 @@ watch(() => props.videoId, (newId) => {
                         :key="tmpl.id"
                         :value="tmpl.id"
                     >
-                        {{ tmpl.name }}{{ tmpl.is_default ? ` (${t('video.detailModal.adTemplateDefault')})` : '' }}
+                        {{ tmpl.name }}{{ tmpl.isDefault ? ` (${t('video.detailModal.adTemplateDefault')})` : '' }}
                     </option>
                 </select>
                 <p v-if="isFreePlan" class="text-xs text-foreground/50 mt-0.5">

@@ -1,3 +1,4 @@
+import { client } from '@/api/rpcclient';
 import { computed, ref } from 'vue';
 
 export interface QueueItem {
@@ -282,22 +283,19 @@ export function useUploadQueue() {
         if (!item.file || !item.uploadedUrls) return;
 
         try {
-            const response = await fetch('/merge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    filename: item.file.name,
-                    chunks: item.uploadedUrls,
-                    size: item.file.size
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Merge failed');
+            const data = await client.merge(item.file.name, item.uploadedUrls, item.file.size);
+            // const response = await fetch('/merge', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         filename: item.file.name,
+            //         chunks: item.uploadedUrls,
+            //         size: item.file.size
+            //     })
+            // });
+            if (!data) {
+                throw new Error('No response from server');
             }
-
             item.status = 'complete';
             item.progress = 100;
             item.uploaded = item.total;
