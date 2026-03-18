@@ -5,8 +5,10 @@ import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
 import RemoteUrlForm from './components/RemoteUrlForm.vue';
 import UploadDropzone from './components/UploadDropzone.vue';
+import { useAppToast } from '@/composables/useAppToast';
 
 const uiState = useUIState();
+const toast = useAppToast();
 const mode = ref<'local' | 'remote'>('local');
 const { t } = useTranslation();
 
@@ -15,7 +17,7 @@ const { addFiles, addRemoteUrls, pendingCount, startQueue, remainingSlots, maxIt
 const handleFilesSelected = (files: FileList) => {
     const result = addFiles(files);
     if (result.duplicates > 0) {
-        uiState.toastQueue.push({
+        toast.add({
             severity: 'warn',
             summary: t('upload.dialog.duplicateFilesSummary'),
             detail: result.duplicates > 1
@@ -30,7 +32,7 @@ const handleFilesSelected = (files: FileList) => {
 const handleRemoteUrls = (urls: string[]) => {
     const result = addRemoteUrls(urls);
     if (result.duplicates > 0) {
-        uiState.toastQueue.push({
+        toast.add({
             severity: 'warn',
             summary: t('upload.dialog.duplicateUrlsSummary'),
             detail: result.duplicates > 1

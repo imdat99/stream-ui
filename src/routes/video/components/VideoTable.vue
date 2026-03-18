@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BaseTable from '@/components/ui/table/BaseTable.vue';
+import BaseTable from '@/components/ui/BaseTable.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';

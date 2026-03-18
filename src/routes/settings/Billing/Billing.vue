@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import AppButton from '@/components/app/AppButton.vue';
-import AppDialog from '@/components/app/AppDialog.vue';
-import AppInput from '@/components/app/AppInput.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import AppDialog from '@/components/ui/AppDialog.vue';
+import AppInput from '@/components/ui/AppInput.vue';
 import { useAppToast } from '@/composables/useAppToast';
 import { useUsageQuery } from '@/composables/useUsageQuery';
+import { formatBytes } from '@/lib/utils';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
 import BillingHistorySection from '@/routes/settings/components/billing/BillingHistorySection.vue';
 import BillingPlansSection from '@/routes/settings/components/billing/BillingPlansSection.vue';
@@ -125,15 +126,6 @@ const upgradeSubmitLabel = computed(() => {
 });
 
 const formatMoney = (amount: number) => currencyFormatter.value.format(amount);
-
-const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
-    return `${new Intl.NumberFormat(localeTag.value).format(value)} ${sizes[i]}`;
-};
 
 const formatDuration = (seconds?: number) => {
     if (!seconds) return t('settings.billing.durationMinutes', { minutes: 0 });
@@ -263,15 +255,12 @@ const loadPaymentHistory = async () => {
     }
 };
 
-const refetchUsageSnapshot = () => refetchUsage((fetchError) => {
-    throw fetchError;
-});
 
 const refreshBillingState = async () => {
     await Promise.allSettled([
         auth.fetchMe(),
         loadPaymentHistory(),
-        refetchUsageSnapshot(),
+        refetchUsage(),
     ]);
 };
 
@@ -403,7 +392,7 @@ const submitUpgrade = async () => {
 
     try {
         const paymentMethod: UpgradePaymentMethod = selectedNeedsTopup.value ? selectedPaymentMethod.value : 'wallet';
-        const payload: Record<string, any> = {
+        const payload: Parameters<typeof rpcClient.createPayment>[0] = {
             planId: selectedPlan.value.id,
             termMonths: selectedTermMonths.value,
             paymentMethod: paymentMethod,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import AppButton from '@/components/app/AppButton.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import AlertTriangleIcon from '@/components/icons/AlertTriangle.vue';
 import SlidersIcon from '@/components/icons/SlidersIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';

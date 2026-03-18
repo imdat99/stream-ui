@@ -27,13 +27,13 @@ export default defineConfig({
   theme: {
     colors: {
       primary: {
-        DEFAULT: "#4563ca",
+        DEFAULT: "#1f883d",
         50: "#effcf3",
         100: "#dcf9e2",
         200: "#bbf0c8",
         300: "#86efac",
         400: "#4ade80",
-        500: "#4563ca",
+        500: "#1f883d",
         600: "#16a34a",
         700: "#15803d",
         800: "#166534",

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { client as rpcClient } from "@/api/rpcclient";
-import AppButton from "@/components/app/AppButton.vue";
-import AppDialog from "@/components/app/AppDialog.vue";
-import AppInput from "@/components/app/AppInput.vue";
-import BaseTable from "@/components/ui/table/BaseTable.vue";
+import AppButton from "@/components/ui/AppButton.vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
+import AppInput from "@/components/ui/AppInput.vue";
+import BaseTable from "@/components/ui/BaseTable.vue";
 import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
 import BillingPlansSection from "@/routes/settings/components/billing/BillingPlansSection.vue";
 import type { Plan as ModelPlan } from "@/server/gen/proto/app/v1/common";

@@ -11,7 +11,7 @@ const props = withDefaults(
     type?: 'button' | 'submit' | 'reset';
   }>(),
   {
-    variant: 'secondary',
+    variant: 'primary',
     size: 'md',
     block: false,
     disabled: false,

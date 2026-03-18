@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { client as rpcClient } from "@/api/rpcclient";
-import AppButton from "@/components/app/AppButton.vue";
-import AppDialog from "@/components/app/AppDialog.vue";
-import AppInput from "@/components/app/AppInput.vue";
+import AppButton from "@/components/ui/AppButton.vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
+import AppInput from "@/components/ui/AppInput.vue";
 import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
 import { computed, onMounted, reactive, ref } from "vue";
 import AdminSectionShell from "./components/AdminSectionShell.vue";

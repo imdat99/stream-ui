@@ -64,7 +64,7 @@ const onDrop = (e: DragEvent) => {
             class="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer" @change="handleFileChange">
 
         <div :class="[
-            'flex-1 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed transition-all duration-200 py-6 px-4 h-full',
+            'flex-1 flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed transition-all duration-200 py-6 px-4 h-full bg-white',
             isDragOver
                 ? 'border-accent bg-accent/5 scale-[0.99]'
                 : 'border-slate-200 group-hover:border-accent/60 group-hover:bg-accent/[0.03]'

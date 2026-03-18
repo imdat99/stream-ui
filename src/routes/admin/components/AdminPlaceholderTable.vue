@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BaseTable from '@/components/ui/table/BaseTable.vue';
+import BaseTable from '@/components/ui/BaseTable.vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { computed, h } from 'vue';
 

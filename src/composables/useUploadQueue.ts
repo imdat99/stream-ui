@@ -1,4 +1,3 @@
-import { client as rpcClient } from '@/api/rpcclient';
 import { computed, ref } from 'vue';
 
 export interface QueueItem {
@@ -11,30 +10,36 @@ export interface QueueItem {
     total?: string;
     speed?: string;
     thumbnail?: string;
-    file?: File;
-    url?: string;
-    playbackUrl?: string;
-    videoId?: string;
-    objectKey?: string;
+    file?: File; // Keep reference to file for local uploads
+    url?: string; // Keep reference to url for remote uploads
+    // Upload chunk tracking
+    activeChunks?: number;
+    uploadedUrls?: string[];
     cancelled?: boolean;
 }
 
 const items = ref<QueueItem[]>([]);
+
+// Upload limits
 const MAX_ITEMS = 5;
+
+// Chunk upload configuration
+const CHUNK_SIZE = 90 * 1024 * 1024; // 90MB per chunk
+const MAX_PARALLEL = 3;
 const MAX_RETRY = 3;
 
-const activeXhrs = new Map<string, XMLHttpRequest>();
+// Track active XHRs per item id so we can abort them on cancel
+const activeXhrs = new Map<string, Set<XMLHttpRequest>>();
 
 const abortItem = (id: string) => {
-    const xhr = activeXhrs.get(id);
-    if (xhr) {
-        xhr.abort();
+    const xhrs = activeXhrs.get(id);
+    if (xhrs) {
+        xhrs.forEach(xhr => xhr.abort());
         activeXhrs.delete(id);
     }
 };
 
 export function useUploadQueue() {
-    const t = (key: string, params?: Record<string, unknown>) => key;
 
     const remainingSlots = computed(() => Math.max(0, MAX_ITEMS - items.value.length));
 
@@ -60,9 +65,11 @@ export function useUploadQueue() {
             uploaded: '0 MB',
             total: formatSize(file.size),
             speed: '0 MB/s',
-            file,
+            file: file,
             thumbnail: undefined,
-            cancelled: false,
+            activeChunks: 0,
+            uploadedUrls: [],
+            cancelled: false
         }));
 
         items.value.push(...newItems);
@@ -75,15 +82,17 @@ export function useUploadQueue() {
         const duplicateCount = allowed.length - fresh.length;
         const newItems: QueueItem[] = fresh.map((url) => ({
             id: Math.random().toString(36).substring(2, 9),
-            name: url.split('/').pop() || t('upload.queueItem.remoteFileName'),
+            name: url.split('/').pop() || 'Remote File',
             type: 'remote',
             status: 'pending',
             progress: 0,
             uploaded: '0 MB',
-            total: t('upload.queueItem.unknownSize'),
+            total: 'Unknown',
             speed: '0 MB/s',
-            url,
-            cancelled: false,
+            url: url,
+            activeChunks: 0,
+            uploadedUrls: [],
+            cancelled: false
         }));
 
         items.value.push(...newItems);
@@ -104,6 +113,7 @@ export function useUploadQueue() {
         if (item) {
             item.cancelled = true;
             item.status = 'error';
+            item.activeChunks = 0;
             item.speed = '0 MB/s';
         }
     };
@@ -112,7 +122,7 @@ export function useUploadQueue() {
         items.value.forEach(item => {
             if (item.status === 'pending') {
                 if (item.type === 'local') {
-                    startUpload(item.id);
+                    startChunkUpload(item.id);
                 } else {
                     startMockRemoteFetch(item.id);
                 }
@@ -120,147 +130,185 @@ export function useUploadQueue() {
         });
     };
 
-    const startUpload = async (id: string) => {
+    // Real Chunk Upload Logic
+    const startChunkUpload = async (id: string) => {
         const item = items.value.find(i => i.id === id);
         if (!item || !item.file) return;
 
         item.status = 'uploading';
-        item.progress = 0;
-        item.uploaded = '0 MB';
-        item.speed = '0 MB/s';
+        item.activeChunks = 0;
+        item.uploadedUrls = [];
 
-        try {
-            const response = await rpcClient.getUploadUrl({ filename: item.file.name });
-            if (!response.uploadUrl || !response.key) {
-                throw new Error(t('upload.errors.mergeFailed'));
+        const file = item.file;
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const progressMap = new Map<number, number>(); // chunk index -> uploaded bytes
+        const queue: number[] = Array.from({ length: totalChunks }, (_, i) => i);
+
+        const updateProgress = () => {
+            let totalUploaded = 0;
+            progressMap.forEach(value => {
+                totalUploaded += value;
+            });
+            const percent = Math.min((totalUploaded / file.size) * 100, 100);
+            item.progress = parseFloat(percent.toFixed(1));
+            item.uploaded = formatSize(totalUploaded);
+
+            // Calculate speed (simplified)
+            const currentSpeed = item.activeChunks ? item.activeChunks * 2 * 1024 * 1024 : 0;
+            item.speed = formatSize(currentSpeed) + '/s';
+        };
+
+        const processQueue = async () => {
+            if (item.cancelled) return;
+
+            const activePromises: Promise<void>[] = [];
+
+            while ((item.activeChunks || 0) < MAX_PARALLEL && queue.length > 0) {
+                const index = queue.shift()!;
+                item.activeChunks = (item.activeChunks || 0) + 1;
+
+                const promise = uploadChunk(index, file, progressMap, updateProgress, item)
+                    .then(() => {
+                        item.activeChunks = (item.activeChunks || 0) - 1;
+                    });
+                activePromises.push(promise);
             }
 
-            item.objectKey = response.key;
-            await uploadFileToPresignedUrl(item, response.uploadUrl);
+            if (activePromises.length > 0) {
+                await Promise.all(activePromises);
+                await processQueue();
+            }
+        };
+
+        try {
+            await processQueue();
 
             if (!item.cancelled) {
                 item.status = 'processing';
                 await completeUpload(item);
             }
         } catch (error) {
-            if (!item.cancelled) {
-                item.status = 'error';
-                console.error('Upload failed:', error);
-            }
+            item.status = 'error';
+            console.error('Upload failed:', error);
         }
     };
 
-    const uploadFileToPresignedUrl = async (item: QueueItem, uploadUrl: string) => {
-        if (!item.file) return;
-
-        for (let attempt = 1; attempt <= MAX_RETRY; attempt++) {
-            try {
-                await sendFile(item, uploadUrl);
-                return;
-            } catch (error) {
-                if (item.cancelled) {
-                    return;
-                }
-                if (attempt === MAX_RETRY) {
-                    throw error;
-                }
-            }
-        }
-    };
-
-    const sendFile = (item: QueueItem, uploadUrl: string): Promise<void> => {
+    const uploadChunk = (
+        index: number,
+        file: File,
+        progressMap: Map<number, number>,
+        updateProgress: () => void,
+        item: QueueItem
+    ): Promise<void> => {
         return new Promise((resolve, reject) => {
-            if (!item.file) {
-                resolve();
-                return;
-            }
+            let retry = 0;
 
-            const xhr = new XMLHttpRequest();
-            const startedAt = Date.now();
+            const attempt = () => {
+                if (item.cancelled) return resolve();
 
-            activeXhrs.set(item.id, xhr);
-            xhr.open('PUT', uploadUrl);
-            if (item.file.type) {
-                xhr.setRequestHeader('Content-Type', item.file.type);
-            }
+                const start = index * CHUNK_SIZE;
+                const end = Math.min(start + CHUNK_SIZE, file.size);
+                const chunk = file.slice(start, end);
 
-            const cleanup = () => {
-                if (activeXhrs.get(item.id) === xhr) {
-                    activeXhrs.delete(item.id);
+                const formData = new FormData();
+                formData.append('file', chunk, file.name);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://tmpfiles.org/api/v1/upload');
+
+                // Register this XHR so it can be aborted on cancel
+                if (!activeXhrs.has(item.id)) activeXhrs.set(item.id, new Set());
+                activeXhrs.get(item.id)!.add(xhr);
+
+                const unregister = () => activeXhrs.get(item.id)?.delete(xhr);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        progressMap.set(index, e.loaded);
+                        updateProgress();
+                    }
+                };
+
+                xhr.onload = function () {
+                    unregister();
+                    if (item.cancelled) return resolve();
+                    if (xhr.status === 200) {
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.status === 'success') {
+                                progressMap.set(index, chunk.size);
+                                if (item.uploadedUrls) {
+                                    item.uploadedUrls[index] = res.data.url;
+                                }
+                                updateProgress();
+                                resolve();
+                                return;
+                            }
+                        } catch {
+                            handleError();
+                        }
+                    }
+                    handleError();
+                };
+
+                xhr.onabort = () => {
+                    unregister();
+                    resolve(); // treat abort as graceful completion — processQueue will short-circuit via item.cancelled
+                };
+
+                xhr.onerror = () => {
+                    unregister();
+                    handleError();
+                };
+
+                function handleError() {
+                    retry++;
+                    if (retry <= MAX_RETRY) {
+                        setTimeout(attempt, 2000);
+                    } else {
+                        item.status = 'error';
+                        reject(new Error(`Failed to upload chunk ${index + 1}`));
+                    }
                 }
+
+                xhr.send(formData);
             };
 
-            xhr.upload.onprogress = (event) => {
-                if (!event.lengthComputable || !item.file) return;
-
-                const uploadedBytes = event.loaded;
-                const percent = Math.min((uploadedBytes / item.file.size) * 100, 100);
-                const elapsedSeconds = Math.max((Date.now() - startedAt) / 1000, 0.001);
-                const speed = uploadedBytes / elapsedSeconds;
-
-                item.progress = parseFloat(percent.toFixed(1));
-                item.uploaded = formatSize(uploadedBytes);
-                item.total = formatSize(item.file.size);
-                item.speed = `${formatSize(speed)}/s`;
-            };
-
-            xhr.onload = () => {
-                cleanup();
-                if (item.cancelled) {
-                    resolve();
-                    return;
-                }
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    item.progress = 100;
-                    item.uploaded = item.total;
-                    item.speed = '0 MB/s';
-                    resolve();
-                    return;
-                }
-                reject(new Error(t('upload.errors.chunkUploadFailed', { index: 1 })));
-            };
-
-            xhr.onerror = () => {
-                cleanup();
-                reject(new Error(t('upload.errors.chunkUploadFailed', { index: 1 })));
-            };
-
-            xhr.onabort = () => {
-                cleanup();
-                resolve();
-            };
-
-            xhr.send(item.file);
+            attempt();
         });
     };
 
     const completeUpload = async (item: QueueItem) => {
-        if (!item.file || !item.objectKey) return;
+        if (!item.file || !item.uploadedUrls) return;
 
         try {
-            const createResponse = await rpcClient.createVideo({
-                title: item.file.name.replace(/\.[^.]+$/, ''),
-                description: '',
-                url: item.objectKey,
-                size: item.file.size,
-                duration: 0,
-                format: item.file.type || 'video/mp4',
+            const response = await fetch('/merge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: item.file.name,
+                    chunks: item.uploadedUrls,
+                    size: item.file.size
+                })
             });
 
-            const createdVideo = createResponse.video;
-            item.videoId = createdVideo?.id;
-            item.playbackUrl = createdVideo?.url || item.objectKey;
-            item.url = createdVideo?.url || item.objectKey;
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Merge failed');
+            }
+
             item.status = 'complete';
             item.progress = 100;
             item.uploaded = item.total;
             item.speed = '0 MB/s';
         } catch (error) {
             item.status = 'error';
-            console.error('Create video failed:', error);
+            console.error('Merge failed:', error);
         }
     };
 
+    // Mock Remote Fetch Logic
     const startMockRemoteFetch = (id: string) => {
         const item = items.value.find(i => i.id === id);
         if (!item) return;
@@ -273,13 +321,13 @@ export function useUploadQueue() {
         }, 3000 + Math.random() * 3000);
     };
 
+
     const formatSize = (bytes: number): string => {
         if (bytes === 0) return '0 B';
         const k = 1024;
         const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
-        return `${value} ${sizes[i]}`;
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
     const totalSize = computed(() => {
@@ -297,11 +345,17 @@ export function useUploadQueue() {
     const pendingCount = computed(() => {
         return items.value.filter(i => i.status === 'pending').length;
     });
-
     function removeAll() {
         items.value = [];
     }
-
+    // watch(items, (newItems) => {
+    //     // console.log(newItems);
+    //     if (newItems.length === 0) return;
+    //     if (newItems.filter(i => i.status === 'pending' || i.status === 'uploading').length === 0) {
+    //         // startQueue();
+    //         items.value = [];
+    //     }
+    // }, { deep: true });
     return {
         items,
         addFiles,

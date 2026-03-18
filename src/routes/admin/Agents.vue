@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { client as rpcClient } from "@/api/rpcclient";
-import AppButton from "@/components/app/AppButton.vue";
-import AppDialog from "@/components/app/AppDialog.vue";
-import BaseTable from "@/components/ui/table/BaseTable.vue";
+import AppButton from "@/components/ui/AppButton.vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
+import BaseTable from "@/components/ui/BaseTable.vue";
 import { useAdminRuntimeMqtt } from "@/composables/useAdminRuntimeMqtt";
 import SettingsSectionCard from "@/routes/settings/components/SettingsSectionCard.vue";
 import SettingsTableSkeleton from "@/routes/settings/components/SettingsTableSkeleton.vue";

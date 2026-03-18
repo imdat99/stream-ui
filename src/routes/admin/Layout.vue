@@ -31,9 +31,9 @@ const menuSections = [
   },
 ] as const;
 
-const allSections = computed(() => menuSections.flatMap((section) => section.items));
 const activeSection = computed(() => {
-  return allSections.value.find((section) => route.path === section.to || route.path.startsWith(`${section.to}/`)) ?? allSections.value[0];
+  const allSections = menuSections.map((section) => section.items).flat();
+  return allSections.find((section) => route.path === section.to || route.path.startsWith(`${section.to}/`)) ?? allSections[0];
 });
 
 const breadcrumbs = computed(() => [
@@ -105,11 +105,6 @@ const content = computed(() => ({
     <div class="max-w-7xl mx-auto pb-12">
       <div class="mt-6 flex flex-col gap-8 md:flex-row">
         <aside class="md:w-56 shrink-0">
-          <div class="mb-8 rounded-lg border border-border bg-header px-4 py-4">
-            <div class="text-sm font-semibold text-foreground">{{ activeSection?.label }}</div>
-            <p class="mt-1 text-sm text-foreground/60">{{ activeSection?.description }}</p>
-          </div>
-
           <nav class="space-y-6">
             <div v-for="section in menuSections" :key="section.title">
               <h3 class="mb-2 pl-3 text-xs font-semibold uppercase tracking-wider text-foreground/50">

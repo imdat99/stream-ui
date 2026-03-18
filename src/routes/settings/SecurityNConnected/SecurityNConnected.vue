@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AppButton from '@/components/app/AppButton.vue';
-import AppDialog from '@/components/app/AppDialog.vue';
-import AppInput from '@/components/app/AppInput.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import AppDialog from '@/components/ui/AppDialog.vue';
+import AppInput from '@/components/ui/AppInput.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LockIcon from '@/components/icons/LockIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';

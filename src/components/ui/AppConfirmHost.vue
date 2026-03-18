@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AppButton from '@/components/app/AppButton.vue';
-import AppDialog from '@/components/app/AppDialog.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import AppDialog from '@/components/ui/AppDialog.vue';
 import AlertTriangleIcon from '@/components/icons/AlertTriangleIcon.vue';
 import { useAppConfirm } from '@/composables/useAppConfirm';
 

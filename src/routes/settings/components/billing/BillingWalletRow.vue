@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppButton from '@/components/app/AppButton.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import CoinsIcon from '@/components/icons/CoinsIcon.vue';
 import PlusIcon from '@/components/icons/PlusIcon.vue';
 import SettingsRow from '../SettingsRow.vue';

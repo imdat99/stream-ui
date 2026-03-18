@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import AppButton from '@/components/app/AppButton.vue';
-import AppDialog from '@/components/app/AppDialog.vue';
-import AppInput from '@/components/app/AppInput.vue';
-import AppSwitch from '@/components/app/AppSwitch.vue';
-import BaseTable from '@/components/ui/table/BaseTable.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import AppDialog from '@/components/ui/AppDialog.vue';
+import AppInput from '@/components/ui/AppInput.vue';
+import AppSwitch from '@/components/ui/AppSwitch.vue';
+import BaseTable from '@/components/ui/BaseTable.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';

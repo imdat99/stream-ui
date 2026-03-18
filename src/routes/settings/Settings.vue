@@ -62,8 +62,8 @@
 </template>
 
 <script setup lang="ts">
-import AppConfirmHost from '@/components/app/AppConfirmHost.vue';
-import AppToastHost from '@/components/app/AppToastHost.vue';
+import AppConfirmHost from '@/components/ui/AppConfirmHost.vue';
+import AppToastHost from '@/components/ui/AppToastHost.vue';
 import ClientOnly from '@/components/ClientOnly';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import AdvertisementIcon from '@/components/icons/AdvertisementIcon.vue';
