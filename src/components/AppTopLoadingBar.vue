@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouteLoading } from '@/composables/useRouteLoading'
+import { useRouteLoading } from '@/composables/useRouteLoading';
+import { computed } from 'vue';
 
 const { visible, progress } = useRouteLoading()
 
@@ -16,7 +16,7 @@ const barStyle = computed(() => ({
     aria-hidden="true"
   >
     <div
-      class="h-full origin-left rounded-r-full bg-primary/50 shadow-[0_0_12px_var(--colors-primary-DEFAULT)] transition-[transform,opacity] duration-200 ease-out"
+      class="h-full origin-left rounded-r-full bg-primary/50 transition-[transform,opacity] duration-200 ease-out"
       :style="barStyle"
     />
   </div>
