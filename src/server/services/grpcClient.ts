@@ -19,9 +19,11 @@ import {
 import {
   AdTemplatesServiceClient,
   DomainsServiceClient,
+  PlayerConfigsServiceClient,
   PlansServiceClient,
   type AdTemplatesServiceClient as AdTemplatesServiceClientType,
   type DomainsServiceClient as DomainsServiceClientType,
+  type PlayerConfigsServiceClient as PlayerConfigsServiceClientType,
   type PlansServiceClient as PlansServiceClientType,
 } from "@/server/gen/proto/app/v1/catalog";
 import {
@@ -45,6 +47,7 @@ declare module "hono" {
     adTemplatesServiceClient: PromisifiedClient<AdTemplatesServiceClientType>;
     videosServiceClient: PromisifiedClient<VideosServiceClientType>;
     domainsServiceClient: PromisifiedClient<DomainsServiceClientType>;
+    playerConfigsServiceClient: PromisifiedClient<PlayerConfigsServiceClientType>;
     plansServiceClient: PromisifiedClient<PlansServiceClientType>;
     paymentsServiceClient: PromisifiedClient<PaymentsServiceClientType>;
     preferencesServiceClient: PromisifiedClient<PreferencesServiceClientType>;
@@ -164,6 +167,14 @@ export const getDomainsServiceClient = () => {
   return context.get("domainsServiceClient");
 };
 
+export const getPlayerConfigsServiceClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get PlayerConfigsServiceClient");
+  }
+  return context.get("playerConfigsServiceClient");
+};
+
 export const getPlansServiceClient = () => {
   const context = tryGetContext();
   if (!context) {
@@ -218,6 +229,7 @@ export const setupServices = (app: Hono) => {
     const adTemplatesClient = new AdTemplatesServiceClient(grpcAddress(), creds);
     const videosClient = new VideosServiceClient(grpcAddress(), creds);
     const domainsClient = new DomainsServiceClient(grpcAddress(), creds);
+    const playerConfigsClient = new PlayerConfigsServiceClient(grpcAddress(), creds);
     const plansClient = new PlansServiceClient(grpcAddress(), creds);
     const paymentsClient = new PaymentsServiceClient(grpcAddress(), creds);
     const preferencesClient = new PreferencesServiceClient(grpcAddress(), creds);
@@ -230,6 +242,7 @@ export const setupServices = (app: Hono) => {
     c.set("adTemplatesServiceClient", promisifyClient(adTemplatesClient));
     c.set("videosServiceClient", promisifyClient(videosClient));
     c.set("domainsServiceClient", promisifyClient(domainsClient));
+    c.set("playerConfigsServiceClient", promisifyClient(playerConfigsClient));
     c.set("plansServiceClient", promisifyClient(plansClient));
     c.set("paymentsServiceClient", promisifyClient(paymentsClient));
     c.set("preferencesServiceClient", promisifyClient(preferencesClient));

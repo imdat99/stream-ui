@@ -35,6 +35,7 @@ export interface RegisterRequest {
   username?: string | undefined;
   email?: string | undefined;
   password?: string | undefined;
+  refUsername?: string | undefined;
 }
 
 export interface RegisterResponse {
@@ -67,6 +68,7 @@ export interface GetGoogleLoginUrlResponse {
 
 export interface CompleteGoogleLoginRequest {
   code?: string | undefined;
+  refUsername?: string | undefined;
 }
 
 export interface CompleteGoogleLoginResponse {
@@ -208,7 +210,7 @@ export const LoginResponse: MessageFns<LoginResponse> = {
 };
 
 function createBaseRegisterRequest(): RegisterRequest {
-  return { username: "", email: "", password: "" };
+  return { username: "", email: "", password: "", refUsername: undefined };
 }
 
 export const RegisterRequest: MessageFns<RegisterRequest> = {
@@ -221,6 +223,9 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     }
     if (message.password !== undefined && message.password !== "") {
       writer.uint32(26).string(message.password);
+    }
+    if (message.refUsername !== undefined) {
+      writer.uint32(34).string(message.refUsername);
     }
     return writer;
   },
@@ -256,6 +261,14 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
           message.password = reader.string();
           continue;
         }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.refUsername = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -270,6 +283,11 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
       username: isSet(object.username) ? globalThis.String(object.username) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       password: isSet(object.password) ? globalThis.String(object.password) : "",
+      refUsername: isSet(object.refUsername)
+        ? globalThis.String(object.refUsername)
+        : isSet(object.ref_username)
+        ? globalThis.String(object.ref_username)
+        : undefined,
     };
   },
 
@@ -284,6 +302,9 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     if (message.password !== undefined && message.password !== "") {
       obj.password = message.password;
     }
+    if (message.refUsername !== undefined) {
+      obj.refUsername = message.refUsername;
+    }
     return obj;
   },
 
@@ -295,6 +316,7 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     message.username = object.username ?? "";
     message.email = object.email ?? "";
     message.password = object.password ?? "";
+    message.refUsername = object.refUsername ?? undefined;
     return message;
   },
 };
@@ -724,13 +746,16 @@ export const GetGoogleLoginUrlResponse: MessageFns<GetGoogleLoginUrlResponse> = 
 };
 
 function createBaseCompleteGoogleLoginRequest(): CompleteGoogleLoginRequest {
-  return { code: "" };
+  return { code: "", refUsername: undefined };
 }
 
 export const CompleteGoogleLoginRequest: MessageFns<CompleteGoogleLoginRequest> = {
   encode(message: CompleteGoogleLoginRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.code !== undefined && message.code !== "") {
       writer.uint32(10).string(message.code);
+    }
+    if (message.refUsername !== undefined) {
+      writer.uint32(18).string(message.refUsername);
     }
     return writer;
   },
@@ -750,6 +775,14 @@ export const CompleteGoogleLoginRequest: MessageFns<CompleteGoogleLoginRequest> 
           message.code = reader.string();
           continue;
         }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.refUsername = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -760,13 +793,23 @@ export const CompleteGoogleLoginRequest: MessageFns<CompleteGoogleLoginRequest> 
   },
 
   fromJSON(object: any): CompleteGoogleLoginRequest {
-    return { code: isSet(object.code) ? globalThis.String(object.code) : "" };
+    return {
+      code: isSet(object.code) ? globalThis.String(object.code) : "",
+      refUsername: isSet(object.refUsername)
+        ? globalThis.String(object.refUsername)
+        : isSet(object.ref_username)
+        ? globalThis.String(object.ref_username)
+        : undefined,
+    };
   },
 
   toJSON(message: CompleteGoogleLoginRequest): unknown {
     const obj: any = {};
     if (message.code !== undefined && message.code !== "") {
       obj.code = message.code;
+    }
+    if (message.refUsername !== undefined) {
+      obj.refUsername = message.refUsername;
     }
     return obj;
   },
@@ -777,6 +820,7 @@ export const CompleteGoogleLoginRequest: MessageFns<CompleteGoogleLoginRequest> 
   fromPartial<I extends Exact<DeepPartial<CompleteGoogleLoginRequest>, I>>(object: I): CompleteGoogleLoginRequest {
     const message = createBaseCompleteGoogleLoginRequest();
     message.code = object.code ?? "";
+    message.refUsername = object.refUsername ?? undefined;
     return message;
   },
 };

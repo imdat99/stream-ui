@@ -8,17 +8,35 @@ import NameGradient from './components/NameGradient.vue';
 import QuickActions from './components/QuickActions.vue';
 import RecentVideos from './components/RecentVideos.vue';
 import StatsOverview from './components/StatsOverview.vue';
-
+import type { StatProps } from '@/components/dashboard/StatsCard.vue';
+import { formatBytes, isAdmin } from '@/lib/utils';
+import { useTranslation } from 'i18next-vue';
+import { useAuthStore } from '@/stores/auth';
+const AdminOverview = defineAsyncComponent(() => import('./components/AdminOverview.vue'));
+const {t} = useTranslation()
+const auth = useAuthStore();
 const recentVideosLoading = ref(true);
 const recentVideos = ref<ModelVideo[]>([]);
-const { data: usageSnapshot, isPending: isUsagePending } = useUsageQuery();
+const { data: usageSnapshot, isPending: isUsagePending, refresh } = useUsageQuery();
 
-const stats = computed(() => ({
-    totalVideos: usageSnapshot.value?.totalVideos ?? 0,
-    totalViews: recentVideos.value.reduce((sum, v: any) => sum + (v.views || 0), 0),
-    storageUsed: usageSnapshot.value?.totalStorage ?? 0,
-    storageLimit: 10737418240,
-}));
+const stats = computed<StatProps[]>(() => [
+    {
+        title: 'overview.stats.totalVideos',
+        value: usageSnapshot.value?.totalVideos ?? 0,
+        trend: { value: 12, isPositive: true }
+    },
+    {
+        title: 'overview.stats.totalViews',
+        value: recentVideos.value.reduce((sum, v: any) => sum + (v.views || 0), 0),
+        trend: { value: 8, isPositive: true }
+    },
+    {
+        title: 'overview.stats.storageUsed',
+        value: `${formatBytes(usageSnapshot.value?.totalStorage ?? 0)} / ${t('overview.stats.unlimited')}`,
+        color: 'warning',
+        trend: { value: 5, isPositive: false }
+    }
+]);
 const statsLoading = computed(() => recentVideosLoading.value || (isUsagePending.value && !usageSnapshot.value));
 
 const fetchDashboardData = async () => {
@@ -34,6 +52,7 @@ const fetchDashboardData = async () => {
 };
 
 onMounted(() => {
+    refresh();
     fetchDashboardData();
 });
 </script>
@@ -44,12 +63,12 @@ onMounted(() => {
             { label: $t('pageHeader.dashboard') }
         ]" />
 
-        <StatsOverview :loading="statsLoading" :stats="stats" />
-
-        <QuickActions :loading="recentVideosLoading" />
-
-        <RecentVideos :loading="recentVideosLoading" :videos="recentVideos" />
-
+        <AdminOverview v-if="isAdmin(auth.user?.role)" />
+        <template v-else>
+            <StatsOverview :loading="statsLoading" :stats="stats" />
+            <QuickActions :loading="recentVideosLoading" />
+            <RecentVideos :loading="recentVideosLoading" :videos="recentVideos" />
+        </template>
         <!-- <StorageUsage :loading="loading" :stats="stats" /> -->
     </div>
 </template>

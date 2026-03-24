@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+
 type UiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type UiButtonSize = 'sm' | 'md' | 'lg';
+
 const props = withDefaults(
   defineProps<{
     variant?: UiButtonVariant;
     size?: UiButtonSize;
     block?: boolean;
     disabled?: boolean;
+    loading?: boolean;
     type?: 'button' | 'submit' | 'reset';
   }>(),
   {
@@ -15,9 +18,12 @@ const props = withDefaults(
     size: 'md',
     block: false,
     disabled: false,
+    loading: false,
     type: 'button',
   },
 );
+
+const isDisabled = computed(() => props.disabled || props.loading);
 
 const classes = computed(() => {
   const variants: Record<UiButtonVariant, string> = {
@@ -34,7 +40,7 @@ const classes = computed(() => {
   };
 
   return [
-    'inline-flex items-center justify-center gap-2 rounded-md border font-medium whitespace-nowrap shadow-primer outline-none transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out active:translate-y-[0.5px] hover:shadow-[0_2px_0_rgba(27,31,36,0.06)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:ring-4',
+    'inline-flex items-center justify-center gap-2 rounded-md border font-medium whitespace-nowrap shadow-primer outline-none transition-[transform,box-shadow,background-color,border-color,color,opacity] duration-150 ease-out active:translate-y-[0.5px] hover:shadow-[0_2px_0_rgba(27,31,36,0.06)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:ring-4',
     variants[props.variant],
     sizes[props.size],
     props.block ? 'w-full' : '',
@@ -43,7 +49,13 @@ const classes = computed(() => {
 </script>
 
 <template>
-  <button :type="type" :disabled="disabled" :class="classes">
+  <button :type="type" :disabled="isDisabled" :class="classes" :aria-busy="loading || undefined">
+    <span
+      v-if="loading"
+      class="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-r-transparent"
+      aria-hidden="true"
+    />
+    <slot v-else name="icon" />
     <slot />
   </button>
 </template>

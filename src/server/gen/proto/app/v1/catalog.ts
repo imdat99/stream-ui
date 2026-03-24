@@ -18,7 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-import { AdTemplate, Domain, MessageResponse, Plan } from "./common";
+import { AdTemplate, Domain, MessageResponse, Plan, PlayerConfig } from "./common";
 
 export const protobufPackage = "stream.app.v1";
 
@@ -78,6 +78,58 @@ export interface UpdateAdTemplateResponse {
 }
 
 export interface DeleteAdTemplateRequest {
+  id?: string | undefined;
+}
+
+export interface ListPlayerConfigsRequest {
+}
+
+export interface ListPlayerConfigsResponse {
+  configs?: PlayerConfig[] | undefined;
+}
+
+export interface CreatePlayerConfigRequest {
+  name?: string | undefined;
+  description?: string | undefined;
+  autoplay?: boolean | undefined;
+  loop?: boolean | undefined;
+  muted?: boolean | undefined;
+  showControls?: boolean | undefined;
+  pip?: boolean | undefined;
+  airplay?: boolean | undefined;
+  chromecast?: boolean | undefined;
+  isActive?: boolean | undefined;
+  isDefault?: boolean | undefined;
+  encrytionM3u8?: boolean | undefined;
+  logoUrl?: string | undefined;
+}
+
+export interface CreatePlayerConfigResponse {
+  config?: PlayerConfig | undefined;
+}
+
+export interface UpdatePlayerConfigRequest {
+  id?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
+  autoplay?: boolean | undefined;
+  loop?: boolean | undefined;
+  muted?: boolean | undefined;
+  showControls?: boolean | undefined;
+  pip?: boolean | undefined;
+  airplay?: boolean | undefined;
+  chromecast?: boolean | undefined;
+  isActive?: boolean | undefined;
+  isDefault?: boolean | undefined;
+  encrytionM3u8?: boolean | undefined;
+  logoUrl?: string | undefined;
+}
+
+export interface UpdatePlayerConfigResponse {
+  config?: PlayerConfig | undefined;
+}
+
+export interface DeletePlayerConfigRequest {
   id?: string | undefined;
 }
 
@@ -1037,6 +1089,883 @@ export const DeleteAdTemplateRequest: MessageFns<DeleteAdTemplateRequest> = {
   },
 };
 
+function createBaseListPlayerConfigsRequest(): ListPlayerConfigsRequest {
+  return {};
+}
+
+export const ListPlayerConfigsRequest: MessageFns<ListPlayerConfigsRequest> = {
+  encode(_: ListPlayerConfigsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListPlayerConfigsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListPlayerConfigsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): ListPlayerConfigsRequest {
+    return {};
+  },
+
+  toJSON(_: ListPlayerConfigsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListPlayerConfigsRequest>, I>>(base?: I): ListPlayerConfigsRequest {
+    return ListPlayerConfigsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListPlayerConfigsRequest>, I>>(_: I): ListPlayerConfigsRequest {
+    const message = createBaseListPlayerConfigsRequest();
+    return message;
+  },
+};
+
+function createBaseListPlayerConfigsResponse(): ListPlayerConfigsResponse {
+  return { configs: [] };
+}
+
+export const ListPlayerConfigsResponse: MessageFns<ListPlayerConfigsResponse> = {
+  encode(message: ListPlayerConfigsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.configs !== undefined && message.configs.length !== 0) {
+      for (const v of message.configs) {
+        PlayerConfig.encode(v!, writer.uint32(10).fork()).join();
+      }
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListPlayerConfigsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListPlayerConfigsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          const el = PlayerConfig.decode(reader, reader.uint32());
+          if (el !== undefined) {
+            message.configs!.push(el);
+          }
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListPlayerConfigsResponse {
+    return {
+      configs: globalThis.Array.isArray(object?.configs)
+        ? object.configs.map((e: any) => PlayerConfig.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ListPlayerConfigsResponse): unknown {
+    const obj: any = {};
+    if (message.configs?.length) {
+      obj.configs = message.configs.map((e) => PlayerConfig.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListPlayerConfigsResponse>, I>>(base?: I): ListPlayerConfigsResponse {
+    return ListPlayerConfigsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListPlayerConfigsResponse>, I>>(object: I): ListPlayerConfigsResponse {
+    const message = createBaseListPlayerConfigsResponse();
+    message.configs = object.configs?.map((e) => PlayerConfig.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseCreatePlayerConfigRequest(): CreatePlayerConfigRequest {
+  return {
+    name: "",
+    description: undefined,
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: false,
+    pip: false,
+    airplay: false,
+    chromecast: false,
+    isActive: undefined,
+    isDefault: undefined,
+    encrytionM3u8: undefined,
+    logoUrl: undefined,
+  };
+}
+
+export const CreatePlayerConfigRequest: MessageFns<CreatePlayerConfigRequest> = {
+  encode(message: CreatePlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== undefined && message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(18).string(message.description);
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      writer.uint32(24).bool(message.autoplay);
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      writer.uint32(32).bool(message.loop);
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      writer.uint32(40).bool(message.muted);
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      writer.uint32(48).bool(message.showControls);
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      writer.uint32(56).bool(message.pip);
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      writer.uint32(64).bool(message.airplay);
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      writer.uint32(72).bool(message.chromecast);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(80).bool(message.isActive);
+    }
+    if (message.isDefault !== undefined) {
+      writer.uint32(88).bool(message.isDefault);
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      writer.uint32(96).bool(message.encrytionM3u8);
+    }
+    if (message.logoUrl !== undefined) {
+      writer.uint32(106).string(message.logoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreatePlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreatePlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.autoplay = reader.bool();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.loop = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.muted = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.showControls = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.pip = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.airplay = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.chromecast = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.isDefault = reader.bool();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.encrytionM3u8 = reader.bool();
+          continue;
+        }
+        case 13: {
+          if (tag !== 106) {
+            break;
+          }
+
+          message.logoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreatePlayerConfigRequest {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      autoplay: isSet(object.autoplay) ? globalThis.Boolean(object.autoplay) : false,
+      loop: isSet(object.loop) ? globalThis.Boolean(object.loop) : false,
+      muted: isSet(object.muted) ? globalThis.Boolean(object.muted) : false,
+      showControls: isSet(object.showControls)
+        ? globalThis.Boolean(object.showControls)
+        : isSet(object.show_controls)
+        ? globalThis.Boolean(object.show_controls)
+        : false,
+      pip: isSet(object.pip) ? globalThis.Boolean(object.pip) : false,
+      airplay: isSet(object.airplay) ? globalThis.Boolean(object.airplay) : false,
+      chromecast: isSet(object.chromecast) ? globalThis.Boolean(object.chromecast) : false,
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      isDefault: isSet(object.isDefault)
+        ? globalThis.Boolean(object.isDefault)
+        : isSet(object.is_default)
+        ? globalThis.Boolean(object.is_default)
+        : undefined,
+      encrytionM3u8: isSet(object.encrytionM3u8)
+        ? globalThis.Boolean(object.encrytionM3u8)
+        : isSet(object.encrytion_m3u8)
+        ? globalThis.Boolean(object.encrytion_m3u8)
+        : undefined,
+      logoUrl: isSet(object.logoUrl)
+        ? globalThis.String(object.logoUrl)
+        : isSet(object.logo_url)
+        ? globalThis.String(object.logo_url)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CreatePlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.name !== undefined && message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      obj.autoplay = message.autoplay;
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      obj.loop = message.loop;
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      obj.muted = message.muted;
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      obj.showControls = message.showControls;
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      obj.pip = message.pip;
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      obj.airplay = message.airplay;
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      obj.chromecast = message.chromecast;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.isDefault !== undefined) {
+      obj.isDefault = message.isDefault;
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      obj.encrytionM3u8 = message.encrytionM3u8;
+    }
+    if (message.logoUrl !== undefined) {
+      obj.logoUrl = message.logoUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreatePlayerConfigRequest>, I>>(base?: I): CreatePlayerConfigRequest {
+    return CreatePlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreatePlayerConfigRequest>, I>>(object: I): CreatePlayerConfigRequest {
+    const message = createBaseCreatePlayerConfigRequest();
+    message.name = object.name ?? "";
+    message.description = object.description ?? undefined;
+    message.autoplay = object.autoplay ?? false;
+    message.loop = object.loop ?? false;
+    message.muted = object.muted ?? false;
+    message.showControls = object.showControls ?? false;
+    message.pip = object.pip ?? false;
+    message.airplay = object.airplay ?? false;
+    message.chromecast = object.chromecast ?? false;
+    message.isActive = object.isActive ?? undefined;
+    message.isDefault = object.isDefault ?? undefined;
+    message.encrytionM3u8 = object.encrytionM3u8 ?? undefined;
+    message.logoUrl = object.logoUrl ?? undefined;
+    return message;
+  },
+};
+
+function createBaseCreatePlayerConfigResponse(): CreatePlayerConfigResponse {
+  return { config: undefined };
+}
+
+export const CreatePlayerConfigResponse: MessageFns<CreatePlayerConfigResponse> = {
+  encode(message: CreatePlayerConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.config !== undefined) {
+      PlayerConfig.encode(message.config, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreatePlayerConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreatePlayerConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.config = PlayerConfig.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreatePlayerConfigResponse {
+    return { config: isSet(object.config) ? PlayerConfig.fromJSON(object.config) : undefined };
+  },
+
+  toJSON(message: CreatePlayerConfigResponse): unknown {
+    const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = PlayerConfig.toJSON(message.config);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreatePlayerConfigResponse>, I>>(base?: I): CreatePlayerConfigResponse {
+    return CreatePlayerConfigResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreatePlayerConfigResponse>, I>>(object: I): CreatePlayerConfigResponse {
+    const message = createBaseCreatePlayerConfigResponse();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? PlayerConfig.fromPartial(object.config)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdatePlayerConfigRequest(): UpdatePlayerConfigRequest {
+  return {
+    id: "",
+    name: "",
+    description: undefined,
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: false,
+    pip: false,
+    airplay: false,
+    chromecast: false,
+    isActive: undefined,
+    isDefault: undefined,
+    encrytionM3u8: undefined,
+    logoUrl: undefined,
+  };
+}
+
+export const UpdatePlayerConfigRequest: MessageFns<UpdatePlayerConfigRequest> = {
+  encode(message: UpdatePlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== undefined && message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      writer.uint32(32).bool(message.autoplay);
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      writer.uint32(40).bool(message.loop);
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      writer.uint32(48).bool(message.muted);
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      writer.uint32(56).bool(message.showControls);
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      writer.uint32(64).bool(message.pip);
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      writer.uint32(72).bool(message.airplay);
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      writer.uint32(80).bool(message.chromecast);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(88).bool(message.isActive);
+    }
+    if (message.isDefault !== undefined) {
+      writer.uint32(96).bool(message.isDefault);
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      writer.uint32(104).bool(message.encrytionM3u8);
+    }
+    if (message.logoUrl !== undefined) {
+      writer.uint32(114).string(message.logoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdatePlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.autoplay = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.loop = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.muted = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.showControls = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.pip = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.airplay = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.chromecast = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.isDefault = reader.bool();
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.encrytionM3u8 = reader.bool();
+          continue;
+        }
+        case 14: {
+          if (tag !== 114) {
+            break;
+          }
+
+          message.logoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePlayerConfigRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      autoplay: isSet(object.autoplay) ? globalThis.Boolean(object.autoplay) : false,
+      loop: isSet(object.loop) ? globalThis.Boolean(object.loop) : false,
+      muted: isSet(object.muted) ? globalThis.Boolean(object.muted) : false,
+      showControls: isSet(object.showControls)
+        ? globalThis.Boolean(object.showControls)
+        : isSet(object.show_controls)
+        ? globalThis.Boolean(object.show_controls)
+        : false,
+      pip: isSet(object.pip) ? globalThis.Boolean(object.pip) : false,
+      airplay: isSet(object.airplay) ? globalThis.Boolean(object.airplay) : false,
+      chromecast: isSet(object.chromecast) ? globalThis.Boolean(object.chromecast) : false,
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      isDefault: isSet(object.isDefault)
+        ? globalThis.Boolean(object.isDefault)
+        : isSet(object.is_default)
+        ? globalThis.Boolean(object.is_default)
+        : undefined,
+      encrytionM3u8: isSet(object.encrytionM3u8)
+        ? globalThis.Boolean(object.encrytionM3u8)
+        : isSet(object.encrytion_m3u8)
+        ? globalThis.Boolean(object.encrytion_m3u8)
+        : undefined,
+      logoUrl: isSet(object.logoUrl)
+        ? globalThis.String(object.logoUrl)
+        : isSet(object.logo_url)
+        ? globalThis.String(object.logo_url)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdatePlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== undefined && message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      obj.autoplay = message.autoplay;
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      obj.loop = message.loop;
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      obj.muted = message.muted;
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      obj.showControls = message.showControls;
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      obj.pip = message.pip;
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      obj.airplay = message.airplay;
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      obj.chromecast = message.chromecast;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.isDefault !== undefined) {
+      obj.isDefault = message.isDefault;
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      obj.encrytionM3u8 = message.encrytionM3u8;
+    }
+    if (message.logoUrl !== undefined) {
+      obj.logoUrl = message.logoUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePlayerConfigRequest>, I>>(base?: I): UpdatePlayerConfigRequest {
+    return UpdatePlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePlayerConfigRequest>, I>>(object: I): UpdatePlayerConfigRequest {
+    const message = createBaseUpdatePlayerConfigRequest();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.description = object.description ?? undefined;
+    message.autoplay = object.autoplay ?? false;
+    message.loop = object.loop ?? false;
+    message.muted = object.muted ?? false;
+    message.showControls = object.showControls ?? false;
+    message.pip = object.pip ?? false;
+    message.airplay = object.airplay ?? false;
+    message.chromecast = object.chromecast ?? false;
+    message.isActive = object.isActive ?? undefined;
+    message.isDefault = object.isDefault ?? undefined;
+    message.encrytionM3u8 = object.encrytionM3u8 ?? undefined;
+    message.logoUrl = object.logoUrl ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdatePlayerConfigResponse(): UpdatePlayerConfigResponse {
+  return { config: undefined };
+}
+
+export const UpdatePlayerConfigResponse: MessageFns<UpdatePlayerConfigResponse> = {
+  encode(message: UpdatePlayerConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.config !== undefined) {
+      PlayerConfig.encode(message.config, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdatePlayerConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePlayerConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.config = PlayerConfig.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePlayerConfigResponse {
+    return { config: isSet(object.config) ? PlayerConfig.fromJSON(object.config) : undefined };
+  },
+
+  toJSON(message: UpdatePlayerConfigResponse): unknown {
+    const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = PlayerConfig.toJSON(message.config);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePlayerConfigResponse>, I>>(base?: I): UpdatePlayerConfigResponse {
+    return UpdatePlayerConfigResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePlayerConfigResponse>, I>>(object: I): UpdatePlayerConfigResponse {
+    const message = createBaseUpdatePlayerConfigResponse();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? PlayerConfig.fromPartial(object.config)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDeletePlayerConfigRequest(): DeletePlayerConfigRequest {
+  return { id: "" };
+}
+
+export const DeletePlayerConfigRequest: MessageFns<DeletePlayerConfigRequest> = {
+  encode(message: DeletePlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeletePlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeletePlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeletePlayerConfigRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeletePlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeletePlayerConfigRequest>, I>>(base?: I): DeletePlayerConfigRequest {
+    return DeletePlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeletePlayerConfigRequest>, I>>(object: I): DeletePlayerConfigRequest {
+    const message = createBaseDeletePlayerConfigRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
 function createBaseListPlansRequest(): ListPlansRequest {
   return {};
 }
@@ -1361,6 +2290,132 @@ export const AdTemplatesServiceClient = makeGenericClientConstructor(
 ) as unknown as {
   new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AdTemplatesServiceClient;
   service: typeof AdTemplatesServiceService;
+  serviceName: string;
+};
+
+export type PlayerConfigsServiceService = typeof PlayerConfigsServiceService;
+export const PlayerConfigsServiceService = {
+  listPlayerConfigs: {
+    path: "/stream.app.v1.PlayerConfigsService/ListPlayerConfigs",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ListPlayerConfigsRequest): Buffer =>
+      Buffer.from(ListPlayerConfigsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListPlayerConfigsRequest => ListPlayerConfigsRequest.decode(value),
+    responseSerialize: (value: ListPlayerConfigsResponse): Buffer =>
+      Buffer.from(ListPlayerConfigsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ListPlayerConfigsResponse => ListPlayerConfigsResponse.decode(value),
+  },
+  createPlayerConfig: {
+    path: "/stream.app.v1.PlayerConfigsService/CreatePlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CreatePlayerConfigRequest): Buffer =>
+      Buffer.from(CreatePlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreatePlayerConfigRequest => CreatePlayerConfigRequest.decode(value),
+    responseSerialize: (value: CreatePlayerConfigResponse): Buffer =>
+      Buffer.from(CreatePlayerConfigResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CreatePlayerConfigResponse => CreatePlayerConfigResponse.decode(value),
+  },
+  updatePlayerConfig: {
+    path: "/stream.app.v1.PlayerConfigsService/UpdatePlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdatePlayerConfigRequest): Buffer =>
+      Buffer.from(UpdatePlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdatePlayerConfigRequest => UpdatePlayerConfigRequest.decode(value),
+    responseSerialize: (value: UpdatePlayerConfigResponse): Buffer =>
+      Buffer.from(UpdatePlayerConfigResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UpdatePlayerConfigResponse => UpdatePlayerConfigResponse.decode(value),
+  },
+  deletePlayerConfig: {
+    path: "/stream.app.v1.PlayerConfigsService/DeletePlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: DeletePlayerConfigRequest): Buffer =>
+      Buffer.from(DeletePlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeletePlayerConfigRequest => DeletePlayerConfigRequest.decode(value),
+    responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
+  },
+} as const;
+
+export interface PlayerConfigsServiceServer extends UntypedServiceImplementation {
+  listPlayerConfigs: handleUnaryCall<ListPlayerConfigsRequest, ListPlayerConfigsResponse>;
+  createPlayerConfig: handleUnaryCall<CreatePlayerConfigRequest, CreatePlayerConfigResponse>;
+  updatePlayerConfig: handleUnaryCall<UpdatePlayerConfigRequest, UpdatePlayerConfigResponse>;
+  deletePlayerConfig: handleUnaryCall<DeletePlayerConfigRequest, MessageResponse>;
+}
+
+export interface PlayerConfigsServiceClient extends Client {
+  listPlayerConfigs(
+    request: ListPlayerConfigsRequest,
+    callback: (error: ServiceError | null, response: ListPlayerConfigsResponse) => void,
+  ): ClientUnaryCall;
+  listPlayerConfigs(
+    request: ListPlayerConfigsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListPlayerConfigsResponse) => void,
+  ): ClientUnaryCall;
+  listPlayerConfigs(
+    request: ListPlayerConfigsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListPlayerConfigsResponse) => void,
+  ): ClientUnaryCall;
+  createPlayerConfig(
+    request: CreatePlayerConfigRequest,
+    callback: (error: ServiceError | null, response: CreatePlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  createPlayerConfig(
+    request: CreatePlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: CreatePlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  createPlayerConfig(
+    request: CreatePlayerConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: CreatePlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  updatePlayerConfig(
+    request: UpdatePlayerConfigRequest,
+    callback: (error: ServiceError | null, response: UpdatePlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  updatePlayerConfig(
+    request: UpdatePlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdatePlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  updatePlayerConfig(
+    request: UpdatePlayerConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdatePlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  deletePlayerConfig(
+    request: DeletePlayerConfigRequest,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deletePlayerConfig(
+    request: DeletePlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deletePlayerConfig(
+    request: DeletePlayerConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+}
+
+export const PlayerConfigsServiceClient = makeGenericClientConstructor(
+  PlayerConfigsServiceService,
+  "stream.app.v1.PlayerConfigsService",
+) as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PlayerConfigsServiceClient;
+  service: typeof PlayerConfigsServiceService;
   serviceName: string;
 };
 

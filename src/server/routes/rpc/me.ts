@@ -139,6 +139,67 @@ export const meMethods = {
     const metadata = context.get("grpcMetadata");
     return await adTemplatesClient.deleteAdTemplate(data, metadata);
   }),
+  listPlayerConfigs: async () => {
+    const context = getContext();
+    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await playerConfigsClient.listPlayerConfigs({}, metadata);
+  },
+  createPlayerConfig: validateFn(
+    z.object({
+      name: z.string().trim().min(1),
+      description: z.string().optional(),
+      autoplay: z.boolean().optional(),
+      loop: z.boolean().optional(),
+      muted: z.boolean().optional(),
+      showControls: z.boolean().optional(),
+      pip: z.boolean().optional(),
+      airplay: z.boolean().optional(),
+      chromecast: z.boolean().optional(),
+      encrytionM3u8: z.boolean().optional(),
+      logoUrl: z.string().trim().optional(),
+      isActive: z.boolean().optional(),
+      isDefault: z.boolean().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await playerConfigsClient.createPlayerConfig(data, metadata);
+  }),
+  updatePlayerConfig: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: z.string().optional(),
+      autoplay: z.boolean().optional(),
+      loop: z.boolean().optional(),
+      muted: z.boolean().optional(),
+      showControls: z.boolean().optional(),
+      pip: z.boolean().optional(),
+      airplay: z.boolean().optional(),
+      chromecast: z.boolean().optional(),
+      encrytionM3u8: z.boolean().optional(),
+      logoUrl: z.string().trim().optional(),
+      isActive: z.boolean().optional(),
+      isDefault: z.boolean().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await playerConfigsClient.updatePlayerConfig(data, metadata);
+  }),
+  deletePlayerConfig: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await playerConfigsClient.deletePlayerConfig(data, metadata);
+  }),
   getPreferences: async () => {
     const context = getContext();
     const preferencesClient = context.get("preferencesServiceClient");
@@ -151,13 +212,8 @@ export const meMethods = {
       pushNotifications: z.boolean().optional(),
       marketingNotifications: z.boolean().optional(),
       telegramNotifications: z.boolean().optional(),
-      autoplay: z.boolean().optional(),
-      loop: z.boolean().optional(),
-      muted: z.boolean().optional(),
-      showControls: z.boolean().optional(),
-      pip: z.boolean().optional(),
-      airplay: z.boolean().optional(),
-      chromecast: z.boolean().optional(),
+      language: z.string().optional(),
+      locale: z.string().optional(),
     }),
   )(async (data) => {
     const context = getContext();

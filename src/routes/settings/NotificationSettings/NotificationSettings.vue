@@ -65,10 +65,6 @@ const notificationTypes = computed(() => [
 const isInitialLoading = computed(() => isPending.value && !preferencesSnapshot.value);
 const isInteractionDisabled = computed(() => saving.value || isInitialLoading.value || !preferencesSnapshot.value);
 
-const refetchPreferences = () => refetch((fetchError) => {
-    throw fetchError;
-});
-
 watch(preferencesSnapshot, (snapshot) => {
     if (!snapshot) return;
     notificationSettings.value = createNotificationSettingsDraft(snapshot);
@@ -93,7 +89,7 @@ const handleSave = async () => {
         await rpcClient.updatePreferences(
             toNotificationPreferencesPayload(notificationSettings.value),
         );
-        await refetchPreferences();
+        await refetch();
 
         toast.add({
             severity: 'success',

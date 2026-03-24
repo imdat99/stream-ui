@@ -31,6 +31,7 @@ export interface User {
   walletBalance?: number | undefined;
   language?: string | undefined;
   locale?: string | undefined;
+  telegramId?: string | undefined;
   createdAt?: string | undefined;
   updatedAt?: string | undefined;
 }
@@ -80,6 +81,46 @@ export interface AdTemplate {
   isDefault?: boolean | undefined;
   createdAt?: string | undefined;
   updatedAt?: string | undefined;
+}
+
+export interface PlayerConfig {
+  id?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
+  autoplay?: boolean | undefined;
+  loop?: boolean | undefined;
+  muted?: boolean | undefined;
+  showControls?: boolean | undefined;
+  pip?: boolean | undefined;
+  airplay?: boolean | undefined;
+  chromecast?: boolean | undefined;
+  isActive?: boolean | undefined;
+  isDefault?: boolean | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+  encrytionM3u8?: boolean | undefined;
+  logoUrl?: string | undefined;
+}
+
+export interface AdminPlayerConfig {
+  id?: string | undefined;
+  userId?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
+  autoplay?: boolean | undefined;
+  loop?: boolean | undefined;
+  muted?: boolean | undefined;
+  showControls?: boolean | undefined;
+  pip?: boolean | undefined;
+  airplay?: boolean | undefined;
+  chromecast?: boolean | undefined;
+  isActive?: boolean | undefined;
+  isDefault?: boolean | undefined;
+  ownerEmail?: string | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+  encrytionM3u8?: boolean | undefined;
+  logoUrl?: string | undefined;
 }
 
 export interface Plan {
@@ -198,9 +239,28 @@ export interface AdminUser {
   updatedAt?: string | undefined;
 }
 
+export interface ReferralUserSummary {
+  id?: string | undefined;
+  email?: string | undefined;
+  username?: string | undefined;
+}
+
+export interface AdminUserReferralInfo {
+  referrer?: ReferralUserSummary | undefined;
+  referralEligible?: boolean | undefined;
+  effectiveRewardPercent?: number | undefined;
+  rewardOverridePercent?: number | undefined;
+  shareLink?: string | undefined;
+  rewardGranted?: boolean | undefined;
+  rewardGrantedAt?: string | undefined;
+  rewardPaymentId?: string | undefined;
+  rewardAmount?: number | undefined;
+}
+
 export interface AdminUserDetail {
   user?: AdminUser | undefined;
   subscription?: PlanSubscription | undefined;
+  referral?: AdminUserReferralInfo | undefined;
 }
 
 export interface AdminVideo {
@@ -389,6 +449,7 @@ function createBaseUser(): User {
     walletBalance: 0,
     language: "",
     locale: "",
+    telegramId: "",
     createdAt: undefined,
     updatedAt: undefined,
   };
@@ -444,11 +505,14 @@ export const User: MessageFns<User> = {
     if (message.locale !== undefined && message.locale !== "") {
       writer.uint32(130).string(message.locale);
     }
+    if (message.telegramId !== undefined && message.telegramId !== "") {
+      writer.uint32(138).string(message.telegramId);
+    }
     if (message.createdAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(138).fork()).join();
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(146).fork()).join();
     }
     if (message.updatedAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(146).fork()).join();
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(154).fork()).join();
     }
     return writer;
   },
@@ -593,11 +657,19 @@ export const User: MessageFns<User> = {
             break;
           }
 
-          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          message.telegramId = reader.string();
           continue;
         }
         case 18: {
           if (tag !== 146) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 19: {
+          if (tag !== 154) {
             break;
           }
 
@@ -667,6 +739,11 @@ export const User: MessageFns<User> = {
         : 0,
       language: isSet(object.language) ? globalThis.String(object.language) : "",
       locale: isSet(object.locale) ? globalThis.String(object.locale) : "",
+      telegramId: isSet(object.telegramId)
+        ? globalThis.String(object.telegramId)
+        : isSet(object.telegram_id)
+        ? globalThis.String(object.telegram_id)
+        : "",
       createdAt: isSet(object.createdAt)
         ? globalThis.String(object.createdAt)
         : isSet(object.created_at)
@@ -730,6 +807,9 @@ export const User: MessageFns<User> = {
     if (message.locale !== undefined && message.locale !== "") {
       obj.locale = message.locale;
     }
+    if (message.telegramId !== undefined && message.telegramId !== "") {
+      obj.telegramId = message.telegramId;
+    }
     if (message.createdAt !== undefined) {
       obj.createdAt = message.createdAt;
     }
@@ -760,6 +840,7 @@ export const User: MessageFns<User> = {
     message.walletBalance = object.walletBalance ?? 0;
     message.language = object.language ?? "";
     message.locale = object.locale ?? "";
+    message.telegramId = object.telegramId ?? "";
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
     return message;
@@ -1596,6 +1677,738 @@ export const AdTemplate: MessageFns<AdTemplate> = {
     message.isDefault = object.isDefault ?? false;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
+    return message;
+  },
+};
+
+function createBasePlayerConfig(): PlayerConfig {
+  return {
+    id: "",
+    name: "",
+    description: undefined,
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: false,
+    pip: false,
+    airplay: false,
+    chromecast: false,
+    isActive: false,
+    isDefault: false,
+    createdAt: undefined,
+    updatedAt: undefined,
+    encrytionM3u8: false,
+    logoUrl: undefined,
+  };
+}
+
+export const PlayerConfig: MessageFns<PlayerConfig> = {
+  encode(message: PlayerConfig, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== undefined && message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      writer.uint32(32).bool(message.autoplay);
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      writer.uint32(40).bool(message.loop);
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      writer.uint32(48).bool(message.muted);
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      writer.uint32(56).bool(message.showControls);
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      writer.uint32(64).bool(message.pip);
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      writer.uint32(72).bool(message.airplay);
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      writer.uint32(80).bool(message.chromecast);
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      writer.uint32(88).bool(message.isActive);
+    }
+    if (message.isDefault !== undefined && message.isDefault !== false) {
+      writer.uint32(96).bool(message.isDefault);
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(106).fork()).join();
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(114).fork()).join();
+    }
+    if (message.encrytionM3u8 !== undefined && message.encrytionM3u8 !== false) {
+      writer.uint32(120).bool(message.encrytionM3u8);
+    }
+    if (message.logoUrl !== undefined) {
+      writer.uint32(130).string(message.logoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PlayerConfig {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.autoplay = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.loop = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.muted = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.showControls = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.pip = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.airplay = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.chromecast = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.isDefault = reader.bool();
+          continue;
+        }
+        case 13: {
+          if (tag !== 106) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 14: {
+          if (tag !== 114) {
+            break;
+          }
+
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 15: {
+          if (tag !== 120) {
+            break;
+          }
+
+          message.encrytionM3u8 = reader.bool();
+          continue;
+        }
+        case 16: {
+          if (tag !== 130) {
+            break;
+          }
+
+          message.logoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PlayerConfig {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      autoplay: isSet(object.autoplay) ? globalThis.Boolean(object.autoplay) : false,
+      loop: isSet(object.loop) ? globalThis.Boolean(object.loop) : false,
+      muted: isSet(object.muted) ? globalThis.Boolean(object.muted) : false,
+      showControls: isSet(object.showControls)
+        ? globalThis.Boolean(object.showControls)
+        : isSet(object.show_controls)
+        ? globalThis.Boolean(object.show_controls)
+        : false,
+      pip: isSet(object.pip) ? globalThis.Boolean(object.pip) : false,
+      airplay: isSet(object.airplay) ? globalThis.Boolean(object.airplay) : false,
+      chromecast: isSet(object.chromecast) ? globalThis.Boolean(object.chromecast) : false,
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : false,
+      isDefault: isSet(object.isDefault)
+        ? globalThis.Boolean(object.isDefault)
+        : isSet(object.is_default)
+        ? globalThis.Boolean(object.is_default)
+        : false,
+      createdAt: isSet(object.createdAt)
+        ? globalThis.String(object.createdAt)
+        : isSet(object.created_at)
+        ? globalThis.String(object.created_at)
+        : undefined,
+      updatedAt: isSet(object.updatedAt)
+        ? globalThis.String(object.updatedAt)
+        : isSet(object.updated_at)
+        ? globalThis.String(object.updated_at)
+        : undefined,
+      encrytionM3u8: isSet(object.encrytionM3u8)
+        ? globalThis.Boolean(object.encrytionM3u8)
+        : isSet(object.encrytion_m3u8)
+        ? globalThis.Boolean(object.encrytion_m3u8)
+        : false,
+      logoUrl: isSet(object.logoUrl)
+        ? globalThis.String(object.logoUrl)
+        : isSet(object.logo_url)
+        ? globalThis.String(object.logo_url)
+        : undefined,
+    };
+  },
+
+  toJSON(message: PlayerConfig): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.name !== undefined && message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      obj.autoplay = message.autoplay;
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      obj.loop = message.loop;
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      obj.muted = message.muted;
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      obj.showControls = message.showControls;
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      obj.pip = message.pip;
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      obj.airplay = message.airplay;
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      obj.chromecast = message.chromecast;
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      obj.isActive = message.isActive;
+    }
+    if (message.isDefault !== undefined && message.isDefault !== false) {
+      obj.isDefault = message.isDefault;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt;
+    }
+    if (message.encrytionM3u8 !== undefined && message.encrytionM3u8 !== false) {
+      obj.encrytionM3u8 = message.encrytionM3u8;
+    }
+    if (message.logoUrl !== undefined) {
+      obj.logoUrl = message.logoUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PlayerConfig>, I>>(base?: I): PlayerConfig {
+    return PlayerConfig.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PlayerConfig>, I>>(object: I): PlayerConfig {
+    const message = createBasePlayerConfig();
+    message.id = object.id ?? "";
+    message.name = object.name ?? "";
+    message.description = object.description ?? undefined;
+    message.autoplay = object.autoplay ?? false;
+    message.loop = object.loop ?? false;
+    message.muted = object.muted ?? false;
+    message.showControls = object.showControls ?? false;
+    message.pip = object.pip ?? false;
+    message.airplay = object.airplay ?? false;
+    message.chromecast = object.chromecast ?? false;
+    message.isActive = object.isActive ?? false;
+    message.isDefault = object.isDefault ?? false;
+    message.createdAt = object.createdAt ?? undefined;
+    message.updatedAt = object.updatedAt ?? undefined;
+    message.encrytionM3u8 = object.encrytionM3u8 ?? false;
+    message.logoUrl = object.logoUrl ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAdminPlayerConfig(): AdminPlayerConfig {
+  return {
+    id: "",
+    userId: "",
+    name: "",
+    description: undefined,
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: false,
+    pip: false,
+    airplay: false,
+    chromecast: false,
+    isActive: false,
+    isDefault: false,
+    ownerEmail: undefined,
+    createdAt: undefined,
+    updatedAt: undefined,
+    encrytionM3u8: false,
+    logoUrl: undefined,
+  };
+}
+
+export const AdminPlayerConfig: MessageFns<AdminPlayerConfig> = {
+  encode(message: AdminPlayerConfig, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      writer.uint32(18).string(message.userId);
+    }
+    if (message.name !== undefined && message.name !== "") {
+      writer.uint32(26).string(message.name);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(34).string(message.description);
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      writer.uint32(40).bool(message.autoplay);
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      writer.uint32(48).bool(message.loop);
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      writer.uint32(56).bool(message.muted);
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      writer.uint32(64).bool(message.showControls);
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      writer.uint32(72).bool(message.pip);
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      writer.uint32(80).bool(message.airplay);
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      writer.uint32(88).bool(message.chromecast);
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      writer.uint32(96).bool(message.isActive);
+    }
+    if (message.isDefault !== undefined && message.isDefault !== false) {
+      writer.uint32(104).bool(message.isDefault);
+    }
+    if (message.ownerEmail !== undefined) {
+      writer.uint32(114).string(message.ownerEmail);
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(122).fork()).join();
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(130).fork()).join();
+    }
+    if (message.encrytionM3u8 !== undefined && message.encrytionM3u8 !== false) {
+      writer.uint32(136).bool(message.encrytionM3u8);
+    }
+    if (message.logoUrl !== undefined) {
+      writer.uint32(146).string(message.logoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminPlayerConfig {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminPlayerConfig();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.autoplay = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.loop = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.muted = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.showControls = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.pip = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.airplay = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.chromecast = reader.bool();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.isDefault = reader.bool();
+          continue;
+        }
+        case 14: {
+          if (tag !== 114) {
+            break;
+          }
+
+          message.ownerEmail = reader.string();
+          continue;
+        }
+        case 15: {
+          if (tag !== 122) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 16: {
+          if (tag !== 130) {
+            break;
+          }
+
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 17: {
+          if (tag !== 136) {
+            break;
+          }
+
+          message.encrytionM3u8 = reader.bool();
+          continue;
+        }
+        case 18: {
+          if (tag !== 146) {
+            break;
+          }
+
+          message.logoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminPlayerConfig {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      autoplay: isSet(object.autoplay) ? globalThis.Boolean(object.autoplay) : false,
+      loop: isSet(object.loop) ? globalThis.Boolean(object.loop) : false,
+      muted: isSet(object.muted) ? globalThis.Boolean(object.muted) : false,
+      showControls: isSet(object.showControls)
+        ? globalThis.Boolean(object.showControls)
+        : isSet(object.show_controls)
+        ? globalThis.Boolean(object.show_controls)
+        : false,
+      pip: isSet(object.pip) ? globalThis.Boolean(object.pip) : false,
+      airplay: isSet(object.airplay) ? globalThis.Boolean(object.airplay) : false,
+      chromecast: isSet(object.chromecast) ? globalThis.Boolean(object.chromecast) : false,
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : false,
+      isDefault: isSet(object.isDefault)
+        ? globalThis.Boolean(object.isDefault)
+        : isSet(object.is_default)
+        ? globalThis.Boolean(object.is_default)
+        : false,
+      ownerEmail: isSet(object.ownerEmail)
+        ? globalThis.String(object.ownerEmail)
+        : isSet(object.owner_email)
+        ? globalThis.String(object.owner_email)
+        : undefined,
+      createdAt: isSet(object.createdAt)
+        ? globalThis.String(object.createdAt)
+        : isSet(object.created_at)
+        ? globalThis.String(object.created_at)
+        : undefined,
+      updatedAt: isSet(object.updatedAt)
+        ? globalThis.String(object.updatedAt)
+        : isSet(object.updated_at)
+        ? globalThis.String(object.updated_at)
+        : undefined,
+      encrytionM3u8: isSet(object.encrytionM3u8)
+        ? globalThis.Boolean(object.encrytionM3u8)
+        : isSet(object.encrytion_m3u8)
+        ? globalThis.Boolean(object.encrytion_m3u8)
+        : false,
+      logoUrl: isSet(object.logoUrl)
+        ? globalThis.String(object.logoUrl)
+        : isSet(object.logo_url)
+        ? globalThis.String(object.logo_url)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AdminPlayerConfig): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    if (message.name !== undefined && message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      obj.autoplay = message.autoplay;
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      obj.loop = message.loop;
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      obj.muted = message.muted;
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      obj.showControls = message.showControls;
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      obj.pip = message.pip;
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      obj.airplay = message.airplay;
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      obj.chromecast = message.chromecast;
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      obj.isActive = message.isActive;
+    }
+    if (message.isDefault !== undefined && message.isDefault !== false) {
+      obj.isDefault = message.isDefault;
+    }
+    if (message.ownerEmail !== undefined) {
+      obj.ownerEmail = message.ownerEmail;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt;
+    }
+    if (message.encrytionM3u8 !== undefined && message.encrytionM3u8 !== false) {
+      obj.encrytionM3u8 = message.encrytionM3u8;
+    }
+    if (message.logoUrl !== undefined) {
+      obj.logoUrl = message.logoUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AdminPlayerConfig>, I>>(base?: I): AdminPlayerConfig {
+    return AdminPlayerConfig.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AdminPlayerConfig>, I>>(object: I): AdminPlayerConfig {
+    const message = createBaseAdminPlayerConfig();
+    message.id = object.id ?? "";
+    message.userId = object.userId ?? "";
+    message.name = object.name ?? "";
+    message.description = object.description ?? undefined;
+    message.autoplay = object.autoplay ?? false;
+    message.loop = object.loop ?? false;
+    message.muted = object.muted ?? false;
+    message.showControls = object.showControls ?? false;
+    message.pip = object.pip ?? false;
+    message.airplay = object.airplay ?? false;
+    message.chromecast = object.chromecast ?? false;
+    message.isActive = object.isActive ?? false;
+    message.isDefault = object.isDefault ?? false;
+    message.ownerEmail = object.ownerEmail ?? undefined;
+    message.createdAt = object.createdAt ?? undefined;
+    message.updatedAt = object.updatedAt ?? undefined;
+    message.encrytionM3u8 = object.encrytionM3u8 ?? false;
+    message.logoUrl = object.logoUrl ?? undefined;
     return message;
   },
 };
@@ -3755,8 +4568,332 @@ export const AdminUser: MessageFns<AdminUser> = {
   },
 };
 
+function createBaseReferralUserSummary(): ReferralUserSummary {
+  return { id: "", email: "", username: undefined };
+}
+
+export const ReferralUserSummary: MessageFns<ReferralUserSummary> = {
+  encode(message: ReferralUserSummary, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.email !== undefined && message.email !== "") {
+      writer.uint32(18).string(message.email);
+    }
+    if (message.username !== undefined) {
+      writer.uint32(26).string(message.username);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ReferralUserSummary {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReferralUserSummary();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ReferralUserSummary {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+      username: isSet(object.username) ? globalThis.String(object.username) : undefined,
+    };
+  },
+
+  toJSON(message: ReferralUserSummary): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.email !== undefined && message.email !== "") {
+      obj.email = message.email;
+    }
+    if (message.username !== undefined) {
+      obj.username = message.username;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ReferralUserSummary>, I>>(base?: I): ReferralUserSummary {
+    return ReferralUserSummary.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ReferralUserSummary>, I>>(object: I): ReferralUserSummary {
+    const message = createBaseReferralUserSummary();
+    message.id = object.id ?? "";
+    message.email = object.email ?? "";
+    message.username = object.username ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAdminUserReferralInfo(): AdminUserReferralInfo {
+  return {
+    referrer: undefined,
+    referralEligible: false,
+    effectiveRewardPercent: 0,
+    rewardOverridePercent: undefined,
+    shareLink: undefined,
+    rewardGranted: false,
+    rewardGrantedAt: undefined,
+    rewardPaymentId: undefined,
+    rewardAmount: undefined,
+  };
+}
+
+export const AdminUserReferralInfo: MessageFns<AdminUserReferralInfo> = {
+  encode(message: AdminUserReferralInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.referrer !== undefined) {
+      ReferralUserSummary.encode(message.referrer, writer.uint32(10).fork()).join();
+    }
+    if (message.referralEligible !== undefined && message.referralEligible !== false) {
+      writer.uint32(16).bool(message.referralEligible);
+    }
+    if (message.effectiveRewardPercent !== undefined && message.effectiveRewardPercent !== 0) {
+      writer.uint32(25).double(message.effectiveRewardPercent);
+    }
+    if (message.rewardOverridePercent !== undefined) {
+      writer.uint32(33).double(message.rewardOverridePercent);
+    }
+    if (message.shareLink !== undefined) {
+      writer.uint32(42).string(message.shareLink);
+    }
+    if (message.rewardGranted !== undefined && message.rewardGranted !== false) {
+      writer.uint32(48).bool(message.rewardGranted);
+    }
+    if (message.rewardGrantedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.rewardGrantedAt), writer.uint32(58).fork()).join();
+    }
+    if (message.rewardPaymentId !== undefined) {
+      writer.uint32(66).string(message.rewardPaymentId);
+    }
+    if (message.rewardAmount !== undefined) {
+      writer.uint32(73).double(message.rewardAmount);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminUserReferralInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminUserReferralInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.referrer = ReferralUserSummary.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.referralEligible = reader.bool();
+          continue;
+        }
+        case 3: {
+          if (tag !== 25) {
+            break;
+          }
+
+          message.effectiveRewardPercent = reader.double();
+          continue;
+        }
+        case 4: {
+          if (tag !== 33) {
+            break;
+          }
+
+          message.rewardOverridePercent = reader.double();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.shareLink = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.rewardGranted = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.rewardGrantedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.rewardPaymentId = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 73) {
+            break;
+          }
+
+          message.rewardAmount = reader.double();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminUserReferralInfo {
+    return {
+      referrer: isSet(object.referrer) ? ReferralUserSummary.fromJSON(object.referrer) : undefined,
+      referralEligible: isSet(object.referralEligible)
+        ? globalThis.Boolean(object.referralEligible)
+        : isSet(object.referral_eligible)
+        ? globalThis.Boolean(object.referral_eligible)
+        : false,
+      effectiveRewardPercent: isSet(object.effectiveRewardPercent)
+        ? globalThis.Number(object.effectiveRewardPercent)
+        : isSet(object.effective_reward_percent)
+        ? globalThis.Number(object.effective_reward_percent)
+        : 0,
+      rewardOverridePercent: isSet(object.rewardOverridePercent)
+        ? globalThis.Number(object.rewardOverridePercent)
+        : isSet(object.reward_override_percent)
+        ? globalThis.Number(object.reward_override_percent)
+        : undefined,
+      shareLink: isSet(object.shareLink)
+        ? globalThis.String(object.shareLink)
+        : isSet(object.share_link)
+        ? globalThis.String(object.share_link)
+        : undefined,
+      rewardGranted: isSet(object.rewardGranted)
+        ? globalThis.Boolean(object.rewardGranted)
+        : isSet(object.reward_granted)
+        ? globalThis.Boolean(object.reward_granted)
+        : false,
+      rewardGrantedAt: isSet(object.rewardGrantedAt)
+        ? globalThis.String(object.rewardGrantedAt)
+        : isSet(object.reward_granted_at)
+        ? globalThis.String(object.reward_granted_at)
+        : undefined,
+      rewardPaymentId: isSet(object.rewardPaymentId)
+        ? globalThis.String(object.rewardPaymentId)
+        : isSet(object.reward_payment_id)
+        ? globalThis.String(object.reward_payment_id)
+        : undefined,
+      rewardAmount: isSet(object.rewardAmount)
+        ? globalThis.Number(object.rewardAmount)
+        : isSet(object.reward_amount)
+        ? globalThis.Number(object.reward_amount)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AdminUserReferralInfo): unknown {
+    const obj: any = {};
+    if (message.referrer !== undefined) {
+      obj.referrer = ReferralUserSummary.toJSON(message.referrer);
+    }
+    if (message.referralEligible !== undefined && message.referralEligible !== false) {
+      obj.referralEligible = message.referralEligible;
+    }
+    if (message.effectiveRewardPercent !== undefined && message.effectiveRewardPercent !== 0) {
+      obj.effectiveRewardPercent = message.effectiveRewardPercent;
+    }
+    if (message.rewardOverridePercent !== undefined) {
+      obj.rewardOverridePercent = message.rewardOverridePercent;
+    }
+    if (message.shareLink !== undefined) {
+      obj.shareLink = message.shareLink;
+    }
+    if (message.rewardGranted !== undefined && message.rewardGranted !== false) {
+      obj.rewardGranted = message.rewardGranted;
+    }
+    if (message.rewardGrantedAt !== undefined) {
+      obj.rewardGrantedAt = message.rewardGrantedAt;
+    }
+    if (message.rewardPaymentId !== undefined) {
+      obj.rewardPaymentId = message.rewardPaymentId;
+    }
+    if (message.rewardAmount !== undefined) {
+      obj.rewardAmount = message.rewardAmount;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AdminUserReferralInfo>, I>>(base?: I): AdminUserReferralInfo {
+    return AdminUserReferralInfo.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AdminUserReferralInfo>, I>>(object: I): AdminUserReferralInfo {
+    const message = createBaseAdminUserReferralInfo();
+    message.referrer = (object.referrer !== undefined && object.referrer !== null)
+      ? ReferralUserSummary.fromPartial(object.referrer)
+      : undefined;
+    message.referralEligible = object.referralEligible ?? false;
+    message.effectiveRewardPercent = object.effectiveRewardPercent ?? 0;
+    message.rewardOverridePercent = object.rewardOverridePercent ?? undefined;
+    message.shareLink = object.shareLink ?? undefined;
+    message.rewardGranted = object.rewardGranted ?? false;
+    message.rewardGrantedAt = object.rewardGrantedAt ?? undefined;
+    message.rewardPaymentId = object.rewardPaymentId ?? undefined;
+    message.rewardAmount = object.rewardAmount ?? undefined;
+    return message;
+  },
+};
+
 function createBaseAdminUserDetail(): AdminUserDetail {
-  return { user: undefined, subscription: undefined };
+  return { user: undefined, subscription: undefined, referral: undefined };
 }
 
 export const AdminUserDetail: MessageFns<AdminUserDetail> = {
@@ -3766,6 +4903,9 @@ export const AdminUserDetail: MessageFns<AdminUserDetail> = {
     }
     if (message.subscription !== undefined) {
       PlanSubscription.encode(message.subscription, writer.uint32(18).fork()).join();
+    }
+    if (message.referral !== undefined) {
+      AdminUserReferralInfo.encode(message.referral, writer.uint32(26).fork()).join();
     }
     return writer;
   },
@@ -3793,6 +4933,14 @@ export const AdminUserDetail: MessageFns<AdminUserDetail> = {
           message.subscription = PlanSubscription.decode(reader, reader.uint32());
           continue;
         }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.referral = AdminUserReferralInfo.decode(reader, reader.uint32());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3806,6 +4954,7 @@ export const AdminUserDetail: MessageFns<AdminUserDetail> = {
     return {
       user: isSet(object.user) ? AdminUser.fromJSON(object.user) : undefined,
       subscription: isSet(object.subscription) ? PlanSubscription.fromJSON(object.subscription) : undefined,
+      referral: isSet(object.referral) ? AdminUserReferralInfo.fromJSON(object.referral) : undefined,
     };
   },
 
@@ -3816,6 +4965,9 @@ export const AdminUserDetail: MessageFns<AdminUserDetail> = {
     }
     if (message.subscription !== undefined) {
       obj.subscription = PlanSubscription.toJSON(message.subscription);
+    }
+    if (message.referral !== undefined) {
+      obj.referral = AdminUserReferralInfo.toJSON(message.referral);
     }
     return obj;
   },
@@ -3828,6 +4980,9 @@ export const AdminUserDetail: MessageFns<AdminUserDetail> = {
     message.user = (object.user !== undefined && object.user !== null) ? AdminUser.fromPartial(object.user) : undefined;
     message.subscription = (object.subscription !== undefined && object.subscription !== null)
       ? PlanSubscription.fromPartial(object.subscription)
+      : undefined;
+    message.referral = (object.referral !== undefined && object.referral !== null)
+      ? AdminUserReferralInfo.fromPartial(object.referral)
       : undefined;
     return message;
   },

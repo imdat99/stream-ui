@@ -38,20 +38,6 @@ const links = computed<Record<string, any>>(() => {
     },
     { href: "/settings", label: t("nav.settings"), icon: SettingsIcon, action: null, className },
   ] as const;
-
-  if (isAdmin.value) {
-    return [
-      ...baseLinks,
-      {
-        href: "/admin/overview",
-        label: "Admin Console",
-        icon: LayoutDashboard,
-        action: null,
-        className,
-      } as const,
-    ];
-  }
-
   return baseLinks;
 });
 </script>

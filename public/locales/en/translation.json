@@ -112,7 +112,8 @@
       "security": "Security",
       "billing": "Billing & Plans",
       "notifications": "Notifications",
-      "player": "Player",
+      "playerGroup": "Player",
+      "playerConfigs": "Player Configs",
       "domains": "Allowed Domains",
       "ads": "Ads & VAST",
       "danger": "Danger Zone"
@@ -128,9 +129,9 @@
         "title": "Notifications",
         "subtitle": "Choose how you want to receive notifications and updates."
       },
-      "player": {
-        "title": "Player Settings",
-        "subtitle": "Configure default video player behavior and features."
+      "preferences": {
+        "title": "Preferences",
+        "subtitle": "Manage your account preferences and notification channels."
       },
       "billing": {
         "title": "Billing & Plans",
@@ -143,6 +144,10 @@
       "ads": {
         "title": "Ads & VAST",
         "subtitle": "Create and manage VAST ad templates for your videos."
+      },
+      "playerConfigs": {
+        "title": "Player Configs",
+        "subtitle": "Create and manage player configurations for your videos."
       },
       "danger": {
         "title": "Danger Zone",
@@ -291,6 +296,126 @@
         "copiedDetail": "Embed code copied to clipboard.",
         "failedSummary": "Action failed",
         "failedDetail": "Failed to load or update domains."
+      }
+    },
+    "playerConfigs": {
+      "createConfig": "Create Config",
+      "infoBanner": "Player configs let you customize playback behavior such as autoplay, loop, controls, and casting features.",
+      "freePlanTitle": "Free plan limit",
+      "freePlanMessage": "Free accounts can create and manage 1 player config. After you create one, create is disabled until you delete it.",
+      "reconciliationTitle": "Too many configs for free plan",
+      "reconciliationMessage": "Your account still has more than 1 player config from a previous paid plan. Delete extra configs until only 1 remains to edit, enable, or set a default again.",
+      "readOnlyTitle": "Free plan limit",
+      "readOnlyMessage": "Free accounts can manage 1 player config. Delete extra configs after downgrade to continue editing.",
+      "defaultBadge": "Default",
+      "createdOn": "Created {{date}}",
+      "emptyTitle": "No player configs yet",
+      "emptySubtitle": "Create your first config to customize video playback",
+      "items": {
+        "autoplay": {
+          "title": "Autoplay",
+          "description": "Automatically start videos when loaded"
+        },
+        "loop": {
+          "title": "Loop",
+          "description": "Repeat video when it ends"
+        },
+        "muted": {
+          "title": "Muted",
+          "description": "Start videos with sound muted"
+        },
+        "showControls": {
+          "title": "Show Controls",
+          "description": "Display player controls during playback"
+        },
+        "pip": {
+          "title": "Picture in Picture",
+          "description": "Enable Picture-in-Picture mode"
+        },
+        "airplay": {
+          "title": "AirPlay",
+          "description": "Allow streaming to Apple devices via AirPlay"
+        },
+        "chromecast": {
+          "title": "Chromecast",
+          "description": "Allow casting to Chromecast devices"
+        },
+        "encrytionM3u8": {
+          "title": "HLS Encryption (m3u8)",
+          "description": "Enable encryption for HLS streams."
+        }
+      },
+      "badges": {
+        "autoplay": "Autoplay",
+        "loop": "Loop",
+        "muted": "Muted",
+        "controls": "Controls",
+        "pip": "PiP",
+        "airplay": "AirPlay",
+        "chromecast": "Chromecast",
+        "encrytionM3u8": "Encrypted HLS",
+        "logo": "Logo"
+      },
+      "state": {
+        "enabled": "enabled",
+        "disabled": "disabled"
+      },
+      "actions": {
+        "default": "Default",
+        "setDefault": "Set Default"
+      },
+      "table": {
+        "name": "Name",
+        "settings": "Settings"
+      },
+      "dialog": {
+        "editTitle": "Edit Config",
+        "createTitle": "Create Player Config",
+        "name": "Config Name",
+        "namePlaceholder": "e.g., Mobile Player, Desktop Player",
+        "description": "Description",
+        "descriptionPlaceholder": "Brief description for this config",
+        "playbackOptions": "Playback Options",
+        "castingOptions": "Casting Options",
+        "advancedOptions": "Advanced Options",
+        "logoUrl": "Logo URL",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "logoUrlHint": "Optional logo image shown in the player overlay.",
+        "defaultLabel": "Default Config",
+        "defaultCheckbox": "Use this config as default for new videos",
+        "defaultHint": "When enabled, newly created videos will automatically use this active config.",
+        "defaultDisabledHint": "Please enable this config before setting it as default.",
+        "update": "Update",
+        "create": "Create"
+      },
+      "confirm": {
+        "deleteMessage": "Are you sure you want to delete \"{name}\"?",
+        "deleteHeader": "Delete Config",
+        "deleteAccept": "Delete",
+        "deleteReject": "Cancel"
+      },
+      "toast": {
+        "nameRequiredSummary": "Name required",
+        "nameRequiredDetail": "Please enter a config name.",
+        "updatedSummary": "Config updated",
+        "updatedDetail": "Player config has been updated.",
+        "createdSummary": "Config created",
+        "createdDetail": "Player config has been created.",
+        "enabledSummary": "Config enabled",
+        "disabledSummary": "Config disabled",
+        "defaultUpdatedSummary": "Default updated",
+        "defaultUpdatedDetail": "{name} is now the default config for new videos.",
+        "upgradeRequiredSummary": "Config limit reached",
+        "upgradeRequiredDetail": "Free accounts can only have 1 player config.",
+        "limitSummary": "Config limit reached",
+        "limitDetail": "Free accounts can only have 1 player config.",
+        "reconciliationSummary": "Delete extra configs",
+        "reconciliationDetail": "Delete extra player configs until only 1 remains to continue managing them on the free plan.",
+        "toggleDetail": "{name} has been {state}.",
+        "deletedSummary": "Config deleted",
+        "deletedDetail": "Player config has been removed.",
+        "failedSummary": "Action failed",
+        "failedDetail": "Failed to load or update player configs."
       }
     },
     "adsVast": {
@@ -629,6 +754,13 @@
   "toast": {
     "dismissAria": "Dismiss"
   },
+  "network": {
+    "offline": {
+      "title": "You're offline",
+      "description": "Your internet connection appears to be unavailable. Check your network and we'll reconnect automatically when you're back online.",
+      "action": "Try again"
+    }
+  },
   "overview": {
     "welcome": {
       "title": "Hello, {{name}}",
@@ -638,7 +770,27 @@
       "totalVideos": "Total Videos",
       "totalViews": "Total Views",
       "storageUsed": "Storage Used",
-      "trendVsLastMonth": "vs last month"
+      "trendVsLastMonth": "vs last month",
+      "unlimited": "Unlimited"
+    },
+    "admin-quickActions": {
+      "title": "Admin Quick Actions",
+      "manageUsers": {
+        "title": "Manage Users",
+        "description": "View and manage all user accounts"
+      },
+      "viewReports": {
+        "title": "View Reports",
+        "description": "Access detailed analytics and reports"
+      },
+      "systemSettings": {
+        "title": "System Settings",
+        "description": "Configure system-wide settings and preferences"
+      },
+      "billingOverview": {
+        "title": "Billing Overview",
+        "description": "Monitor billing and subscription details"
+      }
     },
     "quickActions": {
       "title": "Quick Actions",
@@ -1008,7 +1160,7 @@
         "description": "Content delivered from 200+ PoPs worldwide. Automatic region selection ensures the lowest latency for every viewer."
       },
       "live": {
-        "title": "Live Streaming API",
+        "title": "Streaming API",
         "description": "Scale to millions of concurrent viewers with ultra-low latency. RTMP ingest and HLS playback supported natively.",
         "status": "Live Status",
         "onAir": "On Air",

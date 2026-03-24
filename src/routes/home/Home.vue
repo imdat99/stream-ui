@@ -97,7 +97,7 @@ const isScalePack = (tag: string) => tag === scaleTag.value;
                             <div
                                 v-for="signal in signalItems"
                                 :key="signal.label"
-                                class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm"
+                                class="rounded-2xl border border-slate-200 bg-white px-5 py-4"
                             >
                                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
                                     {{ signal.label }}
@@ -211,7 +211,7 @@ const isScalePack = (tag: string) => tag === scaleTag.value;
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-3">
-                    <article class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]">
+                    <article class="rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]">
                         <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="-8 -258 529 532" fill="none">
                                 <path
@@ -228,7 +228,7 @@ const isScalePack = (tag: string) => tag === scaleTag.value;
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]">
+                    <article class="rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]">
                         <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 570 570" fill="none">
                                 <path
@@ -249,7 +249,7 @@ const isScalePack = (tag: string) => tag === scaleTag.value;
                         </p>
                     </article>
 
-                    <article class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]">
+                    <article class="rounded-3xl border border-slate-200 bg-white p-8 transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]">
                         <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="-10 -226 532 468" fill="none">
                                 <path
@@ -267,7 +267,7 @@ const isScalePack = (tag: string) => tag === scaleTag.value;
                     </article>
                 </div>
 
-                <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
                     <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr] lg:items-center">
                         <div>
                             <p class="text-sm font-semibold uppercase tracking-[0.22em] text-primary">

@@ -112,7 +112,8 @@
       "security": "Bảo mật",
       "billing": "Thanh toán & Gói",
       "notifications": "Thông báo",
-      "player": "Trình phát",
+      "playerGroup": "Trình phát",
+      "playerConfigs": "Cấu hình trình phát",
       "domains": "Tên miền được phép",
       "ads": "Quảng cáo & VAST",
       "danger": "Vùng nguy hiểm"
@@ -128,9 +129,9 @@
         "title": "Thông báo",
         "subtitle": "Chọn cách bạn muốn nhận thông báo và cập nhật."
       },
-      "player": {
-        "title": "Cài đặt trình phát",
-        "subtitle": "Cấu hình hành vi và tính năng mặc định của trình phát video."
+      "preferences": {
+        "title": "Tùy chọn",
+        "subtitle": "Quản lý các tùy chọn tài khoản và kênh thông báo của bạn."
       },
       "billing": {
         "title": "Thanh toán & Gói",
@@ -143,6 +144,10 @@
       "ads": {
         "title": "Quảng cáo & VAST",
         "subtitle": "Tạo và quản lý mẫu quảng cáo VAST cho video."
+      },
+      "playerConfigs": {
+        "title": "Cấu hình trình phát",
+        "subtitle": "Tạo và quản lý cấu hình trình phát cho video."
       },
       "danger": {
         "title": "Vùng nguy hiểm",
@@ -291,6 +296,126 @@
         "copiedDetail": "Đã sao chép mã nhúng vào clipboard.",
         "failedSummary": "Thao tác thất bại",
         "failedDetail": "Không thể tải hoặc cập nhật danh sách tên miền."
+      }
+    },
+    "playerConfigs": {
+      "createConfig": "Tạo cấu hình",
+      "infoBanner": "Cấu hình trình phát cho phép tùy chỉnh hành vi phát video như tự động phát, lặp, hiển thị điều khiển và các tính năng casting.",
+      "freePlanTitle": "Giới hạn gói free",
+      "freePlanMessage": "Tài khoản free có thể tạo và quản lý 1 player config. Sau khi đã có 1 config, bạn cần xóa nó trước khi tạo config mới.",
+      "reconciliationTitle": "Có quá nhiều config cho gói free",
+      "reconciliationMessage": "Tài khoản của bạn vẫn còn hơn 1 player config từ gói paid trước đó. Hãy xóa bớt cho đến khi chỉ còn 1 config để có thể sửa, bật/tắt hoặc đặt mặc định trở lại.",
+      "readOnlyTitle": "Giới hạn gói free",
+      "readOnlyMessage": "Tài khoản free có thể quản lý 1 player config. Sau khi downgrade, hãy xóa bớt config dư để tiếp tục chỉnh sửa.",
+      "defaultBadge": "Mặc định",
+      "createdOn": "Tạo ngày {{date}}",
+      "emptyTitle": "Chưa có cấu hình",
+      "emptySubtitle": "Tạo config đầu tiên để tùy chỉnh trải nghiệm phát video",
+      "items": {
+        "autoplay": {
+          "title": "Tự phát",
+          "description": "Tự động phát video khi tải xong"
+        },
+        "loop": {
+          "title": "Lặp lại",
+          "description": "Phát lại video khi kết thúc"
+        },
+        "muted": {
+          "title": "Tắt tiếng",
+          "description": "Bắt đầu video với âm thanh tắt"
+        },
+        "showControls": {
+          "title": "Hiển thị điều khiển",
+          "description": "Hiển thị thanh điều khiển phát video"
+        },
+        "pip": {
+          "title": "Picture in Picture",
+          "description": "Bật chế độ Picture-in-Picture"
+        },
+        "airplay": {
+          "title": "AirPlay",
+          "description": "Cho phép phát tới thiết bị Apple qua AirPlay"
+        },
+        "chromecast": {
+          "title": "Chromecast",
+          "description": "Cho phép cast tới thiết bị Chromecast"
+        },
+        "encrytionM3u8": {
+          "title": "Mã hóa HLS (m3u8)",
+          "description": "Bật mã hóa cho luồng HLS."
+        }
+      },
+      "badges": {
+        "autoplay": "Tự phát",
+        "loop": "Lặp",
+        "muted": "Tắt tiếng",
+        "controls": "Điều khiển",
+        "pip": "PiP",
+        "airplay": "AirPlay",
+        "chromecast": "Chromecast",
+        "encrytionM3u8": "HLS mã hóa",
+        "logo": "Logo"
+      },
+      "state": {
+        "enabled": "bật",
+        "disabled": "tắt"
+      },
+      "actions": {
+        "default": "Mặc định",
+        "setDefault": "Đặt mặc định"
+      },
+      "table": {
+        "name": "Tên",
+        "settings": "Cài đặt"
+      },
+      "dialog": {
+        "editTitle": "Sửa cấu hình",
+        "createTitle": "Tạo cấu hình trình phát",
+        "name": "Tên cấu hình",
+        "namePlaceholder": "ví dụ: Mobile Player, Desktop Player",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Mô tả ngắn cho cấu hình này",
+        "playbackOptions": "Tùy chọn phát lại",
+        "castingOptions": "Tùy chọn casting",
+        "advancedOptions": "Tùy chọn nâng cao",
+        "logoUrl": "URL logo",
+        "logoUrlPlaceholder": "https://example.com/logo.png",
+        "logoUrlHint": "Logo tùy chọn hiển thị trong lớp phủ của trình phát.",
+        "defaultLabel": "Cấu hình mặc định",
+        "defaultCheckbox": "Dùng cấu hình này mặc định cho video mới",
+        "defaultHint": "Khi bật, video mới tạo sẽ tự động dùng cấu hình đang active này.",
+        "defaultDisabledHint": "Hãy bật cấu hình này trước khi đặt làm mặc định.",
+        "update": "Cập nhật",
+        "create": "Tạo"
+      },
+      "confirm": {
+        "deleteMessage": "Bạn có chắc muốn xóa \"{name}\"?",
+        "deleteHeader": "Xóa cấu hình",
+        "deleteAccept": "Xóa",
+        "deleteReject": "Hủy"
+      },
+      "toast": {
+        "nameRequiredSummary": "Thiếu tên cấu hình",
+        "nameRequiredDetail": "Vui lòng nhập tên cấu hình.",
+        "updatedSummary": "Đã cập nhật cấu hình",
+        "updatedDetail": "Cấu hình trình phát đã được cập nhật.",
+        "createdSummary": "Đã tạo cấu hình",
+        "createdDetail": "Cấu hình trình phát đã được tạo.",
+        "enabledSummary": "Đã bật cấu hình",
+        "disabledSummary": "Đã tắt cấu hình",
+        "defaultUpdatedSummary": "Đã cập nhật mặc định",
+        "defaultUpdatedDetail": "{name} hiện là cấu hình mặc định cho video mới.",
+        "upgradeRequiredSummary": "Đã đạt giới hạn cấu hình",
+        "upgradeRequiredDetail": "Tài khoản free chỉ có thể có 1 player config.",
+        "limitSummary": "Đã đạt giới hạn cấu hình",
+        "limitDetail": "Tài khoản free chỉ có thể có 1 player config.",
+        "reconciliationSummary": "Hãy xóa bớt config",
+        "reconciliationDetail": "Hãy xóa các player config dư cho đến khi chỉ còn 1 config để tiếp tục quản lý trên gói free.",
+        "toggleDetail": "{name} đã được {state}.",
+        "deletedSummary": "Đã xóa cấu hình",
+        "deletedDetail": "Cấu hình trình phát đã được gỡ bỏ.",
+        "failedSummary": "Thao tác thất bại",
+        "failedDetail": "Không thể tải hoặc cập nhật cấu hình trình phát."
       }
     },
     "adsVast": {
@@ -628,6 +753,13 @@
   "toast": {
     "dismissAria": "Đóng"
   },
+  "network": {
+    "offline": {
+      "title": "Bạn đang ngoại tuyến",
+      "description": "Có vẻ như kết nối internet đã bị ngắt. Hãy kiểm tra mạng, ứng dụng sẽ tự kết nối lại khi bạn có mạng trở lại.",
+      "action": "Thử lại"
+    }
+  },
   "overview": {
     "welcome": {
       "title": "Xin chào, {{name}}",
@@ -637,7 +769,23 @@
       "totalVideos": "Tổng số video",
       "totalViews": "Tổng lượt xem",
       "storageUsed": "Dung lượng đã dùng",
-      "trendVsLastMonth": "so với tháng trước"
+      "trendVsLastMonth": "so với tháng trước",
+      "unlimited": "Không giới hạn"
+    },
+    "admin-quickActions": {
+      "title": "Thao tác nhanh cho quản trị viên",
+      "manageUsers": {
+        "title": "Quản lý người dùng",
+        "description": "Xem và quản lý tất cả người dùng"
+      },
+      "viewReports": {
+        "title": "Xem báo cáo",
+        "description": "Phân tích hiệu suất hệ thống và hoạt động của người dùng"
+      },
+      "systemSettings": {
+        "title": "Cài đặt hệ thống",
+        "description": "Cấu hình cài đặt và tùy chọn của hệ thống"
+      }
     },
     "quickActions": {
       "title": "Thao tác nhanh",
@@ -1007,7 +1155,7 @@
         "description": "Nội dung được phân phối từ hơn 200 PoP trên toàn thế giới. Tự động chọn vùng để có độ trễ thấp nhất cho mọi người xem."
       },
       "live": {
-        "title": "Live Streaming API",
+        "title": "Streaming API",
         "description": "Mở rộng tới hàng triệu người xem đồng thời với độ trễ cực thấp. Hỗ trợ RTMP ingest và HLS playback sẵn có.",
         "status": "Trạng thái trực tiếp",
         "onAir": "Đang phát",

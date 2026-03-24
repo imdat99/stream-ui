@@ -34,7 +34,12 @@ const auth = useAuthStore();
 const isCopied = ref(false);
 const { t } = useTranslation();
 
-const url = computed(() => `${location.origin}/ref/${auth.user?.username || ''}`);
+const url = computed(() => {
+    if (typeof location === 'undefined') {
+        return auth.user?.username ? `/ref/${auth.user.username}` : '';
+    }
+    return `${location.origin}/ref/${auth.user?.username || ''}`;
+});
 
 const copyToClipboard = ($event: MouseEvent) => {
     if ($event.target instanceof HTMLInputElement) {

@@ -65,6 +65,11 @@ const routes: RouteData[] = [
             component: () => import("./auth/signup.vue"),
           },
           {
+            path: "ref/:username",
+            name: "referral-entry",
+            beforeEnter: (to) => ({ name: "signup", query: { ref: String(to.params.username || "") } }),
+          },
+          {
             path: "forgot",
             name: "forgot",
             component: () => import("./auth/forgot.vue"),
@@ -177,13 +182,7 @@ const routes: RouteData[] = [
               },
               {
                 path: "player",
-                name: "settings-player",
-                component: () => import("./settings/PlayerSettings/PlayerSettings.vue"),
-                meta: {
-                  head: {
-                    title: "Player Settings - Holistream",
-                  },
-                },
+                redirect: { name: "settings-player-configs" },
               },
               {
                 path: "domains",
@@ -206,6 +205,16 @@ const routes: RouteData[] = [
                 },
               },
               {
+                path: "player-configs",
+                name: "settings-player-configs",
+                component: () => import("./settings/PlayerConfigs/PlayerConfigs.vue"),
+                meta: {
+                  head: {
+                    title: "Player Configs - Holistream",
+                  },
+                },
+              },
+              {
                 path: "danger",
                 name: "settings-danger",
                 component: () => import("./settings/DangerZone/DangerZone.vue"),
@@ -215,23 +224,22 @@ const routes: RouteData[] = [
                   },
                 },
               },
-            ],
-          },
-          {
-            path: "admin",
-            component: () => import("./admin/Layout.vue"),
-            meta: { requiresAdmin: true },
-            redirect: { name: "admin-overview" },
-            children: [
-              { path: "overview", name: "admin-overview", component: () => import("./admin/Overview.vue") },
-              { path: "users", name: "admin-users", component: () => import("./admin/Users.vue") },
-              { path: "videos", name: "admin-videos", component: () => import("./admin/Videos.vue") },
-              { path: "payments", name: "admin-payments", component: () => import("./admin/Payments.vue") },
-              { path: "plans", name: "admin-plans", component: () => import("./admin/Plans.vue") },
-              { path: "ad-templates", name: "admin-ad-templates", component: () => import("./admin/AdTemplates.vue") },
-              { path: "jobs", name: "admin-jobs", component: () => import("./admin/Jobs.vue") },
-              { path: "agents", name: "admin-agents", component: () => import("./admin/Agents.vue") },
-              { path: "logs", name: "admin-logs", component: () => import("./admin/Logs.vue") },
+              {
+                path: "admin",
+                meta: { requiresAdmin: true },
+                redirect: { name: "admin-overview" },
+                children: [
+                  { path: "users", name: "admin-users", component: () => import("./settings/admin/Users.vue") },
+                  { path: "videos", name: "admin-videos", component: () => import("./settings/admin/Videos.vue") },
+                  { path: "payments", name: "admin-payments", component: () => import("./settings/admin/Payments.vue") },
+                  { path: "plans", name: "admin-plans", component: () => import("./settings/admin/Plans.vue") },
+                  { path: "ad-templates", name: "admin-ad-templates", component: () => import("./settings/admin/AdTemplates.vue") },
+                  { path: "player-configs", name: "admin-player-configs", component: () => import("./settings/admin/PlayerConfigs.vue") },
+                  { path: "jobs", name: "admin-jobs", component: () => import("./settings/admin/Jobs.vue") },
+                  { path: "agents", name: "admin-agents", component: () => import("./settings/admin/Agents.vue") },
+                  { path: "logs", name: "admin-logs", component: () => import("./settings/admin/Logs.vue") },
+                ],
+              },
             ],
           },
         ],

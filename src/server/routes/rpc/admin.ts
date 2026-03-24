@@ -53,6 +53,31 @@ export const adminMethods = {
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminUser(data, metadata);
   }),
+  getAdminUser: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.getAdminUser(data, metadata);
+  }),
+  updateAdminUserReferralSettings: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      refUsername: optionalTrimmed(),
+      clearReferrer: z.boolean().optional(),
+      referralEligible: z.boolean().optional(),
+      referralRewardBps: z.number().int().min(0).max(10000).optional(),
+      clearReferralRewardBps: z.boolean().optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminUserReferralSettings(data, metadata);
+  }),
   updateAdminUserRole: validateFn(
     z.object({
       id: z.string().trim().min(1),
@@ -282,8 +307,80 @@ export const adminMethods = {
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminAdTemplate(data, metadata);
   }),
+  listAdminPlayerConfigs: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      userId: optionalTrimmed(),
+      search: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminPlayerConfigs(data, metadata);
+  }),
+  createAdminPlayerConfig: validateFn(
+    z.object({
+      userId: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      autoplay: z.boolean().optional(),
+      loop: z.boolean().optional(),
+      muted: z.boolean().optional(),
+      showControls: z.boolean().optional(),
+      pip: z.boolean().optional(),
+      airplay: z.boolean().optional(),
+      chromecast: z.boolean().optional(),
+      encrytionM3u8: z.boolean().optional(),
+      logoUrl: z.string().trim().optional(),
+      isActive: z.boolean(),
+      isDefault: z.boolean(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminPlayerConfig(data, metadata);
+  }),
+  updateAdminPlayerConfig: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      userId: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+      description: optionalTrimmed(),
+      autoplay: z.boolean().optional(),
+      loop: z.boolean().optional(),
+      muted: z.boolean().optional(),
+      showControls: z.boolean().optional(),
+      pip: z.boolean().optional(),
+      airplay: z.boolean().optional(),
+      chromecast: z.boolean().optional(),
+      encrytionM3u8: z.boolean().optional(),
+      logoUrl: z.string().trim().optional(),
+      isActive: z.boolean(),
+      isDefault: z.boolean(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminPlayerConfig(data, metadata);
+  }),
+  deleteAdminPlayerConfig: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminServiceClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.deleteAdminPlayerConfig(data, metadata);
+  }),
   listAdminJobs: validateFn(
     z.object({
+      cursor: optionalTrimmed(),
+      pageSize: z.number().int().min(1).max(100).optional(),
       offset: z.number().int().min(0).optional(),
       limit: z.number().int().min(1).max(100).optional(),
       agentId: optionalTrimmed(),

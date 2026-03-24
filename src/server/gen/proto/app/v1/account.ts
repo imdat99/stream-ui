@@ -35,6 +35,7 @@ export interface UpdateMeRequest {
   email?: string | undefined;
   language?: string | undefined;
   locale?: string | undefined;
+  telegramId?: string | undefined;
 }
 
 export interface UpdateMeResponse {
@@ -206,7 +207,7 @@ export const GetMeResponse: MessageFns<GetMeResponse> = {
 };
 
 function createBaseUpdateMeRequest(): UpdateMeRequest {
-  return { username: undefined, email: undefined, language: undefined, locale: undefined };
+  return { username: undefined, email: undefined, language: undefined, locale: undefined, telegramId: undefined };
 }
 
 export const UpdateMeRequest: MessageFns<UpdateMeRequest> = {
@@ -222,6 +223,9 @@ export const UpdateMeRequest: MessageFns<UpdateMeRequest> = {
     }
     if (message.locale !== undefined) {
       writer.uint32(34).string(message.locale);
+    }
+    if (message.telegramId !== undefined) {
+      writer.uint32(42).string(message.telegramId);
     }
     return writer;
   },
@@ -265,6 +269,14 @@ export const UpdateMeRequest: MessageFns<UpdateMeRequest> = {
           message.locale = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.telegramId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -280,6 +292,11 @@ export const UpdateMeRequest: MessageFns<UpdateMeRequest> = {
       email: isSet(object.email) ? globalThis.String(object.email) : undefined,
       language: isSet(object.language) ? globalThis.String(object.language) : undefined,
       locale: isSet(object.locale) ? globalThis.String(object.locale) : undefined,
+      telegramId: isSet(object.telegramId)
+        ? globalThis.String(object.telegramId)
+        : isSet(object.telegram_id)
+        ? globalThis.String(object.telegram_id)
+        : undefined,
     };
   },
 
@@ -297,6 +314,9 @@ export const UpdateMeRequest: MessageFns<UpdateMeRequest> = {
     if (message.locale !== undefined) {
       obj.locale = message.locale;
     }
+    if (message.telegramId !== undefined) {
+      obj.telegramId = message.telegramId;
+    }
     return obj;
   },
 
@@ -309,6 +329,7 @@ export const UpdateMeRequest: MessageFns<UpdateMeRequest> = {
     message.email = object.email ?? undefined;
     message.language = object.language ?? undefined;
     message.locale = object.locale ?? undefined;
+    message.telegramId = object.telegramId ?? undefined;
     return message;
   },
 };

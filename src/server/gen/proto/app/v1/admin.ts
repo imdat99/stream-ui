@@ -25,6 +25,7 @@ import {
   AdminJob,
   AdminPayment,
   AdminPlan,
+  AdminPlayerConfig,
   AdminUser,
   AdminUserDetail,
   AdminVideo,
@@ -86,6 +87,19 @@ export interface UpdateAdminUserRequest {
 
 export interface UpdateAdminUserResponse {
   user?: AdminUser | undefined;
+}
+
+export interface UpdateAdminUserReferralSettingsRequest {
+  id?: string | undefined;
+  refUsername?: string | undefined;
+  clearReferrer?: boolean | undefined;
+  referralEligible?: boolean | undefined;
+  referralRewardBps?: number | undefined;
+  clearReferralRewardBps?: boolean | undefined;
+}
+
+export interface UpdateAdminUserReferralSettingsResponse {
+  user?: AdminUserDetail | undefined;
 }
 
 export interface UpdateAdminUserRoleRequest {
@@ -312,8 +326,85 @@ export interface DeleteAdminAdTemplateRequest {
   id?: string | undefined;
 }
 
+export interface ListAdminPlayerConfigsRequest {
+  page?: number | undefined;
+  limit?: number | undefined;
+  userId?: string | undefined;
+  search?: string | undefined;
+}
+
+export interface ListAdminPlayerConfigsResponse {
+  configs?: AdminPlayerConfig[] | undefined;
+  total?: number | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+}
+
+export interface GetAdminPlayerConfigRequest {
+  id?: string | undefined;
+}
+
+export interface GetAdminPlayerConfigResponse {
+  config?: AdminPlayerConfig | undefined;
+}
+
+export interface CreateAdminPlayerConfigRequest {
+  userId?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
+  autoplay?: boolean | undefined;
+  loop?: boolean | undefined;
+  muted?: boolean | undefined;
+  showControls?: boolean | undefined;
+  pip?: boolean | undefined;
+  airplay?: boolean | undefined;
+  chromecast?: boolean | undefined;
+  isActive?: boolean | undefined;
+  isDefault?: boolean | undefined;
+  encrytionM3u8?: boolean | undefined;
+  logoUrl?: string | undefined;
+}
+
+export interface CreateAdminPlayerConfigResponse {
+  config?: AdminPlayerConfig | undefined;
+}
+
+export interface UpdateAdminPlayerConfigRequest {
+  id?: string | undefined;
+  userId?: string | undefined;
+  name?: string | undefined;
+  description?: string | undefined;
+  autoplay?: boolean | undefined;
+  loop?: boolean | undefined;
+  muted?: boolean | undefined;
+  showControls?: boolean | undefined;
+  pip?: boolean | undefined;
+  airplay?: boolean | undefined;
+  chromecast?: boolean | undefined;
+  isActive?: boolean | undefined;
+  isDefault?: boolean | undefined;
+  encrytionM3u8?: boolean | undefined;
+  logoUrl?: string | undefined;
+}
+
+export interface UpdateAdminPlayerConfigResponse {
+  config?: AdminPlayerConfig | undefined;
+}
+
+export interface DeleteAdminPlayerConfigRequest {
+  id?: string | undefined;
+}
+
 export interface ListAdminJobsRequest {
-  offset?: number | undefined;
+  cursor?: string | undefined;
+  pageSize?:
+    | number
+    | undefined;
+  /** Deprecated: use cursor for keyset pagination. */
+  offset?:
+    | number
+    | undefined;
+  /** Deprecated: use page_size for keyset pagination. */
   limit?: number | undefined;
   agentId?: string | undefined;
 }
@@ -324,6 +415,8 @@ export interface ListAdminJobsResponse {
   offset?: number | undefined;
   limit?: number | undefined;
   hasMore?: boolean | undefined;
+  nextCursor?: string | undefined;
+  pageSize?: number | undefined;
 }
 
 export interface GetAdminJobRequest {
@@ -1224,6 +1317,241 @@ export const UpdateAdminUserResponse: MessageFns<UpdateAdminUserResponse> = {
   fromPartial<I extends Exact<DeepPartial<UpdateAdminUserResponse>, I>>(object: I): UpdateAdminUserResponse {
     const message = createBaseUpdateAdminUserResponse();
     message.user = (object.user !== undefined && object.user !== null) ? AdminUser.fromPartial(object.user) : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAdminUserReferralSettingsRequest(): UpdateAdminUserReferralSettingsRequest {
+  return {
+    id: "",
+    refUsername: undefined,
+    clearReferrer: undefined,
+    referralEligible: undefined,
+    referralRewardBps: undefined,
+    clearReferralRewardBps: undefined,
+  };
+}
+
+export const UpdateAdminUserReferralSettingsRequest: MessageFns<UpdateAdminUserReferralSettingsRequest> = {
+  encode(message: UpdateAdminUserReferralSettingsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.refUsername !== undefined) {
+      writer.uint32(18).string(message.refUsername);
+    }
+    if (message.clearReferrer !== undefined) {
+      writer.uint32(24).bool(message.clearReferrer);
+    }
+    if (message.referralEligible !== undefined) {
+      writer.uint32(32).bool(message.referralEligible);
+    }
+    if (message.referralRewardBps !== undefined) {
+      writer.uint32(40).int32(message.referralRewardBps);
+    }
+    if (message.clearReferralRewardBps !== undefined) {
+      writer.uint32(48).bool(message.clearReferralRewardBps);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAdminUserReferralSettingsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAdminUserReferralSettingsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.refUsername = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.clearReferrer = reader.bool();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.referralEligible = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.referralRewardBps = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.clearReferralRewardBps = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAdminUserReferralSettingsRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      refUsername: isSet(object.refUsername)
+        ? globalThis.String(object.refUsername)
+        : isSet(object.ref_username)
+        ? globalThis.String(object.ref_username)
+        : undefined,
+      clearReferrer: isSet(object.clearReferrer)
+        ? globalThis.Boolean(object.clearReferrer)
+        : isSet(object.clear_referrer)
+        ? globalThis.Boolean(object.clear_referrer)
+        : undefined,
+      referralEligible: isSet(object.referralEligible)
+        ? globalThis.Boolean(object.referralEligible)
+        : isSet(object.referral_eligible)
+        ? globalThis.Boolean(object.referral_eligible)
+        : undefined,
+      referralRewardBps: isSet(object.referralRewardBps)
+        ? globalThis.Number(object.referralRewardBps)
+        : isSet(object.referral_reward_bps)
+        ? globalThis.Number(object.referral_reward_bps)
+        : undefined,
+      clearReferralRewardBps: isSet(object.clearReferralRewardBps)
+        ? globalThis.Boolean(object.clearReferralRewardBps)
+        : isSet(object.clear_referral_reward_bps)
+        ? globalThis.Boolean(object.clear_referral_reward_bps)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdateAdminUserReferralSettingsRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.refUsername !== undefined) {
+      obj.refUsername = message.refUsername;
+    }
+    if (message.clearReferrer !== undefined) {
+      obj.clearReferrer = message.clearReferrer;
+    }
+    if (message.referralEligible !== undefined) {
+      obj.referralEligible = message.referralEligible;
+    }
+    if (message.referralRewardBps !== undefined) {
+      obj.referralRewardBps = Math.round(message.referralRewardBps);
+    }
+    if (message.clearReferralRewardBps !== undefined) {
+      obj.clearReferralRewardBps = message.clearReferralRewardBps;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAdminUserReferralSettingsRequest>, I>>(
+    base?: I,
+  ): UpdateAdminUserReferralSettingsRequest {
+    return UpdateAdminUserReferralSettingsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAdminUserReferralSettingsRequest>, I>>(
+    object: I,
+  ): UpdateAdminUserReferralSettingsRequest {
+    const message = createBaseUpdateAdminUserReferralSettingsRequest();
+    message.id = object.id ?? "";
+    message.refUsername = object.refUsername ?? undefined;
+    message.clearReferrer = object.clearReferrer ?? undefined;
+    message.referralEligible = object.referralEligible ?? undefined;
+    message.referralRewardBps = object.referralRewardBps ?? undefined;
+    message.clearReferralRewardBps = object.clearReferralRewardBps ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAdminUserReferralSettingsResponse(): UpdateAdminUserReferralSettingsResponse {
+  return { user: undefined };
+}
+
+export const UpdateAdminUserReferralSettingsResponse: MessageFns<UpdateAdminUserReferralSettingsResponse> = {
+  encode(message: UpdateAdminUserReferralSettingsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.user !== undefined) {
+      AdminUserDetail.encode(message.user, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAdminUserReferralSettingsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAdminUserReferralSettingsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.user = AdminUserDetail.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAdminUserReferralSettingsResponse {
+    return { user: isSet(object.user) ? AdminUserDetail.fromJSON(object.user) : undefined };
+  },
+
+  toJSON(message: UpdateAdminUserReferralSettingsResponse): unknown {
+    const obj: any = {};
+    if (message.user !== undefined) {
+      obj.user = AdminUserDetail.toJSON(message.user);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAdminUserReferralSettingsResponse>, I>>(
+    base?: I,
+  ): UpdateAdminUserReferralSettingsResponse {
+    return UpdateAdminUserReferralSettingsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAdminUserReferralSettingsResponse>, I>>(
+    object: I,
+  ): UpdateAdminUserReferralSettingsResponse {
+    const message = createBaseUpdateAdminUserReferralSettingsResponse();
+    message.user = (object.user !== undefined && object.user !== null)
+      ? AdminUserDetail.fromPartial(object.user)
+      : undefined;
     return message;
   },
 };
@@ -4866,12 +5194,1186 @@ export const DeleteAdminAdTemplateRequest: MessageFns<DeleteAdminAdTemplateReque
   },
 };
 
+function createBaseListAdminPlayerConfigsRequest(): ListAdminPlayerConfigsRequest {
+  return { page: 0, limit: 0, userId: undefined, search: undefined };
+}
+
+export const ListAdminPlayerConfigsRequest: MessageFns<ListAdminPlayerConfigsRequest> = {
+  encode(message: ListAdminPlayerConfigsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(8).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(16).int32(message.limit);
+    }
+    if (message.userId !== undefined) {
+      writer.uint32(26).string(message.userId);
+    }
+    if (message.search !== undefined) {
+      writer.uint32(34).string(message.search);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminPlayerConfigsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAdminPlayerConfigsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.search = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAdminPlayerConfigsRequest {
+    return {
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : undefined,
+      search: isSet(object.search) ? globalThis.String(object.search) : undefined,
+    };
+  },
+
+  toJSON(message: ListAdminPlayerConfigsRequest): unknown {
+    const obj: any = {};
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    if (message.userId !== undefined) {
+      obj.userId = message.userId;
+    }
+    if (message.search !== undefined) {
+      obj.search = message.search;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListAdminPlayerConfigsRequest>, I>>(base?: I): ListAdminPlayerConfigsRequest {
+    return ListAdminPlayerConfigsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListAdminPlayerConfigsRequest>, I>>(
+    object: I,
+  ): ListAdminPlayerConfigsRequest {
+    const message = createBaseListAdminPlayerConfigsRequest();
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    message.userId = object.userId ?? undefined;
+    message.search = object.search ?? undefined;
+    return message;
+  },
+};
+
+function createBaseListAdminPlayerConfigsResponse(): ListAdminPlayerConfigsResponse {
+  return { configs: [], total: 0, page: 0, limit: 0 };
+}
+
+export const ListAdminPlayerConfigsResponse: MessageFns<ListAdminPlayerConfigsResponse> = {
+  encode(message: ListAdminPlayerConfigsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.configs !== undefined && message.configs.length !== 0) {
+      for (const v of message.configs) {
+        AdminPlayerConfig.encode(v!, writer.uint32(10).fork()).join();
+      }
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      writer.uint32(16).int64(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(24).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(32).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminPlayerConfigsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAdminPlayerConfigsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          const el = AdminPlayerConfig.decode(reader, reader.uint32());
+          if (el !== undefined) {
+            message.configs!.push(el);
+          }
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.total = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAdminPlayerConfigsResponse {
+    return {
+      configs: globalThis.Array.isArray(object?.configs)
+        ? object.configs.map((e: any) => AdminPlayerConfig.fromJSON(e))
+        : [],
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: ListAdminPlayerConfigsResponse): unknown {
+    const obj: any = {};
+    if (message.configs?.length) {
+      obj.configs = message.configs.map((e) => AdminPlayerConfig.toJSON(e));
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      obj.total = Math.round(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListAdminPlayerConfigsResponse>, I>>(base?: I): ListAdminPlayerConfigsResponse {
+    return ListAdminPlayerConfigsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListAdminPlayerConfigsResponse>, I>>(
+    object: I,
+  ): ListAdminPlayerConfigsResponse {
+    const message = createBaseListAdminPlayerConfigsResponse();
+    message.configs = object.configs?.map((e) => AdminPlayerConfig.fromPartial(e)) || [];
+    message.total = object.total ?? 0;
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetAdminPlayerConfigRequest(): GetAdminPlayerConfigRequest {
+  return { id: "" };
+}
+
+export const GetAdminPlayerConfigRequest: MessageFns<GetAdminPlayerConfigRequest> = {
+  encode(message: GetAdminPlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAdminPlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAdminPlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAdminPlayerConfigRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: GetAdminPlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAdminPlayerConfigRequest>, I>>(base?: I): GetAdminPlayerConfigRequest {
+    return GetAdminPlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAdminPlayerConfigRequest>, I>>(object: I): GetAdminPlayerConfigRequest {
+    const message = createBaseGetAdminPlayerConfigRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseGetAdminPlayerConfigResponse(): GetAdminPlayerConfigResponse {
+  return { config: undefined };
+}
+
+export const GetAdminPlayerConfigResponse: MessageFns<GetAdminPlayerConfigResponse> = {
+  encode(message: GetAdminPlayerConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.config !== undefined) {
+      AdminPlayerConfig.encode(message.config, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAdminPlayerConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAdminPlayerConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.config = AdminPlayerConfig.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAdminPlayerConfigResponse {
+    return { config: isSet(object.config) ? AdminPlayerConfig.fromJSON(object.config) : undefined };
+  },
+
+  toJSON(message: GetAdminPlayerConfigResponse): unknown {
+    const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = AdminPlayerConfig.toJSON(message.config);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAdminPlayerConfigResponse>, I>>(base?: I): GetAdminPlayerConfigResponse {
+    return GetAdminPlayerConfigResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAdminPlayerConfigResponse>, I>>(object: I): GetAdminPlayerConfigResponse {
+    const message = createBaseGetAdminPlayerConfigResponse();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? AdminPlayerConfig.fromPartial(object.config)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseCreateAdminPlayerConfigRequest(): CreateAdminPlayerConfigRequest {
+  return {
+    userId: "",
+    name: "",
+    description: undefined,
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: false,
+    pip: false,
+    airplay: false,
+    chromecast: false,
+    isActive: undefined,
+    isDefault: undefined,
+    encrytionM3u8: undefined,
+    logoUrl: undefined,
+  };
+}
+
+export const CreateAdminPlayerConfigRequest: MessageFns<CreateAdminPlayerConfigRequest> = {
+  encode(message: CreateAdminPlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== undefined && message.userId !== "") {
+      writer.uint32(10).string(message.userId);
+    }
+    if (message.name !== undefined && message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      writer.uint32(32).bool(message.autoplay);
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      writer.uint32(40).bool(message.loop);
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      writer.uint32(48).bool(message.muted);
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      writer.uint32(56).bool(message.showControls);
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      writer.uint32(64).bool(message.pip);
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      writer.uint32(72).bool(message.airplay);
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      writer.uint32(80).bool(message.chromecast);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(88).bool(message.isActive);
+    }
+    if (message.isDefault !== undefined) {
+      writer.uint32(96).bool(message.isDefault);
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      writer.uint32(104).bool(message.encrytionM3u8);
+    }
+    if (message.logoUrl !== undefined) {
+      writer.uint32(114).string(message.logoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateAdminPlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateAdminPlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.autoplay = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.loop = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.muted = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.showControls = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.pip = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.airplay = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.chromecast = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.isDefault = reader.bool();
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.encrytionM3u8 = reader.bool();
+          continue;
+        }
+        case 14: {
+          if (tag !== 114) {
+            break;
+          }
+
+          message.logoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateAdminPlayerConfigRequest {
+    return {
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      autoplay: isSet(object.autoplay) ? globalThis.Boolean(object.autoplay) : false,
+      loop: isSet(object.loop) ? globalThis.Boolean(object.loop) : false,
+      muted: isSet(object.muted) ? globalThis.Boolean(object.muted) : false,
+      showControls: isSet(object.showControls)
+        ? globalThis.Boolean(object.showControls)
+        : isSet(object.show_controls)
+        ? globalThis.Boolean(object.show_controls)
+        : false,
+      pip: isSet(object.pip) ? globalThis.Boolean(object.pip) : false,
+      airplay: isSet(object.airplay) ? globalThis.Boolean(object.airplay) : false,
+      chromecast: isSet(object.chromecast) ? globalThis.Boolean(object.chromecast) : false,
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      isDefault: isSet(object.isDefault)
+        ? globalThis.Boolean(object.isDefault)
+        : isSet(object.is_default)
+        ? globalThis.Boolean(object.is_default)
+        : undefined,
+      encrytionM3u8: isSet(object.encrytionM3u8)
+        ? globalThis.Boolean(object.encrytionM3u8)
+        : isSet(object.encrytion_m3u8)
+        ? globalThis.Boolean(object.encrytion_m3u8)
+        : undefined,
+      logoUrl: isSet(object.logoUrl)
+        ? globalThis.String(object.logoUrl)
+        : isSet(object.logo_url)
+        ? globalThis.String(object.logo_url)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CreateAdminPlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== undefined && message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    if (message.name !== undefined && message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      obj.autoplay = message.autoplay;
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      obj.loop = message.loop;
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      obj.muted = message.muted;
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      obj.showControls = message.showControls;
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      obj.pip = message.pip;
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      obj.airplay = message.airplay;
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      obj.chromecast = message.chromecast;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.isDefault !== undefined) {
+      obj.isDefault = message.isDefault;
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      obj.encrytionM3u8 = message.encrytionM3u8;
+    }
+    if (message.logoUrl !== undefined) {
+      obj.logoUrl = message.logoUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateAdminPlayerConfigRequest>, I>>(base?: I): CreateAdminPlayerConfigRequest {
+    return CreateAdminPlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateAdminPlayerConfigRequest>, I>>(
+    object: I,
+  ): CreateAdminPlayerConfigRequest {
+    const message = createBaseCreateAdminPlayerConfigRequest();
+    message.userId = object.userId ?? "";
+    message.name = object.name ?? "";
+    message.description = object.description ?? undefined;
+    message.autoplay = object.autoplay ?? false;
+    message.loop = object.loop ?? false;
+    message.muted = object.muted ?? false;
+    message.showControls = object.showControls ?? false;
+    message.pip = object.pip ?? false;
+    message.airplay = object.airplay ?? false;
+    message.chromecast = object.chromecast ?? false;
+    message.isActive = object.isActive ?? undefined;
+    message.isDefault = object.isDefault ?? undefined;
+    message.encrytionM3u8 = object.encrytionM3u8 ?? undefined;
+    message.logoUrl = object.logoUrl ?? undefined;
+    return message;
+  },
+};
+
+function createBaseCreateAdminPlayerConfigResponse(): CreateAdminPlayerConfigResponse {
+  return { config: undefined };
+}
+
+export const CreateAdminPlayerConfigResponse: MessageFns<CreateAdminPlayerConfigResponse> = {
+  encode(message: CreateAdminPlayerConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.config !== undefined) {
+      AdminPlayerConfig.encode(message.config, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateAdminPlayerConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateAdminPlayerConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.config = AdminPlayerConfig.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateAdminPlayerConfigResponse {
+    return { config: isSet(object.config) ? AdminPlayerConfig.fromJSON(object.config) : undefined };
+  },
+
+  toJSON(message: CreateAdminPlayerConfigResponse): unknown {
+    const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = AdminPlayerConfig.toJSON(message.config);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateAdminPlayerConfigResponse>, I>>(base?: I): CreateAdminPlayerConfigResponse {
+    return CreateAdminPlayerConfigResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateAdminPlayerConfigResponse>, I>>(
+    object: I,
+  ): CreateAdminPlayerConfigResponse {
+    const message = createBaseCreateAdminPlayerConfigResponse();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? AdminPlayerConfig.fromPartial(object.config)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAdminPlayerConfigRequest(): UpdateAdminPlayerConfigRequest {
+  return {
+    id: "",
+    userId: "",
+    name: "",
+    description: undefined,
+    autoplay: false,
+    loop: false,
+    muted: false,
+    showControls: false,
+    pip: false,
+    airplay: false,
+    chromecast: false,
+    isActive: undefined,
+    isDefault: undefined,
+    encrytionM3u8: undefined,
+    logoUrl: undefined,
+  };
+}
+
+export const UpdateAdminPlayerConfigRequest: MessageFns<UpdateAdminPlayerConfigRequest> = {
+  encode(message: UpdateAdminPlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      writer.uint32(18).string(message.userId);
+    }
+    if (message.name !== undefined && message.name !== "") {
+      writer.uint32(26).string(message.name);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(34).string(message.description);
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      writer.uint32(40).bool(message.autoplay);
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      writer.uint32(48).bool(message.loop);
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      writer.uint32(56).bool(message.muted);
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      writer.uint32(64).bool(message.showControls);
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      writer.uint32(72).bool(message.pip);
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      writer.uint32(80).bool(message.airplay);
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      writer.uint32(88).bool(message.chromecast);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(96).bool(message.isActive);
+    }
+    if (message.isDefault !== undefined) {
+      writer.uint32(104).bool(message.isDefault);
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      writer.uint32(112).bool(message.encrytionM3u8);
+    }
+    if (message.logoUrl !== undefined) {
+      writer.uint32(122).string(message.logoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAdminPlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAdminPlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.autoplay = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.loop = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.muted = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.showControls = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.pip = reader.bool();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.airplay = reader.bool();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.chromecast = reader.bool();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.isDefault = reader.bool();
+          continue;
+        }
+        case 14: {
+          if (tag !== 112) {
+            break;
+          }
+
+          message.encrytionM3u8 = reader.bool();
+          continue;
+        }
+        case 15: {
+          if (tag !== 122) {
+            break;
+          }
+
+          message.logoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAdminPlayerConfigRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      autoplay: isSet(object.autoplay) ? globalThis.Boolean(object.autoplay) : false,
+      loop: isSet(object.loop) ? globalThis.Boolean(object.loop) : false,
+      muted: isSet(object.muted) ? globalThis.Boolean(object.muted) : false,
+      showControls: isSet(object.showControls)
+        ? globalThis.Boolean(object.showControls)
+        : isSet(object.show_controls)
+        ? globalThis.Boolean(object.show_controls)
+        : false,
+      pip: isSet(object.pip) ? globalThis.Boolean(object.pip) : false,
+      airplay: isSet(object.airplay) ? globalThis.Boolean(object.airplay) : false,
+      chromecast: isSet(object.chromecast) ? globalThis.Boolean(object.chromecast) : false,
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      isDefault: isSet(object.isDefault)
+        ? globalThis.Boolean(object.isDefault)
+        : isSet(object.is_default)
+        ? globalThis.Boolean(object.is_default)
+        : undefined,
+      encrytionM3u8: isSet(object.encrytionM3u8)
+        ? globalThis.Boolean(object.encrytionM3u8)
+        : isSet(object.encrytion_m3u8)
+        ? globalThis.Boolean(object.encrytion_m3u8)
+        : undefined,
+      logoUrl: isSet(object.logoUrl)
+        ? globalThis.String(object.logoUrl)
+        : isSet(object.logo_url)
+        ? globalThis.String(object.logo_url)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdateAdminPlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    if (message.name !== undefined && message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
+    if (message.autoplay !== undefined && message.autoplay !== false) {
+      obj.autoplay = message.autoplay;
+    }
+    if (message.loop !== undefined && message.loop !== false) {
+      obj.loop = message.loop;
+    }
+    if (message.muted !== undefined && message.muted !== false) {
+      obj.muted = message.muted;
+    }
+    if (message.showControls !== undefined && message.showControls !== false) {
+      obj.showControls = message.showControls;
+    }
+    if (message.pip !== undefined && message.pip !== false) {
+      obj.pip = message.pip;
+    }
+    if (message.airplay !== undefined && message.airplay !== false) {
+      obj.airplay = message.airplay;
+    }
+    if (message.chromecast !== undefined && message.chromecast !== false) {
+      obj.chromecast = message.chromecast;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.isDefault !== undefined) {
+      obj.isDefault = message.isDefault;
+    }
+    if (message.encrytionM3u8 !== undefined) {
+      obj.encrytionM3u8 = message.encrytionM3u8;
+    }
+    if (message.logoUrl !== undefined) {
+      obj.logoUrl = message.logoUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAdminPlayerConfigRequest>, I>>(base?: I): UpdateAdminPlayerConfigRequest {
+    return UpdateAdminPlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAdminPlayerConfigRequest>, I>>(
+    object: I,
+  ): UpdateAdminPlayerConfigRequest {
+    const message = createBaseUpdateAdminPlayerConfigRequest();
+    message.id = object.id ?? "";
+    message.userId = object.userId ?? "";
+    message.name = object.name ?? "";
+    message.description = object.description ?? undefined;
+    message.autoplay = object.autoplay ?? false;
+    message.loop = object.loop ?? false;
+    message.muted = object.muted ?? false;
+    message.showControls = object.showControls ?? false;
+    message.pip = object.pip ?? false;
+    message.airplay = object.airplay ?? false;
+    message.chromecast = object.chromecast ?? false;
+    message.isActive = object.isActive ?? undefined;
+    message.isDefault = object.isDefault ?? undefined;
+    message.encrytionM3u8 = object.encrytionM3u8 ?? undefined;
+    message.logoUrl = object.logoUrl ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAdminPlayerConfigResponse(): UpdateAdminPlayerConfigResponse {
+  return { config: undefined };
+}
+
+export const UpdateAdminPlayerConfigResponse: MessageFns<UpdateAdminPlayerConfigResponse> = {
+  encode(message: UpdateAdminPlayerConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.config !== undefined) {
+      AdminPlayerConfig.encode(message.config, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAdminPlayerConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAdminPlayerConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.config = AdminPlayerConfig.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAdminPlayerConfigResponse {
+    return { config: isSet(object.config) ? AdminPlayerConfig.fromJSON(object.config) : undefined };
+  },
+
+  toJSON(message: UpdateAdminPlayerConfigResponse): unknown {
+    const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = AdminPlayerConfig.toJSON(message.config);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAdminPlayerConfigResponse>, I>>(base?: I): UpdateAdminPlayerConfigResponse {
+    return UpdateAdminPlayerConfigResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAdminPlayerConfigResponse>, I>>(
+    object: I,
+  ): UpdateAdminPlayerConfigResponse {
+    const message = createBaseUpdateAdminPlayerConfigResponse();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? AdminPlayerConfig.fromPartial(object.config)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDeleteAdminPlayerConfigRequest(): DeleteAdminPlayerConfigRequest {
+  return { id: "" };
+}
+
+export const DeleteAdminPlayerConfigRequest: MessageFns<DeleteAdminPlayerConfigRequest> = {
+  encode(message: DeleteAdminPlayerConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteAdminPlayerConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteAdminPlayerConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteAdminPlayerConfigRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeleteAdminPlayerConfigRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteAdminPlayerConfigRequest>, I>>(base?: I): DeleteAdminPlayerConfigRequest {
+    return DeleteAdminPlayerConfigRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteAdminPlayerConfigRequest>, I>>(
+    object: I,
+  ): DeleteAdminPlayerConfigRequest {
+    const message = createBaseDeleteAdminPlayerConfigRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
 function createBaseListAdminJobsRequest(): ListAdminJobsRequest {
-  return { offset: 0, limit: 0, agentId: undefined };
+  return { cursor: undefined, pageSize: 0, offset: 0, limit: 0, agentId: undefined };
 }
 
 export const ListAdminJobsRequest: MessageFns<ListAdminJobsRequest> = {
   encode(message: ListAdminJobsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.cursor !== undefined) {
+      writer.uint32(34).string(message.cursor);
+    }
+    if (message.pageSize !== undefined && message.pageSize !== 0) {
+      writer.uint32(40).int32(message.pageSize);
+    }
     if (message.offset !== undefined && message.offset !== 0) {
       writer.uint32(8).int32(message.offset);
     }
@@ -4891,6 +6393,22 @@ export const ListAdminJobsRequest: MessageFns<ListAdminJobsRequest> = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.cursor = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.pageSize = reader.int32();
+          continue;
+        }
         case 1: {
           if (tag !== 8) {
             break;
@@ -4926,6 +6444,12 @@ export const ListAdminJobsRequest: MessageFns<ListAdminJobsRequest> = {
 
   fromJSON(object: any): ListAdminJobsRequest {
     return {
+      cursor: isSet(object.cursor) ? globalThis.String(object.cursor) : undefined,
+      pageSize: isSet(object.pageSize)
+        ? globalThis.Number(object.pageSize)
+        : isSet(object.page_size)
+        ? globalThis.Number(object.page_size)
+        : 0,
       offset: isSet(object.offset) ? globalThis.Number(object.offset) : 0,
       limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
       agentId: isSet(object.agentId)
@@ -4938,6 +6462,12 @@ export const ListAdminJobsRequest: MessageFns<ListAdminJobsRequest> = {
 
   toJSON(message: ListAdminJobsRequest): unknown {
     const obj: any = {};
+    if (message.cursor !== undefined) {
+      obj.cursor = message.cursor;
+    }
+    if (message.pageSize !== undefined && message.pageSize !== 0) {
+      obj.pageSize = Math.round(message.pageSize);
+    }
     if (message.offset !== undefined && message.offset !== 0) {
       obj.offset = Math.round(message.offset);
     }
@@ -4955,6 +6485,8 @@ export const ListAdminJobsRequest: MessageFns<ListAdminJobsRequest> = {
   },
   fromPartial<I extends Exact<DeepPartial<ListAdminJobsRequest>, I>>(object: I): ListAdminJobsRequest {
     const message = createBaseListAdminJobsRequest();
+    message.cursor = object.cursor ?? undefined;
+    message.pageSize = object.pageSize ?? 0;
     message.offset = object.offset ?? 0;
     message.limit = object.limit ?? 0;
     message.agentId = object.agentId ?? undefined;
@@ -4963,7 +6495,7 @@ export const ListAdminJobsRequest: MessageFns<ListAdminJobsRequest> = {
 };
 
 function createBaseListAdminJobsResponse(): ListAdminJobsResponse {
-  return { jobs: [], total: 0, offset: 0, limit: 0, hasMore: false };
+  return { jobs: [], total: 0, offset: 0, limit: 0, hasMore: false, nextCursor: undefined, pageSize: 0 };
 }
 
 export const ListAdminJobsResponse: MessageFns<ListAdminJobsResponse> = {
@@ -4984,6 +6516,12 @@ export const ListAdminJobsResponse: MessageFns<ListAdminJobsResponse> = {
     }
     if (message.hasMore !== undefined && message.hasMore !== false) {
       writer.uint32(40).bool(message.hasMore);
+    }
+    if (message.nextCursor !== undefined) {
+      writer.uint32(50).string(message.nextCursor);
+    }
+    if (message.pageSize !== undefined && message.pageSize !== 0) {
+      writer.uint32(56).int32(message.pageSize);
     }
     return writer;
   },
@@ -5038,6 +6576,22 @@ export const ListAdminJobsResponse: MessageFns<ListAdminJobsResponse> = {
           message.hasMore = reader.bool();
           continue;
         }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.nextCursor = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.pageSize = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5058,6 +6612,16 @@ export const ListAdminJobsResponse: MessageFns<ListAdminJobsResponse> = {
         : isSet(object.has_more)
         ? globalThis.Boolean(object.has_more)
         : false,
+      nextCursor: isSet(object.nextCursor)
+        ? globalThis.String(object.nextCursor)
+        : isSet(object.next_cursor)
+        ? globalThis.String(object.next_cursor)
+        : undefined,
+      pageSize: isSet(object.pageSize)
+        ? globalThis.Number(object.pageSize)
+        : isSet(object.page_size)
+        ? globalThis.Number(object.page_size)
+        : 0,
     };
   },
 
@@ -5078,6 +6642,12 @@ export const ListAdminJobsResponse: MessageFns<ListAdminJobsResponse> = {
     if (message.hasMore !== undefined && message.hasMore !== false) {
       obj.hasMore = message.hasMore;
     }
+    if (message.nextCursor !== undefined) {
+      obj.nextCursor = message.nextCursor;
+    }
+    if (message.pageSize !== undefined && message.pageSize !== 0) {
+      obj.pageSize = Math.round(message.pageSize);
+    }
     return obj;
   },
 
@@ -5091,6 +6661,8 @@ export const ListAdminJobsResponse: MessageFns<ListAdminJobsResponse> = {
     message.offset = object.offset ?? 0;
     message.limit = object.limit ?? 0;
     message.hasMore = object.hasMore ?? false;
+    message.nextCursor = object.nextCursor ?? undefined;
+    message.pageSize = object.pageSize ?? 0;
     return message;
   },
 };
@@ -6273,6 +7845,19 @@ export const AdminServiceService = {
       Buffer.from(UpdateAdminUserResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): UpdateAdminUserResponse => UpdateAdminUserResponse.decode(value),
   },
+  updateAdminUserReferralSettings: {
+    path: "/stream.app.v1.AdminService/UpdateAdminUserReferralSettings",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdateAdminUserReferralSettingsRequest): Buffer =>
+      Buffer.from(UpdateAdminUserReferralSettingsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdateAdminUserReferralSettingsRequest =>
+      UpdateAdminUserReferralSettingsRequest.decode(value),
+    responseSerialize: (value: UpdateAdminUserReferralSettingsResponse): Buffer =>
+      Buffer.from(UpdateAdminUserReferralSettingsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UpdateAdminUserReferralSettingsResponse =>
+      UpdateAdminUserReferralSettingsResponse.decode(value),
+  },
   updateAdminUserRole: {
     path: "/stream.app.v1.AdminService/UpdateAdminUserRole",
     requestStream: false,
@@ -6489,6 +8074,63 @@ export const AdminServiceService = {
     responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
+  listAdminPlayerConfigs: {
+    path: "/stream.app.v1.AdminService/ListAdminPlayerConfigs",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ListAdminPlayerConfigsRequest): Buffer =>
+      Buffer.from(ListAdminPlayerConfigsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListAdminPlayerConfigsRequest => ListAdminPlayerConfigsRequest.decode(value),
+    responseSerialize: (value: ListAdminPlayerConfigsResponse): Buffer =>
+      Buffer.from(ListAdminPlayerConfigsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ListAdminPlayerConfigsResponse =>
+      ListAdminPlayerConfigsResponse.decode(value),
+  },
+  getAdminPlayerConfig: {
+    path: "/stream.app.v1.AdminService/GetAdminPlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetAdminPlayerConfigRequest): Buffer =>
+      Buffer.from(GetAdminPlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetAdminPlayerConfigRequest => GetAdminPlayerConfigRequest.decode(value),
+    responseSerialize: (value: GetAdminPlayerConfigResponse): Buffer =>
+      Buffer.from(GetAdminPlayerConfigResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetAdminPlayerConfigResponse => GetAdminPlayerConfigResponse.decode(value),
+  },
+  createAdminPlayerConfig: {
+    path: "/stream.app.v1.AdminService/CreateAdminPlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CreateAdminPlayerConfigRequest): Buffer =>
+      Buffer.from(CreateAdminPlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreateAdminPlayerConfigRequest => CreateAdminPlayerConfigRequest.decode(value),
+    responseSerialize: (value: CreateAdminPlayerConfigResponse): Buffer =>
+      Buffer.from(CreateAdminPlayerConfigResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CreateAdminPlayerConfigResponse =>
+      CreateAdminPlayerConfigResponse.decode(value),
+  },
+  updateAdminPlayerConfig: {
+    path: "/stream.app.v1.AdminService/UpdateAdminPlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdateAdminPlayerConfigRequest): Buffer =>
+      Buffer.from(UpdateAdminPlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdateAdminPlayerConfigRequest => UpdateAdminPlayerConfigRequest.decode(value),
+    responseSerialize: (value: UpdateAdminPlayerConfigResponse): Buffer =>
+      Buffer.from(UpdateAdminPlayerConfigResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UpdateAdminPlayerConfigResponse =>
+      UpdateAdminPlayerConfigResponse.decode(value),
+  },
+  deleteAdminPlayerConfig: {
+    path: "/stream.app.v1.AdminService/DeleteAdminPlayerConfig",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: DeleteAdminPlayerConfigRequest): Buffer =>
+      Buffer.from(DeleteAdminPlayerConfigRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeleteAdminPlayerConfigRequest => DeleteAdminPlayerConfigRequest.decode(value),
+    responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
+  },
   listAdminJobs: {
     path: "/stream.app.v1.AdminService/ListAdminJobs",
     requestStream: false,
@@ -6592,6 +8234,10 @@ export interface AdminServiceServer extends UntypedServiceImplementation {
   getAdminUser: handleUnaryCall<GetAdminUserRequest, GetAdminUserResponse>;
   createAdminUser: handleUnaryCall<CreateAdminUserRequest, CreateAdminUserResponse>;
   updateAdminUser: handleUnaryCall<UpdateAdminUserRequest, UpdateAdminUserResponse>;
+  updateAdminUserReferralSettings: handleUnaryCall<
+    UpdateAdminUserReferralSettingsRequest,
+    UpdateAdminUserReferralSettingsResponse
+  >;
   updateAdminUserRole: handleUnaryCall<UpdateAdminUserRoleRequest, UpdateAdminUserRoleResponse>;
   deleteAdminUser: handleUnaryCall<DeleteAdminUserRequest, MessageResponse>;
   listAdminVideos: handleUnaryCall<ListAdminVideosRequest, ListAdminVideosResponse>;
@@ -6612,6 +8258,11 @@ export interface AdminServiceServer extends UntypedServiceImplementation {
   createAdminAdTemplate: handleUnaryCall<CreateAdminAdTemplateRequest, CreateAdminAdTemplateResponse>;
   updateAdminAdTemplate: handleUnaryCall<UpdateAdminAdTemplateRequest, UpdateAdminAdTemplateResponse>;
   deleteAdminAdTemplate: handleUnaryCall<DeleteAdminAdTemplateRequest, MessageResponse>;
+  listAdminPlayerConfigs: handleUnaryCall<ListAdminPlayerConfigsRequest, ListAdminPlayerConfigsResponse>;
+  getAdminPlayerConfig: handleUnaryCall<GetAdminPlayerConfigRequest, GetAdminPlayerConfigResponse>;
+  createAdminPlayerConfig: handleUnaryCall<CreateAdminPlayerConfigRequest, CreateAdminPlayerConfigResponse>;
+  updateAdminPlayerConfig: handleUnaryCall<UpdateAdminPlayerConfigRequest, UpdateAdminPlayerConfigResponse>;
+  deleteAdminPlayerConfig: handleUnaryCall<DeleteAdminPlayerConfigRequest, MessageResponse>;
   listAdminJobs: handleUnaryCall<ListAdminJobsRequest, ListAdminJobsResponse>;
   getAdminJob: handleUnaryCall<GetAdminJobRequest, GetAdminJobResponse>;
   getAdminJobLogs: handleUnaryCall<GetAdminJobLogsRequest, GetAdminJobLogsResponse>;
@@ -6699,6 +8350,21 @@ export interface AdminServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: UpdateAdminUserResponse) => void,
   ): ClientUnaryCall;
+  updateAdminUserReferralSettings(
+    request: UpdateAdminUserReferralSettingsRequest,
+    callback: (error: ServiceError | null, response: UpdateAdminUserReferralSettingsResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminUserReferralSettings(
+    request: UpdateAdminUserReferralSettingsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdateAdminUserReferralSettingsResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminUserReferralSettings(
+    request: UpdateAdminUserReferralSettingsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdateAdminUserReferralSettingsResponse) => void,
+  ): ClientUnaryCall;
   updateAdminUserRole(
     request: UpdateAdminUserRoleRequest,
     callback: (error: ServiceError | null, response: UpdateAdminUserRoleResponse) => void,
@@ -6995,6 +8661,81 @@ export interface AdminServiceClient extends Client {
   ): ClientUnaryCall;
   deleteAdminAdTemplate(
     request: DeleteAdminAdTemplateRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  listAdminPlayerConfigs(
+    request: ListAdminPlayerConfigsRequest,
+    callback: (error: ServiceError | null, response: ListAdminPlayerConfigsResponse) => void,
+  ): ClientUnaryCall;
+  listAdminPlayerConfigs(
+    request: ListAdminPlayerConfigsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListAdminPlayerConfigsResponse) => void,
+  ): ClientUnaryCall;
+  listAdminPlayerConfigs(
+    request: ListAdminPlayerConfigsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListAdminPlayerConfigsResponse) => void,
+  ): ClientUnaryCall;
+  getAdminPlayerConfig(
+    request: GetAdminPlayerConfigRequest,
+    callback: (error: ServiceError | null, response: GetAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  getAdminPlayerConfig(
+    request: GetAdminPlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  getAdminPlayerConfig(
+    request: GetAdminPlayerConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  createAdminPlayerConfig(
+    request: CreateAdminPlayerConfigRequest,
+    callback: (error: ServiceError | null, response: CreateAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  createAdminPlayerConfig(
+    request: CreateAdminPlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: CreateAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  createAdminPlayerConfig(
+    request: CreateAdminPlayerConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: CreateAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminPlayerConfig(
+    request: UpdateAdminPlayerConfigRequest,
+    callback: (error: ServiceError | null, response: UpdateAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminPlayerConfig(
+    request: UpdateAdminPlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdateAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminPlayerConfig(
+    request: UpdateAdminPlayerConfigRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdateAdminPlayerConfigResponse) => void,
+  ): ClientUnaryCall;
+  deleteAdminPlayerConfig(
+    request: DeleteAdminPlayerConfigRequest,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deleteAdminPlayerConfig(
+    request: DeleteAdminPlayerConfigRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deleteAdminPlayerConfig(
+    request: DeleteAdminPlayerConfigRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: MessageResponse) => void,

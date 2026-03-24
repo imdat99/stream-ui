@@ -7,7 +7,7 @@ interface Trend {
   isPositive: boolean;
 }
 
-interface Props {
+export interface StatProps {
   title: string;
   value: string | number;
   icon?: string | VNode;
@@ -15,7 +15,7 @@ interface Props {
   color?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
 }
 
-withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<StatProps>(), {
   color: 'primary'
 });
 
@@ -49,7 +49,7 @@ const iconColors = {
     <div class="relative z-10">
       <div class="flex items-start justify-between mb-3">
         <div>
-          <p class="text-sm font-medium text-gray-600 mb-1">{{ title }}</p>
+          <p class="text-sm font-medium text-gray-600 mb-1">{{ $t(title) }}</p>
           <p class="text-3xl font-bold text-gray-900">{{ value }}</p>
         </div>
 

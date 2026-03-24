@@ -10,13 +10,8 @@ export type SettingsPreferencesSnapshot = {
   pushNotifications: boolean;
   marketingNotifications: boolean;
   telegramNotifications: boolean;
-  autoplay: boolean;
-  loop: boolean;
-  muted: boolean;
-  showControls: boolean;
-  pip: boolean;
-  airplay: boolean;
-  chromecast: boolean;
+  language: string;
+  locale: string;
 };
 
 export type NotificationSettingsDraft = {
@@ -24,17 +19,6 @@ export type NotificationSettingsDraft = {
   push: boolean;
   marketing: boolean;
   telegram: boolean;
-};
-
-export type PlayerSettingsDraft = {
-  autoplay: boolean;
-  loop: boolean;
-  muted: boolean;
-  showControls: boolean;
-  pip: boolean;
-  airplay: boolean;
-  chromecast: boolean;
-  encrytion_m3u8: boolean;
 };
 
 type PreferencesResponse = {
@@ -46,13 +30,8 @@ const DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT: SettingsPreferencesSnapshot = {
   pushNotifications: true,
   marketingNotifications: false,
   telegramNotifications: false,
-  autoplay: false,
-  loop: false,
-  muted: false,
-  showControls: true,
-  pip: true,
-  airplay: true,
-  chromecast: true,
+  language: 'en',
+  locale: 'en',
 };
 
 const normalizePreferencesSnapshot = (responseData: unknown): SettingsPreferencesSnapshot => {
@@ -63,13 +42,8 @@ const normalizePreferencesSnapshot = (responseData: unknown): SettingsPreference
     pushNotifications: preferences?.pushNotifications ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.pushNotifications,
     marketingNotifications: preferences?.marketingNotifications ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.marketingNotifications,
     telegramNotifications: preferences?.telegramNotifications ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.telegramNotifications,
-    autoplay: preferences?.autoplay ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.autoplay,
-    loop: preferences?.loop ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.loop,
-    muted: preferences?.muted ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.muted,
-    showControls: preferences?.showControls ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.showControls,
-    pip: preferences?.pip ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.pip,
-    airplay: preferences?.airplay ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.airplay,
-    chromecast: preferences?.chromecast ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.chromecast,
+    language: preferences?.language ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.language,
+    locale: preferences?.locale ?? DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT.locale,
   };
 };
 
@@ -82,19 +56,6 @@ export const createNotificationSettingsDraft = (
   telegram: snapshot.telegramNotifications,
 });
 
-export const createPlayerSettingsDraft = (
-  snapshot: SettingsPreferencesSnapshot = DEFAULT_SETTINGS_PREFERENCES_SNAPSHOT,
-): PlayerSettingsDraft => ({
-  autoplay: snapshot.autoplay,
-  loop: snapshot.loop,
-  muted: snapshot.muted,
-  showControls: snapshot.showControls,
-  pip: snapshot.pip,
-  airplay: snapshot.airplay,
-  chromecast: snapshot.chromecast,
-  encrytion_m3u8: snapshot.chromecast
-});
-
 export const toNotificationPreferencesPayload = (
   draft: NotificationSettingsDraft,
 ): UpdatePreferencesRequest => ({
@@ -102,18 +63,6 @@ export const toNotificationPreferencesPayload = (
   pushNotifications: draft.push,
   marketingNotifications: draft.marketing,
   telegramNotifications: draft.telegram,
-});
-
-export const toPlayerPreferencesPayload = (
-  draft: PlayerSettingsDraft,
-): UpdatePreferencesRequest => ({
-  autoplay: draft.autoplay,
-  loop: draft.loop,
-  muted: draft.muted,
-  showControls: draft.showControls,
-  pip: draft.pip,
-  airplay: draft.airplay,
-  chromecast: draft.chromecast,
 });
 
 export function useSettingsPreferencesQuery() {

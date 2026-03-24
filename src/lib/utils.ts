@@ -97,3 +97,7 @@ export const getStatusSeverity = (status: string = "") => {
       return 'info';
   }
 };
+export const isAdmin = (role: string = "") => {
+  const r = String(role).toLowerCase();
+  return r === "admin" || r === "superadmin";
+};

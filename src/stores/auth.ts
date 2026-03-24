@@ -121,8 +121,13 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function loginWithGoogle() {
+  async function loginWithGoogle(refUsername?: string) {
     if (typeof window === "undefined") return;
+    if (refUsername?.trim()) {
+      document.cookie = `ref_username=${encodeURIComponent(refUsername.trim())}; Path=/; Max-Age=900; SameSite=Lax`;
+    } else {
+      document.cookie = "ref_username=; Path=/; Max-Age=0; SameSite=Lax";
+    }
     const response = await rpcClient.getGoogleLoginUrl();
     if (!response.url) {
       throw new Error(t("auth.errors.unknown"));
@@ -130,12 +135,12 @@ export const useAuthStore = defineStore("auth", () => {
     window.location.assign(response.url);
   }
 
-  async function register(username: string, email: string, password: string) {
+  async function register(username: string, email: string, password: string, refUsername?: string) {
     loading.value = true;
     error.value = null;
 
     try {
-      await rpcClient.register({ username, email, password });
+      await rpcClient.register({ username, email, password, refUsername: refUsername?.trim() || undefined });
       await router.push("/login");
     } catch (e: any) {
       error.value = t("auth.errors.registrationFailed", {

@@ -1,5 +1,5 @@
 import { Context, Hono } from "hono";
-import { deleteCookie } from "hono/cookie";
+import { deleteCookie, getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { getAuthServiceClient, getInternalGrpcMetadata } from "../services/grpcClient";
 import type { User } from "@/server/gen/proto/app/v1/common";
@@ -84,6 +84,7 @@ const redirectToGoogleFinalize = (c: Context, status: string, reason?: string) =
 };
 
 authRoute.get("/google/callback", async (c) => {
+  const referralCookieName = "ref_username";
   const oauthError = c.req.query("error")?.trim();
   if (oauthError) {
     return redirectToGoogleFinalize(c, "error", oauthError);
@@ -96,8 +97,9 @@ authRoute.get("/google/callback", async (c) => {
 
   try {
     const grpcCookies: string[] = [];
+    const refUsername = getCookie(c, referralCookieName)?.trim();
     await authService().completeGoogleLogin(
-      { code },
+      { code, refUsername: refUsername || undefined },
       getInternalGrpcMetadata(),
       {
         onMetadata: (metadata) => {
@@ -109,9 +111,11 @@ authRoute.get("/google/callback", async (c) => {
         },
       },
     );
+    deleteCookie(c, referralCookieName, { path: "/" });
     forwardGrpcCookies(c, grpcCookies);
     return redirectToGoogleFinalize(c, "success");
   } catch (error) {
+    deleteCookie(c, referralCookieName, { path: "/" });
     const reason = normalizeGoogleAuthReason(error instanceof Error ? error.message : undefined);
     return redirectToGoogleFinalize(c, "error", reason);
   }

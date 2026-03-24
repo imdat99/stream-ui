@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import LinkIcon from '@/components/icons/LinkIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import BaseTable from '@/components/ui/BaseTable.vue';
+import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
+import type { ColumnDef } from '@tanstack/vue-table';
+import { useTranslation } from 'i18next-vue';
+import { computed, h } from 'vue';
+import type { DomainItem } from '../types';
+
+const props = defineProps<{
+  domains: DomainItem[];
+  isInitialLoading: boolean;
+  adding: boolean;
+  removingId: string | null;
+}>();
+
+const emit = defineEmits<{
+  (e: 'remove', domain: DomainItem): void;
+}>();
+
+const { t } = useTranslation();
+
+const columns = computed<ColumnDef<DomainItem>[]>(() => [
+  {
+    id: 'domain',
+    header: t('settings.domainsDns.table.domain'),
+    accessorFn: row => row.name,
+    cell: ({ row }) => h('div', { class: 'flex items-center gap-2' }, [
+      h(LinkIcon, { class: 'h-4 w-4 text-foreground/40' }),
+      h('span', { class: 'text-sm font-medium text-foreground' }, row.original.name),
+    ]),
+    meta: {
+      headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+      cellClass: 'px-6 py-3',
+    },
+  },
+  {
+    id: 'addedAt',
+    header: t('settings.domainsDns.table.addedDate'),
+    accessorFn: row => row.addedAt,
+    cell: ({ row }) => h('span', { class: 'text-sm text-foreground/60' }, row.original.addedAt),
+    meta: {
+      headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
+      cellClass: 'px-6 py-3',
+    },
+  },
+  {
+    id: 'actions',
+    header: t('common.actions'),
+    enableSorting: false,
+    cell: ({ row }) => h(AppButton, {
+      variant: 'ghost',
+      size: 'sm',
+      disabled: props.adding || props.removingId !== null,
+      onClick: () => emit('remove', row.original),
+    }, {
+      icon: () => h(TrashIcon, { class: 'h-4 w-4 text-danger' }),
+    }),
+    meta: {
+      headerClass: 'px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50',
+      cellClass: 'px-6 py-3 text-right',
+    },
+  },
+]);
+</script>
+
+<template>
+  <SettingsTableSkeleton v-if="isInitialLoading" :columns="3" :rows="4" />
+
+  <BaseTable
+    v-else
+    :data="domains"
+    :columns="columns"
+    :get-row-id="(row) => row.id"
+    wrapperClass="mt-4 border-b border-border rounded-none border-x-0 border-t-0 bg-transparent"
+    tableClass="w-full"
+    headerRowClass="bg-muted/30"
+    bodyRowClass="border-b border-border hover:bg-muted/30"
+  >
+    <template #empty>
+      <div class="px-6 py-12 text-center">
+        <LinkIcon class="mx-auto mb-3 block h-10 w-10 text-foreground/30" />
+        <p class="mb-1 text-sm text-foreground/60">{{ t('settings.domainsDns.emptyTitle') }}</p>
+        <p class="text-xs text-foreground/40">{{ t('settings.domainsDns.emptySubtitle') }}</p>
+      </div>
+    </template>
+  </BaseTable>
+</template>

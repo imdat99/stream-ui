@@ -36,12 +36,18 @@ export const publicAuthMethods = {
       email: z.string().email("Invalid email"),
       username: z.string().min(3, "Username must be at least 3 characters"),
       password: z.string().min(6, "Password must be at least 6 characters"),
+      refUsername: z.string().trim().min(1).optional(),
     }),
   )(async (data) => {
     const context = getContext();
     const authClient = context.get("authServiceClient");
     const metadata = context.get("internalGrpcMetadata");
-    const response = await authClient.register(data, metadata);
+    const response = await authClient.register({
+      email: data.email,
+      username: data.username,
+      password: data.password,
+      refUsername: data.refUsername,
+    }, metadata);
 
     return { user: ensureSessionUser(response.user) };
   }),

@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import AppButton from '@/components/ui/AppButton.vue';
-import AppDialog from '@/components/ui/AppDialog.vue';
-import AppInput from '@/components/ui/AppInput.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
-import LockIcon from '@/components/icons/LockIcon.vue';
-import TelegramIcon from '@/components/icons/TelegramIcon.vue';
-import XCircleIcon from '@/components/icons/XCircleIcon.vue';
 import { useAppConfirm } from '@/composables/useAppConfirm';
 import { useAppToast } from '@/composables/useAppToast';
 import { supportedLocales } from '@/i18n/constants';
-import SettingsRow from '@/routes/settings/components/SettingsRow.vue';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useTranslation } from 'i18next-vue';
 import { computed, ref } from 'vue';
+import SecurityAccountStatusRow from './components/SecurityAccountStatusRow.vue';
+import SecurityChangePasswordDialog from './components/SecurityChangePasswordDialog.vue';
+import SecurityChangePasswordRow from './components/SecurityChangePasswordRow.vue';
+import SecurityEmailRow from './components/SecurityEmailRow.vue';
+import SecurityLanguageRow from './components/SecurityLanguageRow.vue';
+import SecurityLogoutRow from './components/SecurityLogoutRow.vue';
+import SecurityTelegramRow from './components/SecurityTelegramRow.vue';
+import SecurityTwoFactorDialog from './components/SecurityTwoFactorDialog.vue';
 
 const auth = useAuthStore();
 const toast = useAppToast();
@@ -191,275 +191,50 @@ const disconnectTelegram = async () => {
         :title="t('settings.securityConnected.header.title')"
         :description="t('settings.securityConnected.header.subtitle')"
     >
-        <SettingsRow
-            :title="t('settings.securityConnected.accountStatus.label')"
-            :description="t('settings.securityConnected.accountStatus.detail')"
-        >
-            <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-            </template>
+        <SecurityAccountStatusRow />
 
-            <template #actions>
-                <span class="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded">{{ t('settings.securityConnected.accountStatus.badge') }}</span>
-            </template>
-        </SettingsRow>
+        <SecurityLanguageRow
+            :selected-language="selectedLanguage"
+            :language-options="languageOptions"
+            :language-saving="languageSaving"
+            @update:selected-language="selectedLanguage = $event"
+            @save="saveLanguage"
+        />
 
-        <SettingsRow
-            :title="t('settings.securityConnected.language.label')"
-            :description="t('settings.securityConnected.language.detail')"
-            actionsClass="flex items-center gap-2"
-        >
-            <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M2 12h20" />
-                    <path d="M12 2a15 15 0 0 1 0 20" />
-                    <path d="M12 2a15 15 0 0 0 0 20" />
-                </svg>
-            </template>
+        <SecurityChangePasswordRow @open="openChangePassword" />
 
-            <template #actions>
-                <select
-                    v-model="selectedLanguage"
-                    :disabled="languageSaving"
-                    class="rounded-md border border-border bg-header px-3 py-2 text-sm text-foreground disabled:opacity-60"
-                >
-                    <option
-                        v-for="option in languageOptions"
-                        :key="option.value"
-                        :value="option.value"
-                    >
-                        {{ option.label }}
-                    </option>
-                </select>
-                <AppButton
-                    size="sm"
-                    variant="secondary"
-                    :loading="languageSaving"
-                    :disabled="languageSaving"
-                    @click="saveLanguage"
-                >
-                    {{ t('settings.securityConnected.language.save') }}
-                </AppButton>
-            </template>
-        </SettingsRow>
+        <SecurityEmailRow :email-connected="emailConnected" />
 
-        <SettingsRow
-            :title="t('settings.securityConnected.changePassword.label')"
-            :description="t('settings.securityConnected.changePassword.detail')"
-        >
-            <template #icon>
-                <svg aria-hidden="true" class="fill-primary w-6 h-6" height="24" viewBox="0 0 24 24" version="1.1" width="24" data-view-component="true">
-                    <path d="M22 9.75v5.5A1.75 1.75 0 0 1 20.25 17H3.75A1.75 1.75 0 0 1 2 15.25v-5.5C2 8.784 2.784 8 3.75 8h16.5c.966 0 1.75.784 1.75 1.75Zm-8.75 2.75a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0Zm-6.5 1.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Zm10.5 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"></path>
-                </svg>
-            </template>
+        <SecurityTelegramRow
+            :telegram-connected="telegramConnected"
+            :telegram-username="telegramUsername"
+            @connect="connectTelegram"
+            @disconnect="disconnectTelegram"
+        />
 
-            <template #actions>
-                <AppButton variant="secondary" size="sm" @click="openChangePassword">
-                    {{ t('settings.securityConnected.changePassword.button') }}
-                </AppButton>
-            </template>
-        </SettingsRow>
-
-        <SettingsRow
-            :title="t('settings.securityConnected.email.label')"
-            :description="emailConnected ? t('settings.securityConnected.email.connected') : t('settings.securityConnected.email.disconnected')"
-        >
-            <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="text-info w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="16" x="2" y="4" rx="2"/>
-                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                </svg>
-            </template>
-
-            <template #actions>
-                <span class="text-xs font-medium px-2 py-1 rounded" :class="emailConnected ? 'text-success bg-success/10' : 'text-muted bg-muted/20'">
-                    {{ emailConnected ? t('settings.securityConnected.email.badgeConnected') : t('settings.securityConnected.email.badgeDisconnected') }}
-                </span>
-            </template>
-        </SettingsRow>
-
-        <SettingsRow
-            :title="t('settings.securityConnected.telegram.label')"
-            :description="telegramConnected ? (telegramUsername || t('settings.securityConnected.telegram.connectedFallback')) : t('settings.securityConnected.telegram.detailDisconnected')"
-        >
-            <template #icon>
-                <TelegramIcon class="w-6 h-6 text-[#0088cc]" />
-            </template>
-
-            <template #actions>
-                <AppButton
-                    v-if="telegramConnected"
-                    variant="danger"
-                    size="sm"
-                    @click="disconnectTelegram"
-                >
-                    {{ t('settings.securityConnected.telegram.disconnect') }}
-                </AppButton>
-                <AppButton
-                    v-else
-                    size="sm"
-                    variant="secondary"
-                    @click="connectTelegram"
-                >
-                    {{ t('settings.securityConnected.telegram.connect') }}
-                </AppButton>
-            </template>
-        </SettingsRow>
-
-        <SettingsRow
-            :title="t('settings.securityConnected.logout.label')"
-            :description="t('settings.securityConnected.logout.detail')"
-            hoverClass="hover:bg-danger/5"
-        >
-            <template #icon>
-                <XCircleIcon class="w-6 h-6 text-danger" />
-            </template>
-
-            <template #actions>
-                <AppButton variant="danger" size="sm" @click="handleLogout">
-                    <template #icon>
-                        <XCircleIcon class="w-4 h-4" />
-                    </template>
-                    {{ t('settings.securityConnected.logout.button') }}
-                </AppButton>
-            </template>
-        </SettingsRow>
+        <SecurityLogoutRow @logout="handleLogout" />
     </SettingsSectionCard>
 
-    <AppDialog
+    <SecurityTwoFactorDialog
         :visible="twoFactorDialogVisible"
+        :two-factor-code="twoFactorCode"
+        :two-factor-secret="twoFactorSecret"
         @update:visible="twoFactorDialogVisible = $event"
-        :title="t('settings.securityConnected.twoFactorDialog.title')"
-        maxWidthClass="max-w-md"
-    >
-        <div class="space-y-4">
-            <p class="text-sm text-foreground/70">
-                {{ t('settings.securityConnected.twoFactorDialog.subtitle') }}
-            </p>
+        @update:two-factor-code="twoFactorCode = $event"
+        @confirm="confirmTwoFactor"
+    />
 
-            <div class="flex justify-center py-4">
-                <div class="w-48 h-48 bg-muted rounded-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="7"/>
-                        <rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/>
-                        <rect x="3" y="14" width="7" height="7"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="bg-muted/30 rounded-md p-3">
-                <p class="text-xs text-foreground/60 mb-1">{{ t('settings.securityConnected.twoFactorDialog.secret') }}</p>
-                <code class="text-sm font-mono text-primary">{{ twoFactorSecret }}</code>
-            </div>
-
-            <div class="grid gap-2">
-                <label for="twoFactorCode" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.twoFactorDialog.codeLabel') }}</label>
-                <AppInput
-                    id="twoFactorCode"
-                    v-model="twoFactorCode"
-                    :placeholder="t('settings.securityConnected.twoFactorDialog.codePlaceholder')"
-                    :maxlength="6"
-                />
-            </div>
-        </div>
-        <template #footer>
-            <div class="flex justify-end gap-3">
-                <AppButton variant="secondary" size="sm" @click="twoFactorDialogVisible = false">
-                    {{ t('settings.securityConnected.twoFactorDialog.cancel') }}
-                </AppButton>
-                <AppButton size="sm" @click="confirmTwoFactor">
-                    <template #icon>
-                        <CheckIcon class="w-4 h-4" />
-                    </template>
-                    {{ t('settings.securityConnected.twoFactorDialog.verify') }}
-                </AppButton>
-            </div>
-        </template>
-    </AppDialog>
-
-    <AppDialog
+    <SecurityChangePasswordDialog
         :visible="changePasswordDialogVisible"
+        :current-password="currentPassword"
+        :new-password="newPassword"
+        :confirm-password="confirmPassword"
+        :loading="changePasswordLoading"
+        :error="changePasswordError"
         @update:visible="changePasswordDialogVisible = $event"
-        :title="t('settings.securityConnected.changePassword.dialog.title')"
-        maxWidthClass="max-w-md"
-    >
-        <div class="space-y-4">
-            <p class="text-sm text-foreground/70">
-                {{ t('settings.securityConnected.changePassword.dialog.subtitle') }}
-            </p>
-
-            <div v-if="changePasswordError" class="bg-danger/10 border border-danger text-danger text-sm rounded-md p-3">
-                {{ changePasswordError }}
-            </div>
-
-            <div class="grid gap-2">
-                <label for="currentPassword" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.dialog.current') }}</label>
-                <AppInput
-                    id="currentPassword"
-                    v-model="currentPassword"
-                    type="password"
-                    :placeholder="t('settings.securityConnected.changePassword.dialog.currentPlaceholder')"
-                >
-                    <template #prefix>
-                        <LockIcon class="w-5 h-5" />
-                    </template>
-                </AppInput>
-            </div>
-
-            <div class="grid gap-2">
-                <label for="newPassword" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.dialog.new') }}</label>
-                <AppInput
-                    id="newPassword"
-                    v-model="newPassword"
-                    type="password"
-                    :placeholder="t('settings.securityConnected.changePassword.dialog.newPlaceholder')"
-                >
-                    <template #prefix>
-                        <LockIcon class="w-5 h-5" />
-                    </template>
-                </AppInput>
-            </div>
-
-            <div class="grid gap-2">
-                <label for="confirmPassword" class="text-sm font-medium text-foreground">{{ t('settings.securityConnected.changePassword.dialog.confirm') }}</label>
-                <AppInput
-                    id="confirmPassword"
-                    v-model="confirmPassword"
-                    type="password"
-                    :placeholder="t('settings.securityConnected.changePassword.dialog.confirmPlaceholder')"
-                >
-                    <template #prefix>
-                        <LockIcon class="w-5 h-5" />
-                    </template>
-                </AppInput>
-            </div>
-        </div>
-        <template #footer>
-            <div class="flex justify-end gap-3">
-                <AppButton
-                    variant="secondary"
-                    size="sm"
-                    :disabled="changePasswordLoading"
-                    @click="changePasswordDialogVisible = false"
-                >
-                    {{ t('settings.securityConnected.changePassword.dialog.cancel') }}
-                </AppButton>
-                <AppButton
-                    size="sm"
-                    :loading="changePasswordLoading"
-                    @click="changePassword"
-                >
-                    <template #icon>
-                        <CheckIcon class="w-4 h-4" />
-                    </template>
-                    {{ t('settings.securityConnected.changePassword.dialog.submit') }}
-                </AppButton>
-            </div>
-        </template>
-    </AppDialog>
+        @update:current-password="currentPassword = $event"
+        @update:new-password="newPassword = $event"
+        @update:confirm-password="confirmPassword = $event"
+        @submit="changePassword"
+    />
 </template>
