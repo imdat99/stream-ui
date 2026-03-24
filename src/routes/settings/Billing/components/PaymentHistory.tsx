@@ -9,6 +9,10 @@ import { useAuthStore } from "@/stores/auth";
 import { useQuery } from "@pinia/colada";
 import { useTranslation } from "i18next-vue";
 import type { ColumnDef } from "@tanstack/vue-table";
+import { computed, defineComponent, ref } from "vue";
+import AppButton from "@/components/ui/AppButton.vue";
+
+const pageSizeOptions = [5, 10, 20, 50] as const;
 
 const normalizeHistoryStatus = (status?: string) => {
     switch ((status || '').toLowerCase()) {
@@ -35,6 +39,8 @@ const PaymentHistory = defineComponent({
         const { t } = useTranslation();
         const toast = useAppToast();
         const downloadingInvoiceId = ref<string | null>(null);
+        const page = ref(1);
+        const limit = ref(10);
 
         const formatTermLabel = (months: number) => t('settings.billing.termOption', { months });
         const formatPaymentMethodLabel = (value?: string) => {
@@ -74,9 +80,13 @@ const PaymentHistory = defineComponent({
             };
         };
         const { data, isLoading } = useQuery({
-            key: ['paymentHistory'],
-            query: () => client.listPaymentHistory().then(res => (res.payments || []).map(mapHistoryItem)),
+            key: () => ['paymentHistory', page.value, limit.value],
+            query: () => client.listPaymentHistory(page.value, limit.value).then(res => ({
+                ...res, 
+                items: (res.payments || []).map(mapHistoryItem)
+            })),
         });
+        const totalPages = computed(() => Math.max(1, Math.ceil((data.value?.total || 0) / (data.value?.limit || limit.value || 1))));
 
         const handleDownloadInvoice = async (item: PaymentHistoryItem) => {
             if (!item.id) return;
@@ -193,10 +203,25 @@ const PaymentHistory = defineComponent({
                 ),
                 meta: {
                     headerClass: 'col-span-2 flex justify-center',
-                    cellClass: 'col-span-2 justify-center',
+                    cellClass: 'col-span-2 flex justify-center',
                 },
             },
         ];
+
+        const previousPage = () => {
+            if (!data.value?.hasPrev || isLoading.value) return;
+            page.value -= 1;
+        };
+        const nextPage = () => {
+            if (!data.value?.hasNext || isLoading.value) return;
+            page.value += 1;
+        };
+        const changePageSize = (event: Event) => {
+            const nextLimit = Number((event.target as HTMLSelectElement).value) || 10;
+            if (nextLimit === limit.value) return;
+            limit.value = nextLimit;
+            page.value = 1;
+        };
 
         return () => (
             <div class="px-6 py-4">
@@ -211,7 +236,7 @@ const PaymentHistory = defineComponent({
                 </div>
 
                 <BaseTable
-                    data={data.value || []}
+                    data={data.value?.items || []}
                     columns={columns}
                     loading={isLoading.value}
                     emptyText={t('settings.billing.noPaymentHistory')}
@@ -219,7 +244,7 @@ const PaymentHistory = defineComponent({
                     {{
                         loading: () => (
                             <div class="px-4 py-6 space-y-3">
-                                {Array.from({ length: 3 }).map((_, index) => (
+                                {Array.from({ length: 10 }).map((_, index) => (
                                     <div key={index} class="grid grid-cols-12 gap-4 items-center animate-pulse">
                                         <div class="col-span-3 h-4 rounded bg-muted/50" />
                                         <div class="col-span-2 h-4 rounded bg-muted/50" />
@@ -240,6 +265,28 @@ const PaymentHistory = defineComponent({
                         )
                     }}
                 </BaseTable>
+
+                <div class="mt-4 flex flex-col gap-3 text-xs text-foreground/55 sm:flex-row sm:items-center sm:justify-between">
+                    <div>{t('common.page', { current: data.value?.page || page.value, total: totalPages.value })} · {data.value?.total || 0} {t('common.records')}</div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="flex items-center gap-2">
+                            <span>{t('common.rowsPerPage')}</span>
+                            <select
+                                class="rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground"
+                                value={String(limit.value)}
+                                onChange={changePageSize}
+                            >
+                                {pageSizeOptions.map((option) => (
+                                    <option key={option} value={String(option)}>{option}</option>
+                                ))}
+                            </select>
+                        </label>
+                        <div class="flex items-center gap-2 xl:justify-end">
+                        <AppButton size="sm" variant="secondary" disabled={!data.value?.hasPrev || isLoading.value} onClick={previousPage}>{t('common.previous')}</AppButton>
+                        <AppButton size="sm" variant="secondary" disabled={!data.value?.hasNext || isLoading.value} onClick={nextPage}>{t('common.next')}</AppButton>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

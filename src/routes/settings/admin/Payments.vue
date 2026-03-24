@@ -6,7 +6,7 @@ import AdminInput from "./components/AdminInput.vue";
 import AdminSelect from "./components/AdminSelect.vue";
 import AdminTable from "./components/AdminTable.vue";
 import AdminSectionCard from "./components/AdminSectionCard.vue";
-import BillingPlansSection from "@/routes/settings/Billing/components/BillingPlansSection.vue";
+import PlanSelection from "@/routes/settings/Billing/components/PlanSelection.tsx";
 import type { Plan as ModelPlan } from "@/server/gen/proto/app/v1/common";
 import { type ColumnDef } from "@tanstack/vue-table";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
@@ -470,21 +470,10 @@ onMounted(() => {
       </div>
 
       <div class="overflow-hidden rounded-lg border border-border">
-        <BillingPlansSection
-          title="Available plans"
-          description="Reuse the same plan cards from the billing screen when creating an admin payment."
-          :is-loading="plansLoading"
-          :plans="plans"
+        <PlanSelection
           :current-plan-id="selectedPlanId"
-          :selecting-plan-id="selectedPlanId"
-          :format-money="(amount) => formatMoney(amount, 'USD')"
-          :get-plan-storage-text="getPlanStorageText"
-          :get-plan-duration-text="getPlanDurationText"
-          :get-plan-uploads-text="getPlanUploadsText"
-          current-plan-label="Selected"
-          selecting-label="Selected"
-          choose-label="Select plan"
-          @select="selectPlan"
+          :selected-plan-id="selectedPlanId"
+          @upgrade="selectPlan"
         />
       </div>
     </div>

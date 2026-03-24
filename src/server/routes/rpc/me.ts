@@ -322,12 +322,15 @@ export const meMethods = {
     const metadata = context.get("grpcMetadata");
     return await plansClient.listPlans({}, metadata);
   },
-  listPaymentHistory: async () => {
+  listPaymentHistory: validateFn(
+    z.number().int().min(1).optional(),
+    z.number().int().min(1).max(100).optional(),
+  )(async (page, limit) => {
     const context = getContext();
     const paymentsClient = context.get("paymentsServiceClient");
     const metadata = context.get("grpcMetadata");
-    return await paymentsClient.listPaymentHistory({}, metadata);
-  },
+    return await paymentsClient.listPaymentHistory({ page, limit }, metadata);
+  }),
   createPayment: validateFn(
     z.object({
       planId: z.string().trim().min(1),

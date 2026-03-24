@@ -11,7 +11,12 @@
     "status": "Status",
     "videos": "Videos",
     "selected": "{{count}} selected",
-    "copy": "Copy"
+    "copy": "Copy",
+    "rowsPerPage": "Rows per page",
+    "next": "Next",
+    "previous": "Previous",
+    "page": "Page {{current}} of {{total}}",
+    "records": "records"
   },
   "app": {
     "name": "EcoStream"

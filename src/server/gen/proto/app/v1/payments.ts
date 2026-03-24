@@ -38,10 +38,17 @@ export interface CreatePaymentResponse {
 }
 
 export interface ListPaymentHistoryRequest {
+  page?: number | undefined;
+  limit?: number | undefined;
 }
 
 export interface ListPaymentHistoryResponse {
   payments?: PaymentHistoryItem[] | undefined;
+  total?: number | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+  hasPrev?: boolean | undefined;
+  hasNext?: boolean | undefined;
 }
 
 export interface TopupWalletRequest {
@@ -325,11 +332,17 @@ export const CreatePaymentResponse: MessageFns<CreatePaymentResponse> = {
 };
 
 function createBaseListPaymentHistoryRequest(): ListPaymentHistoryRequest {
-  return {};
+  return { page: 0, limit: 0 };
 }
 
 export const ListPaymentHistoryRequest: MessageFns<ListPaymentHistoryRequest> = {
-  encode(_: ListPaymentHistoryRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(message: ListPaymentHistoryRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(8).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(16).int32(message.limit);
+    }
     return writer;
   },
 
@@ -340,6 +353,22 @@ export const ListPaymentHistoryRequest: MessageFns<ListPaymentHistoryRequest> = 
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -349,26 +378,37 @@ export const ListPaymentHistoryRequest: MessageFns<ListPaymentHistoryRequest> = 
     return message;
   },
 
-  fromJSON(_: any): ListPaymentHistoryRequest {
-    return {};
+  fromJSON(object: any): ListPaymentHistoryRequest {
+    return {
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
   },
 
-  toJSON(_: ListPaymentHistoryRequest): unknown {
+  toJSON(message: ListPaymentHistoryRequest): unknown {
     const obj: any = {};
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ListPaymentHistoryRequest>, I>>(base?: I): ListPaymentHistoryRequest {
     return ListPaymentHistoryRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ListPaymentHistoryRequest>, I>>(_: I): ListPaymentHistoryRequest {
+  fromPartial<I extends Exact<DeepPartial<ListPaymentHistoryRequest>, I>>(object: I): ListPaymentHistoryRequest {
     const message = createBaseListPaymentHistoryRequest();
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
     return message;
   },
 };
 
 function createBaseListPaymentHistoryResponse(): ListPaymentHistoryResponse {
-  return { payments: [] };
+  return { payments: [], total: 0, page: 0, limit: 0, hasPrev: false, hasNext: false };
 }
 
 export const ListPaymentHistoryResponse: MessageFns<ListPaymentHistoryResponse> = {
@@ -377,6 +417,21 @@ export const ListPaymentHistoryResponse: MessageFns<ListPaymentHistoryResponse> 
       for (const v of message.payments) {
         PaymentHistoryItem.encode(v!, writer.uint32(10).fork()).join();
       }
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      writer.uint32(16).int64(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(24).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(32).int32(message.limit);
+    }
+    if (message.hasPrev !== undefined && message.hasPrev !== false) {
+      writer.uint32(40).bool(message.hasPrev);
+    }
+    if (message.hasNext !== undefined && message.hasNext !== false) {
+      writer.uint32(48).bool(message.hasNext);
     }
     return writer;
   },
@@ -399,6 +454,46 @@ export const ListPaymentHistoryResponse: MessageFns<ListPaymentHistoryResponse> 
           }
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.total = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.hasPrev = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.hasNext = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -413,6 +508,19 @@ export const ListPaymentHistoryResponse: MessageFns<ListPaymentHistoryResponse> 
       payments: globalThis.Array.isArray(object?.payments)
         ? object.payments.map((e: any) => PaymentHistoryItem.fromJSON(e))
         : [],
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+      hasPrev: isSet(object.hasPrev)
+        ? globalThis.Boolean(object.hasPrev)
+        : isSet(object.has_prev)
+        ? globalThis.Boolean(object.has_prev)
+        : false,
+      hasNext: isSet(object.hasNext)
+        ? globalThis.Boolean(object.hasNext)
+        : isSet(object.has_next)
+        ? globalThis.Boolean(object.has_next)
+        : false,
     };
   },
 
@@ -420,6 +528,21 @@ export const ListPaymentHistoryResponse: MessageFns<ListPaymentHistoryResponse> 
     const obj: any = {};
     if (message.payments?.length) {
       obj.payments = message.payments.map((e) => PaymentHistoryItem.toJSON(e));
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      obj.total = Math.round(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    if (message.hasPrev !== undefined && message.hasPrev !== false) {
+      obj.hasPrev = message.hasPrev;
+    }
+    if (message.hasNext !== undefined && message.hasNext !== false) {
+      obj.hasNext = message.hasNext;
     }
     return obj;
   },
@@ -430,6 +553,11 @@ export const ListPaymentHistoryResponse: MessageFns<ListPaymentHistoryResponse> 
   fromPartial<I extends Exact<DeepPartial<ListPaymentHistoryResponse>, I>>(object: I): ListPaymentHistoryResponse {
     const message = createBaseListPaymentHistoryResponse();
     message.payments = object.payments?.map((e) => PaymentHistoryItem.fromPartial(e)) || [];
+    message.total = object.total ?? 0;
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    message.hasPrev = object.hasPrev ?? false;
+    message.hasNext = object.hasNext ?? false;
     return message;
   },
 };
@@ -887,6 +1015,17 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function longToNumber(int64: { toString(): string }): number {
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

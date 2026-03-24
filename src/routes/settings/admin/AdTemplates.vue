@@ -440,7 +440,7 @@ onMounted(loadTemplates);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-foreground/70">Description</label>
-          <AdminTextarea v-model="createForm.description" rows="3" placeholder="Optional" />
+          <AdminTextarea v-model="createForm.description" :rows="3" placeholder="Optional" />
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-foreground/70">VAST URL</label>
@@ -488,7 +488,7 @@ onMounted(loadTemplates);
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-foreground/70">Description</label>
-          <AdminTextarea v-model="editForm.description" rows="3" />
+          <AdminTextarea v-model="editForm.description" :rows="3" />
         </div>
         <div class="space-y-2 md:col-span-2">
           <label class="text-sm font-medium text-foreground/70">VAST URL</label>

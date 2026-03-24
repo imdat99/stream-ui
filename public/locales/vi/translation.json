@@ -11,7 +11,12 @@
     "status": "Trạng thái",
     "videos": "Video",
     "selected": "{{count}} mục đã chọn",
-    "copy": "Sao chép"
+    "copy": "Sao chép",
+    "rowsPerPage": "Số hàng mỗi trang",
+    "next": "Tiếp",
+    "previous": "Trước",
+    "page": "Trang {{current}} trên {{total}}",
+    "records": "bản ghi"
   },
   "app": {
     "name": "EcoStream"
