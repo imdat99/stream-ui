@@ -60,7 +60,7 @@ const getButtonClass = (variant?: string) => {
     <!-- Title & Actions -->
     <div class="flex items-start justify-between gap-4 flex-wrap">
       <div class="flex-1 min-w-0">
-        <h1 v-if="typeof props.title == 'string'" class="text-3xl font-bold text-gray-900 mb-1">{{ title }}</h1>
+        <h1 v-if="typeof props.title == 'string'" class="text-2xl font-bold text-gray-900 mb-1">{{ title }}</h1>
         <component v-else :is="title" />
         <p v-if="description" class="text-gray-600">{{ description }}</p>
       </div>
