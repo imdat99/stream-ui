@@ -1,12 +1,14 @@
 import { client } from "@/api/rpcclient";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 import ListIcon from "@/components/icons/ListIcon.vue";
+import BaseTable from "@/components/ui/BaseTable.vue";
 import { useAppToast } from "@/composables/useAppToast";
 import { getApiErrorMessage, getStatusStyles } from "@/lib/utils";
 import { PaymentHistoryItem } from "@/server/gen/proto/app/v1/common";
 import { useAuthStore } from "@/stores/auth";
 import { useQuery } from "@pinia/colada";
 import { useTranslation } from "i18next-vue";
+import type { ColumnDef } from "@tanstack/vue-table";
 
 const normalizeHistoryStatus = (status?: string) => {
     switch ((status || '').toLowerCase()) {
@@ -28,7 +30,7 @@ const normalizeHistoryStatus = (status?: string) => {
 
 const PaymentHistory = defineComponent({
     name: 'PaymentHistory',
-    setup(props, ctx) {
+    setup() {
         const auth = useAuthStore();
         const { t } = useTranslation();
         const toast = useAppToast();
@@ -75,7 +77,7 @@ const PaymentHistory = defineComponent({
             key: ['paymentHistory'],
             query: () => client.listPaymentHistory().then(res => (res.payments || []).map(mapHistoryItem)),
         });
-        
+
         const handleDownloadInvoice = async (item: PaymentHistoryItem) => {
             if (!item.id) return;
 
@@ -120,11 +122,87 @@ const PaymentHistory = defineComponent({
                 downloadingInvoiceId.value = null;
             }
         };
+
+        const columns: ColumnDef<ReturnType<typeof mapHistoryItem>>[] = [
+            {
+                accessorKey: 'date',
+                header:  t('settings.billing.table.date'),
+                cell: ({ getValue }) => (
+                    <p class="text-sm font-medium text-foreground">{getValue<string>()}</p>
+                ),
+                meta: {
+                    headerClass: 'col-span-3',
+                    cellClass: 'col-span-3',
+                },
+            },
+            {
+                accessorKey: 'amount',
+                header:  t('settings.billing.table.amount'),
+                cell: ({ row }) => (
+                    <p class="text-sm text-foreground">{auth.formatMoney(row.original.amount)}</p>
+                ),
+                meta: {
+                    headerClass: 'col-span-2',
+                    cellClass: 'col-span-2',
+                },
+            },
+            {
+                accessorKey: 'plan',
+                header:  t('settings.billing.table.plan'),
+                cell: ({ row }) => (
+                    <>
+                        <p class="text-sm text-foreground">{row.original.plan}</p>
+                        {row.original.details?.length ? (
+                            <p class="mt-1 text-xs text-foreground/60">
+                                {row.original.details.join(' · ')}
+                            </p>
+                        ) : null}
+                    </>
+                ),
+                meta: {
+                    headerClass: 'col-span-3',
+                    cellClass: 'col-span-3',
+                },
+            },
+            {
+                accessorKey: 'status',
+                header:  t('settings.billing.table.status'),
+                cell: ({ row }) => (
+                    <span class={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(row.original.status)}`}>
+                        {t('settings.billing.status.' + row.original.status)}
+                    </span>
+                ),
+                meta: {
+                    headerClass: 'col-span-2',
+                    cellClass: 'col-span-2',
+                },
+            },
+            {
+                accessorKey: 'invoice',
+                enableSorting: false,
+                header:  t('settings.billing.table.invoice'),
+                cell: ({ row }) => (
+                    <button
+                        class="flex items-center gap-2 px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground hover:bg-muted/50 rounded-md transition-all disabled:opacity-60 disabled:cursor-wait"
+                        disabled={downloadingInvoiceId.value === row.original.id}
+                        onClick={() => handleDownloadInvoice(row.original as PaymentHistoryItem)}
+                    >
+                        <DownloadIcon class="w-4 h-4" />
+                        <span>{downloadingInvoiceId.value === row.original.id ? '...' : t('settings.billing.download')}</span>
+                    </button>
+                ),
+                meta: {
+                    headerClass: 'col-span-2 flex justify-center',
+                    cellClass: 'col-span-2 justify-center',
+                },
+            },
+        ];
+
         return () => (
             <div class="px-6 py-4">
                 <div class="flex items-center gap-4 mb-4">
-                    <div class="w-10 h-10 rounded-md bg-info/10 flex items-center justify-center shrink-0">
-                        <ListIcon class="w-6 h-6 text-info" />
+                    <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
+                        <ListIcon class="w-6 h-6 text-primary" />
                     </div>
                     <div>
                         <p class="text-sm font-medium text-foreground">{t('settings.billing.paymentHistory')}</p>
@@ -132,71 +210,36 @@ const PaymentHistory = defineComponent({
                     </div>
                 </div>
 
-                <div class="border border-border rounded-lg overflow-hidden">
-                    <div class="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-medium text-foreground/60 uppercase tracking-wider bg-muted/30">
-                        <div class="col-span-3">{t('settings.billing.table.date')}</div>
-                        <div class="col-span-2">{t('settings.billing.table.amount')}</div>
-                        <div class="col-span-3">{t('settings.billing.table.plan')}</div>
-                        <div class="col-span-2">{t('settings.billing.table.status')}</div>
-                        <div class="col-span-2 text-right">{t('settings.billing.table.invoice')}</div>
-                    </div>
-                    {isLoading.value && (<div class="px-4 py-6 space-y-3">
-                        {Array.from({ length: 3 }).map((_, index) => (
-                            <div key={index} class="grid grid-cols-12 gap-4 items-center animate-pulse">
-                                <div class="col-span-3 h-4 rounded bg-muted/50" />
-                                <div class="col-span-2 h-4 rounded bg-muted/50" />
-                                <div class="col-span-3 h-4 rounded bg-muted/50" />
-                                <div class="col-span-2 h-6 rounded bg-muted/50" />
-                                <div class="col-span-2 h-8 rounded bg-muted/50" />
+                <BaseTable
+                    data={data.value || []}
+                    columns={columns}
+                    loading={isLoading.value}
+                    emptyText={t('settings.billing.noPaymentHistory')}
+                >
+                    {{
+                        loading: () => (
+                            <div class="px-4 py-6 space-y-3">
+                                {Array.from({ length: 3 }).map((_, index) => (
+                                    <div key={index} class="grid grid-cols-12 gap-4 items-center animate-pulse">
+                                        <div class="col-span-3 h-4 rounded bg-muted/50" />
+                                        <div class="col-span-2 h-4 rounded bg-muted/50" />
+                                        <div class="col-span-3 h-4 rounded bg-muted/50" />
+                                        <div class="col-span-2 h-6 rounded bg-muted/50" />
+                                        <div class="col-span-2 h-8 rounded bg-muted/50" />
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>)}
-                    {data.value?.length === 0 && !isLoading.value && (<div class="text-center py-12 text-foreground/60">
-                        <div class="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                            <DownloadIcon class="w-8 h-8 text-foreground/40" />
-                        </div>
-                        <p>{t('settings.billing.noPaymentHistory')}</p>
-                    </div>)}
-
-                    {data.value?.map((item) => (
-                        <div
-                            key={item.id}
-                            class="grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-muted/30 transition-all border-t border-border"
-                        >
-                            <div class="col-span-3">
-                                <p class="text-sm font-medium text-foreground">{item.date}</p>
+                        ),
+                        empty: () => (
+                            <div class="text-center py-12 text-foreground/60">
+                                <div class="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                                    <DownloadIcon class="w-8 h-8 text-foreground/40" />
+                                </div>
+                                <p>{t('settings.billing.noPaymentHistory')}</p>
                             </div>
-                            <div class="col-span-2">
-                                <p class="text-sm text-foreground">{auth.formatMoney(item.amount)}</p>
-                            </div>
-                            <div class="col-span-3">
-                                <p class="text-sm text-foreground">{item.plan}</p>
-                                {
-                                    item.details?.length ? (
-                                        <p class="mt-1 text-xs text-foreground/60">
-                                            {item.details.join(' · ')}
-                                        </p>
-                                    ) : null
-                                }
-                            </div>
-                            <div class="col-span-2">
-                                <span class={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(item.status)}`}>
-                                    {t('settings.billing.status.' + item.status)}
-                                </span>
-                            </div>
-                            <div class="col-span-2 flex justify-end">
-                                <button
-                                    class="flex items-center gap-2 px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground hover:bg-muted/50 rounded-md transition-all disabled:opacity-60 disabled:cursor-wait"
-                                    disabled={downloadingInvoiceId.value === item.id}
-                                    onClick={() => handleDownloadInvoice(item)}
-                                >
-                                    <DownloadIcon class="w-4 h-4" />
-                                    <span>{downloadingInvoiceId.value === item.id ? '...' : t('settings.billing.download')}</span>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        )
+                    }}
+                </BaseTable>
             </div>
         );
     }
