@@ -1,21 +1,14 @@
 <script setup lang="ts">
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import AppDialog from '@/components/ui/AppDialog.vue';
 import AppInput from '@/components/ui/AppInput.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
 
 defineProps<{
     visible: boolean;
-    title: string;
-    subtitle: string;
     presets: number[];
     amount: number | null;
     loading: boolean;
-    customAmountLabel: string;
-    amountPlaceholder: string;
-    hint: string;
-    cancelLabel: string;
-    proceedLabel: string;
 }>();
 
 const emit = defineEmits<{
@@ -30,12 +23,12 @@ const emit = defineEmits<{
     <AppDialog
         :visible="visible"
         @update:visible="emit('update:visible', $event)"
-        :title="title"
+        :title="$t('settings.billing.topupDialog.title')"
         maxWidthClass="max-w-md"
     >
         <div class="space-y-4">
             <p class="text-sm text-foreground/70">
-                {{ subtitle }}
+                {{ $t('settings.billing.topupDialog.subtitle') }}
             </p>
 
             <div class="grid grid-cols-4 gap-3">
@@ -55,13 +48,13 @@ const emit = defineEmits<{
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-medium text-foreground">{{ customAmountLabel }}</label>
+                <label class="text-sm font-medium text-foreground">{{ $t('settings.billing.topupDialog.customAmount') }}</label>
                 <div class="flex items-center gap-2">
                     <span class="text-lg font-semibold text-foreground">$</span>
                     <AppInput
                         :model-value="amount"
                         type="number"
-                        :placeholder="amountPlaceholder"
+                        :placeholder="$t('settings.billing.topupDialog.enterAmount')"
                         inputClass="flex-1"
                         min="1"
                         step="1"
@@ -73,7 +66,7 @@ const emit = defineEmits<{
             </div>
 
             <div class="bg-muted/30 rounded-md p-3 text-xs text-foreground/60">
-                <p>{{ hint }}</p>
+                <p>{{ $t('settings.billing.topupDialog.hint') }}</p>
             </div>
         </div>
 
@@ -85,7 +78,7 @@ const emit = defineEmits<{
                     :disabled="loading"
                     @click="emit('update:visible', false)"
                 >
-                    {{ cancelLabel }}
+                    {{ $t('common.cancel') }}
                 </AppButton>
                 <AppButton
                     size="sm"
@@ -96,7 +89,7 @@ const emit = defineEmits<{
                     <template #icon>
                         <CheckIcon class="w-4 h-4" />
                     </template>
-                    {{ proceedLabel }}
+                    {{ $t('settings.billing.topupDialog.proceed') }}
                 </AppButton>
             </div>
         </template>

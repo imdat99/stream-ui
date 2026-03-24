@@ -171,9 +171,13 @@ const PaymentHistory = defineComponent({
                             </div>
                             <div class="col-span-3">
                                 <p class="text-sm text-foreground">{item.plan}</p>
-                                <p v-if="item.details?.length" class="mt-1 text-xs text-foreground/60">
-                                    {item.details.join(' · ')}
-                                </p>
+                                {
+                                    item.details?.length ? (
+                                        <p class="mt-1 text-xs text-foreground/60">
+                                            {item.details.join(' · ')}
+                                        </p>
+                                    ) : null
+                                }
                             </div>
                             <div class="col-span-2">
                                 <span class={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${getStatusStyles(item.status)}`}>
