@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
@@ -8,9 +8,9 @@ import BaseTable from '@/components/ui/BaseTable.vue';
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { useTranslation } from 'i18next-vue';
-import { computed, h } from 'vue';
-import PlayerConfigSettingsBadges from './PlayerConfigSettingsBadges.vue';
+import { computed } from 'vue';
 import type { PlayerConfig } from '../types';
+import PlayerConfigSettingsBadges from './PlayerConfigSettingsBadges.vue';
 
 const props = defineProps<{
     configs: PlayerConfig[];
@@ -37,19 +37,30 @@ const columns = computed<ColumnDef<PlayerConfig>[]>(() => [
         id: 'config',
         header: t('settings.playerConfigs.table.name'),
         accessorFn: row => row.name,
-        cell: ({ row }) => h('div', [
-            h('div', { class: 'flex flex-wrap items-center gap-2' }, [
-                h('span', { class: 'text-sm font-medium text-foreground cursor-pointer hover:underline', onClick: () => emit('edit', row.original) }, row.original.name),
-                row.original.isDefault
-                    ? h('span', {
-                        class: 'inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary',
-                    }, t('settings.playerConfigs.defaultBadge'))
-                    : null,
-            ]),
-            row.original.description
-                ? h('p', { class: 'mt-0.5 text-xs text-foreground/50' }, row.original.description)
-                : h('p', { class: 'mt-0.5 text-xs text-foreground/40' }, t('settings.playerConfigs.createdOn', { date: row.original.createdAt || '-' })),
-        ]),
+        cell: ({ row }) => (
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                class="text-sm font-medium text-foreground cursor-pointer hover:underline"
+                onClick={() => emit('edit', row.original)}
+              >
+                {row.original.name}
+              </span>
+              {row.original.isDefault && (
+                <span class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                  {t('settings.playerConfigs.defaultBadge')}
+                </span>
+              )}
+            </div>
+            {row.original.description ? (
+              <p class="mt-0.5 text-xs text-foreground/50">{row.original.description}</p>
+            ) : (
+              <p class="mt-0.5 text-xs text-foreground/40">
+                {t('settings.playerConfigs.createdOn', { date: row.original.createdAt || '-' })}
+              </p>
+            )}
+          </div>
+        ),
         meta: {
             headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
             cellClass: 'px-6 py-3',
@@ -69,7 +80,7 @@ const columns = computed<ColumnDef<PlayerConfig>[]>(() => [
             row.encrytionM3u8 ? 'encrytionM3u8' : '',
             row.logoUrl ? 'logo' : '',
         ].filter(Boolean).join(', '),
-        cell: ({ row }) => h(PlayerConfigSettingsBadges, { config: row.original }),
+        cell: ({ row }) => <PlayerConfigSettingsBadges config={row.original} />,
         meta: {
             headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
             cellClass: 'px-6 py-3',
@@ -79,13 +90,23 @@ const columns = computed<ColumnDef<PlayerConfig>[]>(() => [
         id: 'status',
         header: t('common.status'),
         accessorFn: row => Number(row.isActive),
-        cell: ({ row }) => h('div', { class: 'text-center' }, [
-            h(AppSwitch, {
-                modelValue: row.original.isActive,
-                disabled: !props.canManageExistingConfig || props.saving || props.deletingId !== null || props.defaultingId !== null || props.togglingId === row.original.id,
-                'onUpdate:modelValue': (value: boolean) => emit('toggle-active', { config: row.original, value }),
-            }),
-        ]),
+        cell: ({ row }) => (
+            <div class="text-center">
+            <AppSwitch
+              modelValue={row.original.isActive}
+              disabled={
+                !props.canManageExistingConfig ||
+                props.saving ||
+                props.deletingId !== null ||
+                props.defaultingId !== null ||
+                props.togglingId === row.original.id
+              }
+              onUpdate:modelValue={(value: boolean) =>
+                emit('toggle-active', { config: row.original, value })
+              }
+            />
+          </div>
+        ),
         meta: {
             headerClass: 'px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-foreground/50',
             cellClass: 'px-6 py-3 text-center',
@@ -95,35 +116,48 @@ const columns = computed<ColumnDef<PlayerConfig>[]>(() => [
         id: 'actions',
         header: t('common.actions'),
         enableSorting: false,
-        cell: ({ row }) => h('div', { class: 'flex flex-wrap items-center justify-end gap-2' }, [
-            row.original.isDefault
-                ? h('span', {
-                    class: 'inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary',
-                }, t('settings.playerConfigs.actions.default'))
-                : h(AppButton, {
-                    variant: 'ghost',
-                    size: 'sm',
-                    loading: props.defaultingId === row.original.id,
-                    disabled: !props.canManageExistingConfig || props.saving || props.deletingId !== null || props.togglingId !== null || props.defaultingId !== null || !row.original.isActive,
-                    onClick: () => emit('set-default', row.original),
-                }, () => t('settings.playerConfigs.actions.setDefault')),
-            h(AppButton, {
-                variant: 'ghost',
-                size: 'sm',
-                disabled: !props.canManageExistingConfig,
-                onClick: () => emit('edit', row.original),
-            }, {
-                icon: () => h(PencilIcon, { class: 'h-4 w-4' }),
-            }),
-            h(AppButton, {
-                variant: 'ghost',
-                size: 'sm',
-                disabled: !props.canDeleteConfig,
-                onClick: () => emit('delete', row.original),
-            }, {
-                icon: () => h(TrashIcon, { class: 'h-4 w-4 text-danger' }),
-            }),
-        ]),
+        cell: ({ row }) => (<div class="flex flex-wrap items-center justify-end gap-2">
+            {row.original.isDefault ? (
+              <span class="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                {t('settings.playerConfigs.actions.default')}
+              </span>
+            ) : (
+              <AppButton
+                variant="ghost"
+                size="sm"
+                loading={props.defaultingId === row.original.id}
+                disabled={
+                  !props.canManageExistingConfig ||
+                  props.saving ||
+                  props.deletingId !== null ||
+                  props.togglingId !== null ||
+                  props.defaultingId !== null ||
+                  !row.original.isActive
+                }
+                onClick={() => emit('set-default', row.original)}
+              >
+                {t('settings.playerConfigs.actions.setDefault')}
+              </AppButton>
+            )}
+            <AppButton
+              variant="ghost"
+              size="sm"
+              disabled={!props.canManageExistingConfig}
+              onClick={() => emit('edit', row.original)}
+              v-slots={{
+                icon: () => <PencilIcon class="h-4 w-4" />,
+              }}
+            />
+            <AppButton
+              variant="ghost"
+              size="sm"
+              disabled={!props.canDeleteConfig}
+              onClick={() => emit('delete', row.original)}
+              v-slots={{
+                icon: () => <TrashIcon class="h-4 w-4 text-danger" />,
+              }}
+            />
+          </div>),
         meta: {
             headerClass: 'px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-foreground/50 [&>div]:justify-center',
             cellClass: 'px-6 py-3 text-right',

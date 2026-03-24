@@ -41,9 +41,26 @@ export const useAuthStore = defineStore("auth", () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const initialized = ref(false);
+  const localeTag = computed(() => i18next.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US');
+  const currencyFormatter = computed(() => new Intl.NumberFormat(localeTag.value, {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+  }));
+  const shortDateFormatter = computed(() => new Intl.DateTimeFormat(localeTag.value, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+  }));
+  const formatHistoryDate = (value?: string) => {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '-';
+      return shortDateFormatter.value.format(date);
+  };
+  const formatMoney = (amount: number) => currencyFormatter.value.format(amount);
 
   let mqttClient: TinyMqttClient | undefined;
-
   const clearMqttClient = () => {
     mqttClient?.disconnect();
     mqttClient = undefined;
@@ -233,6 +250,8 @@ export const useAuthStore = defineStore("auth", () => {
     changePassword,
     setLanguage,
     logout,
+    formatHistoryDate,
+    formatMoney,
     $reset: () => {
       clearMqttClient();
       clearState();

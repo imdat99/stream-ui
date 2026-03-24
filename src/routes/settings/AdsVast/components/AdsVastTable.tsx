@@ -1,7 +1,7 @@
-import { defineComponent, computed, type PropType } from 'vue';
-import { useTranslation } from 'i18next-vue';
 import { useAppToast } from '@/composables/useAppToast';
 import type { ColumnDef } from '@tanstack/vue-table';
+import { useTranslation } from 'i18next-vue';
+import { computed, defineComponent, type PropType } from 'vue';
 import type { AdTemplate } from '../types';
 
 // Components

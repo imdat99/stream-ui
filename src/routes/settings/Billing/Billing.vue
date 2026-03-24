@@ -5,63 +5,31 @@ import AppDialog from '@/components/ui/AppDialog.vue';
 import AppInput from '@/components/ui/AppInput.vue';
 import { useAppToast } from '@/composables/useAppToast';
 import { useUsageQuery } from '@/composables/useUsageQuery';
-import { formatBytes } from '@/lib/utils';
-import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
-import BillingHistorySection from '@/routes/settings/Billing/components/BillingHistorySection.vue';
-import BillingPlansSection from '@/routes/settings/Billing/components/BillingPlansSection.vue';
+import { getApiErrorMessage, getApiErrorPayload } from '@/lib/utils';
 import BillingTopupDialog from '@/routes/settings/Billing/components/BillingTopupDialog.vue';
 import BillingUsageSection from '@/routes/settings/Billing/components/BillingUsageSection.vue';
-import BillingWalletRow from '@/routes/settings/Billing/components/BillingWalletRow.vue';
-import type { Plan as ModelPlan, PaymentHistoryItem as PaymentHistoryApiItem } from '@/server/gen/proto/app/v1/common';
+import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
+import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 import { useAuthStore } from '@/stores/auth';
-import { useQuery } from '@pinia/colada';
 import { useTranslation } from 'i18next-vue';
 import { computed, ref, watch } from 'vue';
+import SettingsRow from '../components/SettingsRow.vue';
+import PaymentHistory from './components/PaymentHistory';
+import PlanSelection from './components/PlanSelection';
 
 const TERM_OPTIONS = [1, 3, 6, 12] as const;
 type UpgradePaymentMethod = 'wallet' | 'topup';
-
-type InvoiceDownloadResponse = {
-    filename?: string;
-    contentType?: string;
-    content?: string;
-};
-
-type PaymentHistoryItem = {
-    id: string;
-    date: string;
-    amount: number;
-    plan: string;
-    status: string;
-    invoiceId: string;
-    currency: string;
-    kind: string;
-    details?: string[];
-};
-
-type ApiErrorPayload = {
-    code?: number;
-    message?: string;
-    data?: Record<string, any>;
-};
 
 const toast = useAppToast();
 const auth = useAuthStore();
 const { t, i18next } = useTranslation();
 
-const { data: plansResponse, isLoading } = useQuery({
-    key: () => ['billing-plans'],
-    query: () => rpcClient.listPlans(),
-});
-const { data: usageSnapshot, refetch: refetchUsage } = useUsageQuery();
+const { refetch: refetchUsage } = useUsageQuery();
 
 const topupDialogVisible = ref(false);
 const topupAmount = ref<number | null>(null);
 const topupLoading = ref(false);
-const historyLoading = ref(false);
-const downloadingInvoiceId = ref<string | null>(null);
 const topupPresets = [10, 20, 50, 100];
-const paymentHistory = ref<PaymentHistoryItem[]>([]);
 
 const upgradeDialogVisible = ref(false);
 const selectedPlan = ref<ModelPlan | null>(null);
@@ -71,40 +39,8 @@ const purchaseTopupAmount = ref<number | null>(null);
 const purchaseLoading = ref(false);
 const purchaseError = ref<string | null>(null);
 
-const plans = computed(() => plansResponse.value?.plans || [] as ModelPlan[]);
-
 const currentPlanId = computed(() => auth.user?.plan_id || undefined);
-const currentPlan = computed(() => plans.value.find(plan => plan.id === currentPlanId.value));
-const currentPlanName = computed(() => currentPlan.value?.name || t('settings.billing.unknownPlan'));
 const walletBalance = computed(() => auth.user?.wallet_balance || 0);
-const storageUsed = computed(() => usageSnapshot.value?.totalStorage ?? 0);
-const uploadsUsed = computed(() => usageSnapshot.value?.totalVideos ?? 0);
-const storageLimit = computed(() => {
-    const activePlan = plans.value.find(plan => plan.id === currentPlanId.value);
-    return activePlan?.storageLimit || 10737418240;
-});
-const uploadsLimit = computed(() => {
-    const activePlan = plans.value.find(plan => plan.id === currentPlanId.value);
-    return activePlan?.uploadLimit || 50;
-});
-const storagePercentage = computed(() =>
-    Math.min(Math.round((storageUsed.value / storageLimit.value) * 100), 100),
-);
-const uploadsPercentage = computed(() =>
-    Math.min(Math.round((uploadsUsed.value / uploadsLimit.value) * 100), 100),
-);
-
-const localeTag = computed(() => i18next.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US');
-const currencyFormatter = computed(() => new Intl.NumberFormat(localeTag.value, {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-}));
-const shortDateFormatter = computed(() => new Intl.DateTimeFormat(localeTag.value, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-}));
 
 const selectedPlanId = computed(() => upgradeDialogVisible.value ? selectedPlan.value?.id || null : null);
 const selectedPlanPrice = computed(() => selectedPlan.value?.price || 0);
@@ -125,195 +61,17 @@ const upgradeSubmitLabel = computed(() => {
     return t('settings.billing.upgradeDialog.payWithWallet');
 });
 
-const formatMoney = (amount: number) => currencyFormatter.value.format(amount);
-
-const formatDuration = (seconds?: number) => {
-    if (!seconds) return t('settings.billing.durationMinutes', { minutes: 0 });
-    if (seconds < 0) return t('settings.billing.durationMinutes', { minutes: -1 }).replace("-1", "∞")
-    return t('settings.billing.durationMinutes', { minutes: Math.floor(seconds / 60) });
-};
-
-const formatHistoryDate = (value?: string) => {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '-';
-    return shortDateFormatter.value.format(date);
-};
-
-const formatTermLabel = (months: number) => t('settings.billing.termOption', { months });
-
-const formatPaymentMethodLabel = (value?: string) => {
-    switch ((value || '').toLowerCase()) {
-        case 'topup':
-            return t('settings.billing.paymentMethod.topup');
-        case 'wallet':
-        default:
-            return t('settings.billing.paymentMethod.wallet');
-    }
-};
-
-const getPlanStorageText = (plan: ModelPlan) => t('settings.billing.planStorage', { storage: formatBytes(plan.storageLimit || 0) });
-const getPlanDurationText = (plan: ModelPlan) => t('settings.billing.planDuration', { duration: formatDuration(plan.durationLimit) });
-const getPlanUploadsText = (plan: ModelPlan) => t('settings.billing.planUploads', { count: plan.uploadLimit || 0 });
-
-const getStatusStyles = (status: string) => {
-    switch (status) {
-        case 'success':
-            return 'bg-success/10 text-success';
-        case 'failed':
-            return 'bg-danger/10 text-danger';
-        case 'pending':
-            return 'bg-warning/10 text-warning';
-        default:
-            return 'bg-info/10 text-info';
-    }
-};
-
-const getStatusLabel = (status: string) => {
-    const map: Record<string, string> = {
-        success: t('settings.billing.status.success'),
-        failed: t('settings.billing.status.failed'),
-        pending: t('settings.billing.status.pending'),
-    };
-    return map[status] || status;
-};
-
-const normalizeHistoryStatus = (status?: string) => {
-    switch ((status || '').toLowerCase()) {
-        case 'success':
-        case 'succeeded':
-        case 'paid':
-            return 'success';
-        case 'failed':
-        case 'error':
-        case 'canceled':
-        case 'cancelled':
-            return 'failed';
-        case 'pending':
-        case 'processing':
-        default:
-            return 'pending';
-    }
-};
-
-const getApiErrorPayload = (error: unknown): ApiErrorPayload | null => {
-    if (!error || typeof error !== 'object') return null;
-    const candidate = error as { error?: ApiErrorPayload; data?: ApiErrorPayload; message?: string };
-
-    if (candidate.error && typeof candidate.error === 'object') return candidate.error;
-    if (candidate.data && typeof candidate.data === 'object') return candidate.data;
-    if (candidate.message) return { message: candidate.message };
-
-    return null;
-};
-
-const getApiErrorMessage = (error: unknown, fallback: string) => {
-    const payload = getApiErrorPayload(error);
-    return payload?.message || fallback;
-};
-
 const getApiErrorData = (error: unknown) => getApiErrorPayload(error)?.data || null;
-
-const mapHistoryItem = (item: PaymentHistoryApiItem): PaymentHistoryItem => {
-    const details: string[] = [];
-
-    if (item.kind !== 'wallet_topup' && item.termMonths) {
-        details.push(formatTermLabel(item.termMonths));
-    }
-    if (item.kind !== 'wallet_topup' && item.paymentMethod) {
-        details.push(formatPaymentMethodLabel(item.paymentMethod));
-    }
-    if (item.kind !== 'wallet_topup' && item.expiresAt) {
-        details.push(t('settings.billing.history.validUntil', { date: formatHistoryDate(item.expiresAt) }));
-    }
-
-    return {
-        id: item.id || '',
-        date: formatHistoryDate(item.createdAt),
-        amount: item.amount || 0,
-        plan: item.kind === 'wallet_topup'
-            ? t('settings.billing.walletTopup')
-            : (item.planName || t('settings.billing.unknownPlan')),
-        status: normalizeHistoryStatus(item.status),
-        invoiceId: item.invoiceId || '-',
-        currency: item.currency || 'USD',
-        kind: item.kind || 'subscription',
-        details,
-    };
-};
-
-const loadPaymentHistory = async () => {
-    historyLoading.value = true;
-    try {
-        const response = await rpcClient.listPaymentHistory();
-        paymentHistory.value = (response.payments || []).map(mapHistoryItem);
-    } catch (error) {
-        console.error(error);
-        paymentHistory.value = [];
-    } finally {
-        historyLoading.value = false;
-    }
-};
-
 
 const refreshBillingState = async () => {
     await Promise.allSettled([
         auth.fetchMe(),
-        loadPaymentHistory(),
+        // loadPaymentHistory(),
         refetchUsage(),
     ]);
 };
 
-void loadPaymentHistory();
-
-const subscriptionSummary = computed(() => {
-    const expiresAt = auth.user?.planExpiresAt || auth.user?.plan_expires_at;
-    const formattedDate = formatHistoryDate(expiresAt);
-
-    if (auth.user?.plan_id) {
-        if (auth.user?.plan_expiring_soon && expiresAt) {
-            return {
-                title: t('settings.billing.subscription.expiringTitle'),
-                description: t('settings.billing.subscription.expiringDescription', {
-                    plan: currentPlanName.value,
-                    date: formattedDate,
-                }),
-                tone: 'warning' as const,
-            };
-        }
-
-        if (expiresAt) {
-            return {
-                title: t('settings.billing.subscription.activeTitle'),
-                description: t('settings.billing.subscription.activeDescription', {
-                    plan: currentPlanName.value,
-                    date: formattedDate,
-                }),
-                tone: 'default' as const,
-            };
-        }
-
-        return {
-            title: t('settings.billing.subscription.activeTitle'),
-            description: currentPlanName.value,
-            tone: 'default' as const,
-        };
-    }
-
-    if (expiresAt) {
-        return {
-            title: t('settings.billing.subscription.expiredTitle'),
-            description: t('settings.billing.subscription.expiredDescription', { date: formattedDate }),
-            tone: 'warning' as const,
-        };
-    }
-
-    return {
-        title: t('settings.billing.subscription.freeTitle'),
-        description: t('settings.billing.subscription.freeDescription'),
-        tone: 'default' as const,
-    };
-});
+// void loadPaymentHistory();
 
 const resetUpgradeState = () => {
     selectedPlan.value = null;
@@ -410,7 +168,8 @@ const submitUpgrade = async () => {
             summary: t('settings.billing.toast.subscriptionSuccessSummary'),
             detail: t('settings.billing.toast.subscriptionSuccessDetail', {
                 plan: selectedPlan.value.name || '',
-                term: formatTermLabel(selectedTermMonths.value),
+                term: t('settings.billing.termOption', { months: selectedTermMonths.value })
+                // term: formatTermLabel(selectedTermMonths.value),
             }),
             life: 3000,
         });
@@ -446,7 +205,7 @@ const handleTopup = async (amount: number) => {
         toast.add({
             severity: 'success',
             summary: t('settings.billing.toast.topupSuccessSummary'),
-            detail: t('settings.billing.toast.topupSuccessDetail', { amount: formatMoney(amount) }),
+            detail: t('settings.billing.toast.topupSuccessDetail', { amount: auth.formatMoney(amount) }),
             life: 3000,
         });
         topupDialogVisible.value = false;
@@ -464,51 +223,6 @@ const handleTopup = async (amount: number) => {
     }
 };
 
-const handleDownloadInvoice = async (item: PaymentHistoryItem) => {
-    if (!item.id) return;
-
-    downloadingInvoiceId.value = item.id;
-    toast.add({
-        severity: 'info',
-        summary: t('settings.billing.toast.downloadingSummary'),
-        detail: t('settings.billing.toast.downloadingDetail', { invoiceId: item.invoiceId }),
-        life: 2000,
-    });
-
-    try {
-        const response = await rpcClient.downloadInvoice({ id: item.id }) as InvoiceDownloadResponse;
-        const content = response.content || '';
-        const contentType = response.contentType || 'text/plain;charset=utf-8';
-        const filename = response.filename || `${item.invoiceId}.txt`;
-        const blob = new Blob([content], { type: contentType });
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement('a');
-        anchor.href = url;
-        anchor.download = filename;
-        document.body.appendChild(anchor);
-        anchor.click();
-        document.body.removeChild(anchor);
-        URL.revokeObjectURL(url);
-
-        toast.add({
-            severity: 'success',
-            summary: t('settings.billing.toast.downloadedSummary'),
-            detail: t('settings.billing.toast.downloadedDetail', { invoiceId: item.invoiceId }),
-            life: 3000,
-        });
-    } catch (error) {
-        console.error(error);
-        toast.add({
-            severity: 'error',
-            summary: t('settings.billing.toast.downloadFailedSummary'),
-            detail: getApiErrorMessage(error, t('settings.billing.toast.downloadFailedDetail')),
-            life: 5000,
-        });
-    } finally {
-        downloadingInvoiceId.value = null;
-    }
-};
-
 const openTopupDialog = () => {
     topupAmount.value = null;
     topupDialogVisible.value = true;
@@ -520,206 +234,168 @@ const selectPreset = (amount: number) => {
 </script>
 
 <template>
-    <SettingsSectionCard
-        :title="t('settings.content.billing.title')"
-        :description="t('settings.content.billing.subtitle')"
-    >
-        <BillingWalletRow
-            :title="t('settings.billing.walletBalance')"
-            :description="t('settings.billing.currentBalance', { balance: formatMoney(walletBalance) })"
-            :button-label="t('settings.billing.topUp')"
-            :subscription-title="subscriptionSummary.title"
-            :subscription-description="subscriptionSummary.description"
-            :subscription-tone="subscriptionSummary.tone"
-            @topup="openTopupDialog"
-        />
+    <SettingsSectionCard :title="$t('settings.content.billing.title')"
+        :description="$t('settings.content.billing.subtitle')">
+        <SettingsRow :title="$t('settings.billing.walletBalance')"
+            :description="$t('settings.billing.currentBalance', { balance: auth.formatMoney(walletBalance) })"
+            iconBoxClass="bg-primary/10">
+            <template #icon>
+                <CoinsIcon class="w-5 h-5 text-primary" />
+            </template>
 
-        <BillingPlansSection
-            :title="t('settings.billing.availablePlans')"
-            :description="t('settings.billing.availablePlansHint')"
-            :is-loading="isLoading"
-            :plans="plans"
-            :current-plan-id="currentPlanId"
-            :selecting-plan-id="selectedPlanId"
-            :format-money="formatMoney"
-            :get-plan-storage-text="getPlanStorageText"
-            :get-plan-duration-text="getPlanDurationText"
-            :get-plan-uploads-text="getPlanUploadsText"
-            :current-plan-label="t('settings.billing.currentPlan')"
-            :selecting-label="t('settings.billing.upgradeDialog.selecting')"
-            :choose-label="t('settings.billing.upgradeDialog.choosePlan')"
-            @select="openUpgradeDialog"
-        />
+            <template #actions>
+                <div class="flex flex-col items-end gap-2">
+                    <AppButton size="sm" @click="openTopupDialog">
+                        <template #icon>
+                            <PlusIcon class="w-4 h-4" />
+                        </template>
+                        {{ $t('settings.billing.topUp') }}
+                    </AppButton>
+                </div>
+            </template>
+        </SettingsRow>
 
-        <BillingUsageSection
-            :storage-title="t('settings.billing.storage')"
-            :storage-description="t('settings.billing.storageUsedOfLimit', { used: formatBytes(storageUsed), limit: formatBytes(storageLimit) })"
-            :storage-percentage="storagePercentage"
-            :uploads-title="t('settings.billing.totalVideos')"
-            :uploads-description="t('settings.billing.totalVideosUsedOfLimit', { used: uploadsUsed, limit: uploadsLimit })"
-            :uploads-percentage="uploadsPercentage"
-        />
-
-        <BillingHistorySection
-            :title="t('settings.billing.paymentHistory')"
-            :description="t('settings.billing.paymentHistorySubtitle')"
-            :items="paymentHistory"
-            :loading="historyLoading"
-            :downloading-id="downloadingInvoiceId"
-            :format-money="formatMoney"
-            :get-status-styles="getStatusStyles"
-            :get-status-label="getStatusLabel"
-            :date-label="t('settings.billing.table.date')"
-            :amount-label="t('settings.billing.table.amount')"
-            :plan-label="t('settings.billing.table.plan')"
-            :status-label="t('settings.billing.table.status')"
-            :invoice-label="t('settings.billing.table.invoice')"
-            :empty-label="t('settings.billing.noPaymentHistory')"
-            :download-label="t('settings.billing.download')"
-            @download="handleDownloadInvoice"
-        />
+        <PlanSelection :current-plan-id="currentPlanId" :selectedPlanId="String(selectedPlanId)"
+            @upgrade="openUpgradeDialog" />
+        <BillingUsageSection />
+        <PaymentHistory />
     </SettingsSectionCard>
 
-    <AppDialog
-        :visible="upgradeDialogVisible"
-        :title="t('settings.billing.upgradeDialog.title')"
-        maxWidthClass="max-w-2xl"
-        @update:visible="onUpgradeDialogVisibilityChange"
-        @close="closeUpgradeDialog"
-    >
+    <AppDialog :visible="upgradeDialogVisible" :title="$t('settings.billing.upgradeDialog.title')"
+        maxWidthClass="max-w-2xl" @update:visible="onUpgradeDialogVisibilityChange" @close="closeUpgradeDialog">
         <div v-if="selectedPlan" class="space-y-5">
             <div class="rounded-lg border border-border bg-muted/20 p-4">
                 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
                         <p class="text-xs font-medium uppercase tracking-[0.18em] text-foreground/50">
-                            {{ t('settings.billing.upgradeDialog.selectedPlan') }}
+                            {{ $t('settings.billing.upgradeDialog.selectedPlan') }}
                         </p>
                         <h3 class="mt-1 text-lg font-semibold text-foreground">{{ selectedPlan.name }}</h3>
                         <p class="mt-1 text-sm text-foreground/70">
-                            {{ selectedPlan.description || t('settings.billing.availablePlansHint') }}
+                            {{ selectedPlan.description || $t('settings.billing.availablePlansHint') }}
                         </p>
                     </div>
 
                     <div class="text-left md:text-right">
-                        <p class="text-xs text-foreground/50">{{ t('settings.billing.upgradeDialog.basePrice') }}</p>
-                        <p class="mt-1 text-2xl font-semibold text-foreground">{{ formatMoney(selectedPlan.price || 0) }}</p>
-                        <p class="text-xs text-foreground/60">{{ t('settings.billing.upgradeDialog.perMonthBase') }}</p>
+                        <p class="text-xs text-foreground/50">{{ $t('settings.billing.upgradeDialog.basePrice') }}</p>
+                        <p class="mt-1 text-2xl font-semibold text-foreground">{{ auth.formatMoney(selectedPlan.price ||
+                            0)
+                            }}</p>
+                        <p class="text-xs text-foreground/60">{{ $t('settings.billing.upgradeDialog.perMonthBase') }}
+                        </p>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-3">
                 <div>
-                    <p class="text-sm font-medium text-foreground">{{ t('settings.billing.upgradeDialog.termTitle') }}</p>
-                    <p class="mt-1 text-xs text-foreground/60">{{ t('settings.billing.upgradeDialog.termHint') }}</p>
+                    <p class="text-sm font-medium text-foreground">{{ $t('settings.billing.upgradeDialog.termTitle') }}
+                    </p>
+                    <p class="mt-1 text-xs text-foreground/60">{{ $t('settings.billing.upgradeDialog.termHint') }}</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    <button
-                        v-for="months in TERM_OPTIONS"
-                        :key="months"
-                        type="button"
-                        :class="[
-                            'rounded-lg border px-4 py-3 text-left transition-all',
-                            selectedTermMonths === months
-                                ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border bg-header text-foreground hover:border-primary/30 hover:bg-muted/30',
-                        ]"
-                        @click="selectedTermMonths = months"
-                    >
-                        <p class="text-sm font-medium">{{ formatTermLabel(months) }}</p>
-                        <p class="mt-1 text-xs text-foreground/60">{{ formatMoney((selectedPlan.price || 0) * months) }}</p>
+                    <button v-for="months in TERM_OPTIONS" :key="months" type="button" :class="[
+                        'rounded-lg border px-4 py-3 text-left transition-all',
+                        selectedTermMonths === months
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'border-border bg-header text-foreground hover:border-primary/30 hover:bg-muted/30',
+                    ]" @click="selectedTermMonths = months">
+                        <p class="text-sm font-medium">{{ $t('settings.billing.termOption', { months }) }}</p>
+                        <p class="mt-1 text-xs text-foreground/60">{{ auth.formatMoney((selectedPlan.price || 0) *
+                            months)
+                            }}</p>
                     </button>
                 </div>
             </div>
 
             <div class="grid gap-3 md:grid-cols-3">
                 <div class="rounded-lg border border-border bg-header p-4">
-                    <p class="text-xs uppercase tracking-wide text-foreground/50">{{ t('settings.billing.upgradeDialog.totalLabel') }}</p>
-                    <p class="mt-2 text-xl font-semibold text-foreground">{{ formatMoney(selectedTotalAmount) }}</p>
+                    <p class="text-xs uppercase tracking-wide text-foreground/50">{{
+                        $t('settings.billing.upgradeDialog.totalLabel') }}</p>
+                    <p class="mt-2 text-xl font-semibold text-foreground">{{ auth.formatMoney(selectedTotalAmount) }}
+                    </p>
                 </div>
                 <div class="rounded-lg border border-border bg-header p-4">
-                    <p class="text-xs uppercase tracking-wide text-foreground/50">{{ t('settings.billing.upgradeDialog.walletBalanceLabel') }}</p>
-                    <p class="mt-2 text-xl font-semibold text-foreground">{{ formatMoney(walletBalance) }}</p>
+                    <p class="text-xs uppercase tracking-wide text-foreground/50">{{
+                        $t('settings.billing.upgradeDialog.walletBalanceLabel') }}</p>
+                    <p class="mt-2 text-xl font-semibold text-foreground">{{ auth.formatMoney(walletBalance) }}</p>
                 </div>
-                <div
-                    class="rounded-lg border p-4"
-                    :class="selectedNeedsTopup
-                        ? 'border-warning/30 bg-warning/10'
-                        : 'border-success/20 bg-success/5'"
-                >
-                    <p class="text-xs uppercase tracking-wide text-foreground/50">{{ t('settings.billing.upgradeDialog.shortfallLabel') }}</p>
+                <div class="rounded-lg border p-4" :class="selectedNeedsTopup
+                    ? 'border-warning/30 bg-warning/10'
+                    : 'border-success/20 bg-success/5'">
+                    <p class="text-xs uppercase tracking-wide text-foreground/50">{{
+                        $t('settings.billing.upgradeDialog.shortfallLabel') }}</p>
                     <p class="mt-2 text-xl font-semibold" :class="selectedNeedsTopup ? 'text-warning' : 'text-success'">
-                        {{ formatMoney(selectedShortfall) }}
+                        {{ auth.formatMoney(selectedShortfall) }}
                     </p>
                 </div>
             </div>
 
             <div v-if="selectedNeedsTopup" class="space-y-3">
                 <div>
-                    <p class="text-sm font-medium text-foreground">{{ t('settings.billing.upgradeDialog.paymentMethodTitle') }}</p>
-                    <p class="mt-1 text-xs text-foreground/60">{{ t('settings.billing.upgradeDialog.paymentMethodHint') }}</p>
+                    <p class="text-sm font-medium text-foreground">{{
+                        $t('settings.billing.upgradeDialog.paymentMethodTitle') }}</p>
+                    <p class="mt-1 text-xs text-foreground/60">{{ $t('settings.billing.upgradeDialog.paymentMethodHint')
+                        }}
+                    </p>
                 </div>
 
                 <div class="grid gap-3 md:grid-cols-2">
-                    <button
-                        type="button"
-                        :class="[
-                            'rounded-lg border p-4 text-left transition-all',
-                            selectedPaymentMethod === 'wallet'
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border bg-header hover:border-primary/30 hover:bg-muted/30',
-                        ]"
-                        @click="selectUpgradePaymentMethod('wallet')"
-                    >
-                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.paymentMethod.wallet') }}</p>
+                    <button type="button" :class="[
+                        'rounded-lg border p-4 text-left transition-all',
+                        selectedPaymentMethod === 'wallet'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border bg-header hover:border-primary/30 hover:bg-muted/30',
+                    ]" @click="selectUpgradePaymentMethod('wallet')">
+                        <p class="text-sm font-medium text-foreground">{{ $t('settings.billing.paymentMethod.wallet') }}
+                        </p>
                         <p class="mt-1 text-xs text-foreground/60">
-                            {{ t('settings.billing.upgradeDialog.walletOptionDescription') }}
+                            {{ $t('settings.billing.upgradeDialog.walletOptionDescription') }}
                         </p>
                     </button>
 
-                    <button
-                        type="button"
-                        :class="[
-                            'rounded-lg border p-4 text-left transition-all',
-                            selectedPaymentMethod === 'topup'
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border bg-header hover:border-primary/30 hover:bg-muted/30',
-                        ]"
-                        @click="selectUpgradePaymentMethod('topup')"
-                    >
-                        <p class="text-sm font-medium text-foreground">{{ t('settings.billing.paymentMethod.topup') }}</p>
+                    <button type="button" :class="[
+                        'rounded-lg border p-4 text-left transition-all',
+                        selectedPaymentMethod === 'topup'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border bg-header hover:border-primary/30 hover:bg-muted/30',
+                    ]" @click="selectUpgradePaymentMethod('topup')">
+                        <p class="text-sm font-medium text-foreground">{{ $t('settings.billing.paymentMethod.topup') }}
+                        </p>
                         <p class="mt-1 text-xs text-foreground/60">
-                            {{ t('settings.billing.upgradeDialog.topupOptionDescription', { shortfall: formatMoney(selectedShortfall) }) }}
+                            {{ $t('settings.billing.upgradeDialog.topupOptionDescription', {
+                                shortfall:
+                                    auth.formatMoney(selectedShortfall) }) }}
                         </p>
                     </button>
                 </div>
             </div>
 
             <div v-else class="rounded-lg border border-success/20 bg-success/5 p-4 text-sm text-success">
-                {{ t('settings.billing.upgradeDialog.walletCoveredHint') }}
+                {{ $t('settings.billing.upgradeDialog.walletCoveredHint') }}
             </div>
 
             <div v-if="selectedNeedsTopup && selectedPaymentMethod === 'topup'" class="grid gap-2">
-                <label class="text-sm font-medium text-foreground">{{ t('settings.billing.upgradeDialog.topupAmountLabel') }}</label>
-                <AppInput
-                    :model-value="purchaseTopupAmount"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    :placeholder="t('settings.billing.upgradeDialog.topupAmountPlaceholder')"
-                    @update:model-value="updatePurchaseTopupAmount"
-                />
+                <label class="text-sm font-medium text-foreground">{{
+                    $t('settings.billing.upgradeDialog.topupAmountLabel')
+                    }}</label>
+                <AppInput :model-value="purchaseTopupAmount" type="number" min="0.01" step="0.01"
+                    :placeholder="$t('settings.billing.upgradeDialog.topupAmountPlaceholder')"
+                    @update:model-value="updatePurchaseTopupAmount" />
                 <p class="text-xs text-foreground/60">
-                    {{ t('settings.billing.upgradeDialog.topupAmountHint', { shortfall: formatMoney(selectedShortfall) }) }}
+                    {{ $t('settings.billing.upgradeDialog.topupAmountHint', {
+                        shortfall:
+                            auth.formatMoney(selectedShortfall)
+                    }) }}
                 </p>
             </div>
 
-            <div
-                v-if="selectedNeedsTopup && selectedPaymentMethod === 'wallet'"
-                class="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning"
-            >
-                {{ t('settings.billing.upgradeDialog.walletInsufficientHint', { shortfall: formatMoney(selectedShortfall) }) }}
+            <div v-if="selectedNeedsTopup && selectedPaymentMethod === 'wallet'"
+                class="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning">
+                {{ $t('settings.billing.upgradeDialog.walletInsufficientHint', {
+                    shortfall:
+                        auth.formatMoney(selectedShortfall) }) }}
             </div>
 
             <div v-if="purchaseError" class="rounded-lg border border-danger bg-danger/10 p-4 text-sm text-danger">
@@ -730,23 +406,14 @@ const selectPreset = (amount: number) => {
         <template #footer>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-xs text-foreground/60">
-                    {{ t('settings.billing.upgradeDialog.footerHint') }}
+                    {{ $t('settings.billing.upgradeDialog.footerHint') }}
                 </p>
                 <div class="flex justify-end gap-3">
-                    <AppButton
-                        variant="secondary"
-                        size="sm"
-                        :disabled="purchaseLoading"
-                        @click="closeUpgradeDialog"
-                    >
-                        {{ t('common.cancel') }}
+                    <AppButton variant="secondary" size="sm" :disabled="purchaseLoading" @click="closeUpgradeDialog">
+                        {{ $t('common.cancel') }}
                     </AppButton>
-                    <AppButton
-                        size="sm"
-                        :loading="purchaseLoading"
-                        :disabled="!canSubmitUpgrade"
-                        @click="submitUpgrade"
-                    >
+                    <AppButton size="sm" :loading="purchaseLoading" :disabled="!canSubmitUpgrade"
+                        @click="submitUpgrade">
                         {{ upgradeSubmitLabel }}
                     </AppButton>
                 </div>
@@ -754,22 +421,11 @@ const selectPreset = (amount: number) => {
         </template>
     </AppDialog>
 
-    <BillingTopupDialog
-        :visible="topupDialogVisible"
-        :title="t('settings.billing.topupDialog.title')"
-        :subtitle="t('settings.billing.topupDialog.subtitle')"
-        :presets="topupPresets"
-        :amount="topupAmount"
-        :loading="topupLoading"
-        :custom-amount-label="t('settings.billing.topupDialog.customAmount')"
+    <BillingTopupDialog :visible="topupDialogVisible" :title="$t('settings.billing.topupDialog.title')"
+        :subtitle="t('settings.billing.topupDialog.subtitle')" :presets="topupPresets" :amount="topupAmount"
+        :loading="topupLoading" :custom-amount-label="t('settings.billing.topupDialog.customAmount')"
         :amount-placeholder="t('settings.billing.topupDialog.enterAmount')"
-        :hint="t('settings.billing.topupDialog.hint')"
-        :cancel-label="t('common.cancel')"
-        :proceed-label="t('settings.billing.topupDialog.proceed')"
-        :format-money="formatMoney"
-        @update:visible="topupDialogVisible = $event"
-        @update:amount="topupAmount = $event"
-        @selectPreset="selectPreset"
-        @submit="handleTopup(topupAmount || 0)"
-    />
+        :hint="t('settings.billing.topupDialog.hint')" :cancel-label="t('common.cancel')"
+        :proceed-label="t('settings.billing.topupDialog.proceed')" @update:visible="topupDialogVisible = $event"
+        @update:amount="topupAmount = $event" @selectPreset="selectPreset" @submit="handleTopup(topupAmount || 0)" />
 </template>

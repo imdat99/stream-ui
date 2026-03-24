@@ -9,7 +9,7 @@ import { useTranslation } from 'i18next-vue';
 import { computed, ref, watch } from 'vue';
 import AdsVastDialog from './components/AdsVastDialog.vue';
 import AdsVastNotices from './components/AdsVastNotices.vue';
-import AdsVastTable from './components/AdsVastTable.tsx';
+import AdsVastTable from './components/AdsVastTable';
 import AdsVastToolbar from './components/AdsVastToolbar.vue';
 import type {
     AdTemplate,
