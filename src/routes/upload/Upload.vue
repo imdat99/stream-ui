@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useTranslation } from 'i18next-vue';
+import AppDialog from '@/components/ui/AppDialog.vue';
+import { useAppToast } from '@/composables/useAppToast';
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
+import { useTranslation } from 'i18next-vue';
+import { ref } from 'vue';
 import RemoteUrlForm from './components/RemoteUrlForm.vue';
 import UploadDropzone from './components/UploadDropzone.vue';
-import { useAppToast } from '@/composables/useAppToast';
-
 const uiState = useUIState();
 const toast = useAppToast();
 const mode = ref<'local' | 'remote'>('local');

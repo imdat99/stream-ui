@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CoinsIcon from '@/components/icons/CoinsIcon.vue';
+import PlusIcon from '@/components/icons/PlusIcon.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { useUsageQuery } from '@/composables/useUsageQuery';
 import BillingTopupDialog from '@/routes/settings/Billing/components/BillingTopupDialog.vue';
@@ -69,7 +71,7 @@ const openTopupDialog = () => {
             :description="$t('settings.billing.currentBalance', { balance: auth.formatMoney(walletBalance) })"
             iconBoxClass="bg-primary/10">
             <template #icon>
-                <CoinsIcon class="w-5 h-5 text-primary" />
+                <CoinsIcon filled class="w-5 h-5 text-primary" />
             </template>
 
             <template #actions>

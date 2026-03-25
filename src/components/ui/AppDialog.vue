@@ -3,6 +3,7 @@ import XIcon from '@/components/icons/XIcon.vue';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'i18next-vue';
 import { onBeforeUnmount, watch } from 'vue';
+import ClientOnly from '../ClientOnly';
 
 // Ensure client-side only rendering to avoid hydration mismatch
 const props = withDefaults(defineProps<{

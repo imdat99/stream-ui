@@ -1,6 +1,6 @@
 import { client as rpcClient } from '@/api/rpcclient';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
-import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
+import Credit from '@/components/icons/Credit.vue';
 import { cn } from '@/lib/utils';
 import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
 import { useAuthStore } from '@/stores/auth';
@@ -89,7 +89,7 @@ const PlanSelection = defineComponent({
       <div class="px-6 py-4">
         <div class="mb-4 flex items-center gap-4">
           <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
-            <CreditCardIcon class="h-5 w-5 text-primary" />
+            <Credit filled class="h-5 w-5 text-primary" />
           </div>
           <div>
             <p class="text-sm font-medium text-foreground">{t('settings.billing.availablePlans')}</p>

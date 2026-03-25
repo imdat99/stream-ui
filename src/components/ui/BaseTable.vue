@@ -5,12 +5,13 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   useVueTable,
-  type ColumnMeta,
   type ColumnDef,
+  type ColumnMeta,
   type Row,
   type SortingState,
   type Updater,
 } from '@tanstack/vue-table';
+import { ref } from 'vue';
 
 type TableColumnMeta = ColumnMeta<TData, any> & {
   headerClass?: string;

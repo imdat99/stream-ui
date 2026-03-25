@@ -9,6 +9,7 @@ import { useUsageQuery } from '@/composables/useUsageQuery';
 import { getApiErrorMessage } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth';
 import { useTranslation } from 'i18next-vue';
+import { ref } from 'vue';
 
 const visible = defineModel<boolean>();
 const toast = useAppToast();

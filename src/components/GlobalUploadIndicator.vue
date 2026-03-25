@@ -2,8 +2,8 @@
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import UploadQueueItem from '@/routes/upload/components/UploadQueueItem.vue';
 import { useUIState } from '@/stores/uiState';
-import { computed, ref } from 'vue';
 import { useTranslation } from 'i18next-vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();

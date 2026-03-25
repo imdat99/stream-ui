@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import Bell from "@/components/icons/Bell.vue";
 import Home from "@/components/icons/Home.vue";
-import LayoutDashboard from "@/components/icons/LayoutDashboard.vue";
 import SettingsIcon from "@/components/icons/SettingsIcon.vue";
 import Video from "@/components/icons/Video.vue";
 import { cn } from "@/lib/utils";
@@ -32,7 +31,10 @@ const links = computed<Record<string, any>>(() => {
       href: "/notification",
       label: t("nav.notification"),
       icon: Bell,
-      className,
+      className: cn(
+        className,
+        isNotificationOpen.value && "bg-primary/15",
+      ),
       action: handleNotificationClick,
       isActive: isNotificationOpen,
     },

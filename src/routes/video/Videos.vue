@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
-import { createStaticVNode, computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useTranslation } from 'i18next-vue';
+import { computed, createStaticVNode, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
+import ClientOnly from '@/components/ClientOnly';
+import { useAppToast } from '@/composables/useAppToast';
 import { useUploadQueue } from '@/composables/useUploadQueue';
 import { useUIState } from '@/stores/uiState';
-import { useAppToast } from '@/composables/useAppToast';
 import VideoBulkActions from './components/VideoBulkActions.vue';
 import VideoFilters from './components/VideoFilters.vue';
 import VideoTable from './components/VideoTable.vue';
@@ -29,7 +30,7 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const searchQuery = ref('');
 const selectedStatus = ref<string>('all');
-const iconHoist = createStaticVNode(`<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4v-1a4 4 0 00-4-4H7a4 4 0 00-4 4v1zM16 7l-4-4m0 0L8 7m4-4v12" /></svg>`, 1)
+const iconHoist = createStaticVNode(`<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 468 534"><path d="M10 364v64c0 53 43 96 96 96h256c53 0 96-43 96-96v-64c0-18-14-32-32-32s-32 14-32 32v64c0 18-14 32-32 32H106c-18 0-32-14-32-32v-64c0-18-14-32-32-32s-32 14-32 32z" fill="color-mix(in srgb, var(--colors-white-DEFAULT) 60%, transparent)"/><path d="M217 19c9-9 25-9 34 0l144 144c7 7 9 17 5 26-3 9-12 15-22 15h-80v112c0 27-21 48-48 48h-32c-26 0-48-21-48-48V204H90c-10 0-18-6-22-15s-2-19 5-26L217 19z" fill="var(--colors-white-DEFAULT)"/></svg>`, 1)
 
 // Pagination
 const page = ref(1);

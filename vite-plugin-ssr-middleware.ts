@@ -53,7 +53,6 @@ export function vitePluginSsrMiddleware({
       }
 // const mod = await loadModule(entry);
       const handler: Connect.NextHandleFunction = async (req, res, next) => {
-        console.log("vite-plugin-ssr-middleware handling request:", req.method, req.url);
         // expose ViteDevServer via request
         Object.defineProperty(req, "viteDevServer", { value: server });
 

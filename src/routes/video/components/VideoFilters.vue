@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useTranslation } from 'i18next-vue';
+import { computed } from 'vue';
 
 const props = defineProps<{
     searchQuery: string;

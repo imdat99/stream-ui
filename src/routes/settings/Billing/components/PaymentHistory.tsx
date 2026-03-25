@@ -1,16 +1,16 @@
 import { client } from "@/api/rpcclient";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 import ListIcon from "@/components/icons/ListIcon.vue";
+import AppButton from "@/components/ui/AppButton.vue";
 import BaseTable from "@/components/ui/BaseTable.vue";
 import { useAppToast } from "@/composables/useAppToast";
 import { getApiErrorMessage, getStatusStyles } from "@/lib/utils";
 import { PaymentHistoryItem } from "@/server/gen/proto/app/v1/common";
 import { useAuthStore } from "@/stores/auth";
 import { useQuery } from "@pinia/colada";
-import { useTranslation } from "i18next-vue";
 import type { ColumnDef } from "@tanstack/vue-table";
+import { useTranslation } from "i18next-vue";
 import { computed, defineComponent, ref } from "vue";
-import AppButton from "@/components/ui/AppButton.vue";
 
 const pageSizeOptions = [5, 10, 20, 50] as const;
 
@@ -227,7 +227,7 @@ const PaymentHistory = defineComponent({
             <div class="px-6 py-4">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
-                        <ListIcon class="w-6 h-6 text-primary" />
+                        <ListIcon filled class="w-6 h-6 text-primary" />
                     </div>
                     <div>
                         <p class="text-sm font-medium text-foreground">{t('settings.billing.paymentHistory')}</p>

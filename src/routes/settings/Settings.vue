@@ -60,22 +60,23 @@
 </template>
 
 <script setup lang="ts">
-import AppConfirmHost from '@/components/ui/AppConfirmHost.vue';
-import AppToastHost from '@/components/ui/AppToastHost.vue';
 import ClientOnly from '@/components/ClientOnly';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import AdvertisementIcon from '@/components/icons/AdvertisementIcon.vue';
 import AlertTriangle from '@/components/icons/AlertTriangle.vue';
 import Bell from '@/components/icons/Bell.vue';
-import CreditCardIcon from '@/components/icons/CreditCardIcon.vue';
+import Credit from '@/components/icons/Credit.vue';
 import GlobeIcon from '@/components/icons/Globe.vue';
+import ShieldUser from '@/components/icons/shield-user.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import VideoPlayIcon from '@/components/icons/VideoPlayIcon.vue';
+import AppConfirmHost from '@/components/ui/AppConfirmHost.vue';
+import AppToastHost from '@/components/ui/AppToastHost.vue';
+import { isAdmin } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth';
 import { useTranslation } from 'i18next-vue';
-import { computed, createStaticVNode } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { isAdmin } from '@/lib/utils';
 
 const route = useRoute();
 const auth = useAuthStore();
@@ -96,9 +97,9 @@ const menuSections = computed<{ title: string; items: MenuItem[] }[]>(() => [
         items: [
             {
                 to: '/settings/security',
-                value: 'security', label: t('settings.menu.security'), icon: createStaticVNode(`<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="-10 -258 596 564"><path d="M144-120c0-44 36-80 80-80s80 36 80 80-36 80-80 80-80-36-80-80zm208 0c0-71-57-128-128-128S96-191 96-120 153 8 224 8s128-57 128-128zM48 232c0-71 57-128 128-128h64V77c0-7 1-14 3-21h-67C79 56 0 135 0 232v8c0 13 11 24 24 24s24-11 24-24v-8zm397 9-13 6V59l96 32v19c0 56-32 107-83 131zM422 12 310 49c-13 4-22 16-22 30v31c0 75 43 142 110 174l19 9c5 2 10 3 15 3s10-1 15-3l19-9c67-32 110-99 110-174V79c0-14-9-26-22-30L442 11c-6-2-14-2-20 0zm0 0z" fill="currentColor"/></svg>`, 1)
+                value: 'security', label: t('settings.menu.security'), icon: ShieldUser
             },
-            { to: '/settings/billing', value: 'billing', label: t('settings.menu.billing'), icon: CreditCardIcon },
+            { to: '/settings/billing', value: 'billing', label: t('settings.menu.billing'), icon: Credit },
         ],
     },
     {

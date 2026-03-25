@@ -3,7 +3,7 @@ import { TinyMqttClient } from "@/lib/liteMqtt";
 import type { User } from "@/server/gen/proto/app/v1/common";
 import { useTranslation } from "i18next-vue";
 import { defineStore } from "pinia";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 type ProfileUpdatePayload = {

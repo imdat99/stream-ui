@@ -5,7 +5,7 @@
 //     return () => null;
 // });
 
-import { ref, onMounted } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 const ClientOnly = defineComponent({
   name: "ClientOnly",
   setup(_p, { slots }) {

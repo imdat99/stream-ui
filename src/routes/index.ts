@@ -67,7 +67,7 @@ const routes: RouteData[] = [
           {
             path: "ref/:username",
             name: "referral-entry",
-            beforeEnter: (to) => ({ name: "signup", query: { ref: String(to.params.username || "") } }),
+            redirect: (to) => ({ name: "signup", query: { ref: String(to.params.username || "") } }),
           },
           {
             path: "forgot",
