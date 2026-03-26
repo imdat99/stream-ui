@@ -1,8 +1,5 @@
 <template>
-    <svg v-if="filled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
-        stroke="none">
-        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-    </svg>
+    <svg v-if="filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 468 548"><path d="M42 122v352c0 35 29 64 64 64h256c35 0 64-29 64-64V122H42zm64 88c0-13 11-24 24-24s24 11 24 24v240c0 13-11 24-24 24s-24-11-24-24V210zm104 0c0-13 11-24 24-24s24 11 24 24v240c0 13-11 24-24 24s-24-11-24-24V210zm104 0c0-13 11-24 24-24s24 11 24 24v240c0 13-11 24-24 24s-24-11-24-24V210z" fill="color-mix(in srgb, var(--colors-danger-DEFAULT) 40%, transparent)"/><path d="M177 10c-14 0-26 9-30 22l-9 26H42c-18 0-32 14-32 32s14 32 32 32h384c18 0 32-14 32-32s-14-32-32-32h-96l-9-26c-4-13-16-22-30-22H177z" fill="var(--colors-danger-DEFAULT)"/></svg>
     <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="3 6 5 6 21 6"></polyline>

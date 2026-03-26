@@ -394,7 +394,7 @@
         "create": "Tạo"
       },
       "confirm": {
-        "deleteMessage": "Bạn có chắc muốn xóa \"{name}\"?",
+        "deleteMessage": "Bạn có chắc muốn xóa \"{{name}}\"?",
         "deleteHeader": "Xóa cấu hình",
         "deleteAccept": "Xóa",
         "deleteReject": "Hủy"
@@ -409,14 +409,14 @@
         "enabledSummary": "Đã bật cấu hình",
         "disabledSummary": "Đã tắt cấu hình",
         "defaultUpdatedSummary": "Đã cập nhật mặc định",
-        "defaultUpdatedDetail": "{name} hiện là cấu hình mặc định cho video mới.",
+        "defaultUpdatedDetail": "{{name}} hiện là cấu hình mặc định cho video mới.",
         "upgradeRequiredSummary": "Đã đạt giới hạn cấu hình",
         "upgradeRequiredDetail": "Tài khoản free chỉ có thể có 1 player config.",
         "limitSummary": "Đã đạt giới hạn cấu hình",
         "limitDetail": "Tài khoản free chỉ có thể có 1 player config.",
         "reconciliationSummary": "Hãy xóa bớt config",
         "reconciliationDetail": "Hãy xóa các player config dư cho đến khi chỉ còn 1 config để tiếp tục quản lý trên gói free.",
-        "toggleDetail": "{name} đã được {state}.",
+        "toggleDetail": "{{name}} đã được {state}.",
         "deletedSummary": "Đã xóa cấu hình",
         "deletedDetail": "Cấu hình trình phát đã được gỡ bỏ.",
         "failedSummary": "Thao tác thất bại",
@@ -468,7 +468,7 @@
         "create": "Tạo"
       },
       "confirm": {
-        "deleteMessage": "Bạn có chắc muốn xóa \"{name}\"?",
+        "deleteMessage": "Bạn có chắc muốn xóa \"{{name}}\"?",
         "deleteHeader": "Xóa mẫu",
         "deleteAccept": "Xóa",
         "deleteReject": "Hủy"
@@ -489,10 +489,10 @@
         "enabledSummary": "Đã bật mẫu",
         "disabledSummary": "Đã tắt mẫu",
         "defaultUpdatedSummary": "Đã cập nhật mặc định",
-        "defaultUpdatedDetail": "{name} hiện là mẫu mặc định cho video mới.",
+        "defaultUpdatedDetail": "{{name}} hiện là mẫu mặc định cho video mới.",
         "upgradeRequiredSummary": "Cần nâng cấp gói",
         "upgradeRequiredDetail": "Hãy nâng cấp gói để quản lý Ads & VAST.",
-        "toggleDetail": "{name} đã được {state}.",
+        "toggleDetail": "{{name}} đã được {state}.",
         "deletedSummary": "Đã xóa mẫu",
         "deletedDetail": "Mẫu VAST đã được gỡ bỏ.",
         "copiedSummary": "Đã sao chép",
@@ -767,7 +767,7 @@
   },
   "overview": {
     "welcome": {
-      "title": "Xin chào, {{name}}",
+      "title": "Xin chào, {{{name}}}",
       "subtitle": "Đây là tình hình nội dung của bạn hôm nay."
     },
     "stats": {

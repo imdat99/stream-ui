@@ -192,20 +192,20 @@ export default defineComponent({
             )}
             <AppButton
               variant="ghost"
-              size="sm"
+              size="icon"
               disabled={props.isReadOnly || props.isMutating}
               onClick={() => emit('edit', row.original)}
               v-slots={{
-                icon: () => <PencilIcon class="h-4 w-4" />
+                icon: () => <PencilIcon filled class="h-4 w-4" />
               }}
             />
             <AppButton
               variant="ghost"
-              size="sm"
+              size="icon"
               disabled={props.isReadOnly || props.isMutating}
               onClick={() => emit('delete', row.original)}
               v-slots={{
-                icon: () => <TrashIcon class="h-4 w-4 text-danger" />
+                icon: () => <TrashIcon filled class="h-4 w-4" />
               }}
             />
           </div>

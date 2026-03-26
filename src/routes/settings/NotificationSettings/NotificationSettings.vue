@@ -18,6 +18,7 @@ import SettingsRowSkeleton from '@/routes/settings/components/SettingsRowSkeleto
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
 import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
+import Bell from '@/components/icons/Bell.vue';
 
 const toast = useAppToast();
 const { t } = useTranslation();
@@ -40,7 +41,7 @@ const notificationTypes = computed(() => [
         key: 'push' as const,
         title: t('settings.notificationSettings.types.push.title'),
         description: t('settings.notificationSettings.types.push.description'),
-        icon: BellIcon,
+        icon: Bell,
         bgColor: 'bg-accent/10',
         iconColor: 'text-accent',
     },
@@ -140,7 +141,7 @@ const handleSave = async () => {
                 :iconBoxClass="type.bgColor"
             >
                 <template #icon>
-                    <component :is="type.icon" :class="[type.iconColor, 'w-5 h-5']" />
+                    <component :is="type.icon" filled :class="[type.iconColor, 'w-5 h-5']" />
                 </template>
 
                 <template #actions>

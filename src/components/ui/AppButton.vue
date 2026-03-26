@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { cva } from "class-variance-authority";
 import { ButtonHTMLAttributes, computed } from 'vue';
 type UiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-type UiButtonSize = 'sm' | 'md' | 'lg';
+type UiButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 
 const props = withDefaults(
   defineProps<{
@@ -39,6 +39,9 @@ const buttonVariants = cva(":uno: inline-flex items-center justify-center gap-2 
         sm: 'min-h-[28px] px-3 text-[12px] leading-[20px]',
         md: 'min-h-[32px] px-3 text-[14px] leading-[20px]',
         lg: 'min-h-[36px] px-4 text-[14px] leading-[20px]',
+        icon: 'min-h-0 p-2',
+        'icon-sm': 'min-h-0 p-1',
+        'icon-lg': 'min-h-0 p-3',
       },
       block: {
         true: 'w-full',

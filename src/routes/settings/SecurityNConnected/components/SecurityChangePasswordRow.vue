@@ -14,11 +14,10 @@ const { t } = useTranslation();
     <SettingsRow
         :title="t('settings.securityConnected.changePassword.label')"
         :description="t('settings.securityConnected.changePassword.detail')"
+        iconBoxClass="bg-primary/10"
     >
         <template #icon>
-            <svg aria-hidden="true" class="fill-primary w-6 h-6" height="24" viewBox="0 0 24 24" version="1.1" width="24" data-view-component="true">
-                <path d="M22 9.75v5.5A1.75 1.75 0 0 1 20.25 17H3.75A1.75 1.75 0 0 1 2 15.25v-5.5C2 8.784 2.784 8 3.75 8h16.5c.966 0 1.75.784 1.75 1.75Zm-8.75 2.75a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0Zm-6.5 1.25a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Zm10.5 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z"></path>
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 404 564"><path d="M74 138v64h64v-64c0-35 29-64 64-64s64 29 64 64v64h64v-64c0-71-57-128-128-128S74 67 74 138z" fill="var(--fill1)"/><path d="M74 202c-35 0-64 29-64 64v224c0 35 29 64 64 64h256c35 0 64-29 64-64V266c0-35-29-64-64-64H74zm152 136v80c0 13-11 24-24 24s-24-11-24-24v-80c0-13 11-24 24-24s24 11 24 24z" fill="var(--fill4)"/></svg>
         </template>
 
         <template #actions>

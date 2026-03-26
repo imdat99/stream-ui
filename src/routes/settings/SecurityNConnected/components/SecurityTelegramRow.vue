@@ -21,6 +21,7 @@ const { t } = useTranslation();
     <SettingsRow
         :title="t('settings.securityConnected.telegram.label')"
         :description="telegramConnected ? (telegramUsername || t('settings.securityConnected.telegram.connectedFallback')) : t('settings.securityConnected.telegram.detailDisconnected')"
+        iconBoxClass="bg-[#0088cc]/10"
     >
         <template #icon>
             <TelegramIcon class="w-6 h-6 text-[#0088cc]" />

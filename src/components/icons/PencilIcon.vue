@@ -1,13 +1,6 @@
 <template>
-    <svg v-if="filled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
-        stroke="none">
-        <path
-            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-    </svg>
-    <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-    </svg>
+    <svg v-if="filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 534 533"><path d="m303 93 104 104 34 34 62-62c14-13 21-32 21-51s-7-38-21-51l-36-36c-13-13-32-21-51-21s-38 8-51 21l-62 62z" fill="#a6acb9"/><path d="m95 377-24 87 86-25c7-1 13-5 18-10l-71-69c-4 5-8 10-9 17zm174-250 34-34 104 104 34 34-34 34-198 198c-11 11-24 19-39 23L42 521c-8 2-17 0-23-6s-9-15-6-23l35-128c5-15 12-28 23-39l198-198z" fill="#1e3050"/></svg>
+    <svg v-else xmlns="http://www.w3.org/2000/svg" width="534" height="533" viewBox="-12 -258 534 533"><path d="M404-216c-11 0-21 4-28 12l-59 58 93 93 58-58c8-8 12-18 12-29s-4-21-12-28l-35-36c-8-8-18-12-29-12zM93 78l93 93L387-30l-93-93L93 78zm-21 25c-2 3-4 7-5 11L36 229l114-32c4-1 8-3 11-5l-89-89zm281-330c13-13 32-21 51-21s38 8 51 21l36 36c13 13 21 32 21 51s-8 38-21 51L197 205c-11 11-24 19-39 23L30 263c-8 2-17 0-23-6s-9-15-6-23l35-128c5-15 12-28 23-39l294-294z" fill="currentColor"/></svg>
 </template>
 
 <script lang="ts" setup>
