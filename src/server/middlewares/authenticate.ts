@@ -1,7 +1,7 @@
 import { MiddlewareHandler } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
-import { buildInternalMetadata, getAccountServiceClient } from "../services/grpcClient";
+import { buildInternalMetadata, getAccountClient } from "../services/grpcClient";
 import { generateAndSetTokens } from "../utils";
 export const authenticate: MiddlewareHandler = async (ctx, next) => {
     let payload
@@ -36,7 +36,7 @@ export const authenticate: MiddlewareHandler = async (ctx, next) => {
             throw new HTTPException(401)
         }
         const metadata = buildInternalMetadata();
-        const user = await getAccountServiceClient().getUserById(userId, metadata);
+        const user = await getAccountClient().getUserById(userId, metadata);
         
         const tokenPair = await generateAndSetTokens(ctx, user);
         if (!user?.id || !user?.role || user.id !== userId) {

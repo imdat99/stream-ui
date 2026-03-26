@@ -1,6 +1,6 @@
 import { client as rpcClient } from "@/api/rpcclient";
 import { TinyMqttClient } from "@/lib/liteMqtt";
-import type { User } from "@/server/gen/proto/app/v1/common";
+import type { User } from "@/server/api/proto/app/v1/common";
 import { useTranslation } from "i18next-vue";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";

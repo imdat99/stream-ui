@@ -1,8 +1,8 @@
 import { Context, Hono } from "hono";
 import { deleteCookie, getCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
-import { getAuthServiceClient, getInternalGrpcMetadata } from "../services/grpcClient";
-import type { User } from "@/server/gen/proto/app/v1/common";
+import { getAuthClient, getInternalGrpcMetadata } from "../services/grpcClient";
+import type { User } from "@/server/api/proto/app/v1/common";
 
 const authRoute = new Hono();
 
@@ -29,7 +29,7 @@ const forwardGrpcCookies = (c: Context, cookies: readonly string[]) => {
   }
 };
 
-const authService = () => getAuthServiceClient();
+const authService = () => getAuthClient();
 
 const googleAuthReasonMap: Record<string, string> = {
   access_denied: "access_denied",

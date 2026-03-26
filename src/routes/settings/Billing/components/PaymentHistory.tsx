@@ -5,7 +5,7 @@ import AppButton from "@/components/ui/AppButton.vue";
 import BaseTable from "@/components/ui/BaseTable.vue";
 import { useAppToast } from "@/composables/useAppToast";
 import { getApiErrorMessage, getStatusStyles } from "@/lib/utils";
-import { PaymentHistoryItem } from "@/server/gen/proto/app/v1/common";
+import { PaymentHistoryItem } from "@/server/api/proto/app/v1/common";
 import { useAuthStore } from "@/stores/auth";
 import { useQuery } from "@pinia/colada";
 import type { ColumnDef } from "@tanstack/vue-table";

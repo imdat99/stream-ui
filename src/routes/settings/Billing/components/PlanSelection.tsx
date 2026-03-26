@@ -2,7 +2,7 @@ import { client as rpcClient } from '@/api/rpcclient';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import Credit from '@/components/icons/Credit.vue';
 import { cn } from '@/lib/utils';
-import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
+import type { Plan as ModelPlan } from '@/server/api/proto/app/v1/common';
 import { useAuthStore } from '@/stores/auth';
 import { useQuery } from '@pinia/colada';
 import { useTranslation } from 'i18next-vue';

@@ -6,7 +6,7 @@ import { useUsageQuery } from '@/composables/useUsageQuery';
 import BillingTopupDialog from '@/routes/settings/Billing/components/BillingTopupDialog.vue';
 import BillingUsageSection from '@/routes/settings/Billing/components/BillingUsageSection.vue';
 import SettingsSectionCard from '@/routes/settings/components/SettingsSectionCard.vue';
-import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
+import type { Plan as ModelPlan } from '@/server/api/proto/app/v1/common';
 import { useAuthStore } from '@/stores/auth';
 import { computed, ref } from 'vue';
 import SettingsRow from '../components/SettingsRow.vue';

@@ -7,7 +7,7 @@ import AppDialog from '@/components/ui/AppDialog.vue';
 import AppInput from '@/components/ui/AppInput.vue';
 import { useAppToast } from '@/composables/useAppToast';
 import { getApiErrorMessage, getApiErrorPayload } from '@/lib/utils';
-import type { Plan as ModelPlan } from '@/server/gen/proto/app/v1/common';
+import type { Plan as ModelPlan } from '@/server/api/proto/app/v1/common';
 import { useAuthStore } from '@/stores/auth';
 
 const TERM_OPTIONS = [1, 3, 6, 12] as const;

@@ -7,7 +7,7 @@ import AdminSelect from "./components/AdminSelect.vue";
 import AdminTable from "./components/AdminTable.vue";
 import AdminSectionCard from "./components/AdminSectionCard.vue";
 import PlanSelection from "@/routes/settings/Billing/components/PlanSelection.tsx";
-import type { Plan as ModelPlan } from "@/server/gen/proto/app/v1/common";
+import type { Plan as ModelPlan } from "@/server/api/proto/app/v1/common";
 import { type ColumnDef } from "@tanstack/vue-table";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import AdminMetricCard from "./components/AdminMetricCard.vue";

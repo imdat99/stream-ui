@@ -1076,10 +1076,10 @@ export const DeleteVideoRequest: MessageFns<DeleteVideoRequest> = {
   },
 };
 
-export type VideosServiceService = typeof VideosServiceService;
-export const VideosServiceService = {
+export type VideosService = typeof VideosService;
+export const VideosService = {
   getUploadUrl: {
-    path: "/stream.app.v1.VideosService/GetUploadUrl",
+    path: "/stream.app.v1.Videos/GetUploadUrl",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetUploadUrlRequest): Buffer => Buffer.from(GetUploadUrlRequest.encode(value).finish()),
@@ -1089,7 +1089,7 @@ export const VideosServiceService = {
     responseDeserialize: (value: Buffer): GetUploadUrlResponse => GetUploadUrlResponse.decode(value),
   },
   createVideo: {
-    path: "/stream.app.v1.VideosService/CreateVideo",
+    path: "/stream.app.v1.Videos/CreateVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateVideoRequest): Buffer => Buffer.from(CreateVideoRequest.encode(value).finish()),
@@ -1098,7 +1098,7 @@ export const VideosServiceService = {
     responseDeserialize: (value: Buffer): CreateVideoResponse => CreateVideoResponse.decode(value),
   },
   listVideos: {
-    path: "/stream.app.v1.VideosService/ListVideos",
+    path: "/stream.app.v1.Videos/ListVideos",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListVideosRequest): Buffer => Buffer.from(ListVideosRequest.encode(value).finish()),
@@ -1107,7 +1107,7 @@ export const VideosServiceService = {
     responseDeserialize: (value: Buffer): ListVideosResponse => ListVideosResponse.decode(value),
   },
   getVideo: {
-    path: "/stream.app.v1.VideosService/GetVideo",
+    path: "/stream.app.v1.Videos/GetVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetVideoRequest): Buffer => Buffer.from(GetVideoRequest.encode(value).finish()),
@@ -1116,7 +1116,7 @@ export const VideosServiceService = {
     responseDeserialize: (value: Buffer): GetVideoResponse => GetVideoResponse.decode(value),
   },
   updateVideo: {
-    path: "/stream.app.v1.VideosService/UpdateVideo",
+    path: "/stream.app.v1.Videos/UpdateVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateVideoRequest): Buffer => Buffer.from(UpdateVideoRequest.encode(value).finish()),
@@ -1125,7 +1125,7 @@ export const VideosServiceService = {
     responseDeserialize: (value: Buffer): UpdateVideoResponse => UpdateVideoResponse.decode(value),
   },
   deleteVideo: {
-    path: "/stream.app.v1.VideosService/DeleteVideo",
+    path: "/stream.app.v1.Videos/DeleteVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteVideoRequest): Buffer => Buffer.from(DeleteVideoRequest.encode(value).finish()),
@@ -1135,7 +1135,7 @@ export const VideosServiceService = {
   },
 } as const;
 
-export interface VideosServiceServer extends UntypedServiceImplementation {
+export interface VideosServer extends UntypedServiceImplementation {
   getUploadUrl: handleUnaryCall<GetUploadUrlRequest, GetUploadUrlResponse>;
   createVideo: handleUnaryCall<CreateVideoRequest, CreateVideoResponse>;
   listVideos: handleUnaryCall<ListVideosRequest, ListVideosResponse>;
@@ -1144,7 +1144,7 @@ export interface VideosServiceServer extends UntypedServiceImplementation {
   deleteVideo: handleUnaryCall<DeleteVideoRequest, MessageResponse>;
 }
 
-export interface VideosServiceClient extends Client {
+export interface VideosClient extends Client {
   getUploadUrl(
     request: GetUploadUrlRequest,
     callback: (error: ServiceError | null, response: GetUploadUrlResponse) => void,
@@ -1237,12 +1237,9 @@ export interface VideosServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const VideosServiceClient = makeGenericClientConstructor(
-  VideosServiceService,
-  "stream.app.v1.VideosService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): VideosServiceClient;
-  service: typeof VideosServiceService;
+export const VideosClient = makeGenericClientConstructor(VideosService, "stream.app.v1.Videos") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): VideosClient;
+  service: typeof VideosService;
   serviceName: string;
 };
 

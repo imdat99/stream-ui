@@ -1386,10 +1386,10 @@ export const ClearNotificationsRequest: MessageFns<ClearNotificationsRequest> = 
   },
 };
 
-export type AccountServiceService = typeof AccountServiceService;
-export const AccountServiceService = {
+export type AccountService = typeof AccountService;
+export const AccountService = {
   getMe: {
-    path: "/stream.app.v1.AccountService/GetMe",
+    path: "/stream.app.v1.Account/GetMe",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetMeRequest): Buffer => Buffer.from(GetMeRequest.encode(value).finish()),
@@ -1398,7 +1398,7 @@ export const AccountServiceService = {
     responseDeserialize: (value: Buffer): GetMeResponse => GetMeResponse.decode(value),
   },
   updateMe: {
-    path: "/stream.app.v1.AccountService/UpdateMe",
+    path: "/stream.app.v1.Account/UpdateMe",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateMeRequest): Buffer => Buffer.from(UpdateMeRequest.encode(value).finish()),
@@ -1407,7 +1407,7 @@ export const AccountServiceService = {
     responseDeserialize: (value: Buffer): UpdateMeResponse => UpdateMeResponse.decode(value),
   },
   deleteMe: {
-    path: "/stream.app.v1.AccountService/DeleteMe",
+    path: "/stream.app.v1.Account/DeleteMe",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteMeRequest): Buffer => Buffer.from(DeleteMeRequest.encode(value).finish()),
@@ -1416,7 +1416,7 @@ export const AccountServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   clearMyData: {
-    path: "/stream.app.v1.AccountService/ClearMyData",
+    path: "/stream.app.v1.Account/ClearMyData",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ClearMyDataRequest): Buffer => Buffer.from(ClearMyDataRequest.encode(value).finish()),
@@ -1425,7 +1425,7 @@ export const AccountServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   getUserById: {
-    path: "/stream.app.v1.AccountService/GetUserById",
+    path: "/stream.app.v1.Account/GetUserById",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: string | undefined): Buffer =>
@@ -1434,107 +1434,8 @@ export const AccountServiceService = {
     responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
     responseDeserialize: (value: Buffer): User => User.decode(value),
   },
-} as const;
-
-export interface AccountServiceServer extends UntypedServiceImplementation {
-  getMe: handleUnaryCall<GetMeRequest, GetMeResponse>;
-  updateMe: handleUnaryCall<UpdateMeRequest, UpdateMeResponse>;
-  deleteMe: handleUnaryCall<DeleteMeRequest, MessageResponse>;
-  clearMyData: handleUnaryCall<ClearMyDataRequest, MessageResponse>;
-  getUserById: handleUnaryCall<string | undefined, User>;
-}
-
-export interface AccountServiceClient extends Client {
-  getMe(
-    request: GetMeRequest,
-    callback: (error: ServiceError | null, response: GetMeResponse) => void,
-  ): ClientUnaryCall;
-  getMe(
-    request: GetMeRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: GetMeResponse) => void,
-  ): ClientUnaryCall;
-  getMe(
-    request: GetMeRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: GetMeResponse) => void,
-  ): ClientUnaryCall;
-  updateMe(
-    request: UpdateMeRequest,
-    callback: (error: ServiceError | null, response: UpdateMeResponse) => void,
-  ): ClientUnaryCall;
-  updateMe(
-    request: UpdateMeRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: UpdateMeResponse) => void,
-  ): ClientUnaryCall;
-  updateMe(
-    request: UpdateMeRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UpdateMeResponse) => void,
-  ): ClientUnaryCall;
-  deleteMe(
-    request: DeleteMeRequest,
-    callback: (error: ServiceError | null, response: MessageResponse) => void,
-  ): ClientUnaryCall;
-  deleteMe(
-    request: DeleteMeRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: MessageResponse) => void,
-  ): ClientUnaryCall;
-  deleteMe(
-    request: DeleteMeRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: MessageResponse) => void,
-  ): ClientUnaryCall;
-  clearMyData(
-    request: ClearMyDataRequest,
-    callback: (error: ServiceError | null, response: MessageResponse) => void,
-  ): ClientUnaryCall;
-  clearMyData(
-    request: ClearMyDataRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: MessageResponse) => void,
-  ): ClientUnaryCall;
-  clearMyData(
-    request: ClearMyDataRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: MessageResponse) => void,
-  ): ClientUnaryCall;
-  getUserById(
-    request: string | undefined,
-    callback: (error: ServiceError | null, response: User) => void,
-  ): ClientUnaryCall;
-  getUserById(
-    request: string | undefined,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: User) => void,
-  ): ClientUnaryCall;
-  getUserById(
-    request: string | undefined,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: User) => void,
-  ): ClientUnaryCall;
-}
-
-export const AccountServiceClient = makeGenericClientConstructor(
-  AccountServiceService,
-  "stream.app.v1.AccountService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AccountServiceClient;
-  service: typeof AccountServiceService;
-  serviceName: string;
-};
-
-export type PreferencesServiceService = typeof PreferencesServiceService;
-export const PreferencesServiceService = {
   getPreferences: {
-    path: "/stream.app.v1.PreferencesService/GetPreferences",
+    path: "/stream.app.v1.Account/GetPreferences",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetPreferencesRequest): Buffer =>
@@ -1545,7 +1446,7 @@ export const PreferencesServiceService = {
     responseDeserialize: (value: Buffer): GetPreferencesResponse => GetPreferencesResponse.decode(value),
   },
   updatePreferences: {
-    path: "/stream.app.v1.PreferencesService/UpdatePreferences",
+    path: "/stream.app.v1.Account/UpdatePreferences",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdatePreferencesRequest): Buffer =>
@@ -1555,59 +1456,8 @@ export const PreferencesServiceService = {
       Buffer.from(UpdatePreferencesResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): UpdatePreferencesResponse => UpdatePreferencesResponse.decode(value),
   },
-} as const;
-
-export interface PreferencesServiceServer extends UntypedServiceImplementation {
-  getPreferences: handleUnaryCall<GetPreferencesRequest, GetPreferencesResponse>;
-  updatePreferences: handleUnaryCall<UpdatePreferencesRequest, UpdatePreferencesResponse>;
-}
-
-export interface PreferencesServiceClient extends Client {
-  getPreferences(
-    request: GetPreferencesRequest,
-    callback: (error: ServiceError | null, response: GetPreferencesResponse) => void,
-  ): ClientUnaryCall;
-  getPreferences(
-    request: GetPreferencesRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: GetPreferencesResponse) => void,
-  ): ClientUnaryCall;
-  getPreferences(
-    request: GetPreferencesRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: GetPreferencesResponse) => void,
-  ): ClientUnaryCall;
-  updatePreferences(
-    request: UpdatePreferencesRequest,
-    callback: (error: ServiceError | null, response: UpdatePreferencesResponse) => void,
-  ): ClientUnaryCall;
-  updatePreferences(
-    request: UpdatePreferencesRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: UpdatePreferencesResponse) => void,
-  ): ClientUnaryCall;
-  updatePreferences(
-    request: UpdatePreferencesRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UpdatePreferencesResponse) => void,
-  ): ClientUnaryCall;
-}
-
-export const PreferencesServiceClient = makeGenericClientConstructor(
-  PreferencesServiceService,
-  "stream.app.v1.PreferencesService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PreferencesServiceClient;
-  service: typeof PreferencesServiceService;
-  serviceName: string;
-};
-
-export type UsageServiceService = typeof UsageServiceService;
-export const UsageServiceService = {
   getUsage: {
-    path: "/stream.app.v1.UsageService/GetUsage",
+    path: "/stream.app.v1.Account/GetUsage",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetUsageRequest): Buffer => Buffer.from(GetUsageRequest.encode(value).finish()),
@@ -1617,11 +1467,123 @@ export const UsageServiceService = {
   },
 } as const;
 
-export interface UsageServiceServer extends UntypedServiceImplementation {
+export interface AccountServer extends UntypedServiceImplementation {
+  getMe: handleUnaryCall<GetMeRequest, GetMeResponse>;
+  updateMe: handleUnaryCall<UpdateMeRequest, UpdateMeResponse>;
+  deleteMe: handleUnaryCall<DeleteMeRequest, MessageResponse>;
+  clearMyData: handleUnaryCall<ClearMyDataRequest, MessageResponse>;
+  getUserById: handleUnaryCall<string | undefined, User>;
+  getPreferences: handleUnaryCall<GetPreferencesRequest, GetPreferencesResponse>;
+  updatePreferences: handleUnaryCall<UpdatePreferencesRequest, UpdatePreferencesResponse>;
   getUsage: handleUnaryCall<GetUsageRequest, GetUsageResponse>;
 }
 
-export interface UsageServiceClient extends Client {
+export interface AccountClient extends Client {
+  getMe(
+    request: GetMeRequest,
+    callback: (error: ServiceError | null, response: GetMeResponse) => void,
+  ): ClientUnaryCall;
+  getMe(
+    request: GetMeRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetMeResponse) => void,
+  ): ClientUnaryCall;
+  getMe(
+    request: GetMeRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetMeResponse) => void,
+  ): ClientUnaryCall;
+  updateMe(
+    request: UpdateMeRequest,
+    callback: (error: ServiceError | null, response: UpdateMeResponse) => void,
+  ): ClientUnaryCall;
+  updateMe(
+    request: UpdateMeRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdateMeResponse) => void,
+  ): ClientUnaryCall;
+  updateMe(
+    request: UpdateMeRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdateMeResponse) => void,
+  ): ClientUnaryCall;
+  deleteMe(
+    request: DeleteMeRequest,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deleteMe(
+    request: DeleteMeRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deleteMe(
+    request: DeleteMeRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  clearMyData(
+    request: ClearMyDataRequest,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  clearMyData(
+    request: ClearMyDataRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  clearMyData(
+    request: ClearMyDataRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  getUserById(
+    request: string | undefined,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  getUserById(
+    request: string | undefined,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  getUserById(
+    request: string | undefined,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  getPreferences(
+    request: GetPreferencesRequest,
+    callback: (error: ServiceError | null, response: GetPreferencesResponse) => void,
+  ): ClientUnaryCall;
+  getPreferences(
+    request: GetPreferencesRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetPreferencesResponse) => void,
+  ): ClientUnaryCall;
+  getPreferences(
+    request: GetPreferencesRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetPreferencesResponse) => void,
+  ): ClientUnaryCall;
+  updatePreferences(
+    request: UpdatePreferencesRequest,
+    callback: (error: ServiceError | null, response: UpdatePreferencesResponse) => void,
+  ): ClientUnaryCall;
+  updatePreferences(
+    request: UpdatePreferencesRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdatePreferencesResponse) => void,
+  ): ClientUnaryCall;
+  updatePreferences(
+    request: UpdatePreferencesRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdatePreferencesResponse) => void,
+  ): ClientUnaryCall;
   getUsage(
     request: GetUsageRequest,
     callback: (error: ServiceError | null, response: GetUsageResponse) => void,
@@ -1639,19 +1601,16 @@ export interface UsageServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const UsageServiceClient = makeGenericClientConstructor(
-  UsageServiceService,
-  "stream.app.v1.UsageService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): UsageServiceClient;
-  service: typeof UsageServiceService;
+export const AccountClient = makeGenericClientConstructor(AccountService, "stream.app.v1.Account") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AccountClient;
+  service: typeof AccountService;
   serviceName: string;
 };
 
-export type NotificationsServiceService = typeof NotificationsServiceService;
-export const NotificationsServiceService = {
+export type NotificationsService = typeof NotificationsService;
+export const NotificationsService = {
   listNotifications: {
-    path: "/stream.app.v1.NotificationsService/ListNotifications",
+    path: "/stream.app.v1.Notifications/ListNotifications",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListNotificationsRequest): Buffer =>
@@ -1662,7 +1621,7 @@ export const NotificationsServiceService = {
     responseDeserialize: (value: Buffer): ListNotificationsResponse => ListNotificationsResponse.decode(value),
   },
   markNotificationRead: {
-    path: "/stream.app.v1.NotificationsService/MarkNotificationRead",
+    path: "/stream.app.v1.Notifications/MarkNotificationRead",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: MarkNotificationReadRequest): Buffer =>
@@ -1672,7 +1631,7 @@ export const NotificationsServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   markAllNotificationsRead: {
-    path: "/stream.app.v1.NotificationsService/MarkAllNotificationsRead",
+    path: "/stream.app.v1.Notifications/MarkAllNotificationsRead",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: MarkAllNotificationsReadRequest): Buffer =>
@@ -1683,7 +1642,7 @@ export const NotificationsServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   deleteNotification: {
-    path: "/stream.app.v1.NotificationsService/DeleteNotification",
+    path: "/stream.app.v1.Notifications/DeleteNotification",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteNotificationRequest): Buffer =>
@@ -1693,7 +1652,7 @@ export const NotificationsServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   clearNotifications: {
-    path: "/stream.app.v1.NotificationsService/ClearNotifications",
+    path: "/stream.app.v1.Notifications/ClearNotifications",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ClearNotificationsRequest): Buffer =>
@@ -1704,7 +1663,7 @@ export const NotificationsServiceService = {
   },
 } as const;
 
-export interface NotificationsServiceServer extends UntypedServiceImplementation {
+export interface NotificationsServer extends UntypedServiceImplementation {
   listNotifications: handleUnaryCall<ListNotificationsRequest, ListNotificationsResponse>;
   markNotificationRead: handleUnaryCall<MarkNotificationReadRequest, MessageResponse>;
   markAllNotificationsRead: handleUnaryCall<MarkAllNotificationsReadRequest, MessageResponse>;
@@ -1712,7 +1671,7 @@ export interface NotificationsServiceServer extends UntypedServiceImplementation
   clearNotifications: handleUnaryCall<ClearNotificationsRequest, MessageResponse>;
 }
 
-export interface NotificationsServiceClient extends Client {
+export interface NotificationsClient extends Client {
   listNotifications(
     request: ListNotificationsRequest,
     callback: (error: ServiceError | null, response: ListNotificationsResponse) => void,
@@ -1790,12 +1749,12 @@ export interface NotificationsServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const NotificationsServiceClient = makeGenericClientConstructor(
-  NotificationsServiceService,
-  "stream.app.v1.NotificationsService",
+export const NotificationsClient = makeGenericClientConstructor(
+  NotificationsService,
+  "stream.app.v1.Notifications",
 ) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): NotificationsServiceClient;
-  service: typeof NotificationsServiceService;
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): NotificationsClient;
+  service: typeof NotificationsService;
   serviceName: string;
 };
 

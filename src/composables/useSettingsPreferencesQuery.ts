@@ -1,6 +1,6 @@
 import { client as rpcClient } from '@/api/rpcclient';
-import type { Preferences } from '@/server/gen/proto/app/v1/common';
-import type { UpdatePreferencesRequest } from '@/server/gen/proto/app/v1/account';
+import type { Preferences } from '@/server/api/proto/app/v1/common';
+import type { UpdatePreferencesRequest } from '@/server/api/proto/app/v1/account';
 import { useQuery } from '@pinia/colada';
 
 export const SETTINGS_PREFERENCES_QUERY_KEY = ['settings', 'preferences'] as const;

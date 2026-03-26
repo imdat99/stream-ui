@@ -1,4 +1,4 @@
-import type { Video as ModelVideo } from "@/server/gen/proto/app/v1/common";
+import type { Video as ModelVideo } from "@/server/api/proto/app/v1/common";
 
 export const mockVideos: ModelVideo[] = [
     {

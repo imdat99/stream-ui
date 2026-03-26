@@ -5,7 +5,7 @@ import TrashIcon from '@/components/icons/TrashIcon.vue';
 import VideoIcon from '@/components/icons/VideoIcon.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import { formatBytes, formatDate, getStatusSeverity } from '@/lib/utils';
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
+import type { Video as ModelVideo } from '@/server/api/proto/app/v1/common';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { useTranslation } from 'i18next-vue';
 import { computed, h } from 'vue';

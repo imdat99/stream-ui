@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
+import type { Video as ModelVideo } from '@/server/api/proto/app/v1/common';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
 import { useTranslation } from 'i18next-vue';
 import { computed, createStaticVNode, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import type { AdTemplate as ManualAdTemplate, Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
+import type { AdTemplate as ManualAdTemplate, Video as ModelVideo } from '@/server/api/proto/app/v1/common';
 import { useAppToast } from '@/composables/useAppToast';
 import { useAuthStore } from '@/stores/auth';
 import { computed, ref, watch } from 'vue';

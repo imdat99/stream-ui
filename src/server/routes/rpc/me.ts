@@ -9,7 +9,7 @@ const optionalTrimmed = () => z.string().trim().min(1).optional();
 export const meMethods = {
   getMe: async () => {
     const context = getContext();
-    const accountClient = context.get("accountServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
     const response = await accountClient.getMe({}, metadata);
     return response.user ?? null;
@@ -23,20 +23,20 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const accountClient = context.get("accountServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
     const response = await accountClient.updateMe(data, metadata);
     return response.user ?? null;
   }),
   deleteMe: async () => {
     const context = getContext();
-    const accountClient = context.get("accountServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
     return await accountClient.deleteMe({}, metadata);
   },
   clearMyData: async () => {
     const context = getContext();
-    const accountClient = context.get("accountServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
     return await accountClient.clearMyData({}, metadata);
   },
@@ -49,7 +49,7 @@ export const meMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const videosClient = context.get("videosServiceClient");
+    const videosClient = context.get("videosClient");
     const metadata = context.get("grpcMetadata");
     return await videosClient.listVideos(data, metadata);
   }),
@@ -59,7 +59,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const videosClient = context.get("videosServiceClient");
+    const videosClient = context.get("videosClient");
     const metadata = context.get("grpcMetadata");
     return await videosClient.getVideo(data, metadata);
   }),
@@ -76,7 +76,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const videosClient = context.get("videosServiceClient");
+    const videosClient = context.get("videosClient");
     const metadata = context.get("grpcMetadata");
     return await videosClient.updateVideo(data, metadata);
   }),
@@ -86,13 +86,13 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const videosClient = context.get("videosServiceClient");
+    const videosClient = context.get("videosClient");
     const metadata = context.get("grpcMetadata");
     return await videosClient.deleteVideo(data, metadata);
   }),
   listAdTemplates: async () => {
     const context = getContext();
-    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const adTemplatesClient = context.get("adTemplatesClient");
     const metadata = context.get("grpcMetadata");
     return await adTemplatesClient.listAdTemplates({}, metadata);
   },
@@ -108,7 +108,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const adTemplatesClient = context.get("adTemplatesClient");
     const metadata = context.get("grpcMetadata");
     return await adTemplatesClient.createAdTemplate(data, metadata);
   }),
@@ -125,7 +125,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const adTemplatesClient = context.get("adTemplatesClient");
     const metadata = context.get("grpcMetadata");
     return await adTemplatesClient.updateAdTemplate(data, metadata);
   }),
@@ -135,13 +135,13 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adTemplatesClient = context.get("adTemplatesServiceClient");
+    const adTemplatesClient = context.get("adTemplatesClient");
     const metadata = context.get("grpcMetadata");
     return await adTemplatesClient.deleteAdTemplate(data, metadata);
   }),
   listPlayerConfigs: async () => {
     const context = getContext();
-    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const playerConfigsClient = context.get("playerConfigsClient");
     const metadata = context.get("grpcMetadata");
     return await playerConfigsClient.listPlayerConfigs({}, metadata);
   },
@@ -163,7 +163,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const playerConfigsClient = context.get("playerConfigsClient");
     const metadata = context.get("grpcMetadata");
     return await playerConfigsClient.createPlayerConfig(data, metadata);
   }),
@@ -186,7 +186,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const playerConfigsClient = context.get("playerConfigsClient");
     const metadata = context.get("grpcMetadata");
     return await playerConfigsClient.updatePlayerConfig(data, metadata);
   }),
@@ -196,15 +196,15 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const playerConfigsClient = context.get("playerConfigsServiceClient");
+    const playerConfigsClient = context.get("playerConfigsClient");
     const metadata = context.get("grpcMetadata");
     return await playerConfigsClient.deletePlayerConfig(data, metadata);
   }),
   getPreferences: async () => {
     const context = getContext();
-    const preferencesClient = context.get("preferencesServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
-    return await preferencesClient.getPreferences({}, metadata);
+    return await accountClient.getPreferences({}, metadata);
   },
   updatePreferences: validateFn(
     z.object({
@@ -217,13 +217,13 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const preferencesClient = context.get("preferencesServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
-    return await preferencesClient.updatePreferences(data, metadata);
+    return await accountClient.updatePreferences(data, metadata);
   }),
   listNotifications: async () => {
     const context = getContext();
-    const notificationsClient = context.get("notificationsServiceClient");
+    const notificationsClient = context.get("notificationsClient");
     const metadata = context.get("grpcMetadata");
     return await notificationsClient.listNotifications({}, metadata);
   },
@@ -233,13 +233,13 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const notificationsClient = context.get("notificationsServiceClient");
+    const notificationsClient = context.get("notificationsClient");
     const metadata = context.get("grpcMetadata");
     return await notificationsClient.markNotificationRead(data, metadata);
   }),
   markAllNotificationsRead: async () => {
     const context = getContext();
-    const notificationsClient = context.get("notificationsServiceClient");
+    const notificationsClient = context.get("notificationsClient");
     const metadata = context.get("grpcMetadata");
     return await notificationsClient.markAllNotificationsRead({}, metadata);
   },
@@ -249,13 +249,13 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const notificationsClient = context.get("notificationsServiceClient");
+    const notificationsClient = context.get("notificationsClient");
     const metadata = context.get("grpcMetadata");
     return await notificationsClient.deleteNotification(data, metadata);
   }),
   clearNotifications: async () => {
     const context = getContext();
-    const notificationsClient = context.get("notificationsServiceClient");
+    const notificationsClient = context.get("notificationsClient");
     const metadata = context.get("grpcMetadata");
     return await notificationsClient.clearNotifications({}, metadata);
   },
@@ -265,7 +265,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const videosClient = context.get("videosServiceClient");
+    const videosClient = context.get("videosClient");
     const metadata = context.get("grpcMetadata");
     return await videosClient.getUploadUrl(data, metadata);
   }),
@@ -280,19 +280,19 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const videosClient = context.get("videosServiceClient");
+    const videosClient = context.get("videosClient");
     const metadata = context.get("grpcMetadata");
     return await videosClient.createVideo(data, metadata);
   }),
   getUsage: async () => {
     const context = getContext();
-    const usageClient = context.get("usageServiceClient");
+    const accountClient = context.get("accountClient");
     const metadata = context.get("grpcMetadata");
-    return await usageClient.getUsage({}, metadata);
+    return await accountClient.getUsage({}, metadata);
   },
   listDomains: async () => {
     const context = getContext();
-    const domainsClient = context.get("domainsServiceClient");
+    const domainsClient = context.get("domainsClient");
     const metadata = context.get("grpcMetadata");
     return await domainsClient.listDomains({}, metadata);
   },
@@ -302,7 +302,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const domainsClient = context.get("domainsServiceClient");
+    const domainsClient = context.get("domainsClient");
     const metadata = context.get("grpcMetadata");
     return await domainsClient.createDomain(data, metadata);
   }),
@@ -312,13 +312,13 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const domainsClient = context.get("domainsServiceClient");
+    const domainsClient = context.get("domainsClient");
     const metadata = context.get("grpcMetadata");
     return await domainsClient.deleteDomain(data, metadata);
   }),
   listPlans: async () => {
     const context = getContext();
-    const plansClient = context.get("plansServiceClient");
+    const plansClient = context.get("plansClient");
     const metadata = context.get("grpcMetadata");
     return await plansClient.listPlans({}, metadata);
   },
@@ -327,7 +327,7 @@ export const meMethods = {
     z.number().int().min(1).max(100).optional(),
   )(async (page, limit) => {
     const context = getContext();
-    const paymentsClient = context.get("paymentsServiceClient");
+    const paymentsClient = context.get("paymentsClient");
     const metadata = context.get("grpcMetadata");
     return await paymentsClient.listPaymentHistory({ page, limit }, metadata);
   }),
@@ -340,7 +340,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const paymentsClient = context.get("paymentsServiceClient");
+    const paymentsClient = context.get("paymentsClient");
     const metadata = context.get("grpcMetadata");
     return await paymentsClient.createPayment(data, metadata);
   }),
@@ -350,7 +350,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const paymentsClient = context.get("paymentsServiceClient");
+    const paymentsClient = context.get("paymentsClient");
     const metadata = context.get("grpcMetadata");
     return await paymentsClient.topupWallet(data, metadata);
   }),
@@ -360,7 +360,7 @@ export const meMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const paymentsClient = context.get("paymentsServiceClient");
+    const paymentsClient = context.get("paymentsClient");
     const metadata = context.get("grpcMetadata");
     return await paymentsClient.downloadInvoice(data, metadata);
   }),

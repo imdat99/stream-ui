@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import { client as rpcClient } from '@/api/rpcclient';
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
+import type { Video as ModelVideo } from '@/server/api/proto/app/v1/common';
 import { useUsageQuery } from '@/composables/useUsageQuery';
 import PageHeader from '@/components/dashboard/PageHeader.vue';
 import { computed, onMounted, ref } from 'vue';

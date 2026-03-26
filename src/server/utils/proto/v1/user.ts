@@ -1985,7 +1985,7 @@ export interface UserServiceServer extends UntypedServiceImplementation {
   upsertPreferences: handleUnaryCall<UpsertPreferencesRequest, UpsertPreferencesResponse>;
 }
 
-export interface UserServiceClient extends Client {
+export interface UserClient extends Client {
   /** User CRUD */
   getUser(
     request: GetUserRequest,
@@ -2125,11 +2125,11 @@ export interface UserServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const UserServiceClient = makeGenericClientConstructor(
+export const UserClient = makeGenericClientConstructor(
   UserServiceService,
   "stream.User.v1.UserService",
 ) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): UserServiceClient;
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): UserClient;
   service: typeof UserServiceService;
   serviceName: string;
 };

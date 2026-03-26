@@ -880,10 +880,10 @@ export const DownloadInvoiceResponse: MessageFns<DownloadInvoiceResponse> = {
   },
 };
 
-export type PaymentsServiceService = typeof PaymentsServiceService;
-export const PaymentsServiceService = {
+export type PaymentsService = typeof PaymentsService;
+export const PaymentsService = {
   createPayment: {
-    path: "/stream.app.v1.PaymentsService/CreatePayment",
+    path: "/stream.app.v1.Payments/CreatePayment",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreatePaymentRequest): Buffer => Buffer.from(CreatePaymentRequest.encode(value).finish()),
@@ -893,7 +893,7 @@ export const PaymentsServiceService = {
     responseDeserialize: (value: Buffer): CreatePaymentResponse => CreatePaymentResponse.decode(value),
   },
   listPaymentHistory: {
-    path: "/stream.app.v1.PaymentsService/ListPaymentHistory",
+    path: "/stream.app.v1.Payments/ListPaymentHistory",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListPaymentHistoryRequest): Buffer =>
@@ -904,7 +904,7 @@ export const PaymentsServiceService = {
     responseDeserialize: (value: Buffer): ListPaymentHistoryResponse => ListPaymentHistoryResponse.decode(value),
   },
   topupWallet: {
-    path: "/stream.app.v1.PaymentsService/TopupWallet",
+    path: "/stream.app.v1.Payments/TopupWallet",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: TopupWalletRequest): Buffer => Buffer.from(TopupWalletRequest.encode(value).finish()),
@@ -913,7 +913,7 @@ export const PaymentsServiceService = {
     responseDeserialize: (value: Buffer): TopupWalletResponse => TopupWalletResponse.decode(value),
   },
   downloadInvoice: {
-    path: "/stream.app.v1.PaymentsService/DownloadInvoice",
+    path: "/stream.app.v1.Payments/DownloadInvoice",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DownloadInvoiceRequest): Buffer =>
@@ -925,14 +925,14 @@ export const PaymentsServiceService = {
   },
 } as const;
 
-export interface PaymentsServiceServer extends UntypedServiceImplementation {
+export interface PaymentsServer extends UntypedServiceImplementation {
   createPayment: handleUnaryCall<CreatePaymentRequest, CreatePaymentResponse>;
   listPaymentHistory: handleUnaryCall<ListPaymentHistoryRequest, ListPaymentHistoryResponse>;
   topupWallet: handleUnaryCall<TopupWalletRequest, TopupWalletResponse>;
   downloadInvoice: handleUnaryCall<DownloadInvoiceRequest, DownloadInvoiceResponse>;
 }
 
-export interface PaymentsServiceClient extends Client {
+export interface PaymentsClient extends Client {
   createPayment(
     request: CreatePaymentRequest,
     callback: (error: ServiceError | null, response: CreatePaymentResponse) => void,
@@ -995,12 +995,9 @@ export interface PaymentsServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const PaymentsServiceClient = makeGenericClientConstructor(
-  PaymentsServiceService,
-  "stream.app.v1.PaymentsService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PaymentsServiceClient;
-  service: typeof PaymentsServiceService;
+export const PaymentsClient = makeGenericClientConstructor(PaymentsService, "stream.app.v1.Payments") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PaymentsClient;
+  service: typeof PaymentsService;
   serviceName: string;
 };
 

@@ -883,10 +883,10 @@ export const CompleteGoogleLoginResponse: MessageFns<CompleteGoogleLoginResponse
   },
 };
 
-export type AuthServiceService = typeof AuthServiceService;
-export const AuthServiceService = {
+export type AuthService = typeof AuthService;
+export const AuthService = {
   login: {
-    path: "/stream.app.v1.AuthService/Login",
+    path: "/stream.app.v1.Auth/Login",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: LoginRequest): Buffer => Buffer.from(LoginRequest.encode(value).finish()),
@@ -895,7 +895,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): LoginResponse => LoginResponse.decode(value),
   },
   register: {
-    path: "/stream.app.v1.AuthService/Register",
+    path: "/stream.app.v1.Auth/Register",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: RegisterRequest): Buffer => Buffer.from(RegisterRequest.encode(value).finish()),
@@ -904,7 +904,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): RegisterResponse => RegisterResponse.decode(value),
   },
   logout: {
-    path: "/stream.app.v1.AuthService/Logout",
+    path: "/stream.app.v1.Auth/Logout",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: LogoutRequest): Buffer => Buffer.from(LogoutRequest.encode(value).finish()),
@@ -913,7 +913,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   changePassword: {
-    path: "/stream.app.v1.AuthService/ChangePassword",
+    path: "/stream.app.v1.Auth/ChangePassword",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ChangePasswordRequest): Buffer =>
@@ -923,7 +923,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   forgotPassword: {
-    path: "/stream.app.v1.AuthService/ForgotPassword",
+    path: "/stream.app.v1.Auth/ForgotPassword",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ForgotPasswordRequest): Buffer =>
@@ -933,7 +933,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   resetPassword: {
-    path: "/stream.app.v1.AuthService/ResetPassword",
+    path: "/stream.app.v1.Auth/ResetPassword",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ResetPasswordRequest): Buffer => Buffer.from(ResetPasswordRequest.encode(value).finish()),
@@ -942,7 +942,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   getGoogleLoginUrl: {
-    path: "/stream.app.v1.AuthService/GetGoogleLoginUrl",
+    path: "/stream.app.v1.Auth/GetGoogleLoginUrl",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetGoogleLoginUrlRequest): Buffer =>
@@ -953,7 +953,7 @@ export const AuthServiceService = {
     responseDeserialize: (value: Buffer): GetGoogleLoginUrlResponse => GetGoogleLoginUrlResponse.decode(value),
   },
   completeGoogleLogin: {
-    path: "/stream.app.v1.AuthService/CompleteGoogleLogin",
+    path: "/stream.app.v1.Auth/CompleteGoogleLogin",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CompleteGoogleLoginRequest): Buffer =>
@@ -965,7 +965,7 @@ export const AuthServiceService = {
   },
 } as const;
 
-export interface AuthServiceServer extends UntypedServiceImplementation {
+export interface AuthServer extends UntypedServiceImplementation {
   login: handleUnaryCall<LoginRequest, LoginResponse>;
   register: handleUnaryCall<RegisterRequest, RegisterResponse>;
   logout: handleUnaryCall<LogoutRequest, MessageResponse>;
@@ -976,7 +976,7 @@ export interface AuthServiceServer extends UntypedServiceImplementation {
   completeGoogleLogin: handleUnaryCall<CompleteGoogleLoginRequest, CompleteGoogleLoginResponse>;
 }
 
-export interface AuthServiceClient extends Client {
+export interface AuthClient extends Client {
   login(
     request: LoginRequest,
     callback: (error: ServiceError | null, response: LoginResponse) => void,
@@ -1099,12 +1099,9 @@ export interface AuthServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const AuthServiceClient = makeGenericClientConstructor(
-  AuthServiceService,
-  "stream.app.v1.AuthService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AuthServiceClient;
-  service: typeof AuthServiceService;
+export const AuthClient = makeGenericClientConstructor(AuthService, "stream.app.v1.Auth") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AuthClient;
+  service: typeof AuthService;
   serviceName: string;
 };
 

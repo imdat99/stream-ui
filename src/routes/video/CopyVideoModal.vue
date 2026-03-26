@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { client as rpcClient } from '@/api/rpcclient';
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
+import type { Video as ModelVideo } from '@/server/api/proto/app/v1/common';
 import { useAppToast } from '@/composables/useAppToast';
 import { computed, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';

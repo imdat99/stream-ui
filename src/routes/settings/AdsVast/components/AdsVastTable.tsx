@@ -13,6 +13,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import AppSwitch from '@/components/ui/AppSwitch.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
+import { formatDate } from '../../DomainsDns/helpers';
 
 export default defineComponent({
   name: 'AdTemplateTable',
@@ -79,7 +80,7 @@ export default defineComponent({
         header: t('settings.adsVast.table.template'),
         accessorFn: (row) => row.name || '',
         cell: ({ row }) => (
-          <div>
+          <>
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-sm font-medium text-foreground">{row.original.name || ''}</span>
               {row.original.isDefault && (
@@ -89,9 +90,9 @@ export default defineComponent({
               )}
             </div>
             <p class="mt-0.5 text-xs text-foreground/50">
-              {t('settings.adsVast.createdOn', { date: row.original.createdAt || '-' })}
+              {t('settings.adsVast.createdOn', { date: formatDate(row.original.createdAt) || '-' })}
             </p>
-          </div>
+          </>
         ),
         meta: {
           headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
@@ -170,12 +171,8 @@ export default defineComponent({
         header: t('common.actions'),
         enableSorting: false,
         cell: ({ row }) => (
-          <div class="flex flex-wrap items-center justify-end gap-2">
-            {row.original.isDefault ? (
-              <span class="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                {t('settings.adsVast.actions.default')}
-              </span>
-            ) : (
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            {!row.original.isDefault && (
               <AppButton
                 variant="ghost"
                 size="sm"
@@ -214,12 +211,12 @@ export default defineComponent({
           </div>
         ),
         meta: {
-          headerClass: 'px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50',
-          cellClass: 'px-6 py-3 text-right',
+          headerClass: 'px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-foreground/50 [&>div]:justify-center',
+          cellClass: 'px-6 py-3 text-center',
         },
       },
     ]);
-
+    
     return () => (
       <>
         {props.isInitialLoading ? (

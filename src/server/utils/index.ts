@@ -1,4 +1,4 @@
-import type { User } from "@/server/gen/proto/app/v1/common";
+import type { User } from "@/server/api/proto/app/v1/common";
 import { TinyRpcError } from "@hiogawa/tiny-rpc";
 import { tinyassert } from "@hiogawa/utils";
 import { Context } from "hono";

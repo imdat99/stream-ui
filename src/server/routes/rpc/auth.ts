@@ -23,7 +23,7 @@ export const publicAuthMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("internalGrpcMetadata");
     const response = await authClient.login(data, metadata, {
       onMetadata: collectGrpcCookies,
@@ -40,7 +40,7 @@ export const publicAuthMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("internalGrpcMetadata");
     const response = await authClient.register({
       email: data.email,
@@ -57,7 +57,7 @@ export const publicAuthMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("internalGrpcMetadata");
     const response = await authClient.forgotPassword(data, metadata);
     return { message: response.message || "If email exists, a reset link has been sent" };
@@ -69,14 +69,14 @@ export const publicAuthMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("internalGrpcMetadata");
     const response = await authClient.resetPassword(data, metadata);
     return { message: response.message || "Password reset successfully" };
   }),
   getGoogleLoginUrl: async () => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("internalGrpcMetadata");
     return await authClient.getGoogleLoginUrl({}, metadata);
   },
@@ -90,14 +90,14 @@ export const protectedAuthMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("grpcMetadata");
     const response = await authClient.changePassword(data, metadata);
     return { message: response.message || "Password changed successfully" };
   }),
   logout: async () => {
     const context = getContext();
-    const authClient = context.get("authServiceClient");
+    const authClient = context.get("authClient");
     const metadata = context.get("internalGrpcMetadata");
 
     await authClient.logout({}, metadata);

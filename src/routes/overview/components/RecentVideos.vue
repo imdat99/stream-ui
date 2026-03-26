@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseTable from '@/components/ui/BaseTable.vue';
 import EmptyState from '@/components/dashboard/EmptyState.vue';
-import type { Video as ModelVideo } from '@/server/gen/proto/app/v1/common';
+import type { Video as ModelVideo } from '@/server/api/proto/app/v1/common';
 import { formatDate, formatDuration } from '@/lib/utils';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { useTranslation } from 'i18next-vue';

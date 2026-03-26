@@ -6,7 +6,7 @@ const optionalTrimmed = () => z.string().trim().min(1).optional();
 export const adminMethods = {
     getAdminDashboard: async () => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     const response = await adminClient.getAdminDashboard({}, metadata);
     return response.dashboard ?? null;
@@ -20,7 +20,7 @@ export const adminMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminUsers(data, metadata);
   }),
@@ -34,7 +34,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminUser(data, metadata);
   }),
@@ -49,7 +49,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminUser(data, metadata);
   }),
@@ -59,7 +59,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.getAdminUser(data, metadata);
   }),
@@ -74,7 +74,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminUserReferralSettings(data, metadata);
   }),
@@ -85,7 +85,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminUserRole(data, metadata);
   }),
@@ -95,7 +95,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminUser(data, metadata);
   }),
@@ -109,7 +109,7 @@ export const adminMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminVideos(data, metadata);
   }),
@@ -127,7 +127,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminVideo(data, metadata);
   }),
@@ -146,7 +146,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminVideo(data, metadata);
   }),
@@ -156,7 +156,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminVideo(data, metadata);
   }),
@@ -169,7 +169,7 @@ export const adminMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminPayments(data, metadata);
   }),
@@ -183,7 +183,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminPayment(data, metadata);
   }),
@@ -194,13 +194,13 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminPayment(data, metadata);
   }),
   listAdminPlans: async () => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminPlans({}, metadata);
   },
@@ -217,7 +217,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminPlan(data, metadata);
   }),
@@ -235,7 +235,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminPlan(data, metadata);
   }),
@@ -245,7 +245,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminPlan(data, metadata);
   }),
@@ -258,7 +258,7 @@ export const adminMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminAdTemplates(data, metadata);
   }),
@@ -275,7 +275,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminAdTemplate(data, metadata);
   }),
@@ -293,7 +293,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminAdTemplate(data, metadata);
   }),
@@ -303,7 +303,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminAdTemplate(data, metadata);
   }),
@@ -316,7 +316,7 @@ export const adminMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminPlayerConfigs(data, metadata);
   }),
@@ -339,7 +339,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminPlayerConfig(data, metadata);
   }),
@@ -363,7 +363,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminPlayerConfig(data, metadata);
   }),
@@ -373,7 +373,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminPlayerConfig(data, metadata);
   }),
@@ -387,7 +387,7 @@ export const adminMethods = {
     }).optional().default({}),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminJobs(data, metadata);
   }),
@@ -397,7 +397,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.getAdminJob(data, metadata);
   }),
@@ -407,7 +407,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.getAdminJobLogs(data, metadata);
   }),
@@ -423,7 +423,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.createAdminJob(data, metadata);
   }),
@@ -433,7 +433,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.cancelAdminJob(data, metadata);
   }),
@@ -443,13 +443,13 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.retryAdminJob(data, metadata);
   }),
   listAdminAgents: async () => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.listAdminAgents({}, metadata);
   },
@@ -459,7 +459,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.restartAdminAgent(data, metadata);
   }),
@@ -469,7 +469,7 @@ export const adminMethods = {
     }),
   )(async (data) => {
     const context = getContext();
-    const adminClient = context.get("adminServiceClient");
+    const adminClient = context.get("adminClient");
     const metadata = context.get("grpcMetadata");
     return await adminClient.updateAdminAgent(data, metadata);
   }),

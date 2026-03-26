@@ -1,39 +1,35 @@
 import {
-  AccountServiceClient,
-  NotificationsServiceClient,
-  PreferencesServiceClient,
-  UsageServiceClient,
-  type AccountServiceClient as AccountServiceClientType,
-  type NotificationsServiceClient as NotificationsServiceClientType,
-  type PreferencesServiceClient as PreferencesServiceClientType,
-  type UsageServiceClient as UsageServiceClientType,
-} from "@/server/gen/proto/app/v1/account";
+  AccountClient,
+  NotificationsClient,
+  type AccountClient as AccountClientType,
+  type NotificationsClient as NotificationsClientType,
+} from "@/server/api/proto/app/v1/account";
 import {
-  AdminServiceClient,
-  type AdminServiceClient as AdminServiceClientType,
-} from "@/server/gen/proto/app/v1/admin";
+  AdminClient,
+  type AdminClient as AdminClientType,
+} from "@/server/api/proto/app/v1/admin";
 import {
-  AuthServiceClient,
-  type AuthServiceClient as AuthServiceClientType,
-} from "@/server/gen/proto/app/v1/auth";
+  AuthClient,
+  type AuthClient as AuthClientType,
+} from "@/server/api/proto/app/v1/auth";
 import {
-  AdTemplatesServiceClient,
-  DomainsServiceClient,
-  PlayerConfigsServiceClient,
-  PlansServiceClient,
-  type AdTemplatesServiceClient as AdTemplatesServiceClientType,
-  type DomainsServiceClient as DomainsServiceClientType,
-  type PlayerConfigsServiceClient as PlayerConfigsServiceClientType,
-  type PlansServiceClient as PlansServiceClientType,
-} from "@/server/gen/proto/app/v1/catalog";
+  AdTemplatesClient,
+  DomainsClient,
+  PlayerConfigsClient,
+  PlansClient,
+  type AdTemplatesClient as AdTemplatesClientType,
+  type DomainsClient as DomainsClientType,
+  type PlayerConfigsClient as PlayerConfigsClientType,
+  type PlansClient as PlansClientType,
+} from "@/server/api/proto/app/v1/catalog";
 import {
-  PaymentsServiceClient,
-  type PaymentsServiceClient as PaymentsServiceClientType,
-} from "@/server/gen/proto/app/v1/payments";
+  PaymentsClient,
+  type PaymentsClient as PaymentsClientType,
+} from "@/server/api/proto/app/v1/payments";
 import {
-  VideosServiceClient,
-  type VideosServiceClient as VideosServiceClientType,
-} from "@/server/gen/proto/app/v1/videos";
+  VideosClient,
+  type VideosClient as VideosClientType,
+} from "@/server/api/proto/app/v1/videos";
 import { ChannelCredentials, Metadata, credentials } from "@grpc/grpc-js";
 import type { Hono } from "hono";
 import { tryGetContext } from "hono/context-storage";
@@ -41,18 +37,16 @@ import { PromisifiedClient, promisifyClient } from "../utils/grpcHelper";
 
 declare module "hono" {
   interface ContextVariableMap {
-    accountServiceClient: PromisifiedClient<AccountServiceClientType>;
-    authServiceClient: PromisifiedClient<AuthServiceClientType>;
-    adminServiceClient: PromisifiedClient<AdminServiceClientType>;
-    adTemplatesServiceClient: PromisifiedClient<AdTemplatesServiceClientType>;
-    videosServiceClient: PromisifiedClient<VideosServiceClientType>;
-    domainsServiceClient: PromisifiedClient<DomainsServiceClientType>;
-    playerConfigsServiceClient: PromisifiedClient<PlayerConfigsServiceClientType>;
-    plansServiceClient: PromisifiedClient<PlansServiceClientType>;
-    paymentsServiceClient: PromisifiedClient<PaymentsServiceClientType>;
-    preferencesServiceClient: PromisifiedClient<PreferencesServiceClientType>;
-    notificationsServiceClient: PromisifiedClient<NotificationsServiceClientType>;
-    usageServiceClient: PromisifiedClient<UsageServiceClientType>;
+    accountClient: PromisifiedClient<AccountClientType>;
+    authClient: PromisifiedClient<AuthClientType>;
+    adminClient: PromisifiedClient<AdminClientType>;
+    adTemplatesClient: PromisifiedClient<AdTemplatesClientType>;
+    videosClient: PromisifiedClient<VideosClientType>;
+    domainsClient: PromisifiedClient<DomainsClientType>;
+    playerConfigsClient: PromisifiedClient<PlayerConfigsClientType>;
+    plansClient: PromisifiedClient<PlansClientType>;
+    paymentsClient: PromisifiedClient<PaymentsClientType>;
+    notificationsClient: PromisifiedClient<NotificationsClientType>;
     internalGrpcMetadata: Metadata;
   }
 }
@@ -119,100 +113,84 @@ const buildActorMetadata = () => {
   return metadata;
 };
 
-export const getAccountServiceClient = () => {
+export const getAccountClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get AccountServiceClient");
+    throw new Error("No context available to get AccountClient");
   }
-  return context.get("accountServiceClient");
+  return context.get("accountClient");
 };
 
-export const getAuthServiceClient = () => {
+export const getAuthClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get AuthServiceClient");
+    throw new Error("No context available to get AuthClient");
   }
-  return context.get("authServiceClient");
+  return context.get("authClient");
 };
 
-export const getAdminServiceClient = () => {
+export const getAdminClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get AdminServiceClient");
+    throw new Error("No context available to get AdminClient");
   }
-  return context.get("adminServiceClient");
+  return context.get("adminClient");
 };
 
-export const getAdTemplatesServiceClient = () => {
+export const getAdTemplatesClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get AdTemplatesServiceClient");
+    throw new Error("No context available to get AdTemplatesClient");
   }
-  return context.get("adTemplatesServiceClient");
+  return context.get("adTemplatesClient");
 };
 
-export const getVideosServiceClient = () => {
+export const getVideosClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get VideosServiceClient");
+    throw new Error("No context available to get VideosClient");
   }
-  return context.get("videosServiceClient");
+  return context.get("videosClient");
 };
 
-export const getDomainsServiceClient = () => {
+export const getDomainsClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get DomainsServiceClient");
+    throw new Error("No context available to get DomainsClient");
   }
-  return context.get("domainsServiceClient");
+  return context.get("domainsClient");
 };
 
-export const getPlayerConfigsServiceClient = () => {
+export const getPlayerConfigsClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get PlayerConfigsServiceClient");
+    throw new Error("No context available to get PlayerConfigsClient");
   }
-  return context.get("playerConfigsServiceClient");
+  return context.get("playerConfigsClient");
 };
 
-export const getPlansServiceClient = () => {
+export const getPlansClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get PlansServiceClient");
+    throw new Error("No context available to get PlansClient");
   }
-  return context.get("plansServiceClient");
+  return context.get("plansClient");
 };
 
-export const getPaymentsServiceClient = () => {
+export const getPaymentsClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get PaymentsServiceClient");
+    throw new Error("No context available to get PaymentsClient");
   }
-  return context.get("paymentsServiceClient");
+  return context.get("paymentsClient");
 };
 
-export const getPreferencesServiceClient = () => {
+export const getNotificationsClient = () => {
   const context = tryGetContext();
   if (!context) {
-    throw new Error("No context available to get PreferencesServiceClient");
+    throw new Error("No context available to get NotificationsClient");
   }
-  return context.get("preferencesServiceClient");
-};
-
-export const getNotificationsServiceClient = () => {
-  const context = tryGetContext();
-  if (!context) {
-    throw new Error("No context available to get NotificationsServiceClient");
-  }
-  return context.get("notificationsServiceClient");
-};
-
-export const getUsageServiceClient = () => {
-  const context = tryGetContext();
-  if (!context) {
-    throw new Error("No context available to get UsageServiceClient");
-  }
-  return context.get("usageServiceClient");
+  return context.get("notificationsClient");
 };
 
 export const getGrpcMetadataFromContext = () => buildActorMetadata();
@@ -223,31 +201,27 @@ export const setupServices = (app: Hono) => {
   app.use("*", async (c, next) => {
     const creds = getCredentials();
 
-    const accountClient = new AccountServiceClient(grpcAddress(), creds);
-    const authClient = new AuthServiceClient(grpcAddress(), creds);
-    const adminClient = new AdminServiceClient(grpcAddress(), creds);
-    const adTemplatesClient = new AdTemplatesServiceClient(grpcAddress(), creds);
-    const videosClient = new VideosServiceClient(grpcAddress(), creds);
-    const domainsClient = new DomainsServiceClient(grpcAddress(), creds);
-    const playerConfigsClient = new PlayerConfigsServiceClient(grpcAddress(), creds);
-    const plansClient = new PlansServiceClient(grpcAddress(), creds);
-    const paymentsClient = new PaymentsServiceClient(grpcAddress(), creds);
-    const preferencesClient = new PreferencesServiceClient(grpcAddress(), creds);
-    const notificationsClient = new NotificationsServiceClient(grpcAddress(), creds);
-    const usageClient = new UsageServiceClient(grpcAddress(), creds);
+    const accountClient = new AccountClient(grpcAddress(), creds);
+    const authClient = new AuthClient(grpcAddress(), creds);
+    const adminClient = new AdminClient(grpcAddress(), creds);
+    const adTemplatesClient = new AdTemplatesClient(grpcAddress(), creds);
+    const videosClient = new VideosClient(grpcAddress(), creds);
+    const domainsClient = new DomainsClient(grpcAddress(), creds);
+    const playerConfigsClient = new PlayerConfigsClient(grpcAddress(), creds);
+    const plansClient = new PlansClient(grpcAddress(), creds);
+    const paymentsClient = new PaymentsClient(grpcAddress(), creds);
+    const notificationsClient = new NotificationsClient(grpcAddress(), creds);
 
-    c.set("accountServiceClient", promisifyClient(accountClient));
-    c.set("authServiceClient", promisifyClient(authClient));
-    c.set("adminServiceClient", promisifyClient(adminClient));
-    c.set("adTemplatesServiceClient", promisifyClient(adTemplatesClient));
-    c.set("videosServiceClient", promisifyClient(videosClient));
-    c.set("domainsServiceClient", promisifyClient(domainsClient));
-    c.set("playerConfigsServiceClient", promisifyClient(playerConfigsClient));
-    c.set("plansServiceClient", promisifyClient(plansClient));
-    c.set("paymentsServiceClient", promisifyClient(paymentsClient));
-    c.set("preferencesServiceClient", promisifyClient(preferencesClient));
-    c.set("notificationsServiceClient", promisifyClient(notificationsClient));
-    c.set("usageServiceClient", promisifyClient(usageClient));
+    c.set("accountClient", promisifyClient(accountClient));
+    c.set("authClient", promisifyClient(authClient));
+    c.set("adminClient", promisifyClient(adminClient));
+    c.set("adTemplatesClient", promisifyClient(adTemplatesClient));
+    c.set("videosClient", promisifyClient(videosClient));
+    c.set("domainsClient", promisifyClient(domainsClient));
+    c.set("playerConfigsClient", promisifyClient(playerConfigsClient));
+    c.set("plansClient", promisifyClient(plansClient));
+    c.set("paymentsClient", promisifyClient(paymentsClient));
+    c.set("notificationsClient", promisifyClient(notificationsClient));
     c.set("internalGrpcMetadata", getInternalGrpcMetadata());
 
     await next();

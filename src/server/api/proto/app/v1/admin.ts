@@ -7789,10 +7789,10 @@ export const AdminAgentCommandResponse: MessageFns<AdminAgentCommandResponse> = 
   },
 };
 
-export type AdminServiceService = typeof AdminServiceService;
-export const AdminServiceService = {
+export type AdminService = typeof AdminService;
+export const AdminService = {
   getAdminDashboard: {
-    path: "/stream.app.v1.AdminService/GetAdminDashboard",
+    path: "/stream.app.v1.Admin/GetAdminDashboard",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminDashboardRequest): Buffer =>
@@ -7803,7 +7803,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminDashboardResponse => GetAdminDashboardResponse.decode(value),
   },
   listAdminUsers: {
-    path: "/stream.app.v1.AdminService/ListAdminUsers",
+    path: "/stream.app.v1.Admin/ListAdminUsers",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminUsersRequest): Buffer =>
@@ -7814,7 +7814,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminUsersResponse => ListAdminUsersResponse.decode(value),
   },
   getAdminUser: {
-    path: "/stream.app.v1.AdminService/GetAdminUser",
+    path: "/stream.app.v1.Admin/GetAdminUser",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminUserRequest): Buffer => Buffer.from(GetAdminUserRequest.encode(value).finish()),
@@ -7824,7 +7824,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminUserResponse => GetAdminUserResponse.decode(value),
   },
   createAdminUser: {
-    path: "/stream.app.v1.AdminService/CreateAdminUser",
+    path: "/stream.app.v1.Admin/CreateAdminUser",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminUserRequest): Buffer =>
@@ -7835,7 +7835,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CreateAdminUserResponse => CreateAdminUserResponse.decode(value),
   },
   updateAdminUser: {
-    path: "/stream.app.v1.AdminService/UpdateAdminUser",
+    path: "/stream.app.v1.Admin/UpdateAdminUser",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminUserRequest): Buffer =>
@@ -7846,7 +7846,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdminUserResponse => UpdateAdminUserResponse.decode(value),
   },
   updateAdminUserReferralSettings: {
-    path: "/stream.app.v1.AdminService/UpdateAdminUserReferralSettings",
+    path: "/stream.app.v1.Admin/UpdateAdminUserReferralSettings",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminUserReferralSettingsRequest): Buffer =>
@@ -7859,7 +7859,7 @@ export const AdminServiceService = {
       UpdateAdminUserReferralSettingsResponse.decode(value),
   },
   updateAdminUserRole: {
-    path: "/stream.app.v1.AdminService/UpdateAdminUserRole",
+    path: "/stream.app.v1.Admin/UpdateAdminUserRole",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminUserRoleRequest): Buffer =>
@@ -7870,7 +7870,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdminUserRoleResponse => UpdateAdminUserRoleResponse.decode(value),
   },
   deleteAdminUser: {
-    path: "/stream.app.v1.AdminService/DeleteAdminUser",
+    path: "/stream.app.v1.Admin/DeleteAdminUser",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteAdminUserRequest): Buffer =>
@@ -7880,7 +7880,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   listAdminVideos: {
-    path: "/stream.app.v1.AdminService/ListAdminVideos",
+    path: "/stream.app.v1.Admin/ListAdminVideos",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminVideosRequest): Buffer =>
@@ -7891,7 +7891,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminVideosResponse => ListAdminVideosResponse.decode(value),
   },
   getAdminVideo: {
-    path: "/stream.app.v1.AdminService/GetAdminVideo",
+    path: "/stream.app.v1.Admin/GetAdminVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminVideoRequest): Buffer => Buffer.from(GetAdminVideoRequest.encode(value).finish()),
@@ -7901,7 +7901,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminVideoResponse => GetAdminVideoResponse.decode(value),
   },
   createAdminVideo: {
-    path: "/stream.app.v1.AdminService/CreateAdminVideo",
+    path: "/stream.app.v1.Admin/CreateAdminVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminVideoRequest): Buffer =>
@@ -7912,7 +7912,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CreateAdminVideoResponse => CreateAdminVideoResponse.decode(value),
   },
   updateAdminVideo: {
-    path: "/stream.app.v1.AdminService/UpdateAdminVideo",
+    path: "/stream.app.v1.Admin/UpdateAdminVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminVideoRequest): Buffer =>
@@ -7923,7 +7923,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdminVideoResponse => UpdateAdminVideoResponse.decode(value),
   },
   deleteAdminVideo: {
-    path: "/stream.app.v1.AdminService/DeleteAdminVideo",
+    path: "/stream.app.v1.Admin/DeleteAdminVideo",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteAdminVideoRequest): Buffer =>
@@ -7933,7 +7933,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   listAdminPayments: {
-    path: "/stream.app.v1.AdminService/ListAdminPayments",
+    path: "/stream.app.v1.Admin/ListAdminPayments",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminPaymentsRequest): Buffer =>
@@ -7944,7 +7944,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminPaymentsResponse => ListAdminPaymentsResponse.decode(value),
   },
   getAdminPayment: {
-    path: "/stream.app.v1.AdminService/GetAdminPayment",
+    path: "/stream.app.v1.Admin/GetAdminPayment",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminPaymentRequest): Buffer =>
@@ -7955,7 +7955,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminPaymentResponse => GetAdminPaymentResponse.decode(value),
   },
   createAdminPayment: {
-    path: "/stream.app.v1.AdminService/CreateAdminPayment",
+    path: "/stream.app.v1.Admin/CreateAdminPayment",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminPaymentRequest): Buffer =>
@@ -7966,7 +7966,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CreateAdminPaymentResponse => CreateAdminPaymentResponse.decode(value),
   },
   updateAdminPayment: {
-    path: "/stream.app.v1.AdminService/UpdateAdminPayment",
+    path: "/stream.app.v1.Admin/UpdateAdminPayment",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminPaymentRequest): Buffer =>
@@ -7977,7 +7977,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdminPaymentResponse => UpdateAdminPaymentResponse.decode(value),
   },
   listAdminPlans: {
-    path: "/stream.app.v1.AdminService/ListAdminPlans",
+    path: "/stream.app.v1.Admin/ListAdminPlans",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminPlansRequest): Buffer =>
@@ -7988,7 +7988,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminPlansResponse => ListAdminPlansResponse.decode(value),
   },
   createAdminPlan: {
-    path: "/stream.app.v1.AdminService/CreateAdminPlan",
+    path: "/stream.app.v1.Admin/CreateAdminPlan",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminPlanRequest): Buffer =>
@@ -7999,7 +7999,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CreateAdminPlanResponse => CreateAdminPlanResponse.decode(value),
   },
   updateAdminPlan: {
-    path: "/stream.app.v1.AdminService/UpdateAdminPlan",
+    path: "/stream.app.v1.Admin/UpdateAdminPlan",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminPlanRequest): Buffer =>
@@ -8010,7 +8010,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdminPlanResponse => UpdateAdminPlanResponse.decode(value),
   },
   deleteAdminPlan: {
-    path: "/stream.app.v1.AdminService/DeleteAdminPlan",
+    path: "/stream.app.v1.Admin/DeleteAdminPlan",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteAdminPlanRequest): Buffer =>
@@ -8021,7 +8021,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): DeleteAdminPlanResponse => DeleteAdminPlanResponse.decode(value),
   },
   listAdminAdTemplates: {
-    path: "/stream.app.v1.AdminService/ListAdminAdTemplates",
+    path: "/stream.app.v1.Admin/ListAdminAdTemplates",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminAdTemplatesRequest): Buffer =>
@@ -8032,7 +8032,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminAdTemplatesResponse => ListAdminAdTemplatesResponse.decode(value),
   },
   getAdminAdTemplate: {
-    path: "/stream.app.v1.AdminService/GetAdminAdTemplate",
+    path: "/stream.app.v1.Admin/GetAdminAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminAdTemplateRequest): Buffer =>
@@ -8043,7 +8043,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminAdTemplateResponse => GetAdminAdTemplateResponse.decode(value),
   },
   createAdminAdTemplate: {
-    path: "/stream.app.v1.AdminService/CreateAdminAdTemplate",
+    path: "/stream.app.v1.Admin/CreateAdminAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminAdTemplateRequest): Buffer =>
@@ -8054,7 +8054,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CreateAdminAdTemplateResponse => CreateAdminAdTemplateResponse.decode(value),
   },
   updateAdminAdTemplate: {
-    path: "/stream.app.v1.AdminService/UpdateAdminAdTemplate",
+    path: "/stream.app.v1.Admin/UpdateAdminAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminAdTemplateRequest): Buffer =>
@@ -8065,7 +8065,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdminAdTemplateResponse => UpdateAdminAdTemplateResponse.decode(value),
   },
   deleteAdminAdTemplate: {
-    path: "/stream.app.v1.AdminService/DeleteAdminAdTemplate",
+    path: "/stream.app.v1.Admin/DeleteAdminAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteAdminAdTemplateRequest): Buffer =>
@@ -8075,7 +8075,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   listAdminPlayerConfigs: {
-    path: "/stream.app.v1.AdminService/ListAdminPlayerConfigs",
+    path: "/stream.app.v1.Admin/ListAdminPlayerConfigs",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminPlayerConfigsRequest): Buffer =>
@@ -8087,7 +8087,7 @@ export const AdminServiceService = {
       ListAdminPlayerConfigsResponse.decode(value),
   },
   getAdminPlayerConfig: {
-    path: "/stream.app.v1.AdminService/GetAdminPlayerConfig",
+    path: "/stream.app.v1.Admin/GetAdminPlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminPlayerConfigRequest): Buffer =>
@@ -8098,7 +8098,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminPlayerConfigResponse => GetAdminPlayerConfigResponse.decode(value),
   },
   createAdminPlayerConfig: {
-    path: "/stream.app.v1.AdminService/CreateAdminPlayerConfig",
+    path: "/stream.app.v1.Admin/CreateAdminPlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminPlayerConfigRequest): Buffer =>
@@ -8110,7 +8110,7 @@ export const AdminServiceService = {
       CreateAdminPlayerConfigResponse.decode(value),
   },
   updateAdminPlayerConfig: {
-    path: "/stream.app.v1.AdminService/UpdateAdminPlayerConfig",
+    path: "/stream.app.v1.Admin/UpdateAdminPlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminPlayerConfigRequest): Buffer =>
@@ -8122,7 +8122,7 @@ export const AdminServiceService = {
       UpdateAdminPlayerConfigResponse.decode(value),
   },
   deleteAdminPlayerConfig: {
-    path: "/stream.app.v1.AdminService/DeleteAdminPlayerConfig",
+    path: "/stream.app.v1.Admin/DeleteAdminPlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteAdminPlayerConfigRequest): Buffer =>
@@ -8132,7 +8132,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
   listAdminJobs: {
-    path: "/stream.app.v1.AdminService/ListAdminJobs",
+    path: "/stream.app.v1.Admin/ListAdminJobs",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminJobsRequest): Buffer => Buffer.from(ListAdminJobsRequest.encode(value).finish()),
@@ -8142,7 +8142,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminJobsResponse => ListAdminJobsResponse.decode(value),
   },
   getAdminJob: {
-    path: "/stream.app.v1.AdminService/GetAdminJob",
+    path: "/stream.app.v1.Admin/GetAdminJob",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminJobRequest): Buffer => Buffer.from(GetAdminJobRequest.encode(value).finish()),
@@ -8151,7 +8151,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminJobResponse => GetAdminJobResponse.decode(value),
   },
   getAdminJobLogs: {
-    path: "/stream.app.v1.AdminService/GetAdminJobLogs",
+    path: "/stream.app.v1.Admin/GetAdminJobLogs",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: GetAdminJobLogsRequest): Buffer =>
@@ -8162,7 +8162,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): GetAdminJobLogsResponse => GetAdminJobLogsResponse.decode(value),
   },
   createAdminJob: {
-    path: "/stream.app.v1.AdminService/CreateAdminJob",
+    path: "/stream.app.v1.Admin/CreateAdminJob",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdminJobRequest): Buffer =>
@@ -8173,7 +8173,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CreateAdminJobResponse => CreateAdminJobResponse.decode(value),
   },
   cancelAdminJob: {
-    path: "/stream.app.v1.AdminService/CancelAdminJob",
+    path: "/stream.app.v1.Admin/CancelAdminJob",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CancelAdminJobRequest): Buffer =>
@@ -8184,7 +8184,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): CancelAdminJobResponse => CancelAdminJobResponse.decode(value),
   },
   retryAdminJob: {
-    path: "/stream.app.v1.AdminService/RetryAdminJob",
+    path: "/stream.app.v1.Admin/RetryAdminJob",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: RetryAdminJobRequest): Buffer => Buffer.from(RetryAdminJobRequest.encode(value).finish()),
@@ -8194,7 +8194,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): RetryAdminJobResponse => RetryAdminJobResponse.decode(value),
   },
   listAdminAgents: {
-    path: "/stream.app.v1.AdminService/ListAdminAgents",
+    path: "/stream.app.v1.Admin/ListAdminAgents",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdminAgentsRequest): Buffer =>
@@ -8205,7 +8205,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): ListAdminAgentsResponse => ListAdminAgentsResponse.decode(value),
   },
   restartAdminAgent: {
-    path: "/stream.app.v1.AdminService/RestartAdminAgent",
+    path: "/stream.app.v1.Admin/RestartAdminAgent",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: RestartAdminAgentRequest): Buffer =>
@@ -8216,7 +8216,7 @@ export const AdminServiceService = {
     responseDeserialize: (value: Buffer): AdminAgentCommandResponse => AdminAgentCommandResponse.decode(value),
   },
   updateAdminAgent: {
-    path: "/stream.app.v1.AdminService/UpdateAdminAgent",
+    path: "/stream.app.v1.Admin/UpdateAdminAgent",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdminAgentRequest): Buffer =>
@@ -8228,7 +8228,7 @@ export const AdminServiceService = {
   },
 } as const;
 
-export interface AdminServiceServer extends UntypedServiceImplementation {
+export interface AdminServer extends UntypedServiceImplementation {
   getAdminDashboard: handleUnaryCall<GetAdminDashboardRequest, GetAdminDashboardResponse>;
   listAdminUsers: handleUnaryCall<ListAdminUsersRequest, ListAdminUsersResponse>;
   getAdminUser: handleUnaryCall<GetAdminUserRequest, GetAdminUserResponse>;
@@ -8274,7 +8274,7 @@ export interface AdminServiceServer extends UntypedServiceImplementation {
   updateAdminAgent: handleUnaryCall<UpdateAdminAgentRequest, AdminAgentCommandResponse>;
 }
 
-export interface AdminServiceClient extends Client {
+export interface AdminClient extends Client {
   getAdminDashboard(
     request: GetAdminDashboardRequest,
     callback: (error: ServiceError | null, response: GetAdminDashboardResponse) => void,
@@ -8877,12 +8877,9 @@ export interface AdminServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const AdminServiceClient = makeGenericClientConstructor(
-  AdminServiceService,
-  "stream.app.v1.AdminService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AdminServiceClient;
-  service: typeof AdminServiceService;
+export const AdminClient = makeGenericClientConstructor(AdminService, "stream.app.v1.Admin") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AdminClient;
+  service: typeof AdminService;
   serviceName: string;
 };
 

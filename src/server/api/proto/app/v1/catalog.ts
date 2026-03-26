@@ -2072,10 +2072,10 @@ export const ListPlansResponse: MessageFns<ListPlansResponse> = {
   },
 };
 
-export type DomainsServiceService = typeof DomainsServiceService;
-export const DomainsServiceService = {
+export type DomainsService = typeof DomainsService;
+export const DomainsService = {
   listDomains: {
-    path: "/stream.app.v1.DomainsService/ListDomains",
+    path: "/stream.app.v1.Domains/ListDomains",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListDomainsRequest): Buffer => Buffer.from(ListDomainsRequest.encode(value).finish()),
@@ -2084,7 +2084,7 @@ export const DomainsServiceService = {
     responseDeserialize: (value: Buffer): ListDomainsResponse => ListDomainsResponse.decode(value),
   },
   createDomain: {
-    path: "/stream.app.v1.DomainsService/CreateDomain",
+    path: "/stream.app.v1.Domains/CreateDomain",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateDomainRequest): Buffer => Buffer.from(CreateDomainRequest.encode(value).finish()),
@@ -2094,7 +2094,7 @@ export const DomainsServiceService = {
     responseDeserialize: (value: Buffer): CreateDomainResponse => CreateDomainResponse.decode(value),
   },
   deleteDomain: {
-    path: "/stream.app.v1.DomainsService/DeleteDomain",
+    path: "/stream.app.v1.Domains/DeleteDomain",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteDomainRequest): Buffer => Buffer.from(DeleteDomainRequest.encode(value).finish()),
@@ -2104,13 +2104,13 @@ export const DomainsServiceService = {
   },
 } as const;
 
-export interface DomainsServiceServer extends UntypedServiceImplementation {
+export interface DomainsServer extends UntypedServiceImplementation {
   listDomains: handleUnaryCall<ListDomainsRequest, ListDomainsResponse>;
   createDomain: handleUnaryCall<CreateDomainRequest, CreateDomainResponse>;
   deleteDomain: handleUnaryCall<DeleteDomainRequest, MessageResponse>;
 }
 
-export interface DomainsServiceClient extends Client {
+export interface DomainsClient extends Client {
   listDomains(
     request: ListDomainsRequest,
     callback: (error: ServiceError | null, response: ListDomainsResponse) => void,
@@ -2158,19 +2158,16 @@ export interface DomainsServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const DomainsServiceClient = makeGenericClientConstructor(
-  DomainsServiceService,
-  "stream.app.v1.DomainsService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): DomainsServiceClient;
-  service: typeof DomainsServiceService;
+export const DomainsClient = makeGenericClientConstructor(DomainsService, "stream.app.v1.Domains") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): DomainsClient;
+  service: typeof DomainsService;
   serviceName: string;
 };
 
-export type AdTemplatesServiceService = typeof AdTemplatesServiceService;
-export const AdTemplatesServiceService = {
+export type AdTemplatesService = typeof AdTemplatesService;
+export const AdTemplatesService = {
   listAdTemplates: {
-    path: "/stream.app.v1.AdTemplatesService/ListAdTemplates",
+    path: "/stream.app.v1.AdTemplates/ListAdTemplates",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListAdTemplatesRequest): Buffer =>
@@ -2181,7 +2178,7 @@ export const AdTemplatesServiceService = {
     responseDeserialize: (value: Buffer): ListAdTemplatesResponse => ListAdTemplatesResponse.decode(value),
   },
   createAdTemplate: {
-    path: "/stream.app.v1.AdTemplatesService/CreateAdTemplate",
+    path: "/stream.app.v1.AdTemplates/CreateAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreateAdTemplateRequest): Buffer =>
@@ -2192,7 +2189,7 @@ export const AdTemplatesServiceService = {
     responseDeserialize: (value: Buffer): CreateAdTemplateResponse => CreateAdTemplateResponse.decode(value),
   },
   updateAdTemplate: {
-    path: "/stream.app.v1.AdTemplatesService/UpdateAdTemplate",
+    path: "/stream.app.v1.AdTemplates/UpdateAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdateAdTemplateRequest): Buffer =>
@@ -2203,7 +2200,7 @@ export const AdTemplatesServiceService = {
     responseDeserialize: (value: Buffer): UpdateAdTemplateResponse => UpdateAdTemplateResponse.decode(value),
   },
   deleteAdTemplate: {
-    path: "/stream.app.v1.AdTemplatesService/DeleteAdTemplate",
+    path: "/stream.app.v1.AdTemplates/DeleteAdTemplate",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeleteAdTemplateRequest): Buffer =>
@@ -2214,14 +2211,14 @@ export const AdTemplatesServiceService = {
   },
 } as const;
 
-export interface AdTemplatesServiceServer extends UntypedServiceImplementation {
+export interface AdTemplatesServer extends UntypedServiceImplementation {
   listAdTemplates: handleUnaryCall<ListAdTemplatesRequest, ListAdTemplatesResponse>;
   createAdTemplate: handleUnaryCall<CreateAdTemplateRequest, CreateAdTemplateResponse>;
   updateAdTemplate: handleUnaryCall<UpdateAdTemplateRequest, UpdateAdTemplateResponse>;
   deleteAdTemplate: handleUnaryCall<DeleteAdTemplateRequest, MessageResponse>;
 }
 
-export interface AdTemplatesServiceClient extends Client {
+export interface AdTemplatesClient extends Client {
   listAdTemplates(
     request: ListAdTemplatesRequest,
     callback: (error: ServiceError | null, response: ListAdTemplatesResponse) => void,
@@ -2284,19 +2281,19 @@ export interface AdTemplatesServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const AdTemplatesServiceClient = makeGenericClientConstructor(
-  AdTemplatesServiceService,
-  "stream.app.v1.AdTemplatesService",
+export const AdTemplatesClient = makeGenericClientConstructor(
+  AdTemplatesService,
+  "stream.app.v1.AdTemplates",
 ) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AdTemplatesServiceClient;
-  service: typeof AdTemplatesServiceService;
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): AdTemplatesClient;
+  service: typeof AdTemplatesService;
   serviceName: string;
 };
 
-export type PlayerConfigsServiceService = typeof PlayerConfigsServiceService;
-export const PlayerConfigsServiceService = {
+export type PlayerConfigsService = typeof PlayerConfigsService;
+export const PlayerConfigsService = {
   listPlayerConfigs: {
-    path: "/stream.app.v1.PlayerConfigsService/ListPlayerConfigs",
+    path: "/stream.app.v1.PlayerConfigs/ListPlayerConfigs",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListPlayerConfigsRequest): Buffer =>
@@ -2307,7 +2304,7 @@ export const PlayerConfigsServiceService = {
     responseDeserialize: (value: Buffer): ListPlayerConfigsResponse => ListPlayerConfigsResponse.decode(value),
   },
   createPlayerConfig: {
-    path: "/stream.app.v1.PlayerConfigsService/CreatePlayerConfig",
+    path: "/stream.app.v1.PlayerConfigs/CreatePlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: CreatePlayerConfigRequest): Buffer =>
@@ -2318,7 +2315,7 @@ export const PlayerConfigsServiceService = {
     responseDeserialize: (value: Buffer): CreatePlayerConfigResponse => CreatePlayerConfigResponse.decode(value),
   },
   updatePlayerConfig: {
-    path: "/stream.app.v1.PlayerConfigsService/UpdatePlayerConfig",
+    path: "/stream.app.v1.PlayerConfigs/UpdatePlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: UpdatePlayerConfigRequest): Buffer =>
@@ -2329,7 +2326,7 @@ export const PlayerConfigsServiceService = {
     responseDeserialize: (value: Buffer): UpdatePlayerConfigResponse => UpdatePlayerConfigResponse.decode(value),
   },
   deletePlayerConfig: {
-    path: "/stream.app.v1.PlayerConfigsService/DeletePlayerConfig",
+    path: "/stream.app.v1.PlayerConfigs/DeletePlayerConfig",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: DeletePlayerConfigRequest): Buffer =>
@@ -2340,14 +2337,14 @@ export const PlayerConfigsServiceService = {
   },
 } as const;
 
-export interface PlayerConfigsServiceServer extends UntypedServiceImplementation {
+export interface PlayerConfigsServer extends UntypedServiceImplementation {
   listPlayerConfigs: handleUnaryCall<ListPlayerConfigsRequest, ListPlayerConfigsResponse>;
   createPlayerConfig: handleUnaryCall<CreatePlayerConfigRequest, CreatePlayerConfigResponse>;
   updatePlayerConfig: handleUnaryCall<UpdatePlayerConfigRequest, UpdatePlayerConfigResponse>;
   deletePlayerConfig: handleUnaryCall<DeletePlayerConfigRequest, MessageResponse>;
 }
 
-export interface PlayerConfigsServiceClient extends Client {
+export interface PlayerConfigsClient extends Client {
   listPlayerConfigs(
     request: ListPlayerConfigsRequest,
     callback: (error: ServiceError | null, response: ListPlayerConfigsResponse) => void,
@@ -2410,19 +2407,19 @@ export interface PlayerConfigsServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const PlayerConfigsServiceClient = makeGenericClientConstructor(
-  PlayerConfigsServiceService,
-  "stream.app.v1.PlayerConfigsService",
+export const PlayerConfigsClient = makeGenericClientConstructor(
+  PlayerConfigsService,
+  "stream.app.v1.PlayerConfigs",
 ) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PlayerConfigsServiceClient;
-  service: typeof PlayerConfigsServiceService;
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PlayerConfigsClient;
+  service: typeof PlayerConfigsService;
   serviceName: string;
 };
 
-export type PlansServiceService = typeof PlansServiceService;
-export const PlansServiceService = {
+export type PlansService = typeof PlansService;
+export const PlansService = {
   listPlans: {
-    path: "/stream.app.v1.PlansService/ListPlans",
+    path: "/stream.app.v1.Plans/ListPlans",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: ListPlansRequest): Buffer => Buffer.from(ListPlansRequest.encode(value).finish()),
@@ -2432,11 +2429,11 @@ export const PlansServiceService = {
   },
 } as const;
 
-export interface PlansServiceServer extends UntypedServiceImplementation {
+export interface PlansServer extends UntypedServiceImplementation {
   listPlans: handleUnaryCall<ListPlansRequest, ListPlansResponse>;
 }
 
-export interface PlansServiceClient extends Client {
+export interface PlansClient extends Client {
   listPlans(
     request: ListPlansRequest,
     callback: (error: ServiceError | null, response: ListPlansResponse) => void,
@@ -2454,12 +2451,9 @@ export interface PlansServiceClient extends Client {
   ): ClientUnaryCall;
 }
 
-export const PlansServiceClient = makeGenericClientConstructor(
-  PlansServiceService,
-  "stream.app.v1.PlansService",
-) as unknown as {
-  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PlansServiceClient;
-  service: typeof PlansServiceService;
+export const PlansClient = makeGenericClientConstructor(PlansService, "stream.app.v1.Plans") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PlansClient;
+  service: typeof PlansService;
   serviceName: string;
 };
 
