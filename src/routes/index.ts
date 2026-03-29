@@ -118,6 +118,16 @@ const routes: RouteData[] = [
             ],
           },
           {
+            path: "analytics",
+            name: "analytics",
+            component: () => import("./analytics/Analytics.vue"),
+            meta: {
+              head: {
+                title: "Analytics - Holistream",
+              },
+            },
+          },
+          {
             path: "notification",
             name: "notification",
             component: () => import("./notification/Notification.vue"), // TODO: create notification page
