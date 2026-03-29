@@ -85,7 +85,9 @@ export class TinyMqttClient implements ITinyMqttClient {
                 break;
             case 0xD0: // PINGRESP
                 break;
-            case 0x30: // PUBLISH
+            case 0x30: // PUBLISH QoS 0
+            case 0x32: // PUBLISH QoS 1
+            case 0x34: // PUBLISH QoS 2
                 this.parsePublish(data);
                 break;
         }
@@ -102,9 +104,32 @@ export class TinyMqttClient implements ITinyMqttClient {
     }
 
     private parsePublish(data: Uint8Array): void {
-        const tLen = (data[2] << 8) | data[3];
-        const topic = this.decoder.decode(data.slice(4, 4 + tLen));
-        const payload = this.decoder.decode(data.slice(4 + tLen));
+        let multiplier = 1;
+        let remainingLength = 0;
+        let offset = 1;
+        let encodedByte = 0;
+
+        do {
+            encodedByte = data[offset++];
+            remainingLength += (encodedByte & 127) * multiplier;
+            multiplier *= 128;
+        } while ((encodedByte & 128) !== 0 && offset < data.length);
+
+        const variableHeaderStart = offset;
+        const topicLength = (data[offset] << 8) | data[offset + 1];
+        offset += 2;
+
+        const topic = this.decoder.decode(data.slice(offset, offset + topicLength));
+        offset += topicLength;
+
+        const qos = (data[0] >> 1) & 0x03;
+        if (qos > 0) {
+            offset += 2; // packet identifier
+        }
+
+        const consumedFromVariableHeader = offset - variableHeaderStart;
+        const payloadLength = Math.max(0, remainingLength - consumedFromVariableHeader);
+        const payload = this.decoder.decode(data.slice(offset, offset + payloadLength));
         this.onMessage(topic, payload);
     }
 }

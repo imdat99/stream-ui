@@ -139,6 +139,60 @@ export const meMethods = {
     const metadata = context.get("grpcMetadata");
     return await adTemplatesClient.deleteAdTemplate(data, metadata);
   }),
+  listPopupAds: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const popupAdsClient = context.get("popupAdsClient");
+    const metadata = context.get("grpcMetadata");
+    return await popupAdsClient.listPopupAds(data, metadata);
+  }),
+  createPopupAd: validateFn(
+    z.object({
+      type: z.enum(['url', 'script']),
+      label: z.string().trim().min(1),
+      value: z.string().trim().min(1),
+      isActive: z.boolean().optional(),
+      maxTriggersPerSession: z.number().int().min(1).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const popupAdsClient = context.get("popupAdsClient");
+    const metadata = context.get("grpcMetadata");
+    return await popupAdsClient.createPopupAd(data, metadata);
+  }),
+  updatePopupAd: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      type: z.enum(['url', 'script']),
+      label: z.string().trim().min(1),
+      value: z.string().trim().min(1),
+      isActive: z.boolean().optional(),
+      maxTriggersPerSession: z.number().int().min(1).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const popupAdsClient = context.get("popupAdsClient");
+    const metadata = context.get("grpcMetadata");
+    return await popupAdsClient.updatePopupAd(data, metadata);
+  }),
+  deletePopupAd: validateFn(
+    z.object({ id: z.string().trim().min(1) }),
+  )(async (data) => {
+    const context = getContext();
+    const popupAdsClient = context.get("popupAdsClient");
+    const metadata = context.get("grpcMetadata");
+    return await popupAdsClient.deletePopupAd(data, metadata);
+  }),
+  getActivePopupAd: async () => {
+    const context = getContext();
+    const popupAdsClient = context.get("popupAdsClient");
+    const metadata = context.get("grpcMetadata");
+    return await popupAdsClient.getActivePopupAd({}, metadata);
+  },
   listPlayerConfigs: async () => {
     const context = getContext();
     const playerConfigsClient = context.get("playerConfigsClient");

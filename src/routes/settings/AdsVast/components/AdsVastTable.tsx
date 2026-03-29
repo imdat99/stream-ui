@@ -13,7 +13,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import AppSwitch from '@/components/ui/AppSwitch.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
-import { formatDate } from '../../DomainsDns/helpers';
+import { formatDate } from '@/lib/utils';
 
 export default defineComponent({
   name: 'AdTemplateTable',

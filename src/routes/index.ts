@@ -205,6 +205,16 @@ const routes: RouteData[] = [
                 },
               },
               {
+                path: "popup-ads",
+                name: "settings-popup-ads",
+                component: () => import("./settings/PopupAds/PopupAds.vue"),
+                meta: {
+                  head: {
+                    title: "Popup Ads - Holistream",
+                  },
+                },
+              },
+              {
                 path: "player-configs",
                 name: "settings-player-configs",
                 component: () => import("./settings/PlayerConfigs/PlayerConfigs.vue"),
@@ -234,6 +244,7 @@ const routes: RouteData[] = [
                   { path: "payments", name: "admin-payments", component: () => import("./settings/admin/Payments.vue") },
                   { path: "plans", name: "admin-plans", component: () => import("./settings/admin/Plans.vue") },
                   { path: "ad-templates", name: "admin-ad-templates", component: () => import("./settings/admin/AdTemplates.vue") },
+                  { path: "popup-ads", name: "admin-popup-ads", component: () => import("./settings/admin/PopupAds.vue") },
                   { path: "player-configs", name: "admin-player-configs", component: () => import("./settings/admin/PlayerConfigs.vue") },
                   { path: "jobs", name: "admin-jobs", component: () => import("./settings/admin/Jobs.vue") },
                   { path: "agents", name: "admin-agents", component: () => import("./settings/admin/Agents.vue") },

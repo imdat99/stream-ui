@@ -121,7 +121,8 @@
       "playerConfigs": "Cấu hình trình phát",
       "domains": "Tên miền được phép",
       "ads": "Quảng cáo & VAST",
-      "danger": "Vùng nguy hiểm"
+      "danger": "Vùng nguy hiểm",
+      "popupAds": "Popup Ads"
     },
     "content": {
       "fallbackTitle": "Cài đặt",
@@ -157,6 +158,10 @@
       "danger": {
         "title": "Vùng nguy hiểm",
         "subtitle": "Hành động không thể hoàn tác và có tính phá hủy. Hãy cẩn thận!"
+      },
+      "popupAds": {
+        "title": "Popup Ads",
+        "subtitle": "Quản lý cài đặt và tùy chọn quảng cáo popup của bạn."
       }
     },
     "notificationSettings": {
@@ -501,6 +506,68 @@
         "failedDetail": "Không thể tải hoặc cập nhật mẫu VAST."
       }
     },
+    "popupAds": {
+      "createItem": "Thêm popup ad",
+      "maxTriggersLabel": "Giới hạn trigger URL cao nhất mỗi phiên ({{count}})",
+      "emptyTitle": "Chưa có popup ad",
+      "emptySubtitle": "Tạo popup ad để bắt đầu mở URL hoặc inject script.",
+      "types": {
+        "url": "URL",
+        "script": "Script"
+      },
+      "table": {
+        "label": "Nhãn",
+        "type": "Loại",
+        "target": "Đích",
+        "maxTriggersPerSession": "Số trigger tối đa/phiên"
+      },
+      "dialog": {
+        "createTitle": "Tạo popup ad",
+        "editTitle": "Sửa popup ad",
+        "type": "Loại",
+        "label": "Nhãn",
+        "labelPlaceholder": "ví dụ: Ad Network 1",
+        "url": "URL đích",
+        "urlPlaceholder": "https://example.com/landing-page",
+        "script": "Đoạn script",
+        "scriptPlaceholder": "<script async src=\"//example.com/ad.js\"></script>",
+        "maxTriggersPerSession": "Số lần popup tối đa mỗi phiên",
+        "activeTitle": "Trạng thái mục",
+        "activeDescription": "Tắt một mục để giữ nó trong bảng mà không phân phối nó.",
+        "update": "Cập nhật",
+        "create": "Tạo"
+      },
+      "info": {
+        "urlTitle": "URL:",
+        "urlDescription": "Mở tab mới khi người xem nhấp.",
+        "scriptTitle": "Script:",
+        "scriptDescription": "Inject script tag vào trang cho các mạng popup/popunder."
+      },
+      "confirm": {
+        "deleteMessage": "Bạn có chắc muốn xóa \"{{name}}\"?",
+        "deleteHeader": "Xóa popup ad",
+        "deleteAccept": "Xóa",
+        "deleteReject": "Hủy"
+      },
+      "toast": {
+        "labelRequiredSummary": "Thiếu nhãn",
+        "labelRequiredDetail": "Vui lòng nhập nhãn cho popup ad này.",
+        "valueRequiredSummary": "Thiếu giá trị",
+        "valueRequiredDetail": "Vui lòng nhập URL hoặc đoạn script.",
+        "maxTriggersRequiredSummary": "Thiếu giới hạn trigger",
+        "maxTriggersRequiredDetail": "Vui lòng nhập số trigger lớn hơn 0 cho popup ad loại URL.",
+        "invalidUrlSummary": "URL không hợp lệ",
+        "invalidUrlDetail": "Vui lòng nhập URL hợp lệ.",
+        "createdSummary": "Đã tạo popup ad",
+        "createdDetail": "Popup ad đã được thêm.",
+        "updatedSummary": "Đã cập nhật popup ad",
+        "updatedDetail": "Popup ad đã được cập nhật.",
+        "deletedSummary": "Đã xóa popup ad",
+        "deletedDetail": "Popup ad đã được gỡ bỏ.",
+        "failedSummary": "Thao tác thất bại",
+        "failedDetail": "Không thể tải hoặc cập nhật popup ads."
+      }
+    },
     "profile": {
       "title": "Thông tin hồ sơ",
       "subtitle": "Quản lý thông tin cá nhân và chi tiết tài khoản của bạn.",
@@ -767,7 +834,7 @@
   },
   "overview": {
     "welcome": {
-      "title": "Xin chào, {{{name}}}",
+      "title": "Xin chào, {{name}}",
       "subtitle": "Đây là tình hình nội dung của bạn hôm nay."
     },
     "stats": {

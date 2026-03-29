@@ -307,6 +307,58 @@ export const adminMethods = {
     const metadata = context.get("grpcMetadata");
     return await adminClient.deleteAdminAdTemplate(data, metadata);
   }),
+  listAdminPopupAds: validateFn(
+    z.object({
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      userId: optionalTrimmed(),
+      search: optionalTrimmed(),
+    }).optional().default({}),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.listAdminPopupAds(data, metadata);
+  }),
+  createAdminPopupAd: validateFn(
+    z.object({
+      userId: z.string().trim().min(1),
+      type: z.enum(['url', 'script']),
+      label: z.string().trim().min(1),
+      value: z.string().trim().min(1),
+      isActive: z.boolean().optional(),
+      maxTriggersPerSession: z.number().int().min(1).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.createAdminPopupAd(data, metadata);
+  }),
+  updateAdminPopupAd: validateFn(
+    z.object({
+      id: z.string().trim().min(1),
+      userId: z.string().trim().min(1),
+      type: z.enum(['url', 'script']),
+      label: z.string().trim().min(1),
+      value: z.string().trim().min(1),
+      isActive: z.boolean().optional(),
+      maxTriggersPerSession: z.number().int().min(1).optional(),
+    }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.updateAdminPopupAd(data, metadata);
+  }),
+  deleteAdminPopupAd: validateFn(
+    z.object({ id: z.string().trim().min(1) }),
+  )(async (data) => {
+    const context = getContext();
+    const adminClient = context.get("adminClient");
+    const metadata = context.get("grpcMetadata");
+    return await adminClient.deleteAdminPopupAd(data, metadata);
+  }),
   listAdminPlayerConfigs: validateFn(
     z.object({
       page: z.number().int().min(1).optional(),

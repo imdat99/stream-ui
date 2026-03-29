@@ -27,6 +27,11 @@ type NotificationApiItem = {
     createdAt?: string;
 };
 
+type IncomingNotificationEnvelope = {
+    type?: string;
+    payload?: NotificationApiItem;
+};
+
 const notifications = ref<AppNotification[]>([]);
 const loading = ref(false);
 const loaded = ref(false);
@@ -43,6 +48,31 @@ const normalizeType = (value?: string): NotificationType => {
         default:
             return 'info';
     }
+};
+
+const mapNotification = (item: NotificationApiItem): AppNotification => ({
+    id: item.id || '',
+    type: normalizeType(item.type),
+    title: item.title || '',
+    message: item.message || '',
+    time: '',
+    read: Boolean(item.read),
+    actionUrl: item.actionUrl || undefined,
+    actionLabel: item.actionLabel || undefined,
+    createdAt: item.createdAt,
+});
+
+const upsertNotification = (item: NotificationApiItem) => {
+    const mapped = mapNotification({ ...item, read: item.read ?? false });
+    if (!mapped.id) return;
+
+    const index = notifications.value.findIndex(notification => notification.id === mapped.id);
+    if (index >= 0) {
+        notifications.value[index] = { ...notifications.value[index], ...mapped };
+        return;
+    }
+
+    notifications.value = [mapped, ...notifications.value];
 };
 
 export function useNotifications() {
@@ -62,27 +92,36 @@ export function useNotifications() {
         return t('notification.time.daysAgo', { count: Math.max(1, days) });
     };
 
-    const mapNotification = (item: NotificationApiItem): AppNotification => ({
-        id: item.id || '',
-        type: normalizeType(item.type),
-        title: item.title || '',
-        message: item.message || '',
+    const hydrateNotification = (item: NotificationApiItem): AppNotification => ({
+        ...mapNotification(item),
         time: formatRelativeTime(item.createdAt),
-        read: Boolean(item.read),
-        actionUrl: item.actionUrl || undefined,
-        actionLabel: item.actionLabel || undefined,
-        createdAt: item.createdAt,
     });
 
     const fetchNotifications = async () => {
         loading.value = true;
         try {
             const response = await rpcClient.listNotifications();
-            notifications.value = (response.notifications || []).map(mapNotification);
+            notifications.value = (response.notifications || []).map(hydrateNotification);
             loaded.value = true;
             return notifications.value;
         } finally {
             loading.value = false;
+        }
+    };
+
+    const ingestRealtimeNotification = (raw: string | IncomingNotificationEnvelope) => {
+        try {
+            
+            const envelope = typeof raw === 'string' ? JSON.parse(raw) as IncomingNotificationEnvelope : raw;
+            if (envelope?.type !== 'notification.created' || !envelope.payload) return false;
+            upsertNotification(envelope.payload);
+            notifications.value = notifications.value.map(item => ({
+                ...item,
+                time: formatRelativeTime(item.createdAt),
+            }));
+            return true;
+        } catch {
+            return false;
         }
     };
 
@@ -118,6 +157,7 @@ export function useNotifications() {
         unreadCount,
         locale: computed(() => i18next.resolvedLanguage),
         fetchNotifications,
+        ingestRealtimeNotification,
         markRead,
         deleteNotification,
         markAllRead,

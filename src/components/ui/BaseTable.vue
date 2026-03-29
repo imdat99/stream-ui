@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="TData extends Record<string, any>">
+import AppButton from '@/components/ui/AppButton.vue';
 import { cn } from '@/lib/utils';
 import {
   FlexRender,
@@ -11,7 +12,8 @@ import {
   type SortingState,
   type Updater,
 } from '@tanstack/vue-table';
-import { ref } from 'vue';
+import { useTranslation } from 'i18next-vue';
+import { computed, ref } from 'vue';
 
 type TableColumnMeta = ColumnMeta<TData, any> & {
   headerClass?: string;
@@ -28,11 +30,34 @@ const props = withDefaults(defineProps<{
   headerRowClass?: string;
   bodyRowClass?: string | ((row: Row<TData>) => string | undefined);
   getRowId?: (originalRow: TData, index: number) => string;
+  pagination?: boolean;
+  currentPage?: number;
+  totalPages?: number;
+  totalRecords?: number;
+  rowsPerPage?: number;
+  pageSizeOptions?: number[];
+  canPreviousPage?: boolean;
+  canNextPage?: boolean;
 }>(), {
   loading: false,
   emptyText: 'No data available.',
+  pagination: false,
+  currentPage: 1,
+  totalPages: 1,
+  totalRecords: 0,
+  rowsPerPage: 10,
+  pageSizeOptions: () => [],
+  canPreviousPage: false,
+  canNextPage: false,
 });
 
+const emit = defineEmits<{
+  (e: 'previous-page'): void;
+  (e: 'next-page'): void;
+  (e: 'page-size-change', value: number): void;
+}>();
+
+const { t } = useTranslation();
 const sorting = ref<SortingState>([]);
 
 function updateSorting(updaterOrValue: Updater<SortingState>) {
@@ -63,6 +88,27 @@ function resolveBodyRowClass(row: Row<TData>) {
   return typeof props.bodyRowClass === 'function'
     ? props.bodyRowClass(row)
     : props.bodyRowClass;
+}
+
+const shouldRenderPagination = computed(() => (
+  props.pagination
+  && !props.loading
+  && table.getRowModel().rows.length > 0
+));
+
+function previousPage() {
+  if (!props.canPreviousPage) return;
+  emit('previous-page');
+}
+
+function nextPage() {
+  if (!props.canNextPage) return;
+  emit('next-page');
+}
+
+function changePageSize(event: Event) {
+  const nextValue = Number((event.target as HTMLSelectElement).value) || props.rowsPerPage;
+  emit('page-size-change', nextValue);
 }
 </script>
 
@@ -150,5 +196,21 @@ function resolveBodyRowClass(row: Row<TData>) {
         </tr>
       </tbody>
     </table>
+
+    <div v-if="shouldRenderPagination" class="flex flex-col gap-3 border-t border-gray-200 bg-muted/20 px-6 py-4 text-xs text-foreground/55 sm:flex-row sm:items-center sm:justify-between">
+      <div>{{ t('common.page', { current: currentPage, total: totalPages }) }} · {{ totalRecords }} {{ t('common.records') }}</div>
+      <div class="flex flex-wrap items-center gap-2">
+        <label v-if="pageSizeOptions.length" class="flex items-center gap-2">
+          <span>{{ t('common.rowsPerPage') }}</span>
+          <select class="rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground" :value="String(rowsPerPage)" @change="changePageSize">
+            <option v-for="option in pageSizeOptions" :key="option" :value="String(option)">{{ option }}</option>
+          </select>
+        </label>
+        <div class="flex items-center gap-2 xl:justify-end">
+          <AppButton size="sm" variant="secondary" :disabled="!canPreviousPage" @click="previousPage">{{ t('common.previous') }}</AppButton>
+          <AppButton size="sm" variant="secondary" :disabled="!canNextPage" @click="nextPage">{{ t('common.next') }}</AppButton>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

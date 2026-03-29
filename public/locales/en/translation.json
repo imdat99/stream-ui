@@ -121,7 +121,8 @@
       "playerConfigs": "Player Configs",
       "domains": "Allowed Domains",
       "ads": "Ads & VAST",
-      "danger": "Danger Zone"
+      "danger": "Danger Zone",
+      "popupAds": "Popup Ads"
     },
     "content": {
       "fallbackTitle": "Settings",
@@ -157,6 +158,10 @@
       "danger": {
         "title": "Danger Zone",
         "subtitle": "Irreversible and destructive actions. Be careful!"
+      },
+      "popupAds": {
+        "title": "Popup Ads",
+        "subtitle": "Manage your popup ad settings and preferences."
       }
     },
     "notificationSettings": {
@@ -501,6 +506,68 @@
         "failedDetail": "Failed to load or update VAST templates."
       }
     },
+    "popupAds": {
+      "createItem": "Add Popup Ad",
+      "maxTriggersLabel": "Highest URL trigger limit per session ({{count}})",
+      "emptyTitle": "No popup ads yet",
+      "emptySubtitle": "Create a popup ad to start opening URLs or injecting scripts.",
+      "types": {
+        "url": "URL",
+        "script": "Script"
+      },
+      "table": {
+        "label": "Label",
+        "type": "Type",
+        "target": "Target",
+        "maxTriggersPerSession": "Max triggers/session"
+      },
+      "dialog": {
+        "createTitle": "Create Popup Ad",
+        "editTitle": "Edit Popup Ad",
+        "type": "Type",
+        "label": "Label",
+        "labelPlaceholder": "e.g., Ad Network 1",
+        "url": "Destination URL",
+        "urlPlaceholder": "https://example.com/landing-page",
+        "script": "Script snippet",
+        "scriptPlaceholder": "<script async src=\"//example.com/ad.js\"></script>",
+        "maxTriggersPerSession": "Max popup triggers per session",
+        "activeTitle": "Item status",
+        "activeDescription": "Disable an item to keep it in the table without serving it.",
+        "update": "Update",
+        "create": "Create"
+      },
+      "info": {
+        "urlTitle": "URL:",
+        "urlDescription": "Opens in a new tab when viewer clicks.",
+        "scriptTitle": "Script:",
+        "scriptDescription": "Injects the script tag into the page (popunder networks, etc)."
+      },
+      "confirm": {
+        "deleteMessage": "Are you sure you want to delete \"{{name}}\"?",
+        "deleteHeader": "Delete Popup Ad",
+        "deleteAccept": "Delete",
+        "deleteReject": "Cancel"
+      },
+      "toast": {
+        "labelRequiredSummary": "Label required",
+        "labelRequiredDetail": "Please enter a label for this popup ad.",
+        "valueRequiredSummary": "Value required",
+        "valueRequiredDetail": "Please enter a URL or script snippet.",
+        "maxTriggersRequiredSummary": "Trigger limit required",
+        "maxTriggersRequiredDetail": "Please enter a max trigger count greater than 0 for URL popup ads.",
+        "invalidUrlSummary": "Invalid URL",
+        "invalidUrlDetail": "Please enter a valid URL.",
+        "createdSummary": "Popup ad created",
+        "createdDetail": "The popup ad has been added.",
+        "updatedSummary": "Popup ad updated",
+        "updatedDetail": "The popup ad has been updated.",
+        "deletedSummary": "Popup ad deleted",
+        "deletedDetail": "The popup ad has been removed.",
+        "failedSummary": "Action failed",
+        "failedDetail": "Failed to load or update popup ads."
+      }
+    },
     "profile": {
       "title": "Profile Information",
       "subtitle": "Manage your personal information and account details.",
@@ -768,7 +835,7 @@
   },
   "overview": {
     "welcome": {
-      "title": "Hello, {{{name}}}",
+      "title": "Hello, {{name}}",
       "subtitle": "Here's what's happening with your content today."
     },
     "stats": {

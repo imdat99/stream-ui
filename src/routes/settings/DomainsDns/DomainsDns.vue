@@ -11,8 +11,8 @@ import DomainsDnsEmbedCode from './components/DomainsDnsEmbedCode.vue';
 import DomainsDnsNotices from './components/DomainsDnsNotices.vue';
 import DomainsDnsTable from './components/DomainsDnsTable.vue';
 import DomainsDnsToolbar from './components/DomainsDnsToolbar.vue';
-import { mapDomainItem, normalizeDomainInput } from './helpers';
-import type { DomainItem } from './types';
+import { normalizeDomainInput } from './helpers';
+import type { Domain } from '@/server/api/proto/app/v1/common';
 
 const toast = useAppToast();
 const confirm = useAppConfirm();
@@ -27,7 +27,7 @@ const { data: domainsSnapshot, error, isPending, refetch } = useQuery({
   key: () => ['settings', 'domains'],
   query: async () => {
     const response = await rpcClient.listDomains();
-    return (response.domains || []).map(mapDomainItem);
+    return (response.domains || []);
   },
 });
 
@@ -126,16 +126,16 @@ const handleAddDomain = async () => {
   }
 };
 
-const handleRemoveDomain = (domain: DomainItem) => {
+const handleRemoveDomain = (domain: Domain) => {
   confirm.require({
     message: t('settings.domainsDns.confirm.removeMessage', { domain: domain.name }),
     header: t('settings.domainsDns.confirm.removeHeader'),
     acceptLabel: t('settings.domainsDns.confirm.removeAccept'),
     rejectLabel: t('settings.domainsDns.confirm.removeReject'),
     accept: async () => {
-      removingId.value = domain.id;
+      removingId.value = domain.id!;
       try {
-        await rpcClient.deleteDomain({ id: domain.id });
+        await rpcClient.deleteDomain({ id: domain.id! });
         await refetch();
         toast.add({
           severity: 'info',

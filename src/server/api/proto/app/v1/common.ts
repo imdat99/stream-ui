@@ -83,6 +83,17 @@ export interface AdTemplate {
   updatedAt?: string | undefined;
 }
 
+export interface PopupAd {
+  id?: string | undefined;
+  type?: string | undefined;
+  label?: string | undefined;
+  value?: string | undefined;
+  isActive?: boolean | undefined;
+  maxTriggersPerSession?: number | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+}
+
 export interface PlayerConfig {
   id?: string | undefined;
   name?: string | undefined;
@@ -330,6 +341,19 @@ export interface AdminAdTemplate {
   duration?: number | undefined;
   isActive?: boolean | undefined;
   isDefault?: boolean | undefined;
+  ownerEmail?: string | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+}
+
+export interface AdminPopupAd {
+  id?: string | undefined;
+  userId?: string | undefined;
+  type?: string | undefined;
+  label?: string | undefined;
+  value?: string | undefined;
+  isActive?: boolean | undefined;
+  maxTriggersPerSession?: number | undefined;
   ownerEmail?: string | undefined;
   createdAt?: string | undefined;
   updatedAt?: string | undefined;
@@ -1675,6 +1699,203 @@ export const AdTemplate: MessageFns<AdTemplate> = {
     message.duration = object.duration ?? undefined;
     message.isActive = object.isActive ?? false;
     message.isDefault = object.isDefault ?? false;
+    message.createdAt = object.createdAt ?? undefined;
+    message.updatedAt = object.updatedAt ?? undefined;
+    return message;
+  },
+};
+
+function createBasePopupAd(): PopupAd {
+  return {
+    id: "",
+    type: "",
+    label: "",
+    value: "",
+    isActive: false,
+    maxTriggersPerSession: 0,
+    createdAt: undefined,
+    updatedAt: undefined,
+  };
+}
+
+export const PopupAd: MessageFns<PopupAd> = {
+  encode(message: PopupAd, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.type !== undefined && message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(26).string(message.label);
+    }
+    if (message.value !== undefined && message.value !== "") {
+      writer.uint32(34).string(message.value);
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      writer.uint32(40).bool(message.isActive);
+    }
+    if (message.maxTriggersPerSession !== undefined && message.maxTriggersPerSession !== 0) {
+      writer.uint32(48).int32(message.maxTriggersPerSession);
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(58).fork()).join();
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(66).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PopupAd {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePopupAd();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.maxTriggersPerSession = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PopupAd {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : false,
+      maxTriggersPerSession: isSet(object.maxTriggersPerSession)
+        ? globalThis.Number(object.maxTriggersPerSession)
+        : isSet(object.max_triggers_per_session)
+        ? globalThis.Number(object.max_triggers_per_session)
+        : 0,
+      createdAt: isSet(object.createdAt)
+        ? globalThis.String(object.createdAt)
+        : isSet(object.created_at)
+        ? globalThis.String(object.created_at)
+        : undefined,
+      updatedAt: isSet(object.updatedAt)
+        ? globalThis.String(object.updatedAt)
+        : isSet(object.updated_at)
+        ? globalThis.String(object.updated_at)
+        : undefined,
+    };
+  },
+
+  toJSON(message: PopupAd): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.type !== undefined && message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.value !== undefined && message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      obj.isActive = message.isActive;
+    }
+    if (message.maxTriggersPerSession !== undefined && message.maxTriggersPerSession !== 0) {
+      obj.maxTriggersPerSession = Math.round(message.maxTriggersPerSession);
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PopupAd>, I>>(base?: I): PopupAd {
+    return PopupAd.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PopupAd>, I>>(object: I): PopupAd {
+    const message = createBasePopupAd();
+    message.id = object.id ?? "";
+    message.type = object.type ?? "";
+    message.label = object.label ?? "";
+    message.value = object.value ?? "";
+    message.isActive = object.isActive ?? false;
+    message.maxTriggersPerSession = object.maxTriggersPerSession ?? 0;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
     return message;
@@ -6334,6 +6555,245 @@ export const AdminAdTemplate: MessageFns<AdminAdTemplate> = {
     message.duration = object.duration ?? undefined;
     message.isActive = object.isActive ?? false;
     message.isDefault = object.isDefault ?? false;
+    message.ownerEmail = object.ownerEmail ?? undefined;
+    message.createdAt = object.createdAt ?? undefined;
+    message.updatedAt = object.updatedAt ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAdminPopupAd(): AdminPopupAd {
+  return {
+    id: "",
+    userId: "",
+    type: "",
+    label: "",
+    value: "",
+    isActive: false,
+    maxTriggersPerSession: 0,
+    ownerEmail: undefined,
+    createdAt: undefined,
+    updatedAt: undefined,
+  };
+}
+
+export const AdminPopupAd: MessageFns<AdminPopupAd> = {
+  encode(message: AdminPopupAd, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      writer.uint32(18).string(message.userId);
+    }
+    if (message.type !== undefined && message.type !== "") {
+      writer.uint32(26).string(message.type);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(34).string(message.label);
+    }
+    if (message.value !== undefined && message.value !== "") {
+      writer.uint32(42).string(message.value);
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      writer.uint32(48).bool(message.isActive);
+    }
+    if (message.maxTriggersPerSession !== undefined && message.maxTriggersPerSession !== 0) {
+      writer.uint32(56).int32(message.maxTriggersPerSession);
+    }
+    if (message.ownerEmail !== undefined) {
+      writer.uint32(66).string(message.ownerEmail);
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(74).fork()).join();
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(82).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminPopupAd {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminPopupAd();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.maxTriggersPerSession = reader.int32();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.ownerEmail = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminPopupAd {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : false,
+      maxTriggersPerSession: isSet(object.maxTriggersPerSession)
+        ? globalThis.Number(object.maxTriggersPerSession)
+        : isSet(object.max_triggers_per_session)
+        ? globalThis.Number(object.max_triggers_per_session)
+        : 0,
+      ownerEmail: isSet(object.ownerEmail)
+        ? globalThis.String(object.ownerEmail)
+        : isSet(object.owner_email)
+        ? globalThis.String(object.owner_email)
+        : undefined,
+      createdAt: isSet(object.createdAt)
+        ? globalThis.String(object.createdAt)
+        : isSet(object.created_at)
+        ? globalThis.String(object.created_at)
+        : undefined,
+      updatedAt: isSet(object.updatedAt)
+        ? globalThis.String(object.updatedAt)
+        : isSet(object.updated_at)
+        ? globalThis.String(object.updated_at)
+        : undefined,
+    };
+  },
+
+  toJSON(message: AdminPopupAd): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    if (message.type !== undefined && message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.value !== undefined && message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.isActive !== undefined && message.isActive !== false) {
+      obj.isActive = message.isActive;
+    }
+    if (message.maxTriggersPerSession !== undefined && message.maxTriggersPerSession !== 0) {
+      obj.maxTriggersPerSession = Math.round(message.maxTriggersPerSession);
+    }
+    if (message.ownerEmail !== undefined) {
+      obj.ownerEmail = message.ownerEmail;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt;
+    }
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AdminPopupAd>, I>>(base?: I): AdminPopupAd {
+    return AdminPopupAd.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AdminPopupAd>, I>>(object: I): AdminPopupAd {
+    const message = createBaseAdminPopupAd();
+    message.id = object.id ?? "";
+    message.userId = object.userId ?? "";
+    message.type = object.type ?? "";
+    message.label = object.label ?? "";
+    message.value = object.value ?? "";
+    message.isActive = object.isActive ?? false;
+    message.maxTriggersPerSession = object.maxTriggersPerSession ?? 0;
     message.ownerEmail = object.ownerEmail ?? undefined;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;

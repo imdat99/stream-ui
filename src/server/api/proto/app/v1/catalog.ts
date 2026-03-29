@@ -18,7 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-import { AdTemplate, Domain, MessageResponse, Plan, PlayerConfig } from "./common";
+import { AdTemplate, Domain, MessageResponse, Plan, PlayerConfig, PopupAd } from "./common";
 
 export const protobufPackage = "stream.app.v1";
 
@@ -79,6 +79,54 @@ export interface UpdateAdTemplateResponse {
 
 export interface DeleteAdTemplateRequest {
   id?: string | undefined;
+}
+
+export interface ListPopupAdsRequest {
+  page?: number | undefined;
+  limit?: number | undefined;
+}
+
+export interface ListPopupAdsResponse {
+  items?: PopupAd[] | undefined;
+  total?: number | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+}
+
+export interface CreatePopupAdRequest {
+  type?: string | undefined;
+  label?: string | undefined;
+  value?: string | undefined;
+  isActive?: boolean | undefined;
+  maxTriggersPerSession?: number | undefined;
+}
+
+export interface CreatePopupAdResponse {
+  item?: PopupAd | undefined;
+}
+
+export interface UpdatePopupAdRequest {
+  id?: string | undefined;
+  type?: string | undefined;
+  label?: string | undefined;
+  value?: string | undefined;
+  isActive?: boolean | undefined;
+  maxTriggersPerSession?: number | undefined;
+}
+
+export interface UpdatePopupAdResponse {
+  item?: PopupAd | undefined;
+}
+
+export interface DeletePopupAdRequest {
+  id?: string | undefined;
+}
+
+export interface GetActivePopupAdRequest {
+}
+
+export interface GetActivePopupAdResponse {
+  item?: PopupAd | undefined;
 }
 
 export interface ListPlayerConfigsRequest {
@@ -1085,6 +1133,750 @@ export const DeleteAdTemplateRequest: MessageFns<DeleteAdTemplateRequest> = {
   fromPartial<I extends Exact<DeepPartial<DeleteAdTemplateRequest>, I>>(object: I): DeleteAdTemplateRequest {
     const message = createBaseDeleteAdTemplateRequest();
     message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseListPopupAdsRequest(): ListPopupAdsRequest {
+  return { page: 0, limit: 0 };
+}
+
+export const ListPopupAdsRequest: MessageFns<ListPopupAdsRequest> = {
+  encode(message: ListPopupAdsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(8).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(16).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListPopupAdsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListPopupAdsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListPopupAdsRequest {
+    return {
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: ListPopupAdsRequest): unknown {
+    const obj: any = {};
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListPopupAdsRequest>, I>>(base?: I): ListPopupAdsRequest {
+    return ListPopupAdsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListPopupAdsRequest>, I>>(object: I): ListPopupAdsRequest {
+    const message = createBaseListPopupAdsRequest();
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseListPopupAdsResponse(): ListPopupAdsResponse {
+  return { items: [], total: 0, page: 0, limit: 0 };
+}
+
+export const ListPopupAdsResponse: MessageFns<ListPopupAdsResponse> = {
+  encode(message: ListPopupAdsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.items !== undefined && message.items.length !== 0) {
+      for (const v of message.items) {
+        PopupAd.encode(v!, writer.uint32(10).fork()).join();
+      }
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      writer.uint32(16).int64(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(24).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(32).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListPopupAdsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListPopupAdsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          const el = PopupAd.decode(reader, reader.uint32());
+          if (el !== undefined) {
+            message.items!.push(el);
+          }
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.total = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListPopupAdsResponse {
+    return {
+      items: globalThis.Array.isArray(object?.items) ? object.items.map((e: any) => PopupAd.fromJSON(e)) : [],
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: ListPopupAdsResponse): unknown {
+    const obj: any = {};
+    if (message.items?.length) {
+      obj.items = message.items.map((e) => PopupAd.toJSON(e));
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      obj.total = Math.round(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListPopupAdsResponse>, I>>(base?: I): ListPopupAdsResponse {
+    return ListPopupAdsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListPopupAdsResponse>, I>>(object: I): ListPopupAdsResponse {
+    const message = createBaseListPopupAdsResponse();
+    message.items = object.items?.map((e) => PopupAd.fromPartial(e)) || [];
+    message.total = object.total ?? 0;
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseCreatePopupAdRequest(): CreatePopupAdRequest {
+  return { type: "", label: "", value: "", isActive: undefined, maxTriggersPerSession: undefined };
+}
+
+export const CreatePopupAdRequest: MessageFns<CreatePopupAdRequest> = {
+  encode(message: CreatePopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.type !== undefined && message.type !== "") {
+      writer.uint32(10).string(message.type);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(18).string(message.label);
+    }
+    if (message.value !== undefined && message.value !== "") {
+      writer.uint32(26).string(message.value);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(32).bool(message.isActive);
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      writer.uint32(40).int32(message.maxTriggersPerSession);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreatePopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreatePopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.maxTriggersPerSession = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreatePopupAdRequest {
+    return {
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      maxTriggersPerSession: isSet(object.maxTriggersPerSession)
+        ? globalThis.Number(object.maxTriggersPerSession)
+        : isSet(object.max_triggers_per_session)
+        ? globalThis.Number(object.max_triggers_per_session)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CreatePopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.type !== undefined && message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.value !== undefined && message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      obj.maxTriggersPerSession = Math.round(message.maxTriggersPerSession);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreatePopupAdRequest>, I>>(base?: I): CreatePopupAdRequest {
+    return CreatePopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreatePopupAdRequest>, I>>(object: I): CreatePopupAdRequest {
+    const message = createBaseCreatePopupAdRequest();
+    message.type = object.type ?? "";
+    message.label = object.label ?? "";
+    message.value = object.value ?? "";
+    message.isActive = object.isActive ?? undefined;
+    message.maxTriggersPerSession = object.maxTriggersPerSession ?? undefined;
+    return message;
+  },
+};
+
+function createBaseCreatePopupAdResponse(): CreatePopupAdResponse {
+  return { item: undefined };
+}
+
+export const CreatePopupAdResponse: MessageFns<CreatePopupAdResponse> = {
+  encode(message: CreatePopupAdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      PopupAd.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreatePopupAdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreatePopupAdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = PopupAd.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreatePopupAdResponse {
+    return { item: isSet(object.item) ? PopupAd.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: CreatePopupAdResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = PopupAd.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreatePopupAdResponse>, I>>(base?: I): CreatePopupAdResponse {
+    return CreatePopupAdResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreatePopupAdResponse>, I>>(object: I): CreatePopupAdResponse {
+    const message = createBaseCreatePopupAdResponse();
+    message.item = (object.item !== undefined && object.item !== null) ? PopupAd.fromPartial(object.item) : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdatePopupAdRequest(): UpdatePopupAdRequest {
+  return { id: "", type: "", label: "", value: "", isActive: undefined, maxTriggersPerSession: undefined };
+}
+
+export const UpdatePopupAdRequest: MessageFns<UpdatePopupAdRequest> = {
+  encode(message: UpdatePopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.type !== undefined && message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(26).string(message.label);
+    }
+    if (message.value !== undefined && message.value !== "") {
+      writer.uint32(34).string(message.value);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(40).bool(message.isActive);
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      writer.uint32(48).int32(message.maxTriggersPerSession);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdatePopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.maxTriggersPerSession = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePopupAdRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      maxTriggersPerSession: isSet(object.maxTriggersPerSession)
+        ? globalThis.Number(object.maxTriggersPerSession)
+        : isSet(object.max_triggers_per_session)
+        ? globalThis.Number(object.max_triggers_per_session)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdatePopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.type !== undefined && message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.value !== undefined && message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      obj.maxTriggersPerSession = Math.round(message.maxTriggersPerSession);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePopupAdRequest>, I>>(base?: I): UpdatePopupAdRequest {
+    return UpdatePopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePopupAdRequest>, I>>(object: I): UpdatePopupAdRequest {
+    const message = createBaseUpdatePopupAdRequest();
+    message.id = object.id ?? "";
+    message.type = object.type ?? "";
+    message.label = object.label ?? "";
+    message.value = object.value ?? "";
+    message.isActive = object.isActive ?? undefined;
+    message.maxTriggersPerSession = object.maxTriggersPerSession ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdatePopupAdResponse(): UpdatePopupAdResponse {
+  return { item: undefined };
+}
+
+export const UpdatePopupAdResponse: MessageFns<UpdatePopupAdResponse> = {
+  encode(message: UpdatePopupAdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      PopupAd.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdatePopupAdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePopupAdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = PopupAd.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePopupAdResponse {
+    return { item: isSet(object.item) ? PopupAd.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: UpdatePopupAdResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = PopupAd.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePopupAdResponse>, I>>(base?: I): UpdatePopupAdResponse {
+    return UpdatePopupAdResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePopupAdResponse>, I>>(object: I): UpdatePopupAdResponse {
+    const message = createBaseUpdatePopupAdResponse();
+    message.item = (object.item !== undefined && object.item !== null) ? PopupAd.fromPartial(object.item) : undefined;
+    return message;
+  },
+};
+
+function createBaseDeletePopupAdRequest(): DeletePopupAdRequest {
+  return { id: "" };
+}
+
+export const DeletePopupAdRequest: MessageFns<DeletePopupAdRequest> = {
+  encode(message: DeletePopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeletePopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeletePopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeletePopupAdRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeletePopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeletePopupAdRequest>, I>>(base?: I): DeletePopupAdRequest {
+    return DeletePopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeletePopupAdRequest>, I>>(object: I): DeletePopupAdRequest {
+    const message = createBaseDeletePopupAdRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseGetActivePopupAdRequest(): GetActivePopupAdRequest {
+  return {};
+}
+
+export const GetActivePopupAdRequest: MessageFns<GetActivePopupAdRequest> = {
+  encode(_: GetActivePopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetActivePopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetActivePopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetActivePopupAdRequest {
+    return {};
+  },
+
+  toJSON(_: GetActivePopupAdRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetActivePopupAdRequest>, I>>(base?: I): GetActivePopupAdRequest {
+    return GetActivePopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetActivePopupAdRequest>, I>>(_: I): GetActivePopupAdRequest {
+    const message = createBaseGetActivePopupAdRequest();
+    return message;
+  },
+};
+
+function createBaseGetActivePopupAdResponse(): GetActivePopupAdResponse {
+  return { item: undefined };
+}
+
+export const GetActivePopupAdResponse: MessageFns<GetActivePopupAdResponse> = {
+  encode(message: GetActivePopupAdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      PopupAd.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetActivePopupAdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetActivePopupAdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = PopupAd.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetActivePopupAdResponse {
+    return { item: isSet(object.item) ? PopupAd.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: GetActivePopupAdResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = PopupAd.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetActivePopupAdResponse>, I>>(base?: I): GetActivePopupAdResponse {
+    return GetActivePopupAdResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetActivePopupAdResponse>, I>>(object: I): GetActivePopupAdResponse {
+    const message = createBaseGetActivePopupAdResponse();
+    message.item = (object.item !== undefined && object.item !== null) ? PopupAd.fromPartial(object.item) : undefined;
     return message;
   },
 };
@@ -2290,6 +3082,152 @@ export const AdTemplatesClient = makeGenericClientConstructor(
   serviceName: string;
 };
 
+export type PopupAdsService = typeof PopupAdsService;
+export const PopupAdsService = {
+  listPopupAds: {
+    path: "/stream.app.v1.PopupAds/ListPopupAds",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ListPopupAdsRequest): Buffer => Buffer.from(ListPopupAdsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListPopupAdsRequest => ListPopupAdsRequest.decode(value),
+    responseSerialize: (value: ListPopupAdsResponse): Buffer =>
+      Buffer.from(ListPopupAdsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ListPopupAdsResponse => ListPopupAdsResponse.decode(value),
+  },
+  createPopupAd: {
+    path: "/stream.app.v1.PopupAds/CreatePopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CreatePopupAdRequest): Buffer => Buffer.from(CreatePopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreatePopupAdRequest => CreatePopupAdRequest.decode(value),
+    responseSerialize: (value: CreatePopupAdResponse): Buffer =>
+      Buffer.from(CreatePopupAdResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CreatePopupAdResponse => CreatePopupAdResponse.decode(value),
+  },
+  updatePopupAd: {
+    path: "/stream.app.v1.PopupAds/UpdatePopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdatePopupAdRequest): Buffer => Buffer.from(UpdatePopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdatePopupAdRequest => UpdatePopupAdRequest.decode(value),
+    responseSerialize: (value: UpdatePopupAdResponse): Buffer =>
+      Buffer.from(UpdatePopupAdResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UpdatePopupAdResponse => UpdatePopupAdResponse.decode(value),
+  },
+  deletePopupAd: {
+    path: "/stream.app.v1.PopupAds/DeletePopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: DeletePopupAdRequest): Buffer => Buffer.from(DeletePopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeletePopupAdRequest => DeletePopupAdRequest.decode(value),
+    responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
+  },
+  getActivePopupAd: {
+    path: "/stream.app.v1.PopupAds/GetActivePopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetActivePopupAdRequest): Buffer =>
+      Buffer.from(GetActivePopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetActivePopupAdRequest => GetActivePopupAdRequest.decode(value),
+    responseSerialize: (value: GetActivePopupAdResponse): Buffer =>
+      Buffer.from(GetActivePopupAdResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetActivePopupAdResponse => GetActivePopupAdResponse.decode(value),
+  },
+} as const;
+
+export interface PopupAdsServer extends UntypedServiceImplementation {
+  listPopupAds: handleUnaryCall<ListPopupAdsRequest, ListPopupAdsResponse>;
+  createPopupAd: handleUnaryCall<CreatePopupAdRequest, CreatePopupAdResponse>;
+  updatePopupAd: handleUnaryCall<UpdatePopupAdRequest, UpdatePopupAdResponse>;
+  deletePopupAd: handleUnaryCall<DeletePopupAdRequest, MessageResponse>;
+  getActivePopupAd: handleUnaryCall<GetActivePopupAdRequest, GetActivePopupAdResponse>;
+}
+
+export interface PopupAdsClient extends Client {
+  listPopupAds(
+    request: ListPopupAdsRequest,
+    callback: (error: ServiceError | null, response: ListPopupAdsResponse) => void,
+  ): ClientUnaryCall;
+  listPopupAds(
+    request: ListPopupAdsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListPopupAdsResponse) => void,
+  ): ClientUnaryCall;
+  listPopupAds(
+    request: ListPopupAdsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListPopupAdsResponse) => void,
+  ): ClientUnaryCall;
+  createPopupAd(
+    request: CreatePopupAdRequest,
+    callback: (error: ServiceError | null, response: CreatePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  createPopupAd(
+    request: CreatePopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: CreatePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  createPopupAd(
+    request: CreatePopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: CreatePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  updatePopupAd(
+    request: UpdatePopupAdRequest,
+    callback: (error: ServiceError | null, response: UpdatePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  updatePopupAd(
+    request: UpdatePopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdatePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  updatePopupAd(
+    request: UpdatePopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdatePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  deletePopupAd(
+    request: DeletePopupAdRequest,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deletePopupAd(
+    request: DeletePopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deletePopupAd(
+    request: DeletePopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  getActivePopupAd(
+    request: GetActivePopupAdRequest,
+    callback: (error: ServiceError | null, response: GetActivePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  getActivePopupAd(
+    request: GetActivePopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetActivePopupAdResponse) => void,
+  ): ClientUnaryCall;
+  getActivePopupAd(
+    request: GetActivePopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetActivePopupAdResponse) => void,
+  ): ClientUnaryCall;
+}
+
+export const PopupAdsClient = makeGenericClientConstructor(PopupAdsService, "stream.app.v1.PopupAds") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): PopupAdsClient;
+  service: typeof PopupAdsService;
+  serviceName: string;
+};
+
 export type PlayerConfigsService = typeof PlayerConfigsService;
 export const PlayerConfigsService = {
   listPlayerConfigs: {
@@ -2468,6 +3406,17 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function longToNumber(int64: { toString(): string }): number {
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

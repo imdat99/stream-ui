@@ -5,6 +5,7 @@ import { useTranslation } from "i18next-vue";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useNotifications } from "@/composables/useNotifications";
 
 type ProfileUpdatePayload = {
   username?: string;
@@ -21,6 +22,7 @@ type AuthUserPayload = User & {
 };
 
 const mqttBrokerUrl = "wss://mqtt-dashboard.com:8884/mqtt";
+const userNotificationTopic = (userId: string) => ["picpic", "notifications", userId].join("/");
 
 const normalizeUser = (user: User | null): AuthUserPayload | null => {
   if (!user) return null;
@@ -38,6 +40,7 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<AuthUserPayload | null>(null);
   const router = useRouter();
   const { t, i18next } = useTranslation();
+  const notificationStore = useNotifications();
   const loading = ref(false);
   const error = ref<string | null>(null);
   const initialized = ref(false);
@@ -83,13 +86,14 @@ export const useAuthStore = defineStore("auth", () => {
 
       mqttClient = new TinyMqttClient(
         mqttBrokerUrl,
-        [["ecos1231231", userId, "#"].join("/")],
+        [userNotificationTopic(userId)],
         (topic, message) => {
-          console.log(`Tín hiệu nhận được [${topic}]:`, message);
+          notificationStore.ingestRealtimeNotification(message);
         },
       );
       mqttClient.connect();
     },
+    { immediate: true },
   );
 
   watch(() => user.value?.language, (lng) => i18next.changeLanguage(lng));

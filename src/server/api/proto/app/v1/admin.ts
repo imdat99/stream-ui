@@ -26,6 +26,7 @@ import {
   AdminPayment,
   AdminPlan,
   AdminPlayerConfig,
+  AdminPopupAd,
   AdminUser,
   AdminUserDetail,
   AdminVideo,
@@ -323,6 +324,59 @@ export interface UpdateAdminAdTemplateResponse {
 }
 
 export interface DeleteAdminAdTemplateRequest {
+  id?: string | undefined;
+}
+
+export interface ListAdminPopupAdsRequest {
+  page?: number | undefined;
+  limit?: number | undefined;
+  userId?: string | undefined;
+  search?: string | undefined;
+}
+
+export interface ListAdminPopupAdsResponse {
+  items?: AdminPopupAd[] | undefined;
+  total?: number | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
+}
+
+export interface GetAdminPopupAdRequest {
+  id?: string | undefined;
+}
+
+export interface GetAdminPopupAdResponse {
+  item?: AdminPopupAd | undefined;
+}
+
+export interface CreateAdminPopupAdRequest {
+  userId?: string | undefined;
+  type?: string | undefined;
+  label?: string | undefined;
+  value?: string | undefined;
+  isActive?: boolean | undefined;
+  maxTriggersPerSession?: number | undefined;
+}
+
+export interface CreateAdminPopupAdResponse {
+  item?: AdminPopupAd | undefined;
+}
+
+export interface UpdateAdminPopupAdRequest {
+  id?: string | undefined;
+  userId?: string | undefined;
+  type?: string | undefined;
+  label?: string | undefined;
+  value?: string | undefined;
+  isActive?: boolean | undefined;
+  maxTriggersPerSession?: number | undefined;
+}
+
+export interface UpdateAdminPopupAdResponse {
+  item?: AdminPopupAd | undefined;
+}
+
+export interface DeleteAdminPopupAdRequest {
   id?: string | undefined;
 }
 
@@ -5194,6 +5248,847 @@ export const DeleteAdminAdTemplateRequest: MessageFns<DeleteAdminAdTemplateReque
   },
 };
 
+function createBaseListAdminPopupAdsRequest(): ListAdminPopupAdsRequest {
+  return { page: 0, limit: 0, userId: undefined, search: undefined };
+}
+
+export const ListAdminPopupAdsRequest: MessageFns<ListAdminPopupAdsRequest> = {
+  encode(message: ListAdminPopupAdsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(8).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(16).int32(message.limit);
+    }
+    if (message.userId !== undefined) {
+      writer.uint32(26).string(message.userId);
+    }
+    if (message.search !== undefined) {
+      writer.uint32(34).string(message.search);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminPopupAdsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAdminPopupAdsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.search = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAdminPopupAdsRequest {
+    return {
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : undefined,
+      search: isSet(object.search) ? globalThis.String(object.search) : undefined,
+    };
+  },
+
+  toJSON(message: ListAdminPopupAdsRequest): unknown {
+    const obj: any = {};
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    if (message.userId !== undefined) {
+      obj.userId = message.userId;
+    }
+    if (message.search !== undefined) {
+      obj.search = message.search;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListAdminPopupAdsRequest>, I>>(base?: I): ListAdminPopupAdsRequest {
+    return ListAdminPopupAdsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListAdminPopupAdsRequest>, I>>(object: I): ListAdminPopupAdsRequest {
+    const message = createBaseListAdminPopupAdsRequest();
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    message.userId = object.userId ?? undefined;
+    message.search = object.search ?? undefined;
+    return message;
+  },
+};
+
+function createBaseListAdminPopupAdsResponse(): ListAdminPopupAdsResponse {
+  return { items: [], total: 0, page: 0, limit: 0 };
+}
+
+export const ListAdminPopupAdsResponse: MessageFns<ListAdminPopupAdsResponse> = {
+  encode(message: ListAdminPopupAdsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.items !== undefined && message.items.length !== 0) {
+      for (const v of message.items) {
+        AdminPopupAd.encode(v!, writer.uint32(10).fork()).join();
+      }
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      writer.uint32(16).int64(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      writer.uint32(24).int32(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(32).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminPopupAdsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAdminPopupAdsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          const el = AdminPopupAd.decode(reader, reader.uint32());
+          if (el !== undefined) {
+            message.items!.push(el);
+          }
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.total = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.page = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAdminPopupAdsResponse {
+    return {
+      items: globalThis.Array.isArray(object?.items) ? object.items.map((e: any) => AdminPopupAd.fromJSON(e)) : [],
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
+      page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: ListAdminPopupAdsResponse): unknown {
+    const obj: any = {};
+    if (message.items?.length) {
+      obj.items = message.items.map((e) => AdminPopupAd.toJSON(e));
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      obj.total = Math.round(message.total);
+    }
+    if (message.page !== undefined && message.page !== 0) {
+      obj.page = Math.round(message.page);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListAdminPopupAdsResponse>, I>>(base?: I): ListAdminPopupAdsResponse {
+    return ListAdminPopupAdsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListAdminPopupAdsResponse>, I>>(object: I): ListAdminPopupAdsResponse {
+    const message = createBaseListAdminPopupAdsResponse();
+    message.items = object.items?.map((e) => AdminPopupAd.fromPartial(e)) || [];
+    message.total = object.total ?? 0;
+    message.page = object.page ?? 0;
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetAdminPopupAdRequest(): GetAdminPopupAdRequest {
+  return { id: "" };
+}
+
+export const GetAdminPopupAdRequest: MessageFns<GetAdminPopupAdRequest> = {
+  encode(message: GetAdminPopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAdminPopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAdminPopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAdminPopupAdRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: GetAdminPopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAdminPopupAdRequest>, I>>(base?: I): GetAdminPopupAdRequest {
+    return GetAdminPopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAdminPopupAdRequest>, I>>(object: I): GetAdminPopupAdRequest {
+    const message = createBaseGetAdminPopupAdRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseGetAdminPopupAdResponse(): GetAdminPopupAdResponse {
+  return { item: undefined };
+}
+
+export const GetAdminPopupAdResponse: MessageFns<GetAdminPopupAdResponse> = {
+  encode(message: GetAdminPopupAdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      AdminPopupAd.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAdminPopupAdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAdminPopupAdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = AdminPopupAd.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAdminPopupAdResponse {
+    return { item: isSet(object.item) ? AdminPopupAd.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: GetAdminPopupAdResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = AdminPopupAd.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAdminPopupAdResponse>, I>>(base?: I): GetAdminPopupAdResponse {
+    return GetAdminPopupAdResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAdminPopupAdResponse>, I>>(object: I): GetAdminPopupAdResponse {
+    const message = createBaseGetAdminPopupAdResponse();
+    message.item = (object.item !== undefined && object.item !== null)
+      ? AdminPopupAd.fromPartial(object.item)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseCreateAdminPopupAdRequest(): CreateAdminPopupAdRequest {
+  return { userId: "", type: "", label: "", value: "", isActive: undefined, maxTriggersPerSession: undefined };
+}
+
+export const CreateAdminPopupAdRequest: MessageFns<CreateAdminPopupAdRequest> = {
+  encode(message: CreateAdminPopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== undefined && message.userId !== "") {
+      writer.uint32(10).string(message.userId);
+    }
+    if (message.type !== undefined && message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(26).string(message.label);
+    }
+    if (message.value !== undefined && message.value !== "") {
+      writer.uint32(34).string(message.value);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(40).bool(message.isActive);
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      writer.uint32(48).int32(message.maxTriggersPerSession);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateAdminPopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateAdminPopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.maxTriggersPerSession = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateAdminPopupAdRequest {
+    return {
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      maxTriggersPerSession: isSet(object.maxTriggersPerSession)
+        ? globalThis.Number(object.maxTriggersPerSession)
+        : isSet(object.max_triggers_per_session)
+        ? globalThis.Number(object.max_triggers_per_session)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CreateAdminPopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== undefined && message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    if (message.type !== undefined && message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.value !== undefined && message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      obj.maxTriggersPerSession = Math.round(message.maxTriggersPerSession);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateAdminPopupAdRequest>, I>>(base?: I): CreateAdminPopupAdRequest {
+    return CreateAdminPopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateAdminPopupAdRequest>, I>>(object: I): CreateAdminPopupAdRequest {
+    const message = createBaseCreateAdminPopupAdRequest();
+    message.userId = object.userId ?? "";
+    message.type = object.type ?? "";
+    message.label = object.label ?? "";
+    message.value = object.value ?? "";
+    message.isActive = object.isActive ?? undefined;
+    message.maxTriggersPerSession = object.maxTriggersPerSession ?? undefined;
+    return message;
+  },
+};
+
+function createBaseCreateAdminPopupAdResponse(): CreateAdminPopupAdResponse {
+  return { item: undefined };
+}
+
+export const CreateAdminPopupAdResponse: MessageFns<CreateAdminPopupAdResponse> = {
+  encode(message: CreateAdminPopupAdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      AdminPopupAd.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateAdminPopupAdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateAdminPopupAdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = AdminPopupAd.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateAdminPopupAdResponse {
+    return { item: isSet(object.item) ? AdminPopupAd.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: CreateAdminPopupAdResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = AdminPopupAd.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateAdminPopupAdResponse>, I>>(base?: I): CreateAdminPopupAdResponse {
+    return CreateAdminPopupAdResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateAdminPopupAdResponse>, I>>(object: I): CreateAdminPopupAdResponse {
+    const message = createBaseCreateAdminPopupAdResponse();
+    message.item = (object.item !== undefined && object.item !== null)
+      ? AdminPopupAd.fromPartial(object.item)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAdminPopupAdRequest(): UpdateAdminPopupAdRequest {
+  return { id: "", userId: "", type: "", label: "", value: "", isActive: undefined, maxTriggersPerSession: undefined };
+}
+
+export const UpdateAdminPopupAdRequest: MessageFns<UpdateAdminPopupAdRequest> = {
+  encode(message: UpdateAdminPopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      writer.uint32(18).string(message.userId);
+    }
+    if (message.type !== undefined && message.type !== "") {
+      writer.uint32(26).string(message.type);
+    }
+    if (message.label !== undefined && message.label !== "") {
+      writer.uint32(34).string(message.label);
+    }
+    if (message.value !== undefined && message.value !== "") {
+      writer.uint32(42).string(message.value);
+    }
+    if (message.isActive !== undefined) {
+      writer.uint32(48).bool(message.isActive);
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      writer.uint32(56).int32(message.maxTriggersPerSession);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAdminPopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAdminPopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.label = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.isActive = reader.bool();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.maxTriggersPerSession = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAdminPopupAdRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      userId: isSet(object.userId)
+        ? globalThis.String(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.String(object.user_id)
+        : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      label: isSet(object.label) ? globalThis.String(object.label) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      isActive: isSet(object.isActive)
+        ? globalThis.Boolean(object.isActive)
+        : isSet(object.is_active)
+        ? globalThis.Boolean(object.is_active)
+        : undefined,
+      maxTriggersPerSession: isSet(object.maxTriggersPerSession)
+        ? globalThis.Number(object.maxTriggersPerSession)
+        : isSet(object.max_triggers_per_session)
+        ? globalThis.Number(object.max_triggers_per_session)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdateAdminPopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.userId !== undefined && message.userId !== "") {
+      obj.userId = message.userId;
+    }
+    if (message.type !== undefined && message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.label !== undefined && message.label !== "") {
+      obj.label = message.label;
+    }
+    if (message.value !== undefined && message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.isActive !== undefined) {
+      obj.isActive = message.isActive;
+    }
+    if (message.maxTriggersPerSession !== undefined) {
+      obj.maxTriggersPerSession = Math.round(message.maxTriggersPerSession);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAdminPopupAdRequest>, I>>(base?: I): UpdateAdminPopupAdRequest {
+    return UpdateAdminPopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAdminPopupAdRequest>, I>>(object: I): UpdateAdminPopupAdRequest {
+    const message = createBaseUpdateAdminPopupAdRequest();
+    message.id = object.id ?? "";
+    message.userId = object.userId ?? "";
+    message.type = object.type ?? "";
+    message.label = object.label ?? "";
+    message.value = object.value ?? "";
+    message.isActive = object.isActive ?? undefined;
+    message.maxTriggersPerSession = object.maxTriggersPerSession ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAdminPopupAdResponse(): UpdateAdminPopupAdResponse {
+  return { item: undefined };
+}
+
+export const UpdateAdminPopupAdResponse: MessageFns<UpdateAdminPopupAdResponse> = {
+  encode(message: UpdateAdminPopupAdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      AdminPopupAd.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAdminPopupAdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAdminPopupAdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = AdminPopupAd.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAdminPopupAdResponse {
+    return { item: isSet(object.item) ? AdminPopupAd.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: UpdateAdminPopupAdResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = AdminPopupAd.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateAdminPopupAdResponse>, I>>(base?: I): UpdateAdminPopupAdResponse {
+    return UpdateAdminPopupAdResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateAdminPopupAdResponse>, I>>(object: I): UpdateAdminPopupAdResponse {
+    const message = createBaseUpdateAdminPopupAdResponse();
+    message.item = (object.item !== undefined && object.item !== null)
+      ? AdminPopupAd.fromPartial(object.item)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDeleteAdminPopupAdRequest(): DeleteAdminPopupAdRequest {
+  return { id: "" };
+}
+
+export const DeleteAdminPopupAdRequest: MessageFns<DeleteAdminPopupAdRequest> = {
+  encode(message: DeleteAdminPopupAdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteAdminPopupAdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteAdminPopupAdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteAdminPopupAdRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeleteAdminPopupAdRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteAdminPopupAdRequest>, I>>(base?: I): DeleteAdminPopupAdRequest {
+    return DeleteAdminPopupAdRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteAdminPopupAdRequest>, I>>(object: I): DeleteAdminPopupAdRequest {
+    const message = createBaseDeleteAdminPopupAdRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
 function createBaseListAdminPlayerConfigsRequest(): ListAdminPlayerConfigsRequest {
   return { page: 0, limit: 0, userId: undefined, search: undefined };
 }
@@ -8074,6 +8969,60 @@ export const AdminService = {
     responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
   },
+  listAdminPopupAds: {
+    path: "/stream.app.v1.Admin/ListAdminPopupAds",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ListAdminPopupAdsRequest): Buffer =>
+      Buffer.from(ListAdminPopupAdsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListAdminPopupAdsRequest => ListAdminPopupAdsRequest.decode(value),
+    responseSerialize: (value: ListAdminPopupAdsResponse): Buffer =>
+      Buffer.from(ListAdminPopupAdsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ListAdminPopupAdsResponse => ListAdminPopupAdsResponse.decode(value),
+  },
+  getAdminPopupAd: {
+    path: "/stream.app.v1.Admin/GetAdminPopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetAdminPopupAdRequest): Buffer =>
+      Buffer.from(GetAdminPopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetAdminPopupAdRequest => GetAdminPopupAdRequest.decode(value),
+    responseSerialize: (value: GetAdminPopupAdResponse): Buffer =>
+      Buffer.from(GetAdminPopupAdResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetAdminPopupAdResponse => GetAdminPopupAdResponse.decode(value),
+  },
+  createAdminPopupAd: {
+    path: "/stream.app.v1.Admin/CreateAdminPopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CreateAdminPopupAdRequest): Buffer =>
+      Buffer.from(CreateAdminPopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreateAdminPopupAdRequest => CreateAdminPopupAdRequest.decode(value),
+    responseSerialize: (value: CreateAdminPopupAdResponse): Buffer =>
+      Buffer.from(CreateAdminPopupAdResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CreateAdminPopupAdResponse => CreateAdminPopupAdResponse.decode(value),
+  },
+  updateAdminPopupAd: {
+    path: "/stream.app.v1.Admin/UpdateAdminPopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdateAdminPopupAdRequest): Buffer =>
+      Buffer.from(UpdateAdminPopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdateAdminPopupAdRequest => UpdateAdminPopupAdRequest.decode(value),
+    responseSerialize: (value: UpdateAdminPopupAdResponse): Buffer =>
+      Buffer.from(UpdateAdminPopupAdResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UpdateAdminPopupAdResponse => UpdateAdminPopupAdResponse.decode(value),
+  },
+  deleteAdminPopupAd: {
+    path: "/stream.app.v1.Admin/DeleteAdminPopupAd",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: DeleteAdminPopupAdRequest): Buffer =>
+      Buffer.from(DeleteAdminPopupAdRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeleteAdminPopupAdRequest => DeleteAdminPopupAdRequest.decode(value),
+    responseSerialize: (value: MessageResponse): Buffer => Buffer.from(MessageResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): MessageResponse => MessageResponse.decode(value),
+  },
   listAdminPlayerConfigs: {
     path: "/stream.app.v1.Admin/ListAdminPlayerConfigs",
     requestStream: false,
@@ -8258,6 +9207,11 @@ export interface AdminServer extends UntypedServiceImplementation {
   createAdminAdTemplate: handleUnaryCall<CreateAdminAdTemplateRequest, CreateAdminAdTemplateResponse>;
   updateAdminAdTemplate: handleUnaryCall<UpdateAdminAdTemplateRequest, UpdateAdminAdTemplateResponse>;
   deleteAdminAdTemplate: handleUnaryCall<DeleteAdminAdTemplateRequest, MessageResponse>;
+  listAdminPopupAds: handleUnaryCall<ListAdminPopupAdsRequest, ListAdminPopupAdsResponse>;
+  getAdminPopupAd: handleUnaryCall<GetAdminPopupAdRequest, GetAdminPopupAdResponse>;
+  createAdminPopupAd: handleUnaryCall<CreateAdminPopupAdRequest, CreateAdminPopupAdResponse>;
+  updateAdminPopupAd: handleUnaryCall<UpdateAdminPopupAdRequest, UpdateAdminPopupAdResponse>;
+  deleteAdminPopupAd: handleUnaryCall<DeleteAdminPopupAdRequest, MessageResponse>;
   listAdminPlayerConfigs: handleUnaryCall<ListAdminPlayerConfigsRequest, ListAdminPlayerConfigsResponse>;
   getAdminPlayerConfig: handleUnaryCall<GetAdminPlayerConfigRequest, GetAdminPlayerConfigResponse>;
   createAdminPlayerConfig: handleUnaryCall<CreateAdminPlayerConfigRequest, CreateAdminPlayerConfigResponse>;
@@ -8661,6 +9615,81 @@ export interface AdminClient extends Client {
   ): ClientUnaryCall;
   deleteAdminAdTemplate(
     request: DeleteAdminAdTemplateRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  listAdminPopupAds(
+    request: ListAdminPopupAdsRequest,
+    callback: (error: ServiceError | null, response: ListAdminPopupAdsResponse) => void,
+  ): ClientUnaryCall;
+  listAdminPopupAds(
+    request: ListAdminPopupAdsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListAdminPopupAdsResponse) => void,
+  ): ClientUnaryCall;
+  listAdminPopupAds(
+    request: ListAdminPopupAdsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListAdminPopupAdsResponse) => void,
+  ): ClientUnaryCall;
+  getAdminPopupAd(
+    request: GetAdminPopupAdRequest,
+    callback: (error: ServiceError | null, response: GetAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  getAdminPopupAd(
+    request: GetAdminPopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  getAdminPopupAd(
+    request: GetAdminPopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  createAdminPopupAd(
+    request: CreateAdminPopupAdRequest,
+    callback: (error: ServiceError | null, response: CreateAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  createAdminPopupAd(
+    request: CreateAdminPopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: CreateAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  createAdminPopupAd(
+    request: CreateAdminPopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: CreateAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminPopupAd(
+    request: UpdateAdminPopupAdRequest,
+    callback: (error: ServiceError | null, response: UpdateAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminPopupAd(
+    request: UpdateAdminPopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UpdateAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  updateAdminPopupAd(
+    request: UpdateAdminPopupAdRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UpdateAdminPopupAdResponse) => void,
+  ): ClientUnaryCall;
+  deleteAdminPopupAd(
+    request: DeleteAdminPopupAdRequest,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deleteAdminPopupAd(
+    request: DeleteAdminPopupAdRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: MessageResponse) => void,
+  ): ClientUnaryCall;
+  deleteAdminPopupAd(
+    request: DeleteAdminPopupAdRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: MessageResponse) => void,

@@ -70,6 +70,7 @@ import GlobeIcon from '@/components/icons/Globe.vue';
 import ShieldUser from '@/components/icons/shield-user.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import VideoPlayIcon from '@/components/icons/VideoPlayIcon.vue';
+import Windows from '@/components/icons/windows.vue';
 import AppConfirmHost from '@/components/ui/AppConfirmHost.vue';
 import AppToastHost from '@/components/ui/AppToastHost.vue';
 import { isAdmin } from '@/lib/utils';
@@ -119,6 +120,7 @@ const menuSections = computed<{ title: string; items: MenuItem[] }[]>(() => [
         items: [
             { to: '/settings/domains', value: 'domains', label: t('settings.menu.domains'), icon: GlobeIcon },
             { to: '/settings/ads', value: 'ads', label: t('settings.menu.ads'), icon: AdvertisementIcon },
+            { to: '/settings/popup-ads', value: 'popup-ads', label: t('settings.menu.popupAds'), icon: Windows },
         ],
     },
     ...(isAdmin(auth.user?.role) ? [{
@@ -134,6 +136,7 @@ const menuSections = computed<{ title: string; items: MenuItem[] }[]>(() => [
         title: 'Admin Operations',
         items: [
             { to: '/settings/admin/ad-templates', value: 'admin-ad-templates', label: 'Ad Templates', description: 'VAST templates and defaults' },
+            { to: '/settings/admin/popup-ads', value: 'admin-popup-ads', label: 'Popup Ads', description: 'Popup campaigns, timing and cooldowns' },
             { to: '/settings/admin/player-configs', value: 'admin-player-configs', label: 'Player Configs', description: 'Cross-user player presets and defaults' },
             { to: '/settings/admin/jobs', value: 'admin-jobs', label: 'Jobs', description: 'Queue, retries and live logs' },
             { to: '/settings/admin/agents', value: 'admin-agents', label: 'Agents', description: 'Workers, health and maintenance' },
@@ -193,6 +196,10 @@ const content = computed(() => ({
         title: t('settings.content.ads.title'),
         subtitle: t('settings.content.ads.subtitle')
     },
+    'settings-popup-ads': {
+        title: t('settings.content.popupAds.title'),
+        subtitle: t('settings.content.popupAds.subtitle')
+     },
     'settings-player-configs': {
         title: t('settings.content.playerConfigs.title'),
         subtitle: t('settings.content.playerConfigs.subtitle')
@@ -224,6 +231,10 @@ const content = computed(() => ({
     'admin-ad-templates': {
         title: 'Ad Templates',
         subtitle: 'VAST templates, ownership metadata and default assignments.',
+    },
+    'admin-popup-ads': {
+        title: 'Popup Ads',
+        subtitle: 'Popup campaigns, timing windows and cooldown controls across users.',
     },
     'admin-player-configs': {
         title: 'Player Configs',

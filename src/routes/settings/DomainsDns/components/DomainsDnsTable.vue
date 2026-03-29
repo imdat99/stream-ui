@@ -3,31 +3,31 @@ import LinkIcon from '@/components/icons/LinkIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import BaseTable from '@/components/ui/BaseTable.vue';
+import { formatDate } from '@/lib/utils';
 import SettingsTableSkeleton from '@/routes/settings/components/SettingsTableSkeleton.vue';
+import type { Domain } from '@/server/api/proto/app/v1/common';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { useTranslation } from 'i18next-vue';
 import { computed, h } from 'vue';
-import type { DomainItem } from '../types';
 
 const props = defineProps<{
-  domains: DomainItem[];
+  domains: Domain[];
   isInitialLoading: boolean;
   adding: boolean;
   removingId: string | null;
 }>();
 
 const emit = defineEmits<{
-  (e: 'remove', domain: DomainItem): void;
+  (e: 'remove', domain: Domain): void;
 }>();
 
 const { t } = useTranslation();
 
-const columns = computed<ColumnDef<DomainItem>[]>(() => [
+const columns = computed<ColumnDef<Domain>[]>(() => [
   {
     id: 'domain',
     header: t('settings.domainsDns.table.domain'),
-    accessorFn: row => row.name,
-    cell: ({ row }) => h('div', { class: 'flex items-center gap-2' }, [
+    cell: ({ row, getValue }) => h('div', { class: 'flex items-center gap-2' }, [
       h(LinkIcon, { class: 'h-4 w-4 text-foreground/40' }),
       h('span', { class: 'text-sm font-medium text-foreground' }, row.original.name),
     ]),
@@ -39,8 +39,8 @@ const columns = computed<ColumnDef<DomainItem>[]>(() => [
   {
     id: 'addedAt',
     header: t('settings.domainsDns.table.addedDate'),
-    accessorFn: row => row.addedAt,
-    cell: ({ row }) => h('span', { class: 'text-sm text-foreground/60' }, row.original.addedAt),
+    accessorFn: row => formatDate(row.createdAt),
+    cell: ({ getValue }) => h('span', { class: 'text-sm text-foreground/60' }, getValue<string>()),
     meta: {
       headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50',
       cellClass: 'px-6 py-3',
@@ -58,10 +58,7 @@ const columns = computed<ColumnDef<DomainItem>[]>(() => [
     }, {
       icon: () => h(TrashIcon, { class: 'h-4 w-4 text-danger' }),
     }),
-    meta: {
-      headerClass: 'px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/50',
-      cellClass: 'px-6 py-3 text-right',
-    },
+    meta: { headerClass: 'px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-foreground/50 [&>div]:justify-center', cellClass: 'px-6 py-3 text-center' },
   },
 ]);
 </script>
@@ -73,7 +70,7 @@ const columns = computed<ColumnDef<DomainItem>[]>(() => [
     v-else
     :data="domains"
     :columns="columns"
-    :get-row-id="(row) => row.id"
+    :get-row-id="(row) => row.id!"
     wrapperClass="mt-4 border-b border-border rounded-none border-x-0 border-t-0 bg-transparent"
     tableClass="w-full"
     headerRowClass="bg-muted/30"

@@ -2,6 +2,7 @@
 import Upload from "@/routes/upload/Upload.vue";
 import DashboardNav from "./DashboardNav.vue";
 import GlobalUploadIndicator from "./GlobalUploadIndicator.vue";
+import PopupAdsRuntime from "./PopupAdsRuntime.vue";
 
 </script>
 
@@ -22,5 +23,6 @@ import GlobalUploadIndicator from "./GlobalUploadIndicator.vue";
         </div>
         <GlobalUploadIndicator />
         <Upload />
+        <PopupAdsRuntime />
     </main>
 </template>

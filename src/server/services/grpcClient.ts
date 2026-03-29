@@ -17,10 +17,12 @@ import {
   DomainsClient,
   PlayerConfigsClient,
   PlansClient,
+  PopupAdsClient,
   type AdTemplatesClient as AdTemplatesClientType,
   type DomainsClient as DomainsClientType,
   type PlayerConfigsClient as PlayerConfigsClientType,
   type PlansClient as PlansClientType,
+  type PopupAdsClient as PopupAdsClientType,
 } from "@/server/api/proto/app/v1/catalog";
 import {
   PaymentsClient,
@@ -41,6 +43,7 @@ declare module "hono" {
     authClient: PromisifiedClient<AuthClientType>;
     adminClient: PromisifiedClient<AdminClientType>;
     adTemplatesClient: PromisifiedClient<AdTemplatesClientType>;
+    popupAdsClient: PromisifiedClient<PopupAdsClientType>;
     videosClient: PromisifiedClient<VideosClientType>;
     domainsClient: PromisifiedClient<DomainsClientType>;
     playerConfigsClient: PromisifiedClient<PlayerConfigsClientType>;
@@ -145,6 +148,14 @@ export const getAdTemplatesClient = () => {
   return context.get("adTemplatesClient");
 };
 
+export const getPopupAdsClient = () => {
+  const context = tryGetContext();
+  if (!context) {
+    throw new Error("No context available to get PopupAdsClient");
+  }
+  return context.get("popupAdsClient");
+};
+
 export const getVideosClient = () => {
   const context = tryGetContext();
   if (!context) {
@@ -205,6 +216,7 @@ export const setupServices = (app: Hono) => {
     const authClient = new AuthClient(grpcAddress(), creds);
     const adminClient = new AdminClient(grpcAddress(), creds);
     const adTemplatesClient = new AdTemplatesClient(grpcAddress(), creds);
+    const popupAdsClient = new PopupAdsClient(grpcAddress(), creds);
     const videosClient = new VideosClient(grpcAddress(), creds);
     const domainsClient = new DomainsClient(grpcAddress(), creds);
     const playerConfigsClient = new PlayerConfigsClient(grpcAddress(), creds);
@@ -216,6 +228,7 @@ export const setupServices = (app: Hono) => {
     c.set("authClient", promisifyClient(authClient));
     c.set("adminClient", promisifyClient(adminClient));
     c.set("adTemplatesClient", promisifyClient(adTemplatesClient));
+    c.set("popupAdsClient", promisifyClient(popupAdsClient));
     c.set("videosClient", promisifyClient(videosClient));
     c.set("domainsClient", promisifyClient(domainsClient));
     c.set("playerConfigsClient", promisifyClient(playerConfigsClient));
