@@ -5,7 +5,7 @@
             fill="var(--fill1)" />
         <path
             d="M281 169c9-9 25-9 34 0l72 72c9 9 9 25 0 34s-25 9-34 0l-31-31v102c0 13-11 24-24 24s-24-11-24-24V244l-31 31c-9 9-25 9-34 0s-9-25 0-34l72-72z"
-            fill="var(--colors-primary-DEFAULT)" />
+            fill="currentColor" />
     </svg>
     <svg xmlns="http://www.w3.org/2000/svg" v-else class="min-w-[28px]" viewBox="-10 -226 596 468">
         <path

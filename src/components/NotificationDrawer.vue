@@ -4,6 +4,7 @@ import { useNotifications } from '@/composables/useNotifications';
 import { onClickOutside } from '@vueuse/core';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useTranslation } from 'i18next-vue';
+import BellOff from './icons/BellOff.vue';
 
 const isMounted = ref(false);
 onMounted(() => {
@@ -98,7 +99,7 @@ defineExpose({ toggle });
                     </template>
 
                     <div v-else class="py-12 text-center">
-                        <span class="i-lucide-bell-off w-12 h-12 text-gray-300 mx-auto block mb-3"></span>
+                         <BellOff class="w-12 h-12 text-gray-300 mx-auto block mb-3" />
                         <p class="text-gray-500 text-sm">{{ t('notification.empty.title') }}</p>
                     </div>
                 </div>

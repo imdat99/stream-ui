@@ -38,6 +38,7 @@ const props = withDefaults(defineProps<{
   pageSizeOptions?: number[];
   canPreviousPage?: boolean;
   canNextPage?: boolean;
+  skeletonRows?: number;
 }>(), {
   loading: false,
   emptyText: 'No data available.',
@@ -49,6 +50,7 @@ const props = withDefaults(defineProps<{
   pageSizeOptions: () => [],
   canPreviousPage: false,
   canNextPage: false,
+  skeletonRows: 10,
 });
 
 const emit = defineEmits<{
@@ -95,6 +97,14 @@ const shouldRenderPagination = computed(() => (
   && !props.loading
   && table.getRowModel().rows.length > 0
 ));
+
+const skeletonRowIndexes = computed(() =>
+  Array.from({ length: Math.max(1, props.skeletonRows) }, (_, index) => index)
+);
+
+const skeletonColumnIndexes = computed(() =>
+  Array.from({ length: Math.max(1, props.columns.length) }, (_, index) => index)
+);
 
 function previousPage() {
   if (!props.canPreviousPage) return;
@@ -149,16 +159,44 @@ function changePageSize(event: Event) {
       </thead>
 
       <tbody>
-        <tr v-if="loading">
-          <td
-            :colspan="columns.length || 1"
-            class="px-4 py-10 text-center text-sm text-gray-500"
+        <template v-if="loading">
+          <tr v-if="$slots.loading">
+            <td
+              :colspan="columns.length || 1"
+              class="px-4 py-10 text-center text-sm text-gray-500"
+            >
+              <slot name="loading" />
+            </td>
+          </tr>
+
+          <tr
+            v-for="rowIndex in skeletonRowIndexes"
+            v-else
+            :key="`skeleton-row-${rowIndex}`"
+            class="border-b border-gray-200 last:border-b-0"
           >
-            <slot name="loading">
-              Loading...
-            </slot>
-          </td>
-        </tr>
+            <td
+              v-for="columnIndex in skeletonColumnIndexes"
+              :key="`skeleton-cell-${rowIndex}-${columnIndex}`"
+              class="px-4 py-3 align-middle"
+            >
+              <div class="animate-pulse space-y-2">
+                <div
+                  :class="cn(
+                    'h-4 rounded bg-muted/50',
+                    columnIndex === skeletonColumnIndexes.length - 1
+                      ? 'ml-auto w-16'
+                      : 'w-full max-w-[12rem]'
+                  )"
+                />
+                <div
+                  v-if="columnIndex === 0"
+                  class="h-3 w-24 rounded bg-muted/40"
+                />
+              </div>
+            </td>
+          </tr>
+        </template>
 
         <tr v-else-if="!table.getRowModel().rows.length">
           <td

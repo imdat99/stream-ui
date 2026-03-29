@@ -1,8 +1,9 @@
 <script setup lang="ts">
+
 interface Tab {
     key: string;
     label: string;
-    icon: string;
+    icon: any;
     count?: number;
 }
 
@@ -31,7 +32,7 @@ const emit = defineEmits<{
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             ]"
         >
-            <span :class="[tab.icon, 'w-4 h-4']"></span>
+                <component :is="tab.icon" :filled="activeTab === tab.key" class="w-4 h-4" />
             {{ tab.label }}
             <span 
                 v-if="tab.count && tab.count > 0" 

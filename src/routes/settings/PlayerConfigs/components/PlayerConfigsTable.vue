@@ -167,10 +167,9 @@ const columns = computed<ColumnDef<PlayerConfig>[]>(() => [
 </script>
 
 <template>
-    <SettingsTableSkeleton v-if="isInitialLoading" :columns="5" :rows="4" />
-
     <BaseTable
-        v-else
+        :loading="isInitialLoading"
+        :skeleton-rows="4"
         :data="configs"
         :columns="columns"
         :get-row-id="(row) => row.id"

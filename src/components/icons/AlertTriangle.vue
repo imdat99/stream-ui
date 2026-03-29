@@ -5,9 +5,6 @@ defineProps<{
 </script>
 
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-        <path d="M12 9v4" />
-        <path d="M12 17h.01" />
-    </svg>
+    <svg v-if="filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 524"><path d="M10 448c0 36 30 66 67 66h427c36 0 66-30 66-66 0-12-3-23-8-33L353 47c-13-23-37-37-63-37s-50 14-63 37L19 415c-6 10-9 21-9 33zm301-46c0 12-9 21-21 21s-21-9-21-21 9-21 21-21 21 9 21 21zm-35-238c0-8 6-14 14-14s14 6 14 14v168c0 8-6 14-14 14s-14-6-14-14V164z" fill="color-mix(in srgb, currentColor 40%, transparent)"/><path d="M290 423c-12 0-21-9-21-21s9-21 21-21 21 9 21 21-9 21-21 21zm14-91c0 8-6 14-14 14s-14-6-14-14V164c0-8 6-14 14-14s14 6 14 14v168z" fill="currentColor"/></svg>
+    <svg v-else xmlns="http://www.w3.org/2000/svg" width="531" height="488" viewBox="-13 -224 531 488"><path d="M253-106c9 0 18 8 18 18V56c0 10-9 18-18 18-10 0-18-8-18-18V-88c0-10 8-18 18-18zm0 279c14 0 27-12 27-27s-13-27-27-27c-15 0-27 12-27 27s12 27 27 27zm-63-350c12-23 36-37 63-37 26 0 50 14 62 37l180 324c13 22 13 50 0 72s-37 35-62 35H73c-26 0-50-13-63-35s-13-50 0-72l180-324zm63-1c-14 0-26 7-32 19L41 165c-6 11-6 24 0 35 7 11 19 18 32 18h360c12 0 24-7 31-18 6-11 6-24 0-35L284-159c-6-12-18-19-31-19z" fill="currentColor"/></svg>
 </template>

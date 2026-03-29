@@ -27,7 +27,7 @@ const updateSelectedLanguage = (event: Event) => {
         :title="t('settings.securityConnected.language.label')"
         :description="t('settings.securityConnected.language.detail')"
         actionsClass="flex items-center gap-2"
-        iconBoxClass="bg-primary/10"
+        iconBoxClass="bg-primary/10 text-primary"
     >
         <template #icon>
             <LanguageIcon class="h-6 w-6" filled />

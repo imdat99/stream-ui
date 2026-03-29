@@ -218,12 +218,9 @@ export default defineComponent({
     ]);
     
     return () => (
-      <>
-        {props.isInitialLoading ? (
-          <SettingsTableSkeleton columns={5} rows={4} />
-        ) : (
           <BaseTable
             data={props.templates}
+            loading={props.isInitialLoading}
             columns={columns.value}
             getRowId={(row: AdTemplate, index: number) => 
               row.id || `${row.name || 'template'}:${row.vastTagUrl || index}`
@@ -242,8 +239,6 @@ export default defineComponent({
               )
             }}
           />
-        )}
-      </>
     );
   },
 });

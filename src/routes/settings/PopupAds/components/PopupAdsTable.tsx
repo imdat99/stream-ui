@@ -40,9 +40,11 @@ export default defineComponent({
         header: t('settings.popupAds.table.label'),
         accessorFn: (row) => row.label || '',
         cell: ({ row }) => (
-          <div>
-            <p class="text-sm font-medium text-foreground">{row.original.label}</p>
-            <p class="mt-0.5 text-xs text-foreground/50">#{row.original.id}</p>
+          <div class="max-w-[200px]">
+            <p onClick={() => emit('edit', row.original)} class="block text-sm truncate font-medium text-foreground cursor-pointer hover:underline">
+              {row.original.label}
+            </p>
+            <p class="block text-sm truncate mt-0.5 text-xs text-foreground/50">#{row.original.id}</p>
           </div>
         ),
         meta: { headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50', cellClass: 'px-6 py-3' },
@@ -81,14 +83,13 @@ export default defineComponent({
       {
         id: 'maxTriggersPerSession',
         header: t('settings.popupAds.table.maxTriggersPerSession'),
-        accessorFn: (row) => row.maxTriggersPerSession || 0,
-        cell: ({ row }) => <span class="text-foreground/70">{row.original.type === 'url' ? row.original.maxTriggersPerSession || 0 : '—'}</span>,
+        accessorFn: (row) => row?.type === 'url' ? row.maxTriggersPerSession || 0 : '—',
+        cell: ({ getValue }) => <span class="text-foreground/70">{getValue()}</span>,
         meta: { headerClass: 'px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/50', cellClass: 'px-6 py-3 text-foreground/70' },
       },
       {
         id: 'status',
         header: t('common.status'),
-        accessorFn: (row) => Number(Boolean(row.isActive)),
         cell: ({ row }) => (
           <div class="text-center">
             <AppSwitch
@@ -106,7 +107,6 @@ export default defineComponent({
         enableSorting: false,
         cell: ({ row }) => (
           <div class="flex items-center justify-center gap-2">
-            <AppButton variant="ghost" size="icon" disabled={props.disabled} onClick={() => emit('edit', row.original)} v-slots={{ icon: () => <PencilIcon filled class="h-4 w-4" /> }} />
             <AppButton variant="ghost" size="icon" disabled={props.disabled} onClick={() => emit('delete', row.original)} v-slots={{ icon: () => <TrashIcon filled class="h-4 w-4" /> }} />
           </div>
         ),
@@ -125,13 +125,7 @@ export default defineComponent({
         headerRowClass="bg-muted/30"
         bodyRowClass="border-b border-border hover:bg-muted/30"
         pagination
-        currentPage={props.currentPage}
-        totalPages={props.totalPages}
-        totalRecords={props.totalRecords}
-        rowsPerPage={props.rowsPerPage}
-        pageSizeOptions={props.pageSizeOptions}
-        canPreviousPage={props.canPreviousPage}
-        canNextPage={props.canNextPage}
+        {...props}
         onPrevious-page={() => emit('previous-page')}
         onNext-page={() => emit('next-page')}
         onPage-size-change={(value: number) => emit('page-size-change', value)}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTranslation } from 'i18next-vue';
 import NotificationItem from './NotificationItem.vue';
+import BellOff from '@/components/icons/BellOff.vue';
 
 interface Notification {
     id: string;
@@ -60,7 +61,7 @@ const { t } = useTranslation();
             class="py-16 text-center"
         >
             <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <span class="i-lucide-bell-off w-10 h-10 text-gray-400"></span>
+                 <BellOff class="w-10 h-10 text-gray-400" />
             </div>
             <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ t('notification.empty.title') }}</h3>
             <p class="text-gray-500">{{ t('notification.empty.subtitle') }}</p>

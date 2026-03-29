@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import Bell from '@/components/icons/Bell.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
 import { useTranslation } from 'i18next-vue';
 
 interface Props {
@@ -21,7 +24,7 @@ const { t } = useTranslation();
         <div class="flex items-center gap-3">
             <div class="stats flex items-center gap-4">
                 <div class="flex items-center gap-2 text-sm">
-                    <span class="i-lucide-bell w-4 h-4 text-gray-400"></span>
+                    <Bell filled class="w-4 h-4 text-gray-400" />
                     <span class="text-gray-600">{{ t('notification.stats.total', { count: totalCount }) }}</span>
                 </div>
                 <div v-if="unreadCount > 0" class="flex items-center gap-2 text-sm">
@@ -39,7 +42,7 @@ const { t } = useTranslation();
                 class="px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary
                        hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2"
             >
-                <span class="i-lucide-check-check w-4 h-4"></span>
+                 <CheckIcon class="w-4 h-4" />
                 {{ t('notification.actions.markAllRead') }}
             </button>
             <button
@@ -49,7 +52,7 @@ const { t } = useTranslation();
                 class="px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600
                        hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
             >
-                <span class="i-lucide-trash w-4 h-4"></span>
+                <TrashIcon class="w-4 h-4" />
                 {{ t('notification.actions.clearAll') }}
             </button>
         </div>

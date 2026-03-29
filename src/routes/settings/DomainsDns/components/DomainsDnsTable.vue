@@ -64,12 +64,12 @@ const columns = computed<ColumnDef<Domain>[]>(() => [
 </script>
 
 <template>
-  <SettingsTableSkeleton v-if="isInitialLoading" :columns="3" :rows="4" />
 
   <BaseTable
-    v-else
     :data="domains"
     :columns="columns"
+    :loading="isInitialLoading"
+    :skeleton-rows="4"
     :get-row-id="(row) => row.id!"
     wrapperClass="mt-4 border-b border-border rounded-none border-x-0 border-t-0 bg-transparent"
     tableClass="w-full"

@@ -76,7 +76,7 @@ const quickActions = computed(() => [
                     'group press-animated',
                 ]">
                     <div
-                        class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-muted-dark group-hover:bg-primary/10">
+                        class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-muted-dark group-hover:(bg-primary/10 text-primary) transition-colors">
                         <component filled :is="action.icon" class="w-6 h-6" />
                     </div>
                     <h3 class="font-semibold mb-1 group-hover:text-primary transition-colors">{{ action.title }}</h3>

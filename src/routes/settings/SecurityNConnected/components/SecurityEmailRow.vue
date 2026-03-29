@@ -14,7 +14,7 @@ const { t } = useTranslation();
     <SettingsRow
         :title="t('settings.securityConnected.email.label')"
         :description="emailConnected ? t('settings.securityConnected.email.connected') : t('settings.securityConnected.email.disconnected')"
-        iconBoxClass="bg-primary/10"
+        iconBoxClass="bg-primary/10 text-primary"
     >
         <template #icon>
             <MailIcon filled />

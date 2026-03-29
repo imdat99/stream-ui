@@ -9,17 +9,15 @@ import { useAuthStore } from "@/stores/auth";
 import { useTranslation } from "i18next-vue";
 import { computed, createStaticVNode, h, ref } from "vue";
 import NotificationDrawer from "./NotificationDrawer.vue";
+import Chart from "./icons/Chart.vue";
 
 const className = ":uno: w-12 h-12 p-2 rounded-2xl hover:bg-primary/15 flex press-animated items-center justify-center shrink-0";
 const homeHoist = createStaticVNode(`<img class="h-8 w-8" src="/apple-touch-icon.png" alt="Logo" />`, 1);
 const notificationPopover = ref<InstanceType<typeof NotificationDrawer>>();
 const isNotificationOpen = ref(false);
 const { t } = useTranslation();
-const auth = useAuthStore();
 const notificationStore = useNotifications();
 const unreadCount = computed(() => notificationStore.unreadCount.value);
-
-const isAdmin = computed(() => String(auth.user?.role || "").toLowerCase() === "admin");
 
 const handleNotificationClick = (event: Event) => {
   notificationPopover.value?.toggle(event);
@@ -38,6 +36,10 @@ const links = computed<Record<string, any>>(() => {
     {
       id: "videos",
       href: "/videos", label: t("nav.videos"), icon: Video, action: null, className
+    },
+    {
+      id: "analytics",
+      href: "/analytics", label: t("nav.analytics"), icon: Chart, action: null, className
     },
     {
       id: "notification",
@@ -70,7 +72,7 @@ const links = computed<Record<string, any>>(() => {
       <component :name="i.label" :is="i.action ? 'div' : 'router-link'" v-bind="i.action ? {} : { to: i.href }"
         @click="i.action && i.action($event)" :class="cn(
           i.className,
-          ($route.path === i.href || $route.path.startsWith(i.href + '/') || i.isActive?.value) && 'bg-primary/15',
+          ($route.path === i.href || $route.path.startsWith(i.href + '/') || i.isActive?.value) && 'bg-primary/15 text-primary',
         )">
         <div class="relative">
           <component :is="i.icon" class="w-6 h-6 shrink-0"

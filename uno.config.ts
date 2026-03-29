@@ -242,10 +242,10 @@ export default defineConfig({
         --capra-ramp-3: #ff530f;
         --capra-ramp-4: #e62c6d;
         --capra-ramp-5: #b25aff;
-        --fill1: color-mix(in srgb, var(--colors-primary-DEFAULT) 40%, transparent);
-        --fill2: color-mix(in srgb, var(--colors-primary-DEFAULT) 60%, transparent);
-        --fill3: color-mix(in srgb, var(--colors-primary-DEFAULT) 80%, transparent);
-        --fill4: var(--colors-primary-DEFAULT);
+        --fill1: color-mix(in srgb, currentColor 40%, transparent);
+        --fill2: color-mix(in srgb, currentColor 60%, transparent);
+        --fill3: color-mix(in srgb, currentColor 80%, transparent);
+        --fill4: currentColor;
       }
       :focus {
         outline-color: ${context.theme.colors?.primary?.active};

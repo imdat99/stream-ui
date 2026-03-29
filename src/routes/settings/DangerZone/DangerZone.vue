@@ -104,14 +104,11 @@ const handleClearData = () => {
             hoverClass="hover:bg-danger/5"
         >
             <template #icon>
-                <AlertTriangleIcon class="w-5 h-5 text-danger" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-danger" viewBox="-10 -258 532 532"><path d="M256 264c141 0 256-115 256-256S397-248 256-248 0-133 0 8s115 256 256 256zM416-24v64H96v-64h320z" fill="currentColor"/></svg>
             </template>
 
             <template #actions>
                 <AppButton variant="danger" size="sm" :loading="deletingAccount" :disabled="clearingData" @click="handleDeleteAccount">
-                    <template #icon>
-                        <TrashIcon class="w-4 h-4" />
-                    </template>
                     {{ t('settings.dangerZone.deleteAccount.button') }}
                 </AppButton>
             </template>
@@ -124,18 +121,11 @@ const handleClearData = () => {
             hoverClass="hover:bg-danger/5"
         >
             <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 6h18"/>
-                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                </svg>
+                <TrashIcon filled class="w-5 h-5 text-danger" />
             </template>
 
             <template #actions>
                 <AppButton variant="danger" size="sm" :loading="clearingData" :disabled="deletingAccount" @click="handleClearData">
-                    <template #icon>
-                        <SlidersIcon class="w-4 h-4" />
-                    </template>
                     {{ t('settings.dangerZone.clearData.button') }}
                 </AppButton>
             </template>

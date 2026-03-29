@@ -6,6 +6,11 @@ import NotificationActions from './components/NotificationActions.vue';
 import NotificationList from './components/NotificationList.vue';
 import NotificationTabs from './components/NotificationTabs.vue';
 import { useNotifications } from '@/composables/useNotifications';
+import Inbox from '@/components/icons/Inbox.vue';
+import Video from '@/components/icons/Video.vue';
+import Credit from '@/components/icons/Credit.vue';
+import BellOff from '@/components/icons/BellOff.vue';
+import BellDot from '@/components/icons/BellDot.vue';
 
 const activeTab = ref('all');
 const { t } = useTranslation();
@@ -18,10 +23,10 @@ onMounted(() => {
 const unreadCount = computed(() => notificationStore.unreadCount.value);
 
 const tabs = computed(() => [
-    { key: 'all', label: t('notification.tabs.all'), icon: 'i-lucide-inbox', count: notificationStore.notifications.value.length },
-    { key: 'unread', label: t('notification.tabs.unread'), icon: 'i-lucide-bell-dot', count: unreadCount.value },
-    { key: 'video', label: t('notification.tabs.videos'), icon: 'i-lucide-video', count: notificationStore.notifications.value.filter(n => n.type === 'video').length },
-    { key: 'payment', label: t('notification.tabs.payments'), icon: 'i-lucide-credit-card', count: notificationStore.notifications.value.filter(n => n.type === 'payment').length },
+    { key: 'all', label: t('notification.tabs.all'), icon: Inbox, count: notificationStore.notifications.value.length },
+    { key: 'unread', label: t('notification.tabs.unread'), icon: BellDot, count: unreadCount.value },
+    { key: 'video', label: t('notification.tabs.videos'), icon: Video, count: notificationStore.notifications.value.filter(n => n.type === 'video').length },
+    { key: 'payment', label: t('notification.tabs.payments'), icon: Credit, count: notificationStore.notifications.value.filter(n => n.type === 'payment').length },
 ]);
 
 const filteredNotifications = computed(() => {
