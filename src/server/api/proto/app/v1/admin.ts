@@ -22,6 +22,7 @@ import {
   AdminAdTemplate,
   AdminAgent,
   AdminDashboard,
+  AdminDlqEntry,
   AdminJob,
   AdminPayment,
   AdminPlan,
@@ -524,6 +525,43 @@ export interface RetryAdminJobRequest {
 
 export interface RetryAdminJobResponse {
   job?: AdminJob | undefined;
+}
+
+export interface ListAdminDlqJobsRequest {
+  offset?: number | undefined;
+  limit?: number | undefined;
+}
+
+export interface ListAdminDlqJobsResponse {
+  items?: AdminDlqEntry[] | undefined;
+  total?: number | undefined;
+  offset?: number | undefined;
+  limit?: number | undefined;
+}
+
+export interface GetAdminDlqJobRequest {
+  id?: string | undefined;
+}
+
+export interface GetAdminDlqJobResponse {
+  item?: AdminDlqEntry | undefined;
+}
+
+export interface RetryAdminDlqJobRequest {
+  id?: string | undefined;
+}
+
+export interface RetryAdminDlqJobResponse {
+  job?: AdminJob | undefined;
+}
+
+export interface RemoveAdminDlqJobRequest {
+  id?: string | undefined;
+}
+
+export interface RemoveAdminDlqJobResponse {
+  status?: string | undefined;
+  jobId?: string | undefined;
 }
 
 export interface ListAdminAgentsRequest {
@@ -8402,6 +8440,567 @@ export const RetryAdminJobResponse: MessageFns<RetryAdminJobResponse> = {
   },
 };
 
+function createBaseListAdminDlqJobsRequest(): ListAdminDlqJobsRequest {
+  return { offset: 0, limit: 0 };
+}
+
+export const ListAdminDlqJobsRequest: MessageFns<ListAdminDlqJobsRequest> = {
+  encode(message: ListAdminDlqJobsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.offset !== undefined && message.offset !== 0) {
+      writer.uint32(8).int32(message.offset);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(16).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminDlqJobsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAdminDlqJobsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.offset = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAdminDlqJobsRequest {
+    return {
+      offset: isSet(object.offset) ? globalThis.Number(object.offset) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: ListAdminDlqJobsRequest): unknown {
+    const obj: any = {};
+    if (message.offset !== undefined && message.offset !== 0) {
+      obj.offset = Math.round(message.offset);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListAdminDlqJobsRequest>, I>>(base?: I): ListAdminDlqJobsRequest {
+    return ListAdminDlqJobsRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListAdminDlqJobsRequest>, I>>(object: I): ListAdminDlqJobsRequest {
+    const message = createBaseListAdminDlqJobsRequest();
+    message.offset = object.offset ?? 0;
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseListAdminDlqJobsResponse(): ListAdminDlqJobsResponse {
+  return { items: [], total: 0, offset: 0, limit: 0 };
+}
+
+export const ListAdminDlqJobsResponse: MessageFns<ListAdminDlqJobsResponse> = {
+  encode(message: ListAdminDlqJobsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.items !== undefined && message.items.length !== 0) {
+      for (const v of message.items) {
+        AdminDlqEntry.encode(v!, writer.uint32(10).fork()).join();
+      }
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      writer.uint32(16).int64(message.total);
+    }
+    if (message.offset !== undefined && message.offset !== 0) {
+      writer.uint32(24).int32(message.offset);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      writer.uint32(32).int32(message.limit);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAdminDlqJobsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAdminDlqJobsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          const el = AdminDlqEntry.decode(reader, reader.uint32());
+          if (el !== undefined) {
+            message.items!.push(el);
+          }
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.total = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.offset = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.limit = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAdminDlqJobsResponse {
+    return {
+      items: globalThis.Array.isArray(object?.items) ? object.items.map((e: any) => AdminDlqEntry.fromJSON(e)) : [],
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
+      offset: isSet(object.offset) ? globalThis.Number(object.offset) : 0,
+      limit: isSet(object.limit) ? globalThis.Number(object.limit) : 0,
+    };
+  },
+
+  toJSON(message: ListAdminDlqJobsResponse): unknown {
+    const obj: any = {};
+    if (message.items?.length) {
+      obj.items = message.items.map((e) => AdminDlqEntry.toJSON(e));
+    }
+    if (message.total !== undefined && message.total !== 0) {
+      obj.total = Math.round(message.total);
+    }
+    if (message.offset !== undefined && message.offset !== 0) {
+      obj.offset = Math.round(message.offset);
+    }
+    if (message.limit !== undefined && message.limit !== 0) {
+      obj.limit = Math.round(message.limit);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ListAdminDlqJobsResponse>, I>>(base?: I): ListAdminDlqJobsResponse {
+    return ListAdminDlqJobsResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ListAdminDlqJobsResponse>, I>>(object: I): ListAdminDlqJobsResponse {
+    const message = createBaseListAdminDlqJobsResponse();
+    message.items = object.items?.map((e) => AdminDlqEntry.fromPartial(e)) || [];
+    message.total = object.total ?? 0;
+    message.offset = object.offset ?? 0;
+    message.limit = object.limit ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetAdminDlqJobRequest(): GetAdminDlqJobRequest {
+  return { id: "" };
+}
+
+export const GetAdminDlqJobRequest: MessageFns<GetAdminDlqJobRequest> = {
+  encode(message: GetAdminDlqJobRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAdminDlqJobRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAdminDlqJobRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAdminDlqJobRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: GetAdminDlqJobRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAdminDlqJobRequest>, I>>(base?: I): GetAdminDlqJobRequest {
+    return GetAdminDlqJobRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAdminDlqJobRequest>, I>>(object: I): GetAdminDlqJobRequest {
+    const message = createBaseGetAdminDlqJobRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseGetAdminDlqJobResponse(): GetAdminDlqJobResponse {
+  return { item: undefined };
+}
+
+export const GetAdminDlqJobResponse: MessageFns<GetAdminDlqJobResponse> = {
+  encode(message: GetAdminDlqJobResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.item !== undefined) {
+      AdminDlqEntry.encode(message.item, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAdminDlqJobResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAdminDlqJobResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.item = AdminDlqEntry.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAdminDlqJobResponse {
+    return { item: isSet(object.item) ? AdminDlqEntry.fromJSON(object.item) : undefined };
+  },
+
+  toJSON(message: GetAdminDlqJobResponse): unknown {
+    const obj: any = {};
+    if (message.item !== undefined) {
+      obj.item = AdminDlqEntry.toJSON(message.item);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetAdminDlqJobResponse>, I>>(base?: I): GetAdminDlqJobResponse {
+    return GetAdminDlqJobResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetAdminDlqJobResponse>, I>>(object: I): GetAdminDlqJobResponse {
+    const message = createBaseGetAdminDlqJobResponse();
+    message.item = (object.item !== undefined && object.item !== null)
+      ? AdminDlqEntry.fromPartial(object.item)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseRetryAdminDlqJobRequest(): RetryAdminDlqJobRequest {
+  return { id: "" };
+}
+
+export const RetryAdminDlqJobRequest: MessageFns<RetryAdminDlqJobRequest> = {
+  encode(message: RetryAdminDlqJobRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RetryAdminDlqJobRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRetryAdminDlqJobRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RetryAdminDlqJobRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: RetryAdminDlqJobRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RetryAdminDlqJobRequest>, I>>(base?: I): RetryAdminDlqJobRequest {
+    return RetryAdminDlqJobRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RetryAdminDlqJobRequest>, I>>(object: I): RetryAdminDlqJobRequest {
+    const message = createBaseRetryAdminDlqJobRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseRetryAdminDlqJobResponse(): RetryAdminDlqJobResponse {
+  return { job: undefined };
+}
+
+export const RetryAdminDlqJobResponse: MessageFns<RetryAdminDlqJobResponse> = {
+  encode(message: RetryAdminDlqJobResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.job !== undefined) {
+      AdminJob.encode(message.job, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RetryAdminDlqJobResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRetryAdminDlqJobResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.job = AdminJob.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RetryAdminDlqJobResponse {
+    return { job: isSet(object.job) ? AdminJob.fromJSON(object.job) : undefined };
+  },
+
+  toJSON(message: RetryAdminDlqJobResponse): unknown {
+    const obj: any = {};
+    if (message.job !== undefined) {
+      obj.job = AdminJob.toJSON(message.job);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RetryAdminDlqJobResponse>, I>>(base?: I): RetryAdminDlqJobResponse {
+    return RetryAdminDlqJobResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RetryAdminDlqJobResponse>, I>>(object: I): RetryAdminDlqJobResponse {
+    const message = createBaseRetryAdminDlqJobResponse();
+    message.job = (object.job !== undefined && object.job !== null) ? AdminJob.fromPartial(object.job) : undefined;
+    return message;
+  },
+};
+
+function createBaseRemoveAdminDlqJobRequest(): RemoveAdminDlqJobRequest {
+  return { id: "" };
+}
+
+export const RemoveAdminDlqJobRequest: MessageFns<RemoveAdminDlqJobRequest> = {
+  encode(message: RemoveAdminDlqJobRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== undefined && message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RemoveAdminDlqJobRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRemoveAdminDlqJobRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RemoveAdminDlqJobRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: RemoveAdminDlqJobRequest): unknown {
+    const obj: any = {};
+    if (message.id !== undefined && message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RemoveAdminDlqJobRequest>, I>>(base?: I): RemoveAdminDlqJobRequest {
+    return RemoveAdminDlqJobRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RemoveAdminDlqJobRequest>, I>>(object: I): RemoveAdminDlqJobRequest {
+    const message = createBaseRemoveAdminDlqJobRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseRemoveAdminDlqJobResponse(): RemoveAdminDlqJobResponse {
+  return { status: "", jobId: "" };
+}
+
+export const RemoveAdminDlqJobResponse: MessageFns<RemoveAdminDlqJobResponse> = {
+  encode(message: RemoveAdminDlqJobResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.status !== undefined && message.status !== "") {
+      writer.uint32(10).string(message.status);
+    }
+    if (message.jobId !== undefined && message.jobId !== "") {
+      writer.uint32(18).string(message.jobId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RemoveAdminDlqJobResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRemoveAdminDlqJobResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.status = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.jobId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RemoveAdminDlqJobResponse {
+    return {
+      status: isSet(object.status) ? globalThis.String(object.status) : "",
+      jobId: isSet(object.jobId)
+        ? globalThis.String(object.jobId)
+        : isSet(object.job_id)
+        ? globalThis.String(object.job_id)
+        : "",
+    };
+  },
+
+  toJSON(message: RemoveAdminDlqJobResponse): unknown {
+    const obj: any = {};
+    if (message.status !== undefined && message.status !== "") {
+      obj.status = message.status;
+    }
+    if (message.jobId !== undefined && message.jobId !== "") {
+      obj.jobId = message.jobId;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RemoveAdminDlqJobResponse>, I>>(base?: I): RemoveAdminDlqJobResponse {
+    return RemoveAdminDlqJobResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RemoveAdminDlqJobResponse>, I>>(object: I): RemoveAdminDlqJobResponse {
+    const message = createBaseRemoveAdminDlqJobResponse();
+    message.status = object.status ?? "";
+    message.jobId = object.jobId ?? "";
+    return message;
+  },
+};
+
 function createBaseListAdminAgentsRequest(): ListAdminAgentsRequest {
   return {};
 }
@@ -9142,6 +9741,50 @@ export const AdminService = {
       Buffer.from(RetryAdminJobResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): RetryAdminJobResponse => RetryAdminJobResponse.decode(value),
   },
+  listAdminDlqJobs: {
+    path: "/stream.app.v1.Admin/ListAdminDlqJobs",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ListAdminDlqJobsRequest): Buffer =>
+      Buffer.from(ListAdminDlqJobsRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ListAdminDlqJobsRequest => ListAdminDlqJobsRequest.decode(value),
+    responseSerialize: (value: ListAdminDlqJobsResponse): Buffer =>
+      Buffer.from(ListAdminDlqJobsResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ListAdminDlqJobsResponse => ListAdminDlqJobsResponse.decode(value),
+  },
+  getAdminDlqJob: {
+    path: "/stream.app.v1.Admin/GetAdminDlqJob",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetAdminDlqJobRequest): Buffer =>
+      Buffer.from(GetAdminDlqJobRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetAdminDlqJobRequest => GetAdminDlqJobRequest.decode(value),
+    responseSerialize: (value: GetAdminDlqJobResponse): Buffer =>
+      Buffer.from(GetAdminDlqJobResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetAdminDlqJobResponse => GetAdminDlqJobResponse.decode(value),
+  },
+  retryAdminDlqJob: {
+    path: "/stream.app.v1.Admin/RetryAdminDlqJob",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: RetryAdminDlqJobRequest): Buffer =>
+      Buffer.from(RetryAdminDlqJobRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RetryAdminDlqJobRequest => RetryAdminDlqJobRequest.decode(value),
+    responseSerialize: (value: RetryAdminDlqJobResponse): Buffer =>
+      Buffer.from(RetryAdminDlqJobResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): RetryAdminDlqJobResponse => RetryAdminDlqJobResponse.decode(value),
+  },
+  removeAdminDlqJob: {
+    path: "/stream.app.v1.Admin/RemoveAdminDlqJob",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: RemoveAdminDlqJobRequest): Buffer =>
+      Buffer.from(RemoveAdminDlqJobRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RemoveAdminDlqJobRequest => RemoveAdminDlqJobRequest.decode(value),
+    responseSerialize: (value: RemoveAdminDlqJobResponse): Buffer =>
+      Buffer.from(RemoveAdminDlqJobResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): RemoveAdminDlqJobResponse => RemoveAdminDlqJobResponse.decode(value),
+  },
   listAdminAgents: {
     path: "/stream.app.v1.Admin/ListAdminAgents",
     requestStream: false,
@@ -9223,6 +9866,10 @@ export interface AdminServer extends UntypedServiceImplementation {
   createAdminJob: handleUnaryCall<CreateAdminJobRequest, CreateAdminJobResponse>;
   cancelAdminJob: handleUnaryCall<CancelAdminJobRequest, CancelAdminJobResponse>;
   retryAdminJob: handleUnaryCall<RetryAdminJobRequest, RetryAdminJobResponse>;
+  listAdminDlqJobs: handleUnaryCall<ListAdminDlqJobsRequest, ListAdminDlqJobsResponse>;
+  getAdminDlqJob: handleUnaryCall<GetAdminDlqJobRequest, GetAdminDlqJobResponse>;
+  retryAdminDlqJob: handleUnaryCall<RetryAdminDlqJobRequest, RetryAdminDlqJobResponse>;
+  removeAdminDlqJob: handleUnaryCall<RemoveAdminDlqJobRequest, RemoveAdminDlqJobResponse>;
   listAdminAgents: handleUnaryCall<ListAdminAgentsRequest, ListAdminAgentsResponse>;
   restartAdminAgent: handleUnaryCall<RestartAdminAgentRequest, AdminAgentCommandResponse>;
   updateAdminAgent: handleUnaryCall<UpdateAdminAgentRequest, AdminAgentCommandResponse>;
@@ -9858,6 +10505,66 @@ export interface AdminClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: RetryAdminJobResponse) => void,
+  ): ClientUnaryCall;
+  listAdminDlqJobs(
+    request: ListAdminDlqJobsRequest,
+    callback: (error: ServiceError | null, response: ListAdminDlqJobsResponse) => void,
+  ): ClientUnaryCall;
+  listAdminDlqJobs(
+    request: ListAdminDlqJobsRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ListAdminDlqJobsResponse) => void,
+  ): ClientUnaryCall;
+  listAdminDlqJobs(
+    request: ListAdminDlqJobsRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ListAdminDlqJobsResponse) => void,
+  ): ClientUnaryCall;
+  getAdminDlqJob(
+    request: GetAdminDlqJobRequest,
+    callback: (error: ServiceError | null, response: GetAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  getAdminDlqJob(
+    request: GetAdminDlqJobRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  getAdminDlqJob(
+    request: GetAdminDlqJobRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  retryAdminDlqJob(
+    request: RetryAdminDlqJobRequest,
+    callback: (error: ServiceError | null, response: RetryAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  retryAdminDlqJob(
+    request: RetryAdminDlqJobRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: RetryAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  retryAdminDlqJob(
+    request: RetryAdminDlqJobRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: RetryAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  removeAdminDlqJob(
+    request: RemoveAdminDlqJobRequest,
+    callback: (error: ServiceError | null, response: RemoveAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  removeAdminDlqJob(
+    request: RemoveAdminDlqJobRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: RemoveAdminDlqJobResponse) => void,
+  ): ClientUnaryCall;
+  removeAdminDlqJob(
+    request: RemoveAdminDlqJobRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: RemoveAdminDlqJobResponse) => void,
   ): ClientUnaryCall;
   listAdminAgents(
     request: ListAdminAgentsRequest,

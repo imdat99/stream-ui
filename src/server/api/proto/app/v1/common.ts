@@ -397,6 +397,13 @@ export interface AdminAgent {
   updatedAt?: string | undefined;
 }
 
+export interface AdminDlqEntry {
+  job?: AdminJob | undefined;
+  failureTime?: string | undefined;
+  reason?: string | undefined;
+  retryCount?: number | undefined;
+}
+
 function createBaseMessageResponse(): MessageResponse {
   return { message: "" };
 }
@@ -7491,6 +7498,122 @@ export const AdminAgent: MessageFns<AdminAgent> = {
     message.lastHeartbeat = object.lastHeartbeat ?? undefined;
     message.createdAt = object.createdAt ?? undefined;
     message.updatedAt = object.updatedAt ?? undefined;
+    return message;
+  },
+};
+
+function createBaseAdminDlqEntry(): AdminDlqEntry {
+  return { job: undefined, failureTime: undefined, reason: "", retryCount: 0 };
+}
+
+export const AdminDlqEntry: MessageFns<AdminDlqEntry> = {
+  encode(message: AdminDlqEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.job !== undefined) {
+      AdminJob.encode(message.job, writer.uint32(10).fork()).join();
+    }
+    if (message.failureTime !== undefined) {
+      Timestamp.encode(toTimestamp(message.failureTime), writer.uint32(18).fork()).join();
+    }
+    if (message.reason !== undefined && message.reason !== "") {
+      writer.uint32(26).string(message.reason);
+    }
+    if (message.retryCount !== undefined && message.retryCount !== 0) {
+      writer.uint32(32).int32(message.retryCount);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminDlqEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminDlqEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.job = AdminJob.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.failureTime = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.reason = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.retryCount = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminDlqEntry {
+    return {
+      job: isSet(object.job) ? AdminJob.fromJSON(object.job) : undefined,
+      failureTime: isSet(object.failureTime)
+        ? globalThis.String(object.failureTime)
+        : isSet(object.failure_time)
+        ? globalThis.String(object.failure_time)
+        : undefined,
+      reason: isSet(object.reason) ? globalThis.String(object.reason) : "",
+      retryCount: isSet(object.retryCount)
+        ? globalThis.Number(object.retryCount)
+        : isSet(object.retry_count)
+        ? globalThis.Number(object.retry_count)
+        : 0,
+    };
+  },
+
+  toJSON(message: AdminDlqEntry): unknown {
+    const obj: any = {};
+    if (message.job !== undefined) {
+      obj.job = AdminJob.toJSON(message.job);
+    }
+    if (message.failureTime !== undefined) {
+      obj.failureTime = message.failureTime;
+    }
+    if (message.reason !== undefined && message.reason !== "") {
+      obj.reason = message.reason;
+    }
+    if (message.retryCount !== undefined && message.retryCount !== 0) {
+      obj.retryCount = Math.round(message.retryCount);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<AdminDlqEntry>, I>>(base?: I): AdminDlqEntry {
+    return AdminDlqEntry.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<AdminDlqEntry>, I>>(object: I): AdminDlqEntry {
+    const message = createBaseAdminDlqEntry();
+    message.job = (object.job !== undefined && object.job !== null) ? AdminJob.fromPartial(object.job) : undefined;
+    message.failureTime = object.failureTime ?? undefined;
+    message.reason = object.reason ?? "";
+    message.retryCount = object.retryCount ?? 0;
     return message;
   },
 };
